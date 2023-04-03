@@ -3,7 +3,9 @@ import useWebSocket from 'react-use-websocket';
 import Web3 from 'web3';
 import FighterNFTAbi from './abi/FighterNFT.json';
 import Stat from "./FighterStat";
-//import InventoryGrid from "./InventoryGrid";
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import InventoryGrid from "./Grid";
 
 const FighterNFTContractAddress = "0x46296eC931cc34B0F24cdd82b2C0003B10e941C2";
 var FIGHTER_STATS = {
@@ -403,6 +405,10 @@ function App() {
 
   return (
     <div>
+
+
+
+
       {/* Top bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '50px', backgroundColor: '#333', color: '#fff', padding: '0 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -418,6 +424,11 @@ function App() {
 
       {/* Main content */}
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+
+
+
+
+
         {/* Left section */}
         <div style={{ width: '30%', padding: '0 10px' }}>
            <h4>Opponent [{opponentLevel}]</h4>
@@ -428,8 +439,20 @@ function App() {
             
             </div>
           <div>
+            <DndProvider backend={HTML5Backend}>
+              <InventoryGrid />
+            </DndProvider>
+              
           </div>
         </div>
+
+
+
+
+
+
+
+
 
         {/* Middle section */}
         <div style={{ width: '40%', padding: '0 10px' }}>
@@ -448,6 +471,13 @@ function App() {
             )}
           </div>
         </div>
+
+
+
+
+
+
+
 
         {/* Right section */}
         <div style={{ width: '30%', padding: '0 10px' }}>
@@ -518,6 +548,15 @@ function App() {
           </div>
         </div>
       </div>
+
+
+
+
+
+
+
+
+
 
       {/* Bottom bar */}
       <div style={{ backgroundColor: '#333', color: '#fff', padding: '10px', marginTop: '50px' }}>
