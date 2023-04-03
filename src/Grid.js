@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DndProvider, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import DraggableImage from './DraggableImage';
 import GridBoard from './GridBoard';
+import DragLayer from './DragLayer';
 
 const Grid = () => {
   const [images, setImages] = useState([
@@ -36,19 +37,71 @@ const Grid = () => {
     );
   };
 
-  const [, drop] = useDrop(() => ({
-    accept: 'image',
-    drop: (item, monitor) => {
-      const offset = monitor.getSourceClientOffset();
-      const x = Math.floor(offset.x / 40);
-      const y = Math.floor(offset.y / 40);
-      if (isValidMove(item, x, y)) {
-        moveImage(item, x, y);
-        setGrid(emptyGrid);
-        placeImagesOnGrid();
+  const canMove = useCallback(
+    (x, y, width, height, imgArray, imgId) => {
+      // Check if the image is within the grid's boundaries
+      if (x < 0 || x + width > 8 || y < 0 || y + height > 8) {
+        return false;
       }
+
+      // Check for overlapping with other images
+      for (const img of imgArray) {
+        if (
+          img.id !== imgId && // Exclude the image's own position
+          img.x < x + width &&
+          img.x + img.width > x &&
+          img.y < y + height &&
+          img.y + img.height > y
+        ) {
+          return false;
+        }
+      }
+
+      return true;
     },
+    []
+  );
+
+
+
+  const [{ isOver }, drop] = useDrop(() => ({
+    accept: 'image',
+    drop: (item, monitor) => handleDrop(item, monitor),
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+    }),
   }));
+
+
+  const handleDrop = useCallback(
+    (item, monitor) => {
+      const delta = monitor.getDifferenceFromInitialOffset();
+
+      setImages((prevImages) => {
+        const currentImage = prevImages.find((img) => img.id === item.id);
+        const newX = Math.round((currentImage.x * 40 + delta.x) / 40);
+        const newY = Math.round((currentImage.y * 40 + delta.y) / 40);
+
+        if (!canMove(newX, newY, item.width, item.height, prevImages, item.id)) {
+          return prevImages;
+        }
+
+
+        const newImages = prevImages.map((img) => {
+          if (img.id === item.id) {
+            return { ...img, x: newX, y: newY };
+          }
+          return img;
+        });
+
+        return newImages;
+      });
+    },
+    [canMove]
+  );
+
+
+
 
   const isValidMove = (img, x, y) => {
     if (x < 0 || y < 0 || x + img.width > 8 || y + img.height > 8) return false;
@@ -73,7 +126,23 @@ const Grid = () => {
 
   return (
     <div ref={drop} style={{ position: 'relative', width: '320px', height: '320px' }}>
-      <GridBoard grid={grid} isHighlighted={isHighlighted} images={images} />
+      <GridBoard grid={grid} isHighlighted={isHighlighted} style={{ zIndex: -1 }} />
+      {images.map((img) => (
+        <DraggableImage
+          key={img.id}
+          id={img.id}
+          imgSrc={img.imgSrc}
+          width={img.width}
+          height={img.height}
+          style={{
+            position: 'absolute',
+            left: img.x * 40,
+            top: img.y * 40,
+            zIndex: 1,
+          }}
+        />
+      ))}
+      <DragLayer />
     </div>
   );
 }

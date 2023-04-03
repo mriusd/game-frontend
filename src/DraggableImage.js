@@ -1,12 +1,12 @@
 import React from 'react';
 import { useDrag } from 'react-dnd';
 
-const DraggableImage = ({ id, imgSrc, width, height }) => {
+const DraggableImage = ({ id, imgSrc, width, height, style }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'image',
-    item: { id, width, height },
+    item: { id, imgSrc, width, height, x: style.left / 40, y: style.top / 40 },
     collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
+      isDragging: monitor.isDragging(),
     }),
   }));
 
@@ -14,10 +14,13 @@ const DraggableImage = ({ id, imgSrc, width, height }) => {
     <img
       ref={drag}
       src={imgSrc}
-      alt={`Draggable ${id}`}
       width={width * 40}
       height={height * 40}
-      style={{ opacity: isDragging ? 0.5 : 1 }}
+      alt=""
+      style={{
+        ...style,
+        opacity: isDragging ? 0 : 1,
+      }}
     />
   );
 };
