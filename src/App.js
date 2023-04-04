@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import useWebSocket from 'react-use-websocket';
 import Web3 from 'web3';
 import FighterNFTAbi from './abi/FighterNFT.json';
 import Stat from "./FighterStat";
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import InventoryGrid from "./Grid";
+import Grid from "./Grid";
+import Shop from './Shop';
+import ShopModal from './ShopModal';
+import { Dialog, DialogTitle } from '@material-ui/core';
+import "./App.css";
 
 const FighterNFTContractAddress = "0x46296eC931cc34B0F24cdd82b2C0003B10e941C2";
 var FIGHTER_STATS = {
@@ -67,7 +72,8 @@ function App() {
     onMessage: (event) => processIncomingMessage(event)
   };
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(socketUrl, socketOptions);
-    
+  const [isShopOpen, setIsShopOpen] = useState(false);  
+
   var [attackOption, setAttackOption] = useState('');
   var [blockOption, setBlockOption] = useState('');
 
@@ -100,6 +106,7 @@ function App() {
   const [availablePoints, setAvailablePoints] = useState(0);
 
   const [web3, setWeb3] = useState(null);
+  const [appStyle, setAppStyle] = useState({});
 
 
   localStorage.setItem('playerID',1);
@@ -399,14 +406,20 @@ function App() {
       });
   }
 
-
-  
+  const handleShopButtonClick = () => {
+    setIsShopOpen(true);
+  }; 
 
 
   return (
-    <div>
+    <DndProvider backend={HTML5Backend}>
+    <div className="App" style={appStyle}>
 
-
+      <ShopModal
+        isOpen={isShopOpen}
+        onClose={() => { setIsShopOpen(false); setAppStyle({}); }}
+        images={[]}
+      />
 
 
       {/* Top bar */}
@@ -439,9 +452,9 @@ function App() {
             
             </div>
           <div>
-            <DndProvider backend={HTML5Backend}>
-              <InventoryGrid />
-            </DndProvider>
+            
+              <Grid />
+            
               
           </div>
         </div>
@@ -457,7 +470,13 @@ function App() {
         {/* Middle section */}
         <div style={{ width: '40%', padding: '0 10px' }}>
           <h4>Fight Moves Logs</h4>
-          <div><button onClick={handleNewBattleButton}>New Battle</button></div>
+          <div>
+            <button onClick={handleNewBattleButton}>New Battle</button>
+
+            <button onClick={() => { setIsShopOpen(true); setAppStyle({ pointerEvents: "none" }); }}>Shop</button>
+
+          </div>
+
           <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
             {fightLog.map((move, index) => 
               <p key={index}> 
@@ -564,6 +583,7 @@ function App() {
         <button>Choose Opponent</button>
       </div>
     </div>
+  </DndProvider>
   );
 
 
