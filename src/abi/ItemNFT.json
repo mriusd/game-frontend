@@ -1,0 +1,1152 @@
+[
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "approved",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "Approval",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "operator",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "approved",
+				"type": "bool"
+			}
+		],
+		"name": "ApprovalForAll",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "level",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "weaponsDropRate",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "armourDropRate",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "jewelsDropRate",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "miscDropRate",
+				"type": "uint256"
+			}
+		],
+		"name": "BoxDropUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "BoxDropped",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "itemId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "itemName",
+				"type": "string"
+			}
+		],
+		"name": "ItemBoughtFromShop",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "itemId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			}
+		],
+		"name": "ItemGenerated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint8",
+				"name": "",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "LogError",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "Transfer",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "approve",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			}
+		],
+		"name": "balanceOf",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "boxDropList",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "level",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "weaponsDropRate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "armourDropRate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "jewelsDropRate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "miscDropRate",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "itemId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "fighterId",
+				"type": "uint256"
+			}
+		],
+		"name": "buyItemFromShop",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256[51]",
+				"name": "uintValues",
+				"type": "uint256[51]"
+			},
+			{
+				"internalType": "bool[9]",
+				"name": "boolValues",
+				"type": "bool[9]"
+			}
+		],
+		"name": "createItem",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "dropBox",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "getApproved",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "userAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "fighterId",
+				"type": "uint256"
+			}
+		],
+		"name": "getFighterItems",
+		"outputs": [
+			{
+				"internalType": "uint256[2][]",
+				"name": "",
+				"type": "uint256[2][]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "getTokenAttributes",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "itemLevel",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLevel",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "durability",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "classRequired",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "strengthRequired",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "agilityRequired",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "energyRequired",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "vitalityRequired",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "itemWidth",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "itemHeight",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "acceptableSlot1",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "acceptableSlot2",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "physicalDamage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "magicDamage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "defense",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "attackSpeed",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "defenseSuccessRate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "additionalDamage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "additionalDefense",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "increasedExperienceGain",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "damageIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "defenseSuccessRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lifeAfterMonsterIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "manaAfterMonsterIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "zenAfterMonsterIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "doubleDamageProbabilityIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "excellentDamageProbabilityIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "ignoreOpponentsDefenseRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "reflectDamage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLifeIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxManaIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "excellentDamageRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "doubleDamageRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "ignoreOpponentsDefenseSuccessRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "attackDamageIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "defenseSuccessRateIncreaseAncient",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "reflectDamageRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "decreaseDamageRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "hpRecoveryRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "mpRecoveryRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "hpIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "mpIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "increaseDefenseRate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "increaseStrength",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "increaseAgility",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "increaseEnergy",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "increaseVitality",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "attackSpeedIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "fighterId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lastUpdBlock",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "luck",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "skill",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isBox",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isWeapon",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isArmour",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isJewel",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isMisc",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isConsumable",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "inShop",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct Items.ItemAttributes",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "userAddress",
+				"type": "address"
+			}
+		],
+		"name": "getUserItems",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "operator",
+				"type": "address"
+			}
+		],
+		"name": "isApprovedForAll",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "itemName",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "winner",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "opponentLevel",
+				"type": "uint256"
+			}
+		],
+		"name": "mintBox",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "name",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "ownerOf",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "a",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "b",
+				"type": "uint256"
+			}
+		],
+		"name": "safeAdd",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "a",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "b",
+				"type": "uint256"
+			}
+		],
+		"name": "safeMul",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "a",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "b",
+				"type": "uint256"
+			}
+		],
+		"name": "safeSub",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "safeTransferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes",
+				"name": "data",
+				"type": "bytes"
+			}
+		],
+		"name": "safeTransferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "operator",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "approved",
+				"type": "bool"
+			}
+		],
+		"name": "setApprovalForAll",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "level",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256[4]",
+				"name": "dropRates",
+				"type": "uint256[4]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "weaponsList",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "armourList",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "jewelsList",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "miscList",
+				"type": "uint256[]"
+			}
+		],
+		"name": "setBoxDrop",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes4",
+				"name": "interfaceId",
+				"type": "bytes4"
+			}
+		],
+		"name": "supportsInterface",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "symbol",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "tokenByIndex",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "tokenOfOwnerByIndex",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "tokenURI",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalSupply",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "transferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]

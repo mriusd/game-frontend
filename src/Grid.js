@@ -5,13 +5,8 @@ import DraggableImage from './DraggableImage';
 import GridBoard from './GridBoard';
 import DragLayer from './DragLayer';
 
-const Grid = ({isDraggable = true, onClick}) => {
-  const [images, setImages] = useState([
-    { id: 1, imgSrc: 'https://via.placeholder.com/80x120', width: 2, height: 3, x: 0, y: 0 },
-    { id: 2, imgSrc: 'https://via.placeholder.com/80x80', width: 2, height: 2, x: 4, y: 0 },
-    { id: 3, imgSrc: 'https://via.placeholder.com/40x40', width: 1, height: 1, x: 0, y: 4 },
-    { id: 4, imgSrc: 'https://via.placeholder.com/40x80', width: 1, height: 2, x: 3, y: 4 },
-  ]);
+const Grid = ({imgs, isDraggable = true, onClick}) => {
+  const [images, setImages] = useState(imgs);
 
   const emptyGrid = new Array(8).fill(null).map(() => new Array(8).fill(null));
   const [grid, setGrid] = useState(emptyGrid);

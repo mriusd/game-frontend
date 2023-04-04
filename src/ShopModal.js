@@ -4,7 +4,11 @@ import ReactDOM from 'react-dom';
 import DraggableImage from './DraggableImage';
 import Grid from "./Grid";
 
-const ShopModal = ({ isOpen, onClose }) => {
+const ShopModal = ({ isOpen, onClose, onClick }) => {
+
+  const [images, setImages] = useState([
+    { id: 0, imgSrc: 'https://via.placeholder.com/40x40', width: 1, height: 1, x: 0, y: 0 },
+  ]);
   const [modalContainer, setModalContainer] = useState(null);
 
     useEffect(() => {
@@ -24,6 +28,7 @@ const ShopModal = ({ isOpen, onClose }) => {
 
     function handleClick(itemId) {
       console.log("click", itemId);
+      onClick(itemId);
     }
 
     return ReactDOM.createPortal(
@@ -34,7 +39,7 @@ const ShopModal = ({ isOpen, onClose }) => {
             <button onClick={onClose}>&times;</button>
           </div>
           <div className="modal-body">
-            <Grid isDraggable={false} onClick={handleClick} />
+            <Grid imgs={images} isDraggable={false} onClick={handleClick} />
           </div>
         </div>
       </div>,

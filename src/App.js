@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import useWebSocket from 'react-use-websocket';
 import Web3 from 'web3';
 import FighterNFTAbi from './abi/FighterNFT.json';
+import ItemNFTAbi from './abi/ItemNFT.json';
 import Stat from "./FighterStat";
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -13,6 +14,7 @@ import { Dialog, DialogTitle } from '@material-ui/core';
 import "./App.css";
 
 const FighterNFTContractAddress = "0x46296eC931cc34B0F24cdd82b2C0003B10e941C2";
+const ItemsNFTContractAddress = "0x1C8173c1aA104C11F67A8142cE8C75B3EBEE317c";
 var FIGHTER_STATS = {
     Strength: [0, 0],
     Agility: [0, 0],
@@ -23,6 +25,8 @@ var FIGHTER_STATS = {
 
 const Fighter = ({ name, health, color, currentHealth }) => {
   //const [currentHealth, setCurrentHealth] = useState(health);
+
+  
 
   const healthBarStyles = {
     width: '100%',
@@ -63,6 +67,13 @@ const ITEM_SIZE = 40;
 const INVENTORY_SIZE = 8;
 
 function App() {
+
+  const [images, setImages] = useState([
+    { id: 1, imgSrc: 'https://via.placeholder.com/80x120', width: 2, height: 3, x: 0, y: 0 },
+    { id: 2, imgSrc: 'https://via.placeholder.com/80x80', width: 2, height: 2, x: 4, y: 0 },
+    { id: 3, imgSrc: 'https://via.placeholder.com/40x40', width: 1, height: 1, x: 0, y: 4 },
+    { id: 4, imgSrc: 'https://via.placeholder.com/40x80', width: 1, height: 2, x: 3, y: 4 },
+  ]);
 
   // WebSocket
   const socketUrl = 'ws://localhost:8080/ws';
@@ -177,6 +188,38 @@ function App() {
     }
   };
 
+  const buyShopItem = async (itemId) => {
+    if (!web3) {
+      console.error("Web3 not initialized");
+      return;
+    }
+    try {
+      console.log('buyShopItem', itemId)
+      // Call the smart contract method using web3
+      const accounts = await web3.eth.getAccounts();
+      console.log(`Connected to MetaMask with account ${accounts[0]}`);
+      const myContract = new web3.eth.Contract(ItemNFTAbi, ItemsNFTContractAddress);
+      const result = await myContract.methods.buyItemFromShop(itemId, localStorage.getItem("playerID")).send({ from: accounts[0] });
+      const playerID = result.events.FighterCreated.returnValues.tokenId;
+      localStorage.setItem("playerID", playerID);
+      console.log(result);
+      console.log("playerID", playerID);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  function refreshFigterItems() {
+    var response = sendJsonMessage({
+        type: "getFighterItems",
+        data: {
+            userAddress: "0xDf228A720E6B9472c5559a68551bE5ca2e400FD8",
+            fighterId: parseInt(localStorage.getItem('playerID')),
+        }
+
+      });
+  }
+
   function processIncomingMessage(event) {
       var msg = JSON.parse(event.data);
       console.log("New message", msg);
@@ -210,7 +253,17 @@ function App() {
           processMoves(msg.move1, msg.move2)
           generateBattleReceipt(msg);
          break;
+
+        case "fighter_items":
+          updateFighterItems(msg.items);
+          console.log("fighter_items", msg.items)
+        break;
       }
+  }
+
+  function updateFighterItems(items) {
+    var itemList = JSON.parse(items)[0];
+    console.log("updateFighterItems", itemList)
   }
 
   function startNewBattle(msg) {
@@ -418,7 +471,7 @@ function App() {
       <ShopModal
         isOpen={isShopOpen}
         onClose={() => { setIsShopOpen(false); setAppStyle({}); }}
-        images={[]}
+        onClick={buyShopItem}
       />
 
 
@@ -452,8 +505,8 @@ function App() {
             
             </div>
           <div>
-            
-              <Grid />
+              <button onClick={refreshFigterItems}>Refresh Items</button>
+              <Grid imgs={images}/>
             
               
           </div>
