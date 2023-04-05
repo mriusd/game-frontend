@@ -12,21 +12,13 @@ const Grid = ({imgs, isDraggable = true, onClick}) => {
   const [grid, setGrid] = useState(emptyGrid);
   const [draggedImage, setDraggedImage] = useState(null);
 
-  useEffect(() => {
-    placeImagesOnGrid();
-  }, []);
 
-  const placeImagesOnGrid = () => {
-    let newGrid = [...grid];
-    images.forEach((img) => {
-      for (let row = img.y; row < img.y + img.height; row++) {
-        for (let col = img.x; col < img.x + img.width; col++) {
-          newGrid[row][col] = img;
-        }
-      }
-    });
-    setGrid(newGrid);
-  };
+  useEffect(() => {
+    console.log('Images state updated:', imgs);
+    setImages(imgs);
+  }, [imgs]);
+
+  
 
   const moveImage = (img, x, y) => {
     setImages((prevState) =>

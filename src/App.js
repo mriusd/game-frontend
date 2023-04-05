@@ -14,7 +14,7 @@ import { Dialog, DialogTitle } from '@material-ui/core';
 import "./App.css";
 
 const FighterNFTContractAddress = "0x46296eC931cc34B0F24cdd82b2C0003B10e941C2";
-const ItemsNFTContractAddress = "0x1C8173c1aA104C11F67A8142cE8C75B3EBEE317c";
+const ItemsNFTContractAddress = "0xC935065E15BC237b3adf911760bBf47897ce515A";
 var FIGHTER_STATS = {
     Strength: [0, 0],
     Agility: [0, 0],
@@ -68,12 +68,7 @@ const INVENTORY_SIZE = 8;
 
 function App() {
 
-  const [images, setImages] = useState([
-    { id: 1, imgSrc: 'https://via.placeholder.com/80x120', width: 2, height: 3, x: 0, y: 0 },
-    { id: 2, imgSrc: 'https://via.placeholder.com/80x80', width: 2, height: 2, x: 4, y: 0 },
-    { id: 3, imgSrc: 'https://via.placeholder.com/40x40', width: 1, height: 1, x: 0, y: 4 },
-    { id: 4, imgSrc: 'https://via.placeholder.com/40x80', width: 1, height: 2, x: 3, y: 4 },
-  ]);
+  const [images, setImages] = useState([]);
 
   // WebSocket
   const socketUrl = 'ws://localhost:8080/ws';
@@ -200,10 +195,10 @@ function App() {
       console.log(`Connected to MetaMask with account ${accounts[0]}`);
       const myContract = new web3.eth.Contract(ItemNFTAbi, ItemsNFTContractAddress);
       const result = await myContract.methods.buyItemFromShop(itemId, localStorage.getItem("playerID")).send({ from: accounts[0] });
-      const playerID = result.events.FighterCreated.returnValues.tokenId;
-      localStorage.setItem("playerID", playerID);
+      const id = result.events.ItemBoughtFromShop.returnValues.itemId;
+     
       console.log(result);
-      console.log("playerID", playerID);
+      console.log("itemId", id);
     } catch (error) {
       console.error(error);
     }
@@ -256,14 +251,23 @@ function App() {
 
         case "fighter_items":
           updateFighterItems(msg.items);
-          console.log("fighter_items", msg.items)
         break;
       }
   }
 
   function updateFighterItems(items) {
-    var itemList = JSON.parse(items)[0];
-    console.log("updateFighterItems", itemList)
+    if (items == '') return;
+    var itemList = JSON.parse(items);
+    
+    var newItems = [];
+    for (var i = 0; i < itemList.length; i++) {
+      console.log("updateFighterItems", itemList[i])
+      newItems.push({ id: itemList[i]["tokenId"], imgSrc: 'https://via.placeholder.com/40x40', width: 1, height: 1, x: 0, y: 0 });
+      
+    }
+
+    setImages(newItems)
+    
   }
 
   function startNewBattle(msg) {
@@ -506,7 +510,7 @@ function App() {
             </div>
           <div>
               <button onClick={refreshFigterItems}>Refresh Items</button>
-              <Grid imgs={images}/>
+              <Grid imgs={images} onClick={console.log}/>
             
               
           </div>
