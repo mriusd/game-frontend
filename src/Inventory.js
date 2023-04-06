@@ -1,8 +1,8 @@
 import React from 'react';
 
 const Inventory = ({ items, setItems, equipItem }) => {
-  const handleEquipClick = (itemId, slot) => {
-    equipItem(itemId, slot);
+  const handleEquipClick = (itemId, slot1, slot2) => {
+    equipItem(itemId, slot1, slot2);
   };
 
   return (
@@ -13,7 +13,7 @@ const Inventory = ({ items, setItems, equipItem }) => {
           <li key={item.tokenId}>
             <strong>{item.name}</strong>
             <button
-              onClick={() => handleEquipClick(item.id, 3)}
+              onClick={() => handleEquipClick(item.tokenId, item.acceptableSlot1, item.acceptableSlot2)}
               style={{ marginLeft: '1rem' }}
             >
               Equip

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './CharacterEquipment.css';
 
-const CharacterEquipment = (fighter) => {
+const CharacterEquipment = ({fighter, unequipItem}) => {
   const [helmet, setHelmet] = useState(null);
   const [armour, setArmour] = useState(null);
   const [pants, setPants] = useState(null);
@@ -15,19 +15,19 @@ const CharacterEquipment = (fighter) => {
   const [wings, setWings] = useState(null);
 
   useEffect(() => {
-    console.log("CharacterEquipment", fighter, fighter.fighter.TokenID);
-    if (fighter.fighter.TokenID) {
-      setHelmet(fighter.fighter.helmSlot);
-      setArmour(fighter.fighter.armourSlot);
-      setPants(fighter.fighter.pantsSlot);
-      setGloves(fighter.fighter.glovesSlot);
-      setBoots(fighter.fighter.bootsSlot);
-      setLeftHand(fighter.fighter.leftHandSlot);
-      setRightHand(fighter.fighter.rightHandSlot);
-      setLeftRing(fighter.fighter.leftRingSlot);
-      setRightRing(fighter.fighter.rightRingSlot);
-      setPendant(fighter.fighter.pendSlot);
-      setWings(fighter.fighter.wingsSlot);
+    console.log("CharacterEquipment", fighter);
+    if (fighter.TokenID) {
+      setHelmet(fighter.helmSlot);
+      setArmour(fighter.armourSlot);
+      setPants(fighter.pantsSlot);
+      setGloves(fighter.glovesSlot);
+      setBoots(fighter.bootsSlot);
+      setLeftHand(fighter.leftHandSlot);
+      setRightHand(fighter.rightHandSlot);
+      setLeftRing(fighter.leftRingSlot);
+      setRightRing(fighter.rightRingSlot);
+      setPendant(fighter.pendSlot);
+      setWings(fighter.wingsSlot);
     }
   }, [fighter]);
 
@@ -37,7 +37,10 @@ const CharacterEquipment = (fighter) => {
       <div className="slot">
         <h4>{slotName}</h4>
         {slotItem ? (
-          <div className="item">{slotItem}</div>
+        <>
+          <div className="item">{slotName}({slotItem})</div>
+           <button onClick={() => unequipItem(slotItem)}>Unequip</button>
+        </>
         ) : (
           <div className="empty">Empty</div>
         )}

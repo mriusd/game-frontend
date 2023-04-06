@@ -301,6 +301,19 @@
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "consume",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "string",
 				"name": "name",
 				"type": "string"
@@ -384,6 +397,332 @@
 				"internalType": "uint256[2][]",
 				"name": "",
 				"type": "uint256[2][]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "itemId",
+				"type": "uint256"
+			}
+		],
+		"name": "getItemAttributes",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "itemLevel",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLevel",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "durability",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "classRequired",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "strengthRequired",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "agilityRequired",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "energyRequired",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "vitalityRequired",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "itemWidth",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "itemHeight",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "acceptableSlot1",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "acceptableSlot2",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "physicalDamage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "magicDamage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "defense",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "attackSpeed",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "defenseSuccessRate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "additionalDamage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "additionalDefense",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "increasedExperienceGain",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "damageIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "defenseSuccessRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lifeAfterMonsterIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "manaAfterMonsterIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "zenAfterMonsterIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "doubleDamageProbabilityIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "excellentDamageProbabilityIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "ignoreOpponentsDefenseRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "reflectDamage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLifeIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxManaIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "excellentDamageRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "doubleDamageRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "ignoreOpponentsDefenseSuccessRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "attackDamageIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "defenseSuccessRateIncreaseAncient",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "reflectDamageRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "decreaseDamageRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "hpRecoveryRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "mpRecoveryRateIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "hpIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "mpIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "increaseDefenseRate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "increaseStrength",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "increaseAgility",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "increaseEnergy",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "increaseVitality",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "attackSpeedIncrease",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "fighterId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lastUpdBlock",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "luck",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "skill",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isBox",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isWeapon",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isArmour",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isJewel",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isMisc",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isConsumable",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "inShop",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct Items.ItemAttributes",
+				"name": "",
+				"type": "tuple"
 			}
 		],
 		"stateMutability": "view",

@@ -16,7 +16,7 @@ import Inventory from './Inventory';
 import CharacterEquipment from './CharacterEquipment';
 
 const FighterNFTContractAddress = "0x50C6dA7497Cb7A9aec58fF6E594D689413A47a15";
-const ItemsNFTContractAddress = "0xC935065E15BC237b3adf911760bBf47897ce515A";
+const ItemsNFTContractAddress = "0xE119055fb1C3E7E1C27707Ed944F715E9e6Dc9d8";
 var FIGHTER_STATS = {
     Strength: [0, 0],
     Agility: [0, 0],
@@ -216,18 +216,39 @@ function App() {
     }
   };
 
-  const equipItem = async (itemId, slot) => {
+  const equipItem = async (itemId, slot1, slot2) => {
     if (!web3) {
       console.error("Web3 not initialized");
       return;
     }
     try {
-      console.log('equipItem', itemId, "slot", slot)
+      console.log('equipItem', itemId, "slot1", slot1, "slot2", slot2)
       // Call the smart contract method using web3
       const accounts = await web3.eth.getAccounts();
       console.log(`Connected to MetaMask with account ${accounts[0]}`);
       const myContract = new web3.eth.Contract(FighterNFTAbi, FighterNFTContractAddress);
-      const result = await myContract.methods.equipItem(localStorage.getItem("playerID"), 2, 2).send({ from: accounts[0] });
+      const result = await myContract.methods.equipItem(localStorage.getItem("playerID"), itemId, slot1).send({ from: accounts[0] });
+      const id = result.events.ItemEquiped.returnValues.itemId;
+     
+      console.log(result);
+      console.log("itemId", id);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const unequipItem = async (slot) => {
+    if (!web3) {
+      console.error("Web3 not initialized");
+      return;
+    }
+    try {
+      console.log("[unequipItem] slot", slot)
+      // Call the smart contract method using web3
+      const accounts = await web3.eth.getAccounts();
+      console.log(`Connected to MetaMask with account ${accounts[0]}`);
+      const myContract = new web3.eth.Contract(FighterNFTAbi, FighterNFTContractAddress);
+      const result = await myContract.methods.equipItem(localStorage.getItem("playerID"), 0, slot).send({ from: accounts[0] });
       const id = result.events.ItemEquiped.returnValues.itemId;
      
       console.log(result);
@@ -618,7 +639,7 @@ function App() {
             <div>Exp: {playerExperience}</div>
             <button onClick={refreshFighter}>Refresh Fighter</button>
             <div>
-              <CharacterEquipment fighter={fighter}/>
+              <CharacterEquipment fighter={fighter} unequipItem={unequipItem}/>
             </div>
             <div style={{ display: 'flex', flexDirection: 'row' }}>
               <div style={{ flex: 1, padding: '10px', backgroundColor: '#f0f0f0' }}>
