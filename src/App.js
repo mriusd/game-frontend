@@ -13,8 +13,9 @@ import ShopModal from './ShopModal';
 import { Dialog, DialogTitle } from '@material-ui/core';
 import "./App.css";
 import Inventory from './Inventory';
+import CharacterEquipment from './CharacterEquipment';
 
-const FighterNFTContractAddress = "0x46296eC931cc34B0F24cdd82b2C0003B10e941C2";
+const FighterNFTContractAddress = "0x50C6dA7497Cb7A9aec58fF6E594D689413A47a15";
 const ItemsNFTContractAddress = "0xC935065E15BC237b3adf911760bBf47897ce515A";
 var FIGHTER_STATS = {
     Strength: [0, 0],
@@ -116,6 +117,8 @@ function App() {
   const [appStyle, setAppStyle] = useState({});
   const [inventoryItems, setInventoryItems] = useState([]);
 
+  const [fighter, setFighter] = useState([]);
+
   localStorage.setItem('playerID',1);
 
   useEffect(() => {
@@ -137,6 +140,14 @@ function App() {
 
    connectToMetaMask();
   }, []);
+
+
+  function updateFighter (attributes) {
+    // update equiped items
+    setFighter(JSON.parse(attributes));
+    console.log("[updateFighter] updateFighter", attributes);
+  }
+
 
   const updateStats = async () => {
     if (!web3) {
@@ -205,9 +216,41 @@ function App() {
     }
   };
 
+  const equipItem = async (itemId, slot) => {
+    if (!web3) {
+      console.error("Web3 not initialized");
+      return;
+    }
+    try {
+      console.log('equipItem', itemId, "slot", slot)
+      // Call the smart contract method using web3
+      const accounts = await web3.eth.getAccounts();
+      console.log(`Connected to MetaMask with account ${accounts[0]}`);
+      const myContract = new web3.eth.Contract(FighterNFTAbi, FighterNFTContractAddress);
+      const result = await myContract.methods.equipItem(localStorage.getItem("playerID"), 2, 2).send({ from: accounts[0] });
+      const id = result.events.ItemEquiped.returnValues.itemId;
+     
+      console.log(result);
+      console.log("itemId", id);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   function refreshFigterItems() {
     var response = sendJsonMessage({
         type: "getFighterItems",
+        data: {
+            userAddress: "0xDf228A720E6B9472c5559a68551bE5ca2e400FD8",
+            fighterId: parseInt(localStorage.getItem('playerID')),
+        }
+
+      });
+  }
+
+  function refreshFighter() {
+    var response = sendJsonMessage({
+        type: "getFighter",
         data: {
             userAddress: "0xDf228A720E6B9472c5559a68551bE5ca2e400FD8",
             fighterId: parseInt(localStorage.getItem('playerID')),
@@ -253,6 +296,13 @@ function App() {
         case "fighter_items":
           updateFighterItems(msg.items);
         break;
+
+
+        case "update_fighter":
+          updateFighter(msg.attributes);
+        break;
+
+        
       }
   }
 
@@ -510,7 +560,7 @@ function App() {
             </div>
           <div>
               <button onClick={refreshFigterItems}>Refresh Items</button>
-              <Inventory items={inventoryItems} setItems={setInventoryItems} />
+              <Inventory items={inventoryItems} setItems={setInventoryItems} equipItem={equipItem} />
             
               
           </div>
@@ -566,6 +616,10 @@ function App() {
             <h5>Stats</h5>
             <div><Fighter name="Player 1" currentHealth={playerHealth} health={playerMaxHP} color="green" /></div>
             <div>Exp: {playerExperience}</div>
+            <button onClick={refreshFighter}>Refresh Fighter</button>
+            <div>
+              <CharacterEquipment fighter={fighter}/>
+            </div>
             <div style={{ display: 'flex', flexDirection: 'row' }}>
               <div style={{ flex: 1, padding: '10px', backgroundColor: '#f0f0f0' }}>
                 <Stat
