@@ -12,6 +12,7 @@ import Shop from './Shop';
 import ShopModal from './ShopModal';
 import { Dialog, DialogTitle } from '@material-ui/core';
 import "./App.css";
+import Inventory from './Inventory';
 
 const FighterNFTContractAddress = "0x46296eC931cc34B0F24cdd82b2C0003B10e941C2";
 const ItemsNFTContractAddress = "0xC935065E15BC237b3adf911760bBf47897ce515A";
@@ -113,7 +114,7 @@ function App() {
 
   const [web3, setWeb3] = useState(null);
   const [appStyle, setAppStyle] = useState({});
-
+  const [inventoryItems, setInventoryItems] = useState([]);
 
   localStorage.setItem('playerID',1);
 
@@ -262,11 +263,11 @@ function App() {
     var newItems = [];
     for (var i = 0; i < itemList.length; i++) {
       console.log("updateFighterItems", itemList[i])
-      newItems.push({ id: itemList[i]["tokenId"], imgSrc: 'https://via.placeholder.com/40x40', width: 1, height: 1, x: 0, y: 0 });
+      newItems.push(itemList[i]);
       
     }
 
-    setImages(newItems)
+    setInventoryItems(newItems)
     
   }
 
@@ -423,7 +424,6 @@ function App() {
     
   }
 
-  
   async function handleNewBattleButton() {
     var response = sendJsonMessage({
       type: "startNewBattle",
@@ -510,7 +510,7 @@ function App() {
             </div>
           <div>
               <button onClick={refreshFigterItems}>Refresh Items</button>
-              <Grid imgs={images} onClick={console.log}/>
+              <Inventory items={inventoryItems} setItems={setInventoryItems} />
             
               
           </div>
