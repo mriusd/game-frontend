@@ -14,6 +14,7 @@ import { Dialog, DialogTitle } from '@material-ui/core';
 import "./App.css";
 import Inventory from './Inventory';
 import CharacterEquipment from './CharacterEquipment';
+import Fighter from './Fighter';
 
 const FighterNFTContractAddress = "0x50C6dA7497Cb7A9aec58fF6E594D689413A47a15";
 const ItemsNFTContractAddress = "0xE119055fb1C3E7E1C27707Ed944F715E9e6Dc9d8";
@@ -25,45 +26,7 @@ var FIGHTER_STATS = {
 };
 
 
-const Fighter = ({ name, health, color, currentHealth }) => {
-  //const [currentHealth, setCurrentHealth] = useState(health);
 
-  
-
-  const healthBarStyles = {
-    width: '100%',
-    height: '20px',
-    backgroundColor: 'gray',
-    borderRadius: '10px'
-  };
-
-  const currentHealthBarStyles = {
-    width: `${(currentHealth / health) * 100}%`,
-    height: '20px',
-    backgroundColor: color,
-    borderRadius: '10px'
-  };
-
-  const healthTextStyles = {
-    textAlign: 'center',
-    fontWeight: 'bold'
-  };
-
-  const decreaseHealth = (amount) => {
-    const newHealth = currentHealth - amount;
-    //setCurrentHealth(newHealth < 0 ? 0 : newHealth);
-  };
-
-  return (
-    <div style={{ marginBottom: '20px' }}>
-      <h2>{name}</h2>
-      <div style={healthBarStyles}>
-        <div style={currentHealthBarStyles}></div>
-      </div>
-      <p style={healthTextStyles}>{currentHealth} / {health}</p>
-    </div>
-  );
-};
 
 const ITEM_SIZE = 40;
 const INVENTORY_SIZE = 8;
@@ -75,6 +38,7 @@ function App() {
   // WebSocket
   const socketUrl = 'ws://localhost:8080/ws';
   const socketOptions = {
+    onOpen: (event) => { console.log('WebSocket connected!:', event); refreshFigterItems(); },
     onError: (event) => console.error('WebSocket error:', event),
     onClose: (event) => console.log('WebSocket closed:', event),
     onMessage: (event) => processIncomingMessage(event)
@@ -118,6 +82,9 @@ function App() {
   const [inventoryItems, setInventoryItems] = useState([]);
 
   const [fighter, setFighter] = useState([]);
+  const [stats, setStats] = useState([]);
+  const [equipment, setEquipment] = useState({});
+  const [playerItemsDefence, setPlayerItemsDefence] = useState(0);
 
   localStorage.setItem('playerID',1);
 
@@ -141,14 +108,6 @@ function App() {
    connectToMetaMask();
   }, []);
 
-
-  function updateFighter (attributes) {
-    // update equiped items
-    setFighter(JSON.parse(attributes));
-    console.log("[updateFighter] updateFighter", attributes);
-  }
-
-
   const updateStats = async () => {
     if (!web3) {
       console.error("Web3 not initialized");
@@ -170,6 +129,8 @@ function App() {
       const ev = result.events.StatsUpdated.returnValues;
       console.log("[updateStats] Event", ev);
       console.log("[updateStats] Stats updated", result);
+
+      refreshFigterItems();
     } catch (error) {
       console.error(error);
     }
@@ -190,6 +151,7 @@ function App() {
       localStorage.setItem("playerID", playerID);
       console.log(result);
       console.log("playerID", playerID);
+      refreshFigterItems();
     } catch (error) {
       console.error(error);
     }
@@ -208,7 +170,7 @@ function App() {
       const myContract = new web3.eth.Contract(ItemNFTAbi, ItemsNFTContractAddress);
       const result = await myContract.methods.buyItemFromShop(itemId, localStorage.getItem("playerID")).send({ from: accounts[0] });
       const id = result.events.ItemBoughtFromShop.returnValues.itemId;
-     
+      refreshFigterItems();
       console.log(result);
       console.log("itemId", id);
     } catch (error) {
@@ -232,6 +194,7 @@ function App() {
      
       console.log(result);
       console.log("itemId", id);
+      refreshFigterItems();
     } catch (error) {
       console.error(error);
     }
@@ -253,6 +216,7 @@ function App() {
      
       console.log(result);
       console.log("itemId", id);
+      refreshFigterItems();
     } catch (error) {
       console.error(error);
     }
@@ -261,17 +225,6 @@ function App() {
   function refreshFigterItems() {
     var response = sendJsonMessage({
         type: "getFighterItems",
-        data: {
-            userAddress: "0xDf228A720E6B9472c5559a68551bE5ca2e400FD8",
-            fighterId: parseInt(localStorage.getItem('playerID')),
-        }
-
-      });
-  }
-
-  function refreshFighter() {
-    var response = sendJsonMessage({
-        type: "getFighter",
         data: {
             userAddress: "0xDf228A720E6B9472c5559a68551bE5ca2e400FD8",
             fighterId: parseInt(localStorage.getItem('playerID')),
@@ -315,31 +268,86 @@ function App() {
          break;
 
         case "fighter_items":
-          updateFighterItems(msg.items);
+          updateFighterItems(msg.items, msg.fighter, msg.equipment, msg.stats);
         break;
 
 
-        case "update_fighter":
-          updateFighter(msg.attributes);
-        break;
 
         
       }
   }
 
-  function updateFighterItems(items) {
+  function updateFighterItems(items, fighter, equipment, stats) {
     if (items == '') return;
     var itemList = JSON.parse(items);
+    var player = JSON.parse(fighter);
+    var equipment = JSON.parse(equipment);
     
     var newItems = [];
+    var itemDefence = 0;
     for (var i = 0; i < itemList.length; i++) {
       console.log("updateFighterItems", itemList[i])
-      newItems.push(itemList[i]);
-      
+
+      // check if item is equipped
+      if (!isEquiped(itemList[i].tokenId, player))
+      {
+        newItems.push(itemList[i]);
+      } else {
+        itemDefence += parseInt(itemList[i].defense);
+      }     
     }
 
-    setInventoryItems(newItems)
+    setPlayerItemsDefence(itemDefence);
+
+    setInventoryItems(newItems);
+    setEquipment(equipment);
+
+     var stats = JSON.parse(stats);
+
     
+
+    setPlayerHealth(stats.currentHealth);
+    setPlayerStrength(player.Strength);
+    setPlayerAgility(player.Agility);
+    setPlayerEnergy(player.Energy);
+    setPlayerVitality(player.Vitality);
+    setPlayerMaxStats(stats.maxStatPoints);
+    setPlayerExperience(player.Experience);
+
+    FIGHTER_STATS = {
+        Strength: [player.Strength, 0],
+        Agility: [player.Agility, 0],
+        Energy: [player.Energy, 0],
+        Vitality: [player.Vitality, 0],
+    };
+
+    setAvailablePoints(parseInt(stats.maxStatPoints) - parseInt(stats.totalStatPoints));
+    setAttributes(FIGHTER_STATS);
+
+    setPlayerDamage(stats.damage);
+    setPlayerDefence(stats.defence);
+    setPlayerMaxHP(stats.maxHealth);
+    setPlayerMaxMana(stats.maxMana);
+    setPlayerMana(stats.currentMana);
+    setPlayerLevel(stats.level);
+    
+  }
+
+  function isEquiped(tokenId, fighter) {
+    console.log("isEquiped", tokenId, fighter)
+    if (fighter.helmSlot      == tokenId) return true;
+    if (fighter.armourSlot    == tokenId) return true;
+    if (fighter.pantsSlot     == tokenId) return true;
+    if (fighter.glovesSlot    == tokenId) return true;
+    if (fighter.bootsSlot     == tokenId) return true;
+    if (fighter.leftHandSlot  == tokenId) return true;
+    if (fighter.rightHandSlot == tokenId) return true;
+    if (fighter.leftRingSlot  == tokenId) return true;
+    if (fighter.rightRingSlot == tokenId) return true;
+    if (fighter.pendantSlot   == tokenId) return true;
+    if (fighter.wingsSlot     == tokenId) return true;
+
+    return false;
   }
 
   function startNewBattle(msg) {
@@ -380,30 +388,8 @@ function App() {
       }       
       
 
-      setPlayerHealth(stats.currentHealth);
-      setPlayerStrength(player.Strength);
-      setPlayerAgility(player.Agility);
-      setPlayerEnergy(player.Energy);
-      setPlayerVitality(player.Vitality);
-      setPlayerMaxStats(stats.maxStatPoints);
-      setPlayerExperience(player.Experience);
-
-      FIGHTER_STATS = {
-          Strength: [player.Strength, 0],
-          Agility: [player.Agility, 0],
-          Energy: [player.Energy, 0],
-          Vitality: [player.Vitality, 0],
-      };
-
-      setAvailablePoints(parseInt(stats.maxStatPoints) - parseInt(stats.totalStatPoints));
-      setAttributes(FIGHTER_STATS);
-
-      setPlayerDamage(stats.damage);
-      setPlayerDefence(stats.defence);
+      setPlayerHealth(stats.currentHealth)
       setPlayerMaxHP(stats.maxHealth);
-      setPlayerMaxMana(stats.maxMana);
-      setPlayerMana(stats.currentMana);
-      setPlayerLevel(stats.level);
 
       setOpponentHealth(opStats.currentHealth);
       setOpponentStrength(opponent.Strength);
@@ -538,6 +524,7 @@ function App() {
     setIsShopOpen(true);
   }; 
 
+  //refreshFigterItems();
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -580,7 +567,7 @@ function App() {
             
             </div>
           <div>
-              <button onClick={refreshFigterItems}>Refresh Items</button>
+              
               <Inventory items={inventoryItems} setItems={setInventoryItems} equipItem={equipItem} />
             
               
@@ -603,6 +590,7 @@ function App() {
 
             <button onClick={() => { setIsShopOpen(true); setAppStyle({ pointerEvents: "none" }); }}>Shop</button>
 
+            <button onClick={refreshFigterItems}>Refresh</button>
           </div>
 
           <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
@@ -631,15 +619,14 @@ function App() {
          
 
 
-          <h4>My Fighter [{playerLevel}]</h4>
+          <h4>{localStorage.getItem("playerID")} [{playerLevel}]</h4>
           <img src="my-fighter.png" alt="My Fighter" style={{ width: '100%', marginBottom: '10px' }} />
           <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
             <h5>Stats</h5>
-            <div><Fighter name="Player 1" currentHealth={playerHealth} health={playerMaxHP} color="green" /></div>
+            <div><Fighter currentHealth={playerHealth} health={playerMaxHP} color="green" /></div>
             <div>Exp: {playerExperience}</div>
-            <button onClick={refreshFighter}>Refresh Fighter</button>
             <div>
-              <CharacterEquipment fighter={fighter} unequipItem={unequipItem}/>
+              <CharacterEquipment equipment={equipment} unequipItem={unequipItem}/>
             </div>
             <div style={{ display: 'flex', flexDirection: 'row' }}>
               <div style={{ flex: 1, padding: '10px', backgroundColor: '#f0f0f0' }}>
@@ -678,7 +665,7 @@ function App() {
                 </button>
               </div>
               <div style={{ flex: 1, padding: '10px', backgroundColor: '#d9d9d9' }}>
-                  <p>Defence: {parseInt(playerAgility/4)}</p>
+                  <p>Defence: {parseInt(playerAgility/4+playerItemsDefence)}</p>
                   <p>Attack: {parseInt(playerStrength/4 + playerEnergy/4)}</p>
               </div>
             </div>
