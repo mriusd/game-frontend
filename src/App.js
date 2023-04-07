@@ -134,7 +134,35 @@ function App() {
     };
   }, []);
 
-  function processDmgDealt(batlleId, damage, opponent, player, opponentHealth)   {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updateHealth();
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [fighter]);
+
+  function updateHealth() {
+    var health = getHealth(fighter);
+    setPlayerHealth(health.toFixed(0));
+  }
+
+  function getHealth(fighter) {
+    const maxHealth = fighter.maxHealth;
+    const lastDmgTimestamp = fighter.lastDmgTimestamp;
+    const healthAfterLastDmg = fighter.healthAfterLastDmg;
+
+    const healthRegenRate = fighter.hpRegenerationRate;
+    const currentTime = Date.now();
+
+    const health = healthAfterLastDmg + (Math.floor(((currentTime - lastDmgTimestamp)) / 5) * healthRegenRate);
+
+    console.log("[getHealth] maxHealth=", maxHealth, " lastDmgTimestamp=", lastDmgTimestamp, " healthAfterLastDmg=", healthAfterLastDmg, " healthRegenRate=", healthRegenRate, " health=", health);
+
+    return Math.min(maxHealth, health);
+  }
+
+  function processDmgDealt(batlleId, damage, opponent, player, opponentHealth, lastDmgTimestamp)   {
     console.log("[processDmgDealt] batlleId=", batlleId, " damage=", damage ," opponentId=", opponent, " player=", player, " opponentHealth=", opponentHealth);
 
     if (player == localStorage.getItem('playerID'))
@@ -144,7 +172,11 @@ function App() {
     }
     else
     {
-      setPlayerHealth(opponentHealth)
+      setPlayerHealth(opponentHealth);
+
+      var fit = fighter;
+      fighter.lastDmgTimestamp = lastDmgTimestamp;
+      setFighter(fighter);
       setHits(prev => [...prev, damage])
     }
   }
@@ -310,21 +342,22 @@ function App() {
          break;
 
         case "fighter_items":
-          updateFighterItems(msg.items, msg.fighter, msg.equipment, msg.stats, msg.npcs);
+          updateFighterItems(msg.items, msg.attributes, msg.equipment, msg.stats, msg.npcs, msg.fighter);
         break;
 
         case "damage_dealt":
-          processDmgDealt(msg.battleID, msg.damage, msg.opponent, msg.player, msg.opponentHealth)
+          processDmgDealt(msg.battleID, msg.damage, msg.opponent, msg.player, msg.opponentHealth, msg.lastDmgTimestamp)
         break;
 
         
       }
   }
 
-  function updateFighterItems(items, fighter, equipment, stats, npcs) {
+  function updateFighterItems(items, attributes, equipment, stats, npcs, fighter) {
     
     
-    var player = JSON.parse(fighter);
+    var attributes = JSON.parse(attributes);
+    var fighter = JSON.parse(fighter);
     var npcs = JSON.parse(npcs);
     var equipment = JSON.parse(equipment);
     
@@ -336,7 +369,7 @@ function App() {
         console.log("updateFighterItems", itemList[i])
 
         // check if item is equipped
-        if (!isEquiped(itemList[i].tokenId, player))
+        if (!isEquiped(itemList[i].tokenId, attributes))
         {
           newItems.push(itemList[i]);
         } else {
@@ -353,25 +386,26 @@ function App() {
 
      var stats = JSON.parse(stats);
 
-    console.log("Player", player)
+    console.log("attributes", attributes)
 
-    setPlayerHealth(stats.currentHealth);
-    setPlayerStrength(player.Strength);
-    setPlayerAgility(player.Agility);
-    setPlayerEnergy(player.Energy);
-    setPlayerVitality(player.Vitality);
-    setPlayerMaxStats(stats.maxStatPoints);
-    setPlayerExperience(player.Experience);
-    setPlayerAttackSpeed(player.attackSpeed);
-    setPlayerAgilityPointsPerSpeed(player.agilityPointsPerSpeed);
+    setFighter(fighter);
+    setPlayerHealth(getHealth(fighter).toFixed(0));
+    setPlayerStrength(attributes.Strength);
+    setPlayerAgility(attributes.Agility);
+    setPlayerEnergy(attributes.Energy);
+    setPlayerVitality(attributes.Vitality);
+    setPlayerMaxStats(attributes.maxStatPoints);
+    setPlayerExperience(attributes.Experience);
+    setPlayerAttackSpeed(attributes.attackSpeed);
+    setPlayerAgilityPointsPerSpeed(attributes.agilityPointsPerSpeed);
 
-    console.log("[updateFighterItems] ", player);
+    console.log("[updateFighterItems] ", attributes);
 
     FIGHTER_STATS = {
-        Strength: [player.Strength, 0],
-        Agility: [player.Agility, 0],
-        Energy: [player.Energy, 0],
-        Vitality: [player.Vitality, 0],
+        Strength: [attributes.Strength, 0],
+        Agility: [attributes.Agility, 0],
+        Energy: [attributes.Energy, 0],
+        Vitality: [attributes.Vitality, 0],
     };
 
     setAvailablePoints(parseInt(stats.maxStatPoints) - parseInt(stats.totalStatPoints));
@@ -379,7 +413,7 @@ function App() {
 
     setPlayerDamage(stats.damage);
     setPlayerDefence(stats.defence);
-    setPlayerMaxHP(stats.maxHealth);
+    setPlayerMaxHP(fighter.maxHealth);
     setPlayerMaxMana(stats.maxMana);
     setPlayerMana(stats.currentMana);
     setPlayerLevel(stats.level);
