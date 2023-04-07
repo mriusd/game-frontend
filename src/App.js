@@ -15,9 +15,12 @@ import "./App.css";
 import Inventory from './Inventory';
 import CharacterEquipment from './CharacterEquipment';
 import Fighter from './Fighter';
+import DamageTicker from './DamageTicker';
+import LoadingButton from './LoadingButton';
+import NPC from './NPC';
 
-const FighterNFTContractAddress = "0x50C6dA7497Cb7A9aec58fF6E594D689413A47a15";
-const ItemsNFTContractAddress = "0xE119055fb1C3E7E1C27707Ed944F715E9e6Dc9d8";
+const FighterNFTContractAddress = "0x1f3B499720eeDfe4B3a59478c2ab3cA7a3c2F45c";
+const ItemsNFTContractAddress = "0x5a6b2CAfF4a9019E56917Ee5d8A1918a66183e08";
 var FIGHTER_STATS = {
     Strength: [0, 0],
     Agility: [0, 0],
@@ -64,6 +67,9 @@ function App() {
   const [playerMana, setPlayerMana] = useState(0);
   const [playerMaxStats, setPlayerMaxStats] = useState(0);
   const [playerExperience, setPlayerExperience] = useState(0);
+  const [playerAttackSpeed, setPlayerAttackSpeed] = useState(0);
+  const [playerAgilityPointsPerSpeed, setPlayerAgilityPointsPerSpeed] = useState(0);
+
 
 
   const [opponentHealth, setOpponentHealth] = useState(0);
@@ -86,6 +92,16 @@ function App() {
   const [equipment, setEquipment] = useState({});
   const [playerItemsDefence, setPlayerItemsDefence] = useState(0);
 
+  const [damages, setDamages] = useState([]);
+  const [hits, setHits] = useState([]);
+
+  const [isBattle, setIsBattle] = useState(false);
+  const [town, setTown] = useState("lorencia")
+  const [location, setLocation] = useState(0)
+  const [npcList, setNpcList] = useState([]);
+  const [currentTime, setCurrentTime] = useState(0);
+
+
   localStorage.setItem('playerID',1);
 
   useEffect(() => {
@@ -107,6 +123,31 @@ function App() {
 
    connectToMetaMask();
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(prevTime => prevTime + 1);
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  function processDmgDealt(batlleId, damage, opponent, player, opponentHealth)   {
+    console.log("[processDmgDealt] batlleId=", batlleId, " damage=", damage ," opponentId=", opponent, " player=", player, " opponentHealth=", opponentHealth);
+
+    if (player == localStorage.getItem('playerID'))
+    {
+      setOpponentHealth(opponentHealth);
+      setDamages(prev => [...prev, damage])
+    }
+    else
+    {
+      setPlayerHealth(opponentHealth)
+      setHits(prev => [...prev, damage])
+    }
+  }
 
   const updateStats = async () => {
     if (!web3) {
@@ -233,6 +274,7 @@ function App() {
       });
   }
 
+  // !!!!  
   function processIncomingMessage(event) {
       var msg = JSON.parse(event.data);
       console.log("New message", msg);
@@ -263,48 +305,55 @@ function App() {
           console.log("battle_closed", msg)
           
 
-          processMoves(msg.move1, msg.move2)
+          //processMoves(msg.move1, msg.move2)
           generateBattleReceipt(msg);
          break;
 
         case "fighter_items":
-          updateFighterItems(msg.items, msg.fighter, msg.equipment, msg.stats);
+          updateFighterItems(msg.items, msg.fighter, msg.equipment, msg.stats, msg.npcs);
         break;
 
-
+        case "damage_dealt":
+          processDmgDealt(msg.battleID, msg.damage, msg.opponent, msg.player, msg.opponentHealth)
+        break;
 
         
       }
   }
 
-  function updateFighterItems(items, fighter, equipment, stats) {
-    if (items == '') return;
-    var itemList = JSON.parse(items);
+  function updateFighterItems(items, fighter, equipment, stats, npcs) {
+    
+    
     var player = JSON.parse(fighter);
+    var npcs = JSON.parse(npcs);
     var equipment = JSON.parse(equipment);
     
     var newItems = [];
     var itemDefence = 0;
-    for (var i = 0; i < itemList.length; i++) {
-      console.log("updateFighterItems", itemList[i])
+    if (items != '') {
+      var itemList = JSON.parse(items);
+      for (var i = 0; i < itemList.length; i++) {
+        console.log("updateFighterItems", itemList[i])
 
-      // check if item is equipped
-      if (!isEquiped(itemList[i].tokenId, player))
-      {
-        newItems.push(itemList[i]);
-      } else {
-        itemDefence += parseInt(itemList[i].defense);
-      }     
+        // check if item is equipped
+        if (!isEquiped(itemList[i].tokenId, player))
+        {
+          newItems.push(itemList[i]);
+        } else {
+          itemDefence += parseInt(itemList[i].defense);
+        }     
+      }
     }
-
+    
     setPlayerItemsDefence(itemDefence);
 
     setInventoryItems(newItems);
     setEquipment(equipment);
+    setNpcList(npcs);
 
      var stats = JSON.parse(stats);
 
-    
+    console.log("Player", player)
 
     setPlayerHealth(stats.currentHealth);
     setPlayerStrength(player.Strength);
@@ -313,6 +362,10 @@ function App() {
     setPlayerVitality(player.Vitality);
     setPlayerMaxStats(stats.maxStatPoints);
     setPlayerExperience(player.Experience);
+    setPlayerAttackSpeed(player.attackSpeed);
+    setPlayerAgilityPointsPerSpeed(player.agilityPointsPerSpeed);
+
+    console.log("[updateFighterItems] ", player);
 
     FIGHTER_STATS = {
         Strength: [player.Strength, 0],
@@ -352,21 +405,16 @@ function App() {
 
   function startNewBattle(msg) {
       setFightLog([]); 
+      setDamages([]);
+      setHits([]);
       localStorage.setItem('battleClosed', false);
       localStorage.setItem('battleID', msg.battleID);
       localStorage.setItem('currentRound', 1);
 
-
       var opp1 = JSON.parse(msg.opponent1);
-      var opp2 = JSON.parse(msg.opponent2);
-      
-
-      
+      var opp2 = JSON.parse(msg.opponent2);     
 
       let player, opponent, stats, opStats;
-
-      
-
 
       if (opp1.TokenID == localStorage.getItem('playerID'))
       {
@@ -385,8 +433,7 @@ function App() {
           opponent = opp1;
           stats = JSON.parse(msg.fighterStats2);
           opStats = JSON.parse(msg.fighterStats1);
-      }       
-      
+      }        
 
       setPlayerHealth(stats.currentHealth)
       setPlayerMaxHP(stats.maxHealth);
@@ -400,11 +447,16 @@ function App() {
       setOpponentMaxHP(opStats.maxHealth);
 
       localStorage.setItem("opponentID", opponent.TokenID)
+
+      setIsBattle(true);
+      console.log("isBattle: ", isBattle);
   }
 
   function generateBattleReceipt(msg) {
     var winner = msg.winner;
     console.log("WINNER: ", winner);
+    setIsBattle(false);
+    console.log("isBattle: ", isBattle);
   }
 
   function processMoves(move1, move2) {
@@ -468,19 +520,6 @@ function App() {
     setAvailablePoints(parseInt(playerMaxStats)-parseInt(playerStrength)-parseInt(playerAgility)-parseInt(playerEnergy)-parseInt(playerVitality));
   }
 
-  function handleAttackSelection(attack) {
-    setAttackOption(attack);
-    attackOption = attack;
-    console.log('Attack:', attack);
-  }
-
-  function handleBlockSelection(block) {
-    setBlockOption(block);
-    blockOption = block;
-    console.log('Block:', block);
-    
-  }
-
   async function handleNewBattleButton() {
     var response = sendJsonMessage({
       type: "startNewBattle",
@@ -492,15 +531,24 @@ function App() {
     });
   }
 
+  async function initiateBattle(userId) {
+    var response = sendJsonMessage({
+      type: "startNewBattle",
+      data: {
+          playerID: parseInt(localStorage.getItem('playerID')),
+          opponentID: parseInt(userId)
+      }
+
+    });
+  }
+
   async function handleMoveSubmission() {
       var response = sendJsonMessage({
         type: "recordMove",
         data: {
             battleID: localStorage.getItem('battleID'),
             playerID: parseInt(localStorage.getItem('playerID')),
-            attack: attackOption,
-            block: blockOption,
-            round: parseInt(localStorage.getItem('currentRound'))
+            skill: 0
         }
 
       });
@@ -512,9 +560,7 @@ function App() {
         data: {
             battleID: localStorage.getItem('battleID'),
             playerID: parseInt(localStorage.getItem('opponentID')),
-            attack: parts[Math.floor(Math.random() * parts.length)],
-            block: parts[Math.floor(Math.random() * parts.length)],
-            round: parseInt(localStorage.getItem('currentRound'))
+            skill: 0
         }
 
       });
@@ -565,7 +611,12 @@ function App() {
             <h5>Stats</h5>
             <div><Fighter name="Player 2" currentHealth={opponentHealth} health={opponentMaxHP} color="red" /></div>
             
-            </div>
+          </div>
+          <div> 
+            <DamageTicker color="green" damages={damages} />
+            <DamageTicker color="red" damages={hits} />
+
+          </div>
           <div>
               
               <Inventory items={inventoryItems} setItems={setInventoryItems} equipItem={equipItem} />
@@ -584,7 +635,7 @@ function App() {
 
         {/* Middle section */}
         <div style={{ width: '40%', padding: '0 10px' }}>
-          <h4>Fight Moves Logs</h4>
+          <h4>Game Chat</h4>
           <div>
             <button onClick={handleNewBattleButton}>New Battle</button>
 
@@ -592,18 +643,11 @@ function App() {
 
             <button onClick={refreshFigterItems}>Refresh</button>
           </div>
-
+          {npcList.map((npc) => (
+            <NPC key={npc.id} npc={npc} currentTime={currentTime} initiateBattle={initiateBattle} />
+          ))}
           <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
-            {fightLog.map((move, index) => 
-              <p key={index}> 
-              <b>[Round {move.Round}]</b>: 
-                {move.PlayerID == localStorage.getItem("playerID") ? ' You hit your opponent ' : ' Opponent hit you '} 
-                 on the <b>{move.Atack} </b> 
-                 <i><u>{move.WasBlocked ? ' but met a block ' : ''}</u></i>
-                  causing <b style={{ color: move.PlayerID == localStorage.getItem("playerID") ? 'green' : 'red'}}>
-                  {move.Damage}</b> damage!
-              </p>
-            )}
+            
           </div>
         </div>
 
@@ -616,11 +660,13 @@ function App() {
 
         {/* Right section */}
         <div style={{ width: '30%', padding: '0 10px' }}>
-         
+           
 
 
           <h4>{localStorage.getItem("playerID")} [{playerLevel}]</h4>
           <img src="my-fighter.png" alt="My Fighter" style={{ width: '100%', marginBottom: '10px' }} />
+           
+            
           <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
             <h5>Stats</h5>
             <div><Fighter currentHealth={playerHealth} health={playerMaxHP} color="green" /></div>
@@ -667,22 +713,13 @@ function App() {
               <div style={{ flex: 1, padding: '10px', backgroundColor: '#d9d9d9' }}>
                   <p>Defence: {parseInt(playerAgility/4+playerItemsDefence)}</p>
                   <p>Attack: {parseInt(playerStrength/4 + playerEnergy/4)}</p>
+                  <p>Speed: {parseInt(playerAttackSpeed + playerAgility/playerAgilityPointsPerSpeed)}</p>
               </div>
             </div>
 
           </div>
           <div className="button-container">
-            <div className="button-column">
-              <button style={{ backgroundColor: attackOption === "head" ? 'yellow' : 'white' }} onClick={() => handleAttackSelection("head")}>Head</button>
-              <button style={{ backgroundColor: attackOption === "body" ? 'yellow' : 'white' }} onClick={() => handleAttackSelection("body")}>Body</button>
-              <button style={{ backgroundColor: attackOption === "legs" ? 'yellow' : 'white' }} onClick={() => handleAttackSelection("legs")}>Legs</button>
-            </div>
-            <div className="button-column">
-              <button style={{ backgroundColor: blockOption === "head" ? 'green' : 'white' }} onClick={() => handleBlockSelection("head")}>Head</button>
-              <button style={{ backgroundColor: blockOption === "body" ? 'green' : 'white' }} onClick={() => handleBlockSelection("body")}>Body</button>
-              <button style={{ backgroundColor: blockOption === "legs" ? 'green' : 'white' }} onClick={() => handleBlockSelection("legs")}>Legs</button>
-            </div>
-            <button onClick={handleMoveSubmission}>Submit Move</button>
+            <LoadingButton onClick={handleMoveSubmission} isBattle={isBattle} playerSpeed={playerAttackSpeed + playerAgility/playerAgilityPointsPerSpeed}>Submit Move</LoadingButton>
           </div>
         </div>
       </div>
