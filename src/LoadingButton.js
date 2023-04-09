@@ -1,43 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './LoadingButton.css';
 
-const LoadingButton = ({ onClick, children, isBattle, playerSpeed }) => {
+const LoadingButton = ({ onClick, children, playerSpeed }) => {
   const [loading, setLoading] = useState(false);
   const [autoClick, setAutoClick] = useState(true);
+  const [lastClick, setLastClick] = useState(Date.now());
 
-  const handleClick = async () => {
+  const handleClick = useCallback(async () => {
+    console.log("handleClick called");
     setLoading(true);
+    setLastClick(Date.now());
     await onClick();
     setTimeout(() => {
       setLoading(false);
     }, 60000 / playerSpeed);
-  };
+  }, [onClick, playerSpeed]);
 
   useEffect(() => {
-    let timer;
-
-    if (autoClick && isBattle && !loading) {
-      handleClick();
-      timer = setTimeout(handleClick, 60000 / playerSpeed);
+    if (autoClick && !loading) {
+      const timeSinceLastClick = Date.now() - lastClick;
+      const timeToNextClick = Math.max(0, 60000 / playerSpeed - timeSinceLastClick);
+      const timer = setTimeout(() => {
+        handleClick();
+      }, timeToNextClick);
+      return () => clearTimeout(timer);
     }
-
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
-  }, [autoClick, isBattle, loading, handleClick, playerSpeed]);
-
-  // Stop the spinner when isBattle becomes false
-  useEffect(() => {
-    if (!isBattle) {
-      setLoading(false);
-    }
-  }, [isBattle]);
+  }, [autoClick, loading, handleClick, playerSpeed, lastClick]);
 
   const handleCheckboxChange = (e) => {
     setAutoClick(e.target.checked);
   };
+
+  const animationDuration = `${60000 / playerSpeed}ms`;
 
   return (
     <div>
@@ -46,8 +40,11 @@ const LoadingButton = ({ onClick, children, isBattle, playerSpeed }) => {
         onClick={handleClick}
         disabled={loading}
       >
-        {loading ? <span className="spinner"></span> : null}
         {children}
+        <div
+          className={`progress-bar ${loading ? 'loading' : ''}`}
+          style={{ animationDuration }}
+        ></div>
       </button>
       <label htmlFor="auto-click-checkbox">
         <input

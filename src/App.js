@@ -18,6 +18,7 @@ import Fighter from './Fighter';
 import DamageTicker from './DamageTicker';
 import LoadingButton from './LoadingButton';
 import NPC from './NPC';
+import FloatingDamage from "./FloatingDamage";
 
 const FighterNFTContractAddress = "0x1f3B499720eeDfe4B3a59478c2ab3cA7a3c2F45c";
 const ItemsNFTContractAddress = "0x5a6b2CAfF4a9019E56917Ee5d8A1918a66183e08";
@@ -70,16 +71,6 @@ function App() {
   const [playerAttackSpeed, setPlayerAttackSpeed] = useState(0);
   const [playerAgilityPointsPerSpeed, setPlayerAgilityPointsPerSpeed] = useState(0);
 
-
-
-  const [opponentHealth, setOpponentHealth] = useState(0);
-  const [opponentStrength, setOpponentStrength] = useState(0);
-  const [opponentAgility, setOpponentAgility] = useState(0);
-  const [opponentEnergy, setOpponentEnergy] = useState(0);
-  const [opponentVitality, setOpponentVitality] = useState(0);
-  const [opponentLevel, setOpponentLevel] = useState(0);
-  const [opponentMaxHP, setOpponentMaxHP] = useState(0);
-
   const [attributes, setAttributes] = useState(FIGHTER_STATS);
   const [availablePoints, setAvailablePoints] = useState(0);
 
@@ -100,9 +91,36 @@ function App() {
   const [location, setLocation] = useState(0)
   const [npcList, setNpcList] = useState([]);
   const [currentTime, setCurrentTime] = useState(0);
-
+  const [battles, setBattles] = useState([]);
+  const [target, setTarget] = useState(0);
+  const [damageData, setDamageData] = useState(null);
 
   localStorage.setItem('playerID',1);
+
+  useEffect(() => {
+    sendAuth();
+  }, []);
+
+  async function sendAuth(target) {
+    var response = sendJsonMessage({
+      type: "auth",
+      data: {
+          playerID: parseInt(localStorage.getItem('playerID')),
+      }
+    });
+  }
+
+  const handleDamageReceived = (npcId, damage) => {
+    // Set the damage data, which will trigger the floating damage animation
+    setDamageData({ npcId, damage });
+  };
+
+  useEffect(() => {
+    if (damageData) {
+      // Reset damageData after a short delay to prevent continuous triggering
+      setTimeout(() => setDamageData(null), 500);
+    }
+  }, [damageData]);
 
   useEffect(() => {
     const connectToMetaMask = async () => {
@@ -142,6 +160,41 @@ function App() {
     return () => clearInterval(interval);
   }, [fighter]);
 
+  useEffect(() => {
+    if (target !== 0) {
+      sendMove(target);
+    }
+  }, [target]);
+
+  function getRandomAliveNpc() {
+    const aliveNpcs = npcList.filter((npc) => !npc.isDead);
+
+    if (aliveNpcs.length === 0) {
+      return null;
+    }
+
+    const randomIndex = Math.floor(Math.random() * aliveNpcs.length);
+    return aliveNpcs[randomIndex].id;
+  }
+
+  function isNpc(id) {
+    for (var i=0; i<npcList.length; i++) {
+      if (parseInt(npcList[i].id) == parseInt(id)) {
+        return true;
+      } else {
+        return false;
+      }
+    } 
+  }
+
+  function getNpcIndex(id) {
+    for (var i=0; i<npcList.length; i++) {
+      if (parseInt(npcList[i].id) == parseInt(id)) {
+        return i;
+      } 
+    } 
+  }
+
   function updateHealth() {
     var health = getHealth(fighter);
     setPlayerHealth(health);
@@ -166,26 +219,65 @@ function App() {
     return Math.min(maxHealth, health).toFixed(0);
   }
 
-  function updateNpcHealth(npcId, newHealth, lastDmgTimestamp) {
-    console.log("updateNpcHealth", npcId, newHealth, lastDmgTimestamp)
-    for (var i = 0; i < npcList.length; i++)
-    {
-      if (npcList[i].id == npcId)
-      {
-        console.log("updateNpcHealth", npcId, newHealth, lastDmgTimestamp)
-        npcList[i].healthAfterLastDmg = newHealth;
-        npcList[i].lastDmgTimestamp = lastDmgTimestamp;
+  function getNpcHealth(npcId) {
+
+    var npc = npcList.find((npc) => npc.id === npcId);
+    //console.log("getNpcHealth ",  npc)
+
+    if (!npc.isDead) {
+      return getHealth(npc);
+    } else {
+      const now = Date.now();
+      const elapsedTimeMs = now - parseInt(npc.lastDmgTimestamp);
+      //console.log("getNpcHealth elapsedTimeMs",  elapsedTimeMs)
+      if (parseInt(elapsedTimeMs) >= 5000) {
+
+        //console.log("getNpcHealth2 ",  npc, elapsedTimeMs, npc.maxHealth)
+        npc.isDead = false;
+        npc.healthAfterLastDmg = npc.maxHealth;
+        npc[npcId] = npc;
+        return npc.maxHealth;
+      } else {
+        return 0;
       }
     }
   }
 
-  function processDmgDealt(batlleId, damage, opponent, player, opponentHealth, lastDmgTimestamp)   {
-    console.log("[processDmgDealt] batlleId=", batlleId, " damage=", damage ," opponentId=", opponent, " player=", player, " opponentHealth=", opponentHealth);
+  function updateNpcHealth(npcId, newHealth, lastDmgTimestamp) {
+    for (var i = 0; i < npcList.length; i++)
+    {
+      if (npcList[i].id == npcId)
+      {
+        setNpcList((prevNpcList) =>
+          prevNpcList.map((npc) => {
+            if (npc.id === npcId) {
+              return {
+                ...npc,
+                healthAfterLastDmg: newHealth,
+                lastDmgTimestamp: lastDmgTimestamp,
+              };
+            }
+            return npc;
+          })
+        );
+      }
+    }
+  }
+
+  function processDmgDealt(damage, opponent, player, opponentHealth, lastDmgTimestamp)   {
+    console.log("[processDmgDealt]  damage=", damage ," opponentId=", opponent, " player=", player, " opponentHealth=", opponentHealth);
 
     if (player == localStorage.getItem('playerID'))
     {
-      setOpponentHealth(opponentHealth)
+
       updateNpcHealth(opponent, opponentHealth, lastDmgTimestamp)
+      if (parseInt(opponentHealth) == 0)
+      {
+        setNpcDead(opponent, true);
+      }
+
+      setDamageData({ npcId: opponent, damage });
+      
       setDamages(prev => [...prev, damage])
     }
     else
@@ -197,6 +289,28 @@ function App() {
       fighter.healthAfterLastDmg = opponentHealth;
       setFighter(fighter);
       setHits(prev => [...prev, damage])
+    }
+  }
+
+  function setNpcDead(npcId, val) {
+    setNpcList((prevNpcList) =>
+      prevNpcList.map((npc) => {
+        if (parseInt(npc.id) === parseInt(npcId)) {
+          return {
+            ...npc,
+            isDead: val,
+            healthAfterLastDmg: !val ? npc.maxHealth : 0
+          };
+        }
+        return npc;
+      })
+    );
+  }
+
+  function isNpcDead(npcId) {
+    const npc = npcList.find((npc) => npc.id === npcId);
+    if (npc) {
+      return npc.isDead;
     }
   }
 
@@ -348,7 +462,7 @@ function App() {
           console.log("next_round_started", msg)
           localStorage.setItem('currentRound', msg.newround);
 
-          processMoves(msg.move1, msg.move2)
+          //processMoves(msg.move1, msg.move2)
          break;
 
         case "battle_closed":
@@ -365,13 +479,13 @@ function App() {
         break;
 
         case "damage_dealt":
-          processDmgDealt(msg.battleID, msg.damage, msg.opponent, msg.player, msg.opponentHealth, msg.lastDmgTimestamp)
+          processDmgDealt(msg.damage, msg.opponent, msg.player, msg.opponentHealth, msg.lastDmgTimestamp)
         break;
 
         
       }
   }
-
+  // !!!!!!
   function updateFighterItems(items, attributes, equipment, stats, npcs, fighter) {
     
     
@@ -457,83 +571,37 @@ function App() {
   }
 
   function startNewBattle(msg) {
-      setFightLog([]); 
-      setDamages([]);
-      setHits([]);
-      localStorage.setItem('battleClosed', false);
-      localStorage.setItem('battleID', msg.battleID);
-      localStorage.setItem('currentRound', 1);
+      // setDamages([]);
+      // setHits([]);
 
-      var opp1 = JSON.parse(msg.opponent1);
-      var opp2 = JSON.parse(msg.opponent2);  
+   
 
-      var fighter1 = JSON.parse(msg.fighter1);
-      var fighter2 = JSON.parse(msg.fighter2);   
-
-      let player, opponent, stats, opStats;
-
-      if (opp1.TokenID == localStorage.getItem('playerID'))
-      {
-          localStorage.setItem('player', opp1);
-          localStorage.setItem('opponent', opp2);
-
-          player = opp1;
-          opponent = opp2;
-          stats = JSON.parse(msg.fighterStats1);
-          opStats = JSON.parse(msg.fighterStats2);
-      } else if (opp2.TokenID == localStorage.getItem('playerID')) {
-          localStorage.setItem('player', opp2);
-          localStorage.setItem('opponent', opp1);
-
-          player = opp2;
-          opponent = opp1;
-          stats = JSON.parse(msg.fighterStats2);
-          opStats = JSON.parse(msg.fighterStats1);
-      }        
-
-      setPlayerHealth(getHealth(fighter1));
-      setPlayerMaxHP(stats.maxHealth);
-
-      setOpponentHealth(opStats.currentHealth);
-      setOpponentStrength(opponent.Strength);
-      setOpponentAgility(opponent.Agility);
-      setOpponentEnergy(opponent.Energy);
-      setOpponentVitality(opponent.Vitality);
-      setOpponentLevel(opStats.level);
-      setOpponentMaxHP(opStats.maxHealth);
-
-      localStorage.setItem("opponentID", opponent.TokenID)
-
-      setIsBattle(true);
-      console.log("isBattle: ", isBattle);
+      // setPlayerHealth(getHealth(fighter1));
+      // setPlayerMaxHP(stats.maxHealth);
   }
 
   function generateBattleReceipt(msg) {
     var winner = msg.winner;
+
+    var battle = JSON.parse(msg.battle);
+    var opp1 = battle.Opponent1;
+    var opp2 = battle.Opponent2;
+
+    if (isNpc(opp1)) {
+      var npcs = npcList;
+      npcs[getNpcIndex(opp1)].inBattle = false;
+      setNpcList(npcs);
+    }
+
+    if (isNpc(opp2)) {
+      var npcs = npcList;
+      npcs[getNpcIndex(opp2)].inBattle = false;
+      setNpcList(npcs);
+    }
+
+
     console.log("WINNER: ", winner);
-    setIsBattle(false);
-    console.log("isBattle: ", isBattle);
-  }
-
-  function processMoves(move1, move2) {
-      var move1 = JSON.parse(move1);
-      var move2 = JSON.parse(move2);
-
-      console.log("move1", move1);
-      console.log("move2", move2);
-
-
-      if (move1.PlayerID == localStorage.getItem('playerID')) {
-        setPlayerHealth(move1.NewHealth);
-        setOpponentHealth(move2.NewHealth);   
-
-      } else {
-        setPlayerHealth(move2.NewHealth);
-        setOpponentHealth(move1.NewHealth);
-      }
-
-      setFightLog(prevMoves => [...prevMoves, move1]); 
-      setFightLog(prevMoves => [...prevMoves, move2]); 
+    //setIsBattle(false);
   }
 
   function handleAttributeChange(name, value) {
@@ -581,50 +649,44 @@ function App() {
     setAvailablePoints(parseInt(playerMaxStats)-parseInt(playerStrength)-parseInt(playerAgility)-parseInt(playerEnergy)-parseInt(playerVitality));
   }
 
-  async function handleNewBattleButton() {
-    var response = sendJsonMessage({
-      type: "startNewBattle",
-      data: {
-          playerID: parseInt(localStorage.getItem('playerID')),
-          opponentID: parseInt(2)
-      }
-
-    });
+  function getNpcMaxHealth(npcId) {
+    const npc = npcList.find((npc) => npc.id === npcId);
+    if (npc) {
+      return npc.maxHealth;
+    }
+    return null;
   }
-
-  async function initiateBattle(userId) {
-    var response = sendJsonMessage({
-      type: "startNewBattle",
-      data: {
-          playerID: parseInt(localStorage.getItem('playerID')),
-          opponentID: parseInt(userId)
-      }
-
-    });
-  }
-
+  
   async function handleMoveSubmission() {
-      var response = sendJsonMessage({
-        type: "recordMove",
-        data: {
-            battleID: localStorage.getItem('battleID'),
-            playerID: parseInt(localStorage.getItem('playerID')),
-            skill: 0
-        }
+    if (target == 0) return;
+    if (isNpcDead(target) && getNpcHealth(target) < getNpcMaxHealth(target)) {
+      console.log("NPC Dead, finding new target");
+      var newTarget = getRandomAliveNpc();
 
-      });
+      if (newTarget != null) {
+        setTarget(newTarget);
 
-      // // send opponent move random
-      // const parts = ["head", "body", "legs"];
-      // var response = sendJsonMessage({
-      //   type: "recordMove",
-      //   data: {
-      //       battleID: localStorage.getItem('battleID'),
-      //       playerID: parseInt(localStorage.getItem('opponentID')),
-      //       skill: 0
-      //   }
+      } else {
+        console.log("No live mobs");
+        return;
+      }
+      
+    } else {
+      sendMove(target);
+    }    
+  }
 
-      // });
+
+  async function sendMove(target) {
+    var response = sendJsonMessage({
+      type: "recordMove",
+      data: {
+          opponentID: target,
+          playerID: parseInt(localStorage.getItem('playerID')),
+          skill: 0
+      }
+
+    });
   }
 
   const handleShopButtonClick = () => {
@@ -666,12 +728,9 @@ function App() {
 
         {/* Left section */}
         <div style={{ width: '30%', padding: '0 10px' }}>
-           <h4>Opponent [{opponentLevel}]</h4>
           <img src="opponent.png" alt="Opponent" style={{ width: '100%', marginBottom: '10px' }} />
           <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
-            <h5>Stats</h5>
-            <div><Fighter name="Player 2" currentHealth={opponentHealth} health={opponentMaxHP} color="red" /></div>
-            
+            <NPC target={target} setTarget={setTarget} damageData={damageData} npcs={npcList} currentTime={currentTime} getNpcHealth={getNpcHealth}/>
           </div>
           <div> 
             <DamageTicker color="green" damages={damages} />
@@ -698,15 +757,16 @@ function App() {
         <div style={{ width: '40%', padding: '0 10px' }}>
           <h4>Game Chat</h4>
           <div>
-            <button onClick={handleNewBattleButton}>New Battle</button>
 
             <button onClick={() => { setIsShopOpen(true); setAppStyle({ pointerEvents: "none" }); }}>Shop</button>
 
             <button onClick={refreshFigterItems}>Refresh</button>
           </div>
-           <NPC npcs={npcList} currentTime={currentTime} initiateBattle={initiateBattle} getHealth={getHealth}/>
+           
           <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
-            
+            <div className="button-container">
+              <LoadingButton onClick={handleMoveSubmission} playerSpeed={playerAttackSpeed + playerAgility/playerAgilityPointsPerSpeed}>Submit Move</LoadingButton>
+            </div>
           </div>
         </div>
 
@@ -777,9 +837,7 @@ function App() {
             </div>
 
           </div>
-          <div className="button-container">
-            <LoadingButton onClick={handleMoveSubmission} isBattle={isBattle} playerSpeed={playerAttackSpeed + playerAgility/playerAgilityPointsPerSpeed}>Submit Move</LoadingButton>
-          </div>
+          
         </div>
       </div>
 

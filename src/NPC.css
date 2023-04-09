@@ -7,6 +7,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin: 10px;
 }
 
 .npc-name {
@@ -42,6 +43,16 @@
   border-radius: 50%;
   clip: rect(0, 50px, 100px, 0);
   animation: pie-fill 1s linear infinite;
+}
+
+.npc-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.npc-name {
+  font-size: 14px;
+  text-align: center;
 }
 
 @keyframes pie-fade-out {
