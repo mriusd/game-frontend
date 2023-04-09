@@ -1,38 +1,40 @@
 import React, { useState, useEffect } from "react";
 import "./NPC.css";
 
-const NPC = ({ npc, currentTime, initiateBattle }) => {
-  const [currentNpc, setCurrentNpc] = useState(npc);
-  const [timeLeft, setTimeLeft] = useState(0);
+const NPC = ({ npcs, currentTime, initiateBattle, getHealth }) => {
+  const [npcState, setNpcState] = useState(npcs);
 
   useEffect(() => {
-    setCurrentNpc(npc);
-  }, [npc]);
+    setNpcState(npcs);
+  }, [npcs]);
 
-  useEffect(() => {
-    if (currentNpc.isDead) {
-      setTimeLeft(currentNpc.timeOfDeath + currentNpc.respawnDelay - currentTime);
-    }
-  }, [currentNpc, currentTime]);
-
-  const handleClick = () => {
-    initiateBattle(npc.id);
+  const handleClick = (npc) => {
+    if (getHealth(npc) < npc.maxHealth) {
+      console.log('Mob unavailable')
+    } else {
+      initiateBattle(npc.id);
+    }    
   };
 
   return (
-    <div className="npc"  onClick={handleClick}>
-      <div className="npc-name">{currentNpc.name}</div>
-      <div className="npc-health-bar">
-        <div
-          className="npc-health"
-          style={{ width: `${(currentNpc.health / 100) * 100}%` }}
-        />
-      </div>
-      {currentNpc.isDead && (
-        <div className="npc-respawn-pie" style={{ animationDuration: `${currentNpc.respawnDelay}s` }}>
-          <div className="pie-spinner" style={{ animationDuration: `${currentNpc.respawnDelay}s` }}></div>
-        </div>
-      )}
+    <div className="npc-container">
+      {npcState.map((npc) => {
+        const isDead = npc.timeOfDeath + npc.respawnDelay * 1000 > currentTime;
+        const timeLeft = npc.timeOfDeath + npc.respawnDelay - currentTime;
+        const progress = (timeLeft / npc.respawnDelay) * 100;
+
+        return (
+          <div key={npc.id} className="npc" onClick={() => handleClick(npc)} style={{ width: '100px', height: '50px', border: '1px solid black', position: 'relative' }}>
+            <div className="npc-name">{npc.name}</div>
+            <div className="npc-healthbar" style={{ width: '100%', height: '5px', backgroundColor: 'lightgray' }}>
+              <div className="npc-current-health" style={{ width: `${(getHealth(npc)/npc.maxHealth) * 100}%`, height: '100%', backgroundColor: 'green' }}></div>
+            </div>
+            {isDead && (
+              <div className="npc-respawn-progress" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: '50%', clipPath: `inset(0 ${progress}% 0 0)` }}></div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };

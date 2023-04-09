@@ -144,10 +144,11 @@ function App() {
 
   function updateHealth() {
     var health = getHealth(fighter);
-    setPlayerHealth(health.toFixed(0));
+    setPlayerHealth(health);
   }
 
   function getHealth(fighter) {
+    //console.log("getHealth fighter", fighter);
     const maxHealth = fighter.maxHealth;
     const lastDmgTimestamp = fighter.lastDmgTimestamp;
     const healthAfterLastDmg = fighter.healthAfterLastDmg;
@@ -155,11 +156,27 @@ function App() {
     const healthRegenRate = fighter.hpRegenerationRate;
     const currentTime = Date.now();
 
-    const health = healthAfterLastDmg + (Math.floor(((currentTime - lastDmgTimestamp)) / 5) * healthRegenRate);
+    var health;
 
-    console.log("[getHealth] maxHealth=", maxHealth, " lastDmgTimestamp=", lastDmgTimestamp, " healthAfterLastDmg=", healthAfterLastDmg, " healthRegenRate=", healthRegenRate, " health=", health);
+    health = healthAfterLastDmg + (Math.floor(((currentTime - lastDmgTimestamp)) / 5) * healthRegenRate);
 
-    return Math.min(maxHealth, health);
+    
+    //console.log("[getHealth] maxHealth=", maxHealth, " lastDmgTimestamp=", lastDmgTimestamp, " healthAfterLastDmg=", healthAfterLastDmg, " healthRegenRate=", healthRegenRate, " health=", health);
+
+    return Math.min(maxHealth, health).toFixed(0);
+  }
+
+  function updateNpcHealth(npcId, newHealth, lastDmgTimestamp) {
+    console.log("updateNpcHealth", npcId, newHealth, lastDmgTimestamp)
+    for (var i = 0; i < npcList.length; i++)
+    {
+      if (npcList[i].id == npcId)
+      {
+        console.log("updateNpcHealth", npcId, newHealth, lastDmgTimestamp)
+        npcList[i].healthAfterLastDmg = newHealth;
+        npcList[i].lastDmgTimestamp = lastDmgTimestamp;
+      }
+    }
   }
 
   function processDmgDealt(batlleId, damage, opponent, player, opponentHealth, lastDmgTimestamp)   {
@@ -167,7 +184,8 @@ function App() {
 
     if (player == localStorage.getItem('playerID'))
     {
-      setOpponentHealth(opponentHealth);
+      setOpponentHealth(opponentHealth)
+      updateNpcHealth(opponent, opponentHealth, lastDmgTimestamp)
       setDamages(prev => [...prev, damage])
     }
     else
@@ -176,6 +194,7 @@ function App() {
 
       var fit = fighter;
       fighter.lastDmgTimestamp = lastDmgTimestamp;
+      fighter.healthAfterLastDmg = opponentHealth;
       setFighter(fighter);
       setHits(prev => [...prev, damage])
     }
@@ -389,12 +408,12 @@ function App() {
     console.log("attributes", attributes)
 
     setFighter(fighter);
-    setPlayerHealth(getHealth(fighter).toFixed(0));
+    setPlayerHealth(getHealth(fighter));
     setPlayerStrength(attributes.Strength);
     setPlayerAgility(attributes.Agility);
     setPlayerEnergy(attributes.Energy);
     setPlayerVitality(attributes.Vitality);
-    setPlayerMaxStats(attributes.maxStatPoints);
+    setPlayerMaxStats(stats.maxStatPoints);
     setPlayerExperience(attributes.Experience);
     setPlayerAttackSpeed(attributes.attackSpeed);
     setPlayerAgilityPointsPerSpeed(attributes.agilityPointsPerSpeed);
@@ -446,7 +465,10 @@ function App() {
       localStorage.setItem('currentRound', 1);
 
       var opp1 = JSON.parse(msg.opponent1);
-      var opp2 = JSON.parse(msg.opponent2);     
+      var opp2 = JSON.parse(msg.opponent2);  
+
+      var fighter1 = JSON.parse(msg.fighter1);
+      var fighter2 = JSON.parse(msg.fighter2);   
 
       let player, opponent, stats, opStats;
 
@@ -469,7 +491,7 @@ function App() {
           opStats = JSON.parse(msg.fighterStats1);
       }        
 
-      setPlayerHealth(stats.currentHealth)
+      setPlayerHealth(getHealth(fighter1));
       setPlayerMaxHP(stats.maxHealth);
 
       setOpponentHealth(opStats.currentHealth);
@@ -524,7 +546,12 @@ function App() {
     // );
     attributes[name] = value;
 
-    console.log("FIGHTER_STATS ", FIGHTER_STATS);
+    // console.log("FIGHTER_STATS ", FIGHTER_STATS);
+    // console.log("playerMaxStats ", playerMaxStats);
+    // console.log("playerStrength ", playerStrength);
+    // console.log("playerAgility ", playerAgility);
+    // console.log("playerEnergy ", playerEnergy);
+    // console.log("playerVitality ", playerVitality);
     setAvailablePoints(
       parseInt(playerMaxStats)
       -parseInt(playerStrength)
@@ -587,17 +614,17 @@ function App() {
 
       });
 
-      // send opponent move random
-      const parts = ["head", "body", "legs"];
-      var response = sendJsonMessage({
-        type: "recordMove",
-        data: {
-            battleID: localStorage.getItem('battleID'),
-            playerID: parseInt(localStorage.getItem('opponentID')),
-            skill: 0
-        }
+      // // send opponent move random
+      // const parts = ["head", "body", "legs"];
+      // var response = sendJsonMessage({
+      //   type: "recordMove",
+      //   data: {
+      //       battleID: localStorage.getItem('battleID'),
+      //       playerID: parseInt(localStorage.getItem('opponentID')),
+      //       skill: 0
+      //   }
 
-      });
+      // });
   }
 
   const handleShopButtonClick = () => {
@@ -677,9 +704,7 @@ function App() {
 
             <button onClick={refreshFigterItems}>Refresh</button>
           </div>
-          {npcList.map((npc) => (
-            <NPC key={npc.id} npc={npc} currentTime={currentTime} initiateBattle={initiateBattle} />
-          ))}
+           <NPC npcs={npcList} currentTime={currentTime} initiateBattle={initiateBattle} getHealth={getHealth}/>
           <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
             
           </div>
