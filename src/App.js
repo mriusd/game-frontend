@@ -22,15 +22,15 @@ import FloatingDamage from "./FloatingDamage";
 
 const FighterNFTContractAddress = "0x1f3B499720eeDfe4B3a59478c2ab3cA7a3c2F45c";
 const ItemsNFTContractAddress = "0x5a6b2CAfF4a9019E56917Ee5d8A1918a66183e08";
+const UserAddress = "0xC1FcD8e0e55499D25811FAEFd0418FEabd5e4E1e";
+const PlayerID = "1";
+
 var FIGHTER_STATS = {
     Strength: [0, 0],
     Agility: [0, 0],
     Energy: [0, 0],
     Vitality: [0, 0],
 };
-
-
-
 
 const ITEM_SIZE = 40;
 const INVENTORY_SIZE = 8;
@@ -42,7 +42,7 @@ function App() {
   // WebSocket
   const socketUrl = 'ws://localhost:8080/ws';
   const socketOptions = {
-    onOpen: (event) => { console.log('WebSocket connected!:', event); refreshFigterItems(); },
+    onOpen: (event) => { console.log('WebSocket connected!:', event); sendAuth(); },
     onError: (event) => console.error('WebSocket error:', event),
     onClose: (event) => console.log('WebSocket closed:', event),
     onMessage: (event) => processIncomingMessage(event)
@@ -95,17 +95,16 @@ function App() {
   const [target, setTarget] = useState(0);
   const [damageData, setDamageData] = useState(null);
 
-  localStorage.setItem('playerID',1);
 
   useEffect(() => {
-    sendAuth();
+    refreshFigterItems();
   }, []);
 
   async function sendAuth(target) {
     var response = sendJsonMessage({
       type: "auth",
       data: {
-          playerID: parseInt(localStorage.getItem('playerID')),
+          playerID: parseInt(PlayerID),
       }
     });
   }
@@ -154,17 +153,27 @@ function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      updateHealth();
-    }, 1000);
+      updateHealth();      
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [fighter]);
 
   useEffect(() => {
+    
     if (target !== 0) {
       sendMove(target);
+    } else {
+      setTarget(getRandomAliveNpc());
     }
   }, [target]);
+
+  useEffect(() => {   
+    if (target == null) {
+        setTarget(getRandomAliveNpc());
+    }
+    
+  }, [npcList]);
 
   function getRandomAliveNpc() {
     const aliveNpcs = npcList.filter((npc) => !npc.isDead);
@@ -211,37 +220,18 @@ function App() {
 
     var health;
 
-    health = healthAfterLastDmg + (Math.floor(((currentTime - lastDmgTimestamp)) / 5) * healthRegenRate);
-
-    
-    //console.log("[getHealth] maxHealth=", maxHealth, " lastDmgTimestamp=", lastDmgTimestamp, " healthAfterLastDmg=", healthAfterLastDmg, " healthRegenRate=", healthRegenRate, " health=", health);
+    health = parseInt(healthAfterLastDmg) + (Math.floor(((currentTime - lastDmgTimestamp)) / 5) * healthRegenRate);
+  
+    console.log("[getHealth] fighter=", fighter.id," isDead=", fighter.isDead," maxHealth=", maxHealth, " lastDmgTimestamp=", lastDmgTimestamp, " healthAfterLastDmg=", healthAfterLastDmg, " healthRegenRate=", healthRegenRate, " health=", health);
 
     return Math.min(maxHealth, health).toFixed(0);
   }
 
   function getNpcHealth(npcId) {
-
-    var npc = npcList.find((npc) => npc.id === npcId);
-    //console.log("getNpcHealth ",  npc)
-
-    if (!npc.isDead) {
-      return getHealth(npc);
-    } else {
-      const now = Date.now();
-      const elapsedTimeMs = now - parseInt(npc.lastDmgTimestamp);
-      //console.log("getNpcHealth elapsedTimeMs",  elapsedTimeMs)
-      if (parseInt(elapsedTimeMs) >= 5000) {
-
-        //console.log("getNpcHealth2 ",  npc, elapsedTimeMs, npc.maxHealth)
-        npc.isDead = false;
-        npc.healthAfterLastDmg = npc.maxHealth;
-        npc[npcId] = npc;
-        return npc.maxHealth;
-      } else {
-        return 0;
-      }
-    }
+    const npc = npcList.find((npc) => npc.id === npcId);
+    return getHealth(npc);
   }
+
 
   function updateNpcHealth(npcId, newHealth, lastDmgTimestamp) {
     for (var i = 0; i < npcList.length; i++)
@@ -267,7 +257,7 @@ function App() {
   function processDmgDealt(damage, opponent, player, opponentHealth, lastDmgTimestamp)   {
     console.log("[processDmgDealt]  damage=", damage ," opponentId=", opponent, " player=", player, " opponentHealth=", opponentHealth);
 
-    if (player == localStorage.getItem('playerID'))
+    if (player == PlayerID)
     {
 
       updateNpcHealth(opponent, opponentHealth, lastDmgTimestamp)
@@ -295,11 +285,10 @@ function App() {
   function setNpcDead(npcId, val) {
     setNpcList((prevNpcList) =>
       prevNpcList.map((npc) => {
-        if (parseInt(npc.id) === parseInt(npcId)) {
+        if (npc.id === npcId) {
           return {
             ...npc,
-            isDead: val,
-            healthAfterLastDmg: !val ? npc.maxHealth : 0
+            isDead: val
           };
         }
         return npc;
@@ -325,7 +314,7 @@ function App() {
       console.log(`Connected to MetaMask with account ${accounts[0]}`);
       const myContract = new web3.eth.Contract(FighterNFTAbi, FighterNFTContractAddress);
       const result = await myContract.methods.updateFighterStats(
-        localStorage.getItem("playerID"),
+        PlayerID,
         attributes.Strength[0],
         attributes.Agility[0],
         attributes.Energy[0],
@@ -354,7 +343,7 @@ function App() {
       const myContract = new web3.eth.Contract(FighterNFTAbi, FighterNFTContractAddress);
       const result = await myContract.methods.createFighter(1).send({ from: accounts[0] });
       const playerID = result.events.FighterCreated.returnValues.tokenId;
-      localStorage.setItem("playerID", playerID);
+      PlayerID = playerID;
       console.log(result);
       console.log("playerID", playerID);
       refreshFigterItems();
@@ -374,7 +363,7 @@ function App() {
       const accounts = await web3.eth.getAccounts();
       console.log(`Connected to MetaMask with account ${accounts[0]}`);
       const myContract = new web3.eth.Contract(ItemNFTAbi, ItemsNFTContractAddress);
-      const result = await myContract.methods.buyItemFromShop(itemId, localStorage.getItem("playerID")).send({ from: accounts[0] });
+      const result = await myContract.methods.buyItemFromShop(itemId, PlayerID).send({ from: accounts[0] });
       const id = result.events.ItemBoughtFromShop.returnValues.itemId;
       refreshFigterItems();
       console.log(result);
@@ -395,7 +384,7 @@ function App() {
       const accounts = await web3.eth.getAccounts();
       console.log(`Connected to MetaMask with account ${accounts[0]}`);
       const myContract = new web3.eth.Contract(FighterNFTAbi, FighterNFTContractAddress);
-      const result = await myContract.methods.equipItem(localStorage.getItem("playerID"), itemId, slot1).send({ from: accounts[0] });
+      const result = await myContract.methods.equipItem(PlayerID, itemId, slot1).send({ from: accounts[0] });
       const id = result.events.ItemEquiped.returnValues.itemId;
      
       console.log(result);
@@ -417,7 +406,7 @@ function App() {
       const accounts = await web3.eth.getAccounts();
       console.log(`Connected to MetaMask with account ${accounts[0]}`);
       const myContract = new web3.eth.Contract(FighterNFTAbi, FighterNFTContractAddress);
-      const result = await myContract.methods.equipItem(localStorage.getItem("playerID"), 0, slot).send({ from: accounts[0] });
+      const result = await myContract.methods.equipItem(PlayerID, 0, slot).send({ from: accounts[0] });
       const id = result.events.ItemEquiped.returnValues.itemId;
      
       console.log(result);
@@ -432,11 +421,17 @@ function App() {
     var response = sendJsonMessage({
         type: "getFighterItems",
         data: {
-            userAddress: "0xDf228A720E6B9472c5559a68551bE5ca2e400FD8",
-            fighterId: parseInt(localStorage.getItem('playerID')),
+            userAddress: UserAddress,
+            fighterId: parseInt(PlayerID),
         }
 
       });
+  }
+
+  function spawnNpc(npc) {
+    console.log("Spawn NPC ", npc);
+    updateNpcHealth(npc.id, npc.maxHealth, npc.lastDmgTimestamp)
+    setNpcDead(npc.id, false);
   }
 
   // !!!!  
@@ -445,34 +440,9 @@ function App() {
       console.log("New message", msg);
 
       switch (msg.action) {
-        case "new_battle_started":
-
-          startNewBattle(msg);
-          
-
-          console.log("new_battle_started", msg)
-         break;
-       case "move_accepted":
-          // print move to battle log
-          console.log("move_accepted", msg)
-         break;
-
-        case "next_round_started":
-          // print move to battle log
-          console.log("next_round_started", msg)
-          localStorage.setItem('currentRound', msg.newround);
-
-          //processMoves(msg.move1, msg.move2)
-         break;
-
-        case "battle_closed":
-          localStorage.setItem('battleClosed', true);
-          console.log("battle_closed", msg)
-          
-
-          //processMoves(msg.move1, msg.move2)
-          generateBattleReceipt(msg);
-         break;
+        case "spawn_npc":
+          spawnNpc(msg.npc);
+        break;
 
         case "fighter_items":
           updateFighterItems(msg.items, msg.attributes, msg.equipment, msg.stats, msg.npcs, msg.fighter);
@@ -515,7 +485,7 @@ function App() {
 
     setInventoryItems(newItems);
     setEquipment(equipment);
-    setNpcList(npcs);
+    setNpcList(npcs);    
 
      var stats = JSON.parse(stats);
 
@@ -568,16 +538,6 @@ function App() {
     if (fighter.wingsSlot     == tokenId) return true;
 
     return false;
-  }
-
-  function startNewBattle(msg) {
-      // setDamages([]);
-      // setHits([]);
-
-   
-
-      // setPlayerHealth(getHealth(fighter1));
-      // setPlayerMaxHP(stats.maxHealth);
   }
 
   function generateBattleReceipt(msg) {
@@ -682,7 +642,7 @@ function App() {
       type: "recordMove",
       data: {
           opponentID: target,
-          playerID: parseInt(localStorage.getItem('playerID')),
+          playerID: PlayerID,
           skill: 0
       }
 
@@ -765,7 +725,7 @@ function App() {
            
           <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
             <div className="button-container">
-              <LoadingButton onClick={handleMoveSubmission} playerSpeed={playerAttackSpeed + playerAgility/playerAgilityPointsPerSpeed}>Submit Move</LoadingButton>
+              <LoadingButton onClick={handleMoveSubmission} target={target} playerSpeed={playerAttackSpeed*10 + playerAgility/playerAgilityPointsPerSpeed}>Submit Move</LoadingButton>
             </div>
           </div>
         </div>
@@ -782,7 +742,7 @@ function App() {
            
 
 
-          <h4>{localStorage.getItem("playerID")} [{playerLevel}]</h4>
+          <h4>{PlayerID} [{playerLevel}]</h4>
           <img src="my-fighter.png" alt="My Fighter" style={{ width: '100%', marginBottom: '10px' }} />
            
             

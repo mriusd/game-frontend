@@ -8,7 +8,7 @@ const NPC = ({ npcs, currentTime, getNpcHealth, target, setTarget, damageData })
   const [floatingDamages, setFloatingDamages] = useState({});
 
   useEffect(() => {
-    console.log(`damageData `, damageData);
+    //console.log(`damageData `, damageData);
     if (damageData) {
       // Check if the current NPC's ID matches the ID in damageData
       const npc = npcState.find((npc) => npc.id === damageData.npcId);

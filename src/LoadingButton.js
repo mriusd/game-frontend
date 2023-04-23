@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './LoadingButton.css';
 
-const LoadingButton = ({ onClick, children, playerSpeed }) => {
+const LoadingButton = ({ onClick, children, playerSpeed, target }) => {
   const [loading, setLoading] = useState(false);
-  const [autoClick, setAutoClick] = useState(true);
+  const [autoClick, setAutoClick] = useState(false);
   const [lastClick, setLastClick] = useState(Date.now());
 
   const handleClick = useCallback(async () => {
@@ -17,7 +17,7 @@ const LoadingButton = ({ onClick, children, playerSpeed }) => {
   }, [onClick, playerSpeed]);
 
   useEffect(() => {
-    if (autoClick && !loading) {
+    if (autoClick && !loading && target != 0) {
       const timeSinceLastClick = Date.now() - lastClick;
       const timeToNextClick = Math.max(0, 60000 / playerSpeed - timeSinceLastClick);
       const timer = setTimeout(() => {
@@ -25,7 +25,7 @@ const LoadingButton = ({ onClick, children, playerSpeed }) => {
       }, timeToNextClick);
       return () => clearTimeout(timer);
     }
-  }, [autoClick, loading, handleClick, playerSpeed, lastClick]);
+  }, [autoClick, loading, handleClick, playerSpeed, lastClick, target]);
 
   const handleCheckboxChange = (e) => {
     setAutoClick(e.target.checked);
