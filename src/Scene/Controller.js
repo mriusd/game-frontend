@@ -1,7 +1,7 @@
 import * as THREE from "three"
 import { useEffect, useState } from "react"
 import { useFrame, useThree } from "@react-three/fiber"
-import { lerp } from "three/src/math/MathUtils"
+import { lerp, clamp } from "three/src/math/MathUtils"
 import { CAMERA_POSITION } from "./Scene"
 
 const EASE = 0.075
@@ -73,7 +73,7 @@ const Controller = ({ world, character }) => {
             return
         }
 
-        const clampedTargetAngle = THREE.MathUtils.clamp(targetAngle, minAngle.value, maxAngle.value);
+        const clampedTargetAngle = clamp(targetAngle, minAngle.value, maxAngle.value);
         // Rotate the object
         character.current.rotation.y = clampedTargetAngle
         // Save rotation
