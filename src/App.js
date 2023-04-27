@@ -20,6 +20,8 @@ import LoadingButton from './LoadingButton';
 import NPC from './NPC';
 import FloatingDamage from "./FloatingDamage";
 
+import Scene from './Scene/Scene';
+
 const FighterNFTContractAddress = "0x1f3B499720eeDfe4B3a59478c2ab3cA7a3c2F45c";
 const ItemsNFTContractAddress = "0x5a6b2CAfF4a9019E56917Ee5d8A1918a66183e08";
 const UserAddress = "0xC1FcD8e0e55499D25811FAEFd0418FEabd5e4E1e";
@@ -47,7 +49,8 @@ function App() {
     onClose: (event) => console.log('WebSocket closed:', event),
     onMessage: (event) => processIncomingMessage(event)
   };
-  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(socketUrl, socketOptions);
+  // const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(socketUrl, socketOptions);
+  const sendJsonMessage = () => {}
   const [isShopOpen, setIsShopOpen] = useState(false);  
 
   var [attackOption, setAttackOption] = useState('');
@@ -96,9 +99,9 @@ function App() {
   const [damageData, setDamageData] = useState(null);
 
 
-  useEffect(() => {
-    refreshFigterItems();
-  }, []);
+  // useEffect(() => {
+  //   refreshFigterItems();
+  // }, []);
 
   async function sendAuth(target) {
     var response = sendJsonMessage({
@@ -121,59 +124,59 @@ function App() {
     }
   }, [damageData]);
 
-  useEffect(() => {
-    const connectToMetaMask = async () => {
-      if (window.ethereum) {
-        try {
-          // Request account access if needed
-          await window.ethereum.request({ method: "eth_requestAccounts" });
-          // Instantiate Web3 with MetaMask provider
-          const web3Instance = new Web3(window.ethereum);
-          setWeb3(web3Instance);
-        } catch (error) {
-          console.error(error);
-        }
-      } else {
-        console.error("MetaMask not detected");
-      }
-    };
+  // useEffect(() => {
+  //   const connectToMetaMask = async () => {
+  //     if (window.ethereum) {
+  //       try {
+  //         // Request account access if needed
+  //         await window.ethereum.request({ method: "eth_requestAccounts" });
+  //         // Instantiate Web3 with MetaMask provider
+  //         const web3Instance = new Web3(window.ethereum);
+  //         setWeb3(web3Instance);
+  //       } catch (error) {
+  //         console.error(error);
+  //       }
+  //     } else {
+  //       console.error("MetaMask not detected");
+  //     }
+  //   };
 
-   connectToMetaMask();
-  }, []);
+  //  connectToMetaMask();
+  // }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(prevTime => prevTime + 1);
-    }, 1000);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setCurrentTime(prevTime => prevTime + 1);
+  //   }, 1000);
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      updateHealth();      
-    }, 5000);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     updateHealth();      
+  //   }, 5000);
 
-    return () => clearInterval(interval);
-  }, [fighter]);
+  //   return () => clearInterval(interval);
+  // }, [fighter]);
 
-  useEffect(() => {
+  // useEffect(() => {
     
-    if (target !== 0) {
-      sendMove(target);
-    } else {
-      setTarget(getRandomAliveNpc());
-    }
-  }, [target]);
+  //   if (target !== 0) {
+  //     sendMove(target);
+  //   } else {
+  //     setTarget(getRandomAliveNpc());
+  //   }
+  // }, [target]);
 
-  useEffect(() => {   
-    if (target == null) {
-        setTarget(getRandomAliveNpc());
-    }
+  // useEffect(() => {   
+  //   if (target == null) {
+  //       setTarget(getRandomAliveNpc());
+  //   }
     
-  }, [npcList]);
+  // }, [npcList]);
 
   function getRandomAliveNpc() {
     const aliveNpcs = npcList.filter((npc) => !npc.isDead);
@@ -655,55 +658,55 @@ function App() {
 
   //refreshFigterItems();
 
-  return (
-    <DndProvider backend={HTML5Backend}>
-    <div className="App" style={appStyle}>
+  // return (
+  //   <DndProvider backend={HTML5Backend}>
+  //   <div className="App" style={appStyle}>
 
-      <ShopModal
-        isOpen={isShopOpen}
-        onClose={() => { setIsShopOpen(false); setAppStyle({}); }}
-        onClick={buyShopItem}
-      />
-
-
-      {/* Top bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '50px', backgroundColor: '#333', color: '#fff', padding: '0 20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="logo.png" alt="Logo" style={{ height: '30px', marginRight: '10px' }} />
-          <h3>My Fighting Game</h3>
-        </div>
-        <div>
-          <button onClick={createFighter}>New Fighter</button>
-          <button style={{ marginRight: '10px' }}>Settings</button>
-          <button>Logout</button>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+  //     <ShopModal
+  //       isOpen={isShopOpen}
+  //       onClose={() => { setIsShopOpen(false); setAppStyle({}); }}
+  //       onClick={buyShopItem}
+  //     />
 
 
+  //     {/* Top bar */}
+  //     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '50px', backgroundColor: '#333', color: '#fff', padding: '0 20px' }}>
+  //       <div style={{ display: 'flex', alignItems: 'center' }}>
+  //         <img src="logo.png" alt="Logo" style={{ height: '30px', marginRight: '10px' }} />
+  //         <h3>My Fighting Game</h3>
+  //       </div>
+  //       <div>
+  //         <button onClick={createFighter}>New Fighter</button>
+  //         <button style={{ marginRight: '10px' }}>Settings</button>
+  //         <button>Logout</button>
+  //       </div>
+  //     </div>
+
+  //     {/* Main content */}
+  //     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
 
 
 
-        {/* Left section */}
-        <div style={{ width: '30%', padding: '0 10px' }}>
-          <img src="opponent.png" alt="Opponent" style={{ width: '100%', marginBottom: '10px' }} />
-          <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
-            <NPC target={target} setTarget={setTarget} damageData={damageData} npcs={npcList} currentTime={currentTime} getNpcHealth={getNpcHealth}/>
-          </div>
-          <div> 
-            <DamageTicker color="green" damages={damages} />
-            <DamageTicker color="red" damages={hits} />
 
-          </div>
-          <div>
+
+  //       {/* Left section */}
+  //       <div style={{ width: '30%', padding: '0 10px' }}>
+  //         <img src="opponent.png" alt="Opponent" style={{ width: '100%', marginBottom: '10px' }} />
+  //         <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
+  //           <NPC target={target} setTarget={setTarget} damageData={damageData} npcs={npcList} currentTime={currentTime} getNpcHealth={getNpcHealth}/>
+  //         </div>
+  //         <div> 
+  //           <DamageTicker color="green" damages={damages} />
+  //           <DamageTicker color="red" damages={hits} />
+
+  //         </div>
+  //         <div>
               
-              <Inventory items={inventoryItems} setItems={setInventoryItems} equipItem={equipItem} />
+  //             <Inventory items={inventoryItems} setItems={setInventoryItems} equipItem={equipItem} />
             
               
-          </div>
-        </div>
+  //         </div>
+  //       </div>
 
 
 
@@ -713,22 +716,22 @@ function App() {
 
 
 
-        {/* Middle section */}
-        <div style={{ width: '40%', padding: '0 10px' }}>
-          <h4>Game Chat</h4>
-          <div>
+  //       {/* Middle section */}
+  //       <div style={{ width: '40%', padding: '0 10px' }}>
+  //         <h4>Game Chat</h4>
+  //         <div>
 
-            <button onClick={() => { setIsShopOpen(true); setAppStyle({ pointerEvents: "none" }); }}>Shop</button>
+  //           <button onClick={() => { setIsShopOpen(true); setAppStyle({ pointerEvents: "none" }); }}>Shop</button>
 
-            <button onClick={refreshFigterItems}>Refresh</button>
-          </div>
+  //           <button onClick={refreshFigterItems}>Refresh</button>
+  //         </div>
            
-          <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
-            <div className="button-container">
-              <LoadingButton onClick={handleMoveSubmission} target={target} playerSpeed={playerAttackSpeed*10 + playerAgility/playerAgilityPointsPerSpeed}>Submit Move</LoadingButton>
-            </div>
-          </div>
-        </div>
+  //         <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
+  //           <div className="button-container">
+  //             <LoadingButton onClick={handleMoveSubmission} target={target} playerSpeed={playerAttackSpeed*10 + playerAgility/playerAgilityPointsPerSpeed}>Submit Move</LoadingButton>
+  //           </div>
+  //         </div>
+  //       </div>
 
 
 
@@ -737,69 +740,69 @@ function App() {
 
 
 
-        {/* Right section */}
-        <div style={{ width: '30%', padding: '0 10px' }}>
+  //       {/* Right section */}
+  //       <div style={{ width: '30%', padding: '0 10px' }}>
            
 
 
-          <h4>{PlayerID} [{playerLevel}]</h4>
-          <img src="my-fighter.png" alt="My Fighter" style={{ width: '100%', marginBottom: '10px' }} />
+  //         <h4>{PlayerID} [{playerLevel}]</h4>
+  //         <img src="my-fighter.png" alt="My Fighter" style={{ width: '100%', marginBottom: '10px' }} />
            
             
-          <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
-            <h5>Stats</h5>
-            <div><Fighter currentHealth={playerHealth} health={playerMaxHP} color="green" /></div>
-            <div>Exp: {playerExperience}</div>
-            <div>
-              <CharacterEquipment equipment={equipment} unequipItem={unequipItem}/>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
-              <div style={{ flex: 1, padding: '10px', backgroundColor: '#f0f0f0' }}>
-                <Stat
-                  name="Strength"
-                  value={attributes.Strength}
-                  onChange={handleAttributeChange}
-                  availablePoints={availablePoints}
-                />
-                <Stat
-                  name="Agility"
-                  value={attributes.Agility}
-                  onChange={handleAttributeChange}
-                  availablePoints={availablePoints}
-                />
-                <Stat
-                  name="Energy"
-                  value={attributes.Energy}
-                  onChange={handleAttributeChange}
-                  availablePoints={availablePoints}
-                />
-                <Stat
-                  name="Vitality"
-                  value={attributes.Vitality}
-                  onChange={handleAttributeChange}
-                  availablePoints={availablePoints}
-                />
-                <div>
-                  Available points: {availablePoints}{" "}
-                  <button onClick={resetAttributes}>Reset</button>
-                </div>
-                <button
-                  onClick={updateStats}
-                >
-                  Submit Stats
-                </button>
-              </div>
-              <div style={{ flex: 1, padding: '10px', backgroundColor: '#d9d9d9' }}>
-                  <p>Defence: {parseInt(playerAgility/4+playerItemsDefence)}</p>
-                  <p>Attack: {parseInt(playerStrength/4 + playerEnergy/4)}</p>
-                  <p>Speed: {parseInt(playerAttackSpeed + playerAgility/playerAgilityPointsPerSpeed)}</p>
-              </div>
-            </div>
+  //         <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
+  //           <h5>Stats</h5>
+  //           <div><Fighter currentHealth={playerHealth} health={playerMaxHP} color="green" /></div>
+  //           <div>Exp: {playerExperience}</div>
+  //           <div>
+  //             <CharacterEquipment equipment={equipment} unequipItem={unequipItem}/>
+  //           </div>
+  //           <div style={{ display: 'flex', flexDirection: 'row' }}>
+  //             <div style={{ flex: 1, padding: '10px', backgroundColor: '#f0f0f0' }}>
+  //               <Stat
+  //                 name="Strength"
+  //                 value={attributes.Strength}
+  //                 onChange={handleAttributeChange}
+  //                 availablePoints={availablePoints}
+  //               />
+  //               <Stat
+  //                 name="Agility"
+  //                 value={attributes.Agility}
+  //                 onChange={handleAttributeChange}
+  //                 availablePoints={availablePoints}
+  //               />
+  //               <Stat
+  //                 name="Energy"
+  //                 value={attributes.Energy}
+  //                 onChange={handleAttributeChange}
+  //                 availablePoints={availablePoints}
+  //               />
+  //               <Stat
+  //                 name="Vitality"
+  //                 value={attributes.Vitality}
+  //                 onChange={handleAttributeChange}
+  //                 availablePoints={availablePoints}
+  //               />
+  //               <div>
+  //                 Available points: {availablePoints}{" "}
+  //                 <button onClick={resetAttributes}>Reset</button>
+  //               </div>
+  //               <button
+  //                 onClick={updateStats}
+  //               >
+  //                 Submit Stats
+  //               </button>
+  //             </div>
+  //             <div style={{ flex: 1, padding: '10px', backgroundColor: '#d9d9d9' }}>
+  //                 <p>Defence: {parseInt(playerAgility/4+playerItemsDefence)}</p>
+  //                 <p>Attack: {parseInt(playerStrength/4 + playerEnergy/4)}</p>
+  //                 <p>Speed: {parseInt(playerAttackSpeed + playerAgility/playerAgilityPointsPerSpeed)}</p>
+  //             </div>
+  //           </div>
 
-          </div>
+  //         </div>
           
-        </div>
-      </div>
+  //       </div>
+  //     </div>
 
 
 
@@ -810,14 +813,18 @@ function App() {
 
 
 
-      {/* Bottom bar */}
-      <div style={{ backgroundColor: '#333', color: '#fff', padding: '10px', marginTop: '50px' }}>
-        <button style={{ marginRight: '10px' }}>Fight Again</button>
-        <button>Choose Opponent</button>
-      </div>
-    </div>
-  </DndProvider>
-  );
+  //     {/* Bottom bar */}
+  //     <div style={{ backgroundColor: '#333', color: '#fff', padding: '10px', marginTop: '50px' }}>
+  //       <button style={{ marginRight: '10px' }}>Fight Again</button>
+  //       <button>Choose Opponent</button>
+  //     </div>
+  //   </div>
+  // </DndProvider>
+  // );
+
+  return (
+    <Scene/>
+  )
 
 
 }
