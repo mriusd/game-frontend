@@ -8,13 +8,14 @@ import { worldCoordToMatrix } from "./utils/worldCoordToMatrix"
 const ANGLE_STEP = Math.PI / 4 // 8 directions
 const ANGLE_RANGE = Math.PI / 8 // set a range of angles to rotate towards
 const MIN_ANGLE = Math.PI / 6 // Min angle on which detect rotation
+
 // TODO: Put this in a store & make reactive
 const currentAngle = { value: 0 } // Current character rotation angle
 const pointerWorld = { value: 0 } // Pointer position in world coordinates
 
 const Controller = ({ world, character }) => {
     const [raycaster] = useState(new THREE.Raycaster())
-    const { matrix, setPosition, setDirection } = useContext(SceneContext)
+    const { matrix, setDirection, setTargetPosition } = useContext(SceneContext)
     const pointer = useThree(state => state.pointer)
     const camera = useThree(state => state.camera)
 
@@ -29,6 +30,7 @@ const Controller = ({ world, character }) => {
         const intersections = raycaster.intersectObject(world.current)
         const point = intersections[0]?.point
         if (point) {
+            // console.log('point', {...point, z: point.z - 0.5})
             pointerWorld.value = point
         }
     }
@@ -44,8 +46,8 @@ const Controller = ({ world, character }) => {
 
     // Set world mouse position to move character
     function mouseDown() {
-        console.log(pointerWorld.value, worldCoordToMatrix(matrix, pointerWorld.value))
-        setPosition(worldCoordToMatrix(matrix, pointerWorld.value))
+        console.log({...pointerWorld.value, z: pointerWorld.value.z - 0.5 }, worldCoordToMatrix(matrix, pointerWorld.value))
+        setTargetPosition(worldCoordToMatrix(matrix, pointerWorld.value))
     }
 
     // Calc character rotation angle (direction)

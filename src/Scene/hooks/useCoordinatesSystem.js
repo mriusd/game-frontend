@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { matrixCoordToWorld } from "../utils/matrixCoordToWorld"
 
 const MATRIX_MOCK = [
     { x: 0, z: 0, av: true, eq: false },
@@ -185,15 +186,18 @@ const MATRIX_MOCK = [
 
 ]
 
-export const useWorldMatrix = () => {
+export const useCoordinatesSystem = () => {
     const [ matrix, setMatrix ] = useState({})
+    const [ position, setPosition ] = useState()
     useEffect(() => {
         setTimeout(() => {
-            setMatrix({
+            const matrix = {
                 size: 13,
                 value: MATRIX_MOCK,
-            })
+            }
+            setMatrix(matrix)
+            setPosition(matrixCoordToWorld(matrix, matrix.value.find(_ => _.eq)))
         }, 1000)
     }, [])
-    return [ matrix, setMatrix ]
+    return [ matrix, setMatrix, position, setPosition ]
 }

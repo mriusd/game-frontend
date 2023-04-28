@@ -4,7 +4,7 @@ import { forwardRef, useContext } from "react"
 import { SceneContext } from "../store/SceneContextProvider"
 
 const World = forwardRef((props, ref) => {
-    const { matrix } = useContext(SceneContext)
+    const { matrix } = useContext(SceneContext) 
 
     const colors = {
         GRAY: 0x6C6C6C
