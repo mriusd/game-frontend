@@ -1,8 +1,11 @@
 
 import * as THREE from "three"
-import { forwardRef, useMemo, useRef } from "react"
+import { forwardRef, useContext } from "react"
+import { SceneContext } from "../store/SceneContextProvider"
 
-const World = forwardRef(({ matrix }, ref) => {
+const World = forwardRef((props, ref) => {
+    const { matrix } = useContext(SceneContext)
+
     const colors = {
         GRAY: 0x6C6C6C
     }

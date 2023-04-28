@@ -21,6 +21,7 @@ import NPC from './NPC';
 import FloatingDamage from "./FloatingDamage";
 
 import Scene from './Scene/Scene';
+import SceneContextProvider from './Scene/store/SceneContextProvider';
 
 const FighterNFTContractAddress = "0x1f3B499720eeDfe4B3a59478c2ab3cA7a3c2F45c";
 const ItemsNFTContractAddress = "0x5a6b2CAfF4a9019E56917Ee5d8A1918a66183e08";
@@ -823,7 +824,9 @@ function App() {
   // );
 
   return (
-    <Scene/>
+    <SceneContextProvider>
+      <Scene/>
+    </SceneContextProvider>
   )
 
 

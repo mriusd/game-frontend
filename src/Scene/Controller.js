@@ -1,10 +1,10 @@
 import * as THREE from "three"
-import { useEffect, useState } from "react"
-import { useFrame, useThree } from "@react-three/fiber"
-import { lerp, clamp } from "three/src/math/MathUtils"
-import { CAMERA_POSITION } from "./Scene"
+import { useEffect, useState, useContext } from "react"
+import { SceneContext } from "./store/SceneContextProvider"
+import { useThree, useFrame } from "@react-three/fiber"
+import { clamp } from "three/src/math/MathUtils"
+import { worldCoordToMatrix } from "./utils/worldCoordToMatrix"
 
-const EASE = 0.075
 const ANGLE_STEP = Math.PI / 4 // 8 directions
 const ANGLE_RANGE = Math.PI / 8 // set a range of angles to rotate towards
 const MIN_ANGLE = Math.PI / 6 // Min angle on which detect rotation
@@ -12,32 +12,31 @@ const MIN_ANGLE = Math.PI / 6 // Min angle on which detect rotation
 const currentAngle = { value: 0 } // Current character rotation angle
 const pointerWorld = { value: 0 } // Pointer position in world coordinates
 
-const Controller = ({ world, matrix, character }) => {
-    const [ raycaster ] = useState(new THREE.Raycaster())
-    const [ locationAim, setLocationAim ] = useState(new THREE.Vector3(0, 0, 0))
+const Controller = ({ world, character }) => {
+    const [raycaster] = useState(new THREE.Raycaster())
+    const { matrix, setPosition, setDirection } = useContext(SceneContext)
     const pointer = useThree(state => state.pointer)
     const camera = useThree(state => state.camera)
-    const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
 
+    // TODO: optimize this (CPU), render only on mousemove & character move
     useFrame(() => {
-        if (!character.current) { return }
-
-        // Move towards aim
-        if (character.current.position.x !== locationAim.x && character.current.position.z !== locationAim.z) {
-            character.current.position.x = lerp(character.current.position.x, locationAim.x, EASE)
-            character.current.position.z = lerp(character.current.position.z, locationAim.z, EASE)
-
-            // Make camera follow the character
-            camera.position.copy(character.current.position).add(cameraPosition)
-
-            calcPointerWorldLocation()
-        }
+        calcPointerWorldLocation()
     })
+
+    // Render on object move and mouse move
+    function calcPointerWorldLocation() {
+        raycaster.setFromCamera(pointer, camera)
+        const intersections = raycaster.intersectObject(world.current)
+        const point = intersections[0]?.point
+        if (point) {
+            pointerWorld.value = point
+        }
+    }
 
     useEffect(() => {
         window.addEventListener("mousedown", mouseDown)
         window.addEventListener("mousemove", mouseMove)
-        return () => { 
+        return () => {
             window.removeEventListener("mousedown", mouseDown)
             window.removeEventListener("mousemove", mouseMove)
         }
@@ -45,13 +44,12 @@ const Controller = ({ world, matrix, character }) => {
 
     // Set world mouse position to move character
     function mouseDown() {
-        setLocationAim(pointerWorld.value)
+        console.log(pointerWorld.value, worldCoordToMatrix(matrix, pointerWorld.value))
+        setPosition(worldCoordToMatrix(matrix, pointerWorld.value))
     }
 
-    // Set character look direction
+    // Calc character rotation angle (direction)
     function mouseMove() {
-        calcPointerWorldLocation()
-
         if (!character.current) { return }
         // Angle between object and mouse
         const angle = Math.atan2(
@@ -66,28 +64,18 @@ const Controller = ({ world, matrix, character }) => {
         const maxAngle = { value: currentAngle.value + ANGLE_RANGE }
         if (angleDelta > MIN_ANGLE) {
             maxAngle.value += angleDelta
-        } 
+        }
         else if (angleDelta < -MIN_ANGLE) {
             minAngle.value += angleDelta
         } else {
             return
         }
 
-        const clampedTargetAngle = clamp(targetAngle, minAngle.value, maxAngle.value);
-        // Rotate the object
-        character.current.rotation.y = clampedTargetAngle
-        // Save rotation
-        currentAngle.value = clampedTargetAngle
-    }
+        const clampedTargetAngle = clamp(targetAngle, minAngle.value, maxAngle.value)
 
-    // Render on object move and mouse move
-    function calcPointerWorldLocation() {
-        raycaster.setFromCamera(pointer, camera)
-        const intersections = raycaster.intersectObject(world.current)
-        const point = intersections[0]?.point
-        if (point) {
-            pointerWorld.value = point
-        }
+        // Save rotation angle, then rotate character in Character component
+        currentAngle.value = clampedTargetAngle
+        setDirection(currentAngle.value)
     }
 
     return (

@@ -169,15 +169,31 @@ const MATRIX_MOCK = [
     { x: 11, z: 11, av: true, eq: false },
     { x: 12, z: 11, av: true, eq: false },
 
+    { x: 0, z: 12, av: true, eq: false },
+    { x: 1, z: 12, av: true, eq: false },
+    { x: 2, z: 12, av: true, eq: false },
+    { x: 3, z: 12, av: true, eq: false },
+    { x: 4, z: 12, av: true, eq: false },
+    { x: 5, z: 12, av: true, eq: false },
+    { x: 6, z: 12, av: true, eq: false },
+    { x: 7, z: 12, av: true, eq: false },
+    { x: 8, z: 12, av: true, eq: false },
+    { x: 9, z: 12, av: true, eq: false },
+    { x: 10, z: 12, av: true, eq: false },
+    { x: 11, z: 12, av: true, eq: false },
+    { x: 12, z: 12, av: true, eq: false },
+
 ]
 
 export const useWorldMatrix = () => {
     const [ matrix, setMatrix ] = useState({})
     useEffect(() => {
-        setMatrix({
-            size: 13,
-            matrix: MATRIX_MOCK,
-        })
+        setTimeout(() => {
+            setMatrix({
+                size: 13,
+                value: MATRIX_MOCK,
+            })
+        }, 1000)
     }, [])
     return [ matrix, setMatrix ]
 }
