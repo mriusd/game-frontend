@@ -7,9 +7,13 @@ import World from "./World/World"
 import Character from "./Character"
 import Controller from "./Controller"
 
+import { useWorldMatrix } from "./hooks/useWorldMatrix"
+
 export const CAMERA_POSITION = [ -8, 8, 8 ] // used for camera, to save distance to object
 
 const Scene = () => {
+    const [ matrix, setMatrix ] = useWorldMatrix()
+
     const worldRef = useRef()
     const characterRef = useRef()
     return (
@@ -29,8 +33,8 @@ const Scene = () => {
                 <Light/>
 
                 <Character ref={characterRef} />
-                <World ref={worldRef}/>
-                <Controller world={worldRef} character={characterRef} />
+                <World ref={worldRef} matrix={matrix}/>
+                <Controller world={worldRef} matrix={matrix} character={characterRef} />
             </Canvas>
         </Suspense>
     )

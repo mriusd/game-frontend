@@ -12,7 +12,7 @@ const MIN_ANGLE = Math.PI / 6 // Min angle on which detect rotation
 const currentAngle = { value: 0 } // Current character rotation angle
 const pointerWorld = { value: 0 } // Pointer position in world coordinates
 
-const Controller = ({ world, character }) => {
+const Controller = ({ world, matrix, character }) => {
     const [ raycaster ] = useState(new THREE.Raycaster())
     const [ locationAim, setLocationAim ] = useState(new THREE.Vector3(0, 0, 0))
     const pointer = useThree(state => state.pointer)
