@@ -18,7 +18,7 @@ const Scene = memo(function Scene() {
     return (
         <Suspense fallback={<span>loading...</span>}>
             {
-                store.matrix.size ? 
+                store.matrix.size && store.spawned ? 
                 (
                     <Canvas
                         shadows

@@ -47,19 +47,24 @@ const SceneContextProvider = ({ children, fighter, moveFighter }) => {
     }
 
     useEffect(() => {
+        synchroniseFighterPosition()
+    }, [ fighter ]);
+    function synchroniseFighterPosition() {
         if (!spawned) { return }
+        if (isFighterMoving) { return }
 
         console.log("[SceneContextProvider] fighter updated", fighter);
         const serverFighterPosition = fighter?.coordinates // { x, z }
         if (!serverFighterPosition) { return }
 
         const localeFighterPosition = getMatrixPosition() // { x, z }
-        if (serverFighterPosition.x === localeFighterPosition.x 
-            && serverFighterPosition.z === localeFighterPosition.z) {
+        if (serverFighterPosition.x - localeFighterPosition.x < 2 
+            && serverFighterPosition.z - localeFighterPosition.z < 2) {
                 return
         }
+
         setMatrixPosition({ ...serverFighterPosition })
-    }, [ fighter ]);
+    }
 
     // spawn fighter on load
     useEffect(() => {
@@ -115,7 +120,8 @@ const SceneContextProvider = ({ children, fighter, moveFighter }) => {
         setTargetPosition,
         direction,
         setDirection,
-        isFighterMoving
+        isFighterMoving,
+        spawned
     } 
 
     return (
