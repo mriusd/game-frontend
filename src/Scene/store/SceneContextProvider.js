@@ -51,10 +51,6 @@ const SceneContextProvider = ({ children, fighter, moveFighter }) => {
         const serverFighterPosition = fighter?.coordinates // { x, z }
         if (!serverFighterPosition) { return }
 
-        if (!spawned) {
-            setPosition
-        }
-
         const localeFighterPosition = getMatrixPosition() // { x, z }
         if (serverFighterPosition.x === localeFighterPosition.x 
             && serverFighterPosition.z === localeFighterPosition.z) {
