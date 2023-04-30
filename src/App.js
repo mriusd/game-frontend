@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import useWebSocket from 'react-use-websocket';
 import Web3 from 'web3';
@@ -19,6 +19,8 @@ import DamageTicker from './DamageTicker';
 import LoadingButton from './LoadingButton';
 import NPC from './NPC';
 import FloatingDamage from "./FloatingDamage";
+import ChatWindow from './ChatWindow';
+import MoveFighterForm from './MoveFighterForm';
 
 import Scene from './Scene/Scene';
 import SceneContextProvider from './Scene/store/SceneContextProvider';
@@ -39,15 +41,26 @@ const ITEM_SIZE = 40;
 const INVENTORY_SIZE = 8;
 
 function App() {
+  const chatWindowRef = useRef();
 
   const [images, setImages] = useState([]);
 
   // WebSocket
   const socketUrl = 'ws://localhost:8080/ws';
   const socketOptions = {
-    onOpen: (event) => { console.log('WebSocket connected!:', event); sendAuth(); },
-    onError: (event) => console.error('WebSocket error:', event),
-    onClose: (event) => console.log('WebSocket closed:', event),
+    onOpen: (event) => { 
+      console.log('WebSocket connected!:', event); 
+      chatWindowRef.current.writeMessageToLog('Connected to server');
+      sendAuth(); 
+    },
+    onError: (event) => {
+      console.error('WebSocket error:', event)
+      chatWindowRef.current.writeMessageToLog('Connection error');
+    },
+    onClose: (event) => {
+      console.log('WebSocket closed:', event);
+      chatWindowRef.current.writeMessageToLog('Connection closed');
+    },
     onMessage: (event) => processIncomingMessage(event)
   };
   // const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(socketUrl, socketOptions);
@@ -99,16 +112,22 @@ function App() {
   const [target, setTarget] = useState(0);
   const [damageData, setDamageData] = useState(null);
 
+  const [money, setMoney] = useState(0);
+  const [coords, setCoords] = useState({x:0, y:0});
+
 
   // useEffect(() => {
   //   refreshFigterItems();
   // }, []);
 
   async function sendAuth(target) {
+    chatWindowRef.current.writeMessageToLog('Authenticated');
     var response = sendJsonMessage({
       type: "auth",
       data: {
           playerID: parseInt(PlayerID),
+          userAddress: UserAddress,
+          locationHash: "lorencia_0_0"
       }
     });
   }
@@ -179,6 +198,63 @@ function App() {
     
   // }, [npcList]);
 
+  function isExcellent(item) {
+    if (item.lifeAfterMonsterIncrease == 1 || 
+        item.manaAfterMonsterIncrease == 1 || 
+        item.excellentDamageProbabilityIncrease == 1 || 
+        item.attackSpeedIncrease == 1 ||
+        item.damageIncrease == 1 ||
+
+        item.defenseSuccessRateIncrease == 1 ||
+        item.goldAfterMonsterIncrease == 1 ||
+        item.reflectDamage == 1 ||
+        item.maxLifeIncrease == 1 ||
+        item.maxManaIncrease == 1 ||
+        item.hpRecoveryRateIncrease == 1 ||
+        item.mpRecoveryRateIncrease == 1 ||
+        item.decreaseDamageRateIncrease == 1
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  function generateItemName(item, qty) {
+    //console.log("[generateItemName] ", item.name);
+    var itemName = item.name;
+    
+    if (item.itemLevel > 0) {
+      itemName += " +"+item.itemLevel;
+    }
+
+    if (item.luck) {
+      itemName += " +Luck";
+    }
+
+    if (item.skill) {
+      itemName += " +Skill";
+    }
+
+    if (isExcellent(item)) {
+      itemName = "Exc "+itemName;
+    }
+
+    if (item.additionalDamage > 0) {
+      itemName += " +"+item.additionalDamage;
+    } 
+
+    if (item.additionalDefense > 0) {
+      itemName += " +"+item.additionalDefense;
+    } 
+
+    if (item.itemAttributesId == 1) {
+      itemName = qty + ' ' + itemName;
+    } 
+
+    return itemName;
+  }
+
   function getRandomAliveNpc() {
     const aliveNpcs = npcList.filter((npc) => !npc.isDead);
 
@@ -226,16 +302,21 @@ function App() {
 
     health = parseInt(healthAfterLastDmg) + (Math.floor(((currentTime - lastDmgTimestamp)) / 5) * healthRegenRate);
   
-    console.log("[getHealth] fighter=", fighter.id," isDead=", fighter.isDead," maxHealth=", maxHealth, " lastDmgTimestamp=", lastDmgTimestamp, " healthAfterLastDmg=", healthAfterLastDmg, " healthRegenRate=", healthRegenRate, " health=", health);
+    //console.log("[getHealth] fighter=", fighter.id," isDead=", fighter.isDead," maxHealth=", maxHealth, " lastDmgTimestamp=", lastDmgTimestamp, " healthAfterLastDmg=", healthAfterLastDmg, " healthRegenRate=", healthRegenRate, " health=", health);
 
     return Math.min(maxHealth, health).toFixed(0);
   }
 
   function getNpcHealth(npcId) {
     const npc = npcList.find((npc) => npc.id === npcId);
+
+    if (!npc) {
+      console.error(`NPC with ID ${npcId} not found in npcList`);
+      return 0; // Return a default value or handle it as per your requirement
+    }
+
     return getHealth(npc);
   }
-
 
   function updateNpcHealth(npcId, newHealth, lastDmgTimestamp) {
     for (var i = 0; i < npcList.length; i++)
@@ -259,7 +340,7 @@ function App() {
   }
 
   function processDmgDealt(damage, opponent, player, opponentHealth, lastDmgTimestamp)   {
-    console.log("[processDmgDealt]  damage=", damage ," opponentId=", opponent, " player=", player, " opponentHealth=", opponentHealth);
+    //console.log("[processDmgDealt]  damage=", damage ," opponentId=", opponent, " player=", player, " opponentHealth=", opponentHealth);
 
     if (player == PlayerID)
     {
@@ -423,9 +504,8 @@ function App() {
 
   function refreshFigterItems() {
     var response = sendJsonMessage({
-        type: "getFighterItems",
+        type: "get_fighter_items",
         data: {
-            userAddress: UserAddress,
             fighterId: parseInt(PlayerID),
         }
 
@@ -438,29 +518,96 @@ function App() {
     setNpcDead(npc.id, false);
   }
 
+  function handleItemDroppedEvent(event) {
+    var item = event.Item;
+    var itemHash = event.ItemHash;
+    var qty = event.Qty;
+
+    chatWindowRef.current.writeMessageToLog('Dropped '+generateItemName(item, qty),  () => { pickupDroppedItem(event) }, 'Pick up');
+  }
+
+  function handleItemPickedEvent(item, fighter, qty) {
+    if (item.tokenId == 1 && fighter.tokenId == PlayerID) {
+      setMoney(money + parseInt(qty));
+    } else {
+      refreshFigterItems();
+    }
+    chatWindowRef.current.writeMessageToLog('Picked '+generateItemName(item, qty));
+  }
+
+  function pickupDroppedItem (event) {
+    console.log("Pickup ", event.ItemHash, event.Item);
+
+    var response = sendJsonMessage({
+      type: "pickup_dropped_item",
+      data: {
+          itemHash: event.ItemHash,
+      }
+
+    });
+  }
+
+  function handlePing(event) {
+    var currCoords = event.coordinates;
+    var location = event.location;
+    console.log("Ping event: ", currCoords);
+  }
+
+  function handleUpdateNpc(npc) {
+    setNpcList((prevNpcList) => {
+      const index = prevNpcList.findIndex((item) => item.id === npc.id);
+      if (index !== -1) {
+        // Replace the NPC with the same ID in the list
+        return [
+          ...prevNpcList.slice(0, index),
+          npc,
+          ...prevNpcList.slice(index + 1),
+        ];
+      } else {
+        // If the NPC is not found in the list, add it to the list
+        return [...prevNpcList, npc];
+      }
+    });
+  }
+
+
   // !!!!  
   function processIncomingMessage(event) {
       var msg = JSON.parse(event.data);
       console.log("New message", msg);
 
       switch (msg.action) {
+        case "item_picked":
+          handleItemPickedEvent(msg.item, msg.fighter, msg.qty);
+        break;
+
+        case "item_dropped":
+          handleItemDroppedEvent(msg.eventData);
+        break;
+
         case "spawn_npc":
-          spawnNpc(msg.npc);
+          handleUpdateNpc(msg.npc);
         break;
 
         case "fighter_items":
-          updateFighterItems(msg.items, msg.attributes, msg.equipment, msg.stats, msg.npcs, msg.fighter);
+          updateFighterItems(msg.items, msg.attributes, msg.equipment, msg.stats, msg.npcs, msg.fighter, msg.money);
         break;
 
         case "damage_dealt":
           processDmgDealt(msg.damage, msg.opponent, msg.player, msg.opponentHealth, msg.lastDmgTimestamp)
         break;
 
-        
+        case "ping":
+          handlePing(msg);
+        break;
+
+      case "update_npc":
+          handleUpdateNpc(msg.npc);
+        break;
       }
   }
   // !!!!!!
-  function updateFighterItems(items, attributes, equipment, stats, npcs, fighter) {
+  function updateFighterItems(items, attributes, equipment, stats, npcs, fighter, money) {
     
     
     var attributes = JSON.parse(attributes);
@@ -473,7 +620,7 @@ function App() {
     if (items != '') {
       var itemList = JSON.parse(items);
       for (var i = 0; i < itemList.length; i++) {
-        console.log("updateFighterItems", itemList[i])
+        //console.log("updateFighterItems", itemList[i])
 
         // check if item is equipped
         if (!isEquiped(itemList[i].tokenId, attributes))
@@ -490,10 +637,11 @@ function App() {
     setInventoryItems(newItems);
     setEquipment(equipment);
     setNpcList(npcs);    
+    setCoords(fighter.coordinates);
 
      var stats = JSON.parse(stats);
 
-    console.log("attributes", attributes)
+    //console.log("attributes", attributes)
 
     setFighter(fighter);
     setPlayerHealth(getHealth(fighter));
@@ -506,7 +654,7 @@ function App() {
     setPlayerAttackSpeed(attributes.attackSpeed);
     setPlayerAgilityPointsPerSpeed(attributes.agilityPointsPerSpeed);
 
-    console.log("[updateFighterItems] ", attributes);
+    //console.log("[updateFighterItems] ", attributes);
 
     FIGHTER_STATS = {
         Strength: [attributes.Strength, 0],
@@ -524,11 +672,13 @@ function App() {
     setPlayerMaxMana(stats.maxMana);
     setPlayerMana(stats.currentMana);
     setPlayerLevel(stats.level);
+
+    setMoney(money);
     
   }
 
   function isEquiped(tokenId, fighter) {
-    console.log("isEquiped", tokenId, fighter)
+    //console.log("isEquiped", tokenId, fighter)
     if (fighter.helmSlot      == tokenId) return true;
     if (fighter.armourSlot    == tokenId) return true;
     if (fighter.pantsSlot     == tokenId) return true;
@@ -640,10 +790,9 @@ function App() {
     }    
   }
 
-
   async function sendMove(target) {
     var response = sendJsonMessage({
-      type: "recordMove",
+      type: "record_move",
       data: {
           opponentID: target,
           playerID: PlayerID,
@@ -653,15 +802,33 @@ function App() {
     });
   }
 
+  async function moveFighter(x, y) {
+    console.log("Move fighter");
+    var response = sendJsonMessage({
+      type: "move_fighter",
+      data: {
+          x: x,
+          y: y,
+      }
+
+    });
+  }
+
   const handleShopButtonClick = () => {
     setIsShopOpen(true);
   }; 
 
-  //refreshFigterItems();
+// <<<<<<< HEAD
+//   //refreshFigterItems();
 
-  // return (
-  //   <DndProvider backend={HTML5Backend}>
-  //   <div className="App" style={appStyle}>
+//   // return (
+//   //   <DndProvider backend={HTML5Backend}>
+//   //   <div className="App" style={appStyle}>
+// =======
+//   return (
+//     <DndProvider backend={HTML5Backend}>
+//     <div className="App" style={appStyle}>
+// >>>>>>> main
 
   //     <ShopModal
   //       isOpen={isShopOpen}
@@ -690,6 +857,7 @@ function App() {
 
 
 
+// <<<<<<< HEAD
   //       {/* Left section */}
   //       <div style={{ width: '30%', padding: '0 10px' }}>
   //         <img src="opponent.png" alt="Opponent" style={{ width: '100%', marginBottom: '10px' }} />
@@ -704,6 +872,22 @@ function App() {
   //         <div>
               
   //             <Inventory items={inventoryItems} setItems={setInventoryItems} equipItem={equipItem} />
+// =======
+//         {/* Left section */}
+//         <div style={{ width: '30%', padding: '0 10px' }}>
+//           <img src="opponent.png" alt="Opponent" style={{ width: '100%', marginBottom: '10px' }} />
+//           <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
+//             <NPC target={target} setTarget={setTarget} damageData={damageData} npcs={npcList} currentTime={currentTime} getNpcHealth={getNpcHealth}/>
+//           </div>
+//           <div> 
+//             <DamageTicker color="red" damages={hits} />
+
+//           </div>
+//           <div>Money: {money}</div>
+//           <div>
+              
+//               <Inventory items={inventoryItems} setItems={setInventoryItems} equipItem={equipItem} generateItemName={generateItemName}/>
+// >>>>>>> main
             
               
   //         </div>
@@ -727,12 +911,27 @@ function App() {
   //           <button onClick={refreshFigterItems}>Refresh</button>
   //         </div>
            
+// <<<<<<< HEAD
   //         <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
   //           <div className="button-container">
   //             <LoadingButton onClick={handleMoveSubmission} target={target} playerSpeed={playerAttackSpeed*10 + playerAgility/playerAgilityPointsPerSpeed}>Submit Move</LoadingButton>
   //           </div>
   //         </div>
   //       </div>
+// =======
+//           <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
+//             <div className="button-container">
+//               <LoadingButton onClick={handleMoveSubmission} target={target} playerSpeed={playerAttackSpeed*10 + playerAgility/playerAgilityPointsPerSpeed}>Submit Move</LoadingButton>
+//             </div>
+//             <h4>Move Fighter ({coords.x},{coords.y})</h4>
+//             <MoveFighterForm moveFighter={moveFighter} />
+//           </div>
+
+//           <div>
+//             <ChatWindow ref={chatWindowRef} />
+//           </div>
+//         </div>
+// >>>>>>> main
 
 
 
@@ -824,7 +1023,7 @@ function App() {
   // );
 
   return (
-    <SceneContextProvider>
+    <SceneContextProvider fighter={fighter} moveFighter={moveFighter}>
       <Scene/>
     </SceneContextProvider>
   )

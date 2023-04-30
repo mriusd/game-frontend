@@ -9,7 +9,7 @@ import Tween from "../utils/tween/tween"
 
 export const SceneContext = createContext()
 
-const SceneContextProvider = ({ children }) => {
+const SceneContextProvider = ({ children, fighter, moveFighter }) => {
     const [ matrix, setMatrix, position, setPosition ] = useCoordinatesSystem() //position in matrix & world
     const [ targetPosition, setTargetPosition ] = useState()
     const [ direction, setDirection ] = useState(0)
@@ -40,6 +40,10 @@ const SceneContextProvider = ({ children }) => {
             return newMatrix
         }) 
     }
+
+    useEffect(() => {
+        console.log("[SceneContextProvider] fighter updated", fighter);
+    }, [fighter]);
 
     useEffect(() => {
         if (!matrix.size) { return }
