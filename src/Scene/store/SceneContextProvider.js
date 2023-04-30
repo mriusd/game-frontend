@@ -65,7 +65,7 @@ const SceneContextProvider = ({ children, fighter, moveFighter }) => {
     useEffect(() => {
         if (spawned) { return }
         if (!matrix?.size, !fighter?.coordinates) { return }
-        setPosition(matrixCoordToWorld({ ...fighter.coordinates }))
+        setPosition(matrixCoordToWorld(matrix, { ...fighter.coordinates }))
         setMatrixPosition({ ...fighter.coordinates })
         setSpawned(true)
     }, [ fighter, matrix ])
