@@ -47,6 +47,8 @@ const SceneContextProvider = ({ children, fighter, moveFighter }) => {
     }
 
     useEffect(() => {
+        if (!spawned) { return }
+
         console.log("[SceneContextProvider] fighter updated", fighter);
         const serverFighterPosition = fighter?.coordinates // { x, z }
         if (!serverFighterPosition) { return }
