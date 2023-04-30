@@ -12,6 +12,7 @@ export const SceneContext = createContext()
 const SceneContextProvider = ({ children, fighter, moveFighter }) => {
     const [ matrix, setMatrix, position, setPosition ] = useCoordinatesSystem() //position in matrix & world
     const [ targetPosition, setTargetPosition ] = useState()
+    const [ isFighterMoving, setIsFighterMoving ] = useState(false)
     const [ direction, setDirection ] = useState(0)
 
     const getMatrixPosition = () => {
@@ -43,7 +44,15 @@ const SceneContextProvider = ({ children, fighter, moveFighter }) => {
 
     useEffect(() => {
         console.log("[SceneContextProvider] fighter updated", fighter);
-    }, [fighter]);
+        const serverFighterPosition = fighter?.coordinates // { x, z }
+        if (!serverFighterPosition) { return }
+        const localeFighterPosition = getMatrixPosition() // { x, z }
+        if (serverFighterPosition.x === localeFighterPosition.x 
+            && serverFighterPosition.z === localeFighterPosition.z) {
+                return
+        }
+        setMatrixPosition({ ...serverFighterPosition })
+    }, [ fighter ]);
 
     useEffect(() => {
         if (!matrix.size) { return }
@@ -60,6 +69,10 @@ const SceneContextProvider = ({ children, fighter, moveFighter }) => {
         const nextPosition = getNextPosition(currentPosition, targetPosition)
         const currentWorldPosition = matrixCoordToWorld(matrix, currentPosition)
         const nextWorldPosition = matrixCoordToWorld(matrix, nextPosition)
+
+        moveFighter && moveFighter({ ...nextPosition })
+
+        setIsFighterMoving(true)
         Tween.to(currentWorldPosition, nextWorldPosition,
             {
                 duration: 200 / CHARACTER_SETTINGS.speed,
@@ -70,6 +83,7 @@ const SceneContextProvider = ({ children, fighter, moveFighter }) => {
                 onComplete() {
                     setPosition(nextWorldPosition)
                     setMatrixPosition(nextPosition)
+                    setIsFighterMoving(false)
                 },
             }
         )
@@ -83,7 +97,8 @@ const SceneContextProvider = ({ children, fighter, moveFighter }) => {
         setMatrixPosition,
         setTargetPosition,
         direction,
-        setDirection
+        setDirection,
+        isFighterMoving
     } 
 
     return (
