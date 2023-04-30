@@ -49,7 +49,7 @@ const MATRIX_MOCK = [
     { x: 2, z: 3, av: true, eq: false },
     { x: 3, z: 3, av: true, eq: false },
     { x: 4, z: 3, av: true, eq: false },
-    { x: 5, z: 3, av: true, eq: true },
+    { x: 5, z: 3, av: true, eq: false },
     { x: 6, z: 3, av: true, eq: false },
     { x: 7, z: 3, av: true, eq: false },
     { x: 8, z: 3, av: true, eq: false },
@@ -196,7 +196,7 @@ export const useCoordinatesSystem = () => {
                 value: MATRIX_MOCK,
             }
             setMatrix(matrix)
-            setPosition(matrixCoordToWorld(matrix, matrix.value.find(_ => _.eq)))
+            // setPosition(matrixCoordToWorld(matrix, matrix.value.find(_ => _.eq)))
         }, 1000)
     }, [])
     return [ matrix, setMatrix, position, setPosition ]

@@ -14,6 +14,7 @@ const SceneContextProvider = ({ children, fighter, moveFighter }) => {
     const [ targetPosition, setTargetPosition ] = useState()
     const [ isFighterMoving, setIsFighterMoving ] = useState(false)
     const [ direction, setDirection ] = useState(0)
+    const [ spawned, setSpawned ] = useState(false)
 
     const getMatrixPosition = () => {
         if (!matrix.size) { return }
@@ -32,8 +33,11 @@ const SceneContextProvider = ({ children, fighter, moveFighter }) => {
                 return newMatrix
             }
 
-            currentPosition.eq = false
-            currentPosition.av = true
+            // wont work on first spawn
+            if (currentPosition) {
+                currentPosition.eq = false
+                currentPosition.av = true
+            }
 
             newPosition.av = false
             newPosition.eq = true
@@ -46,6 +50,11 @@ const SceneContextProvider = ({ children, fighter, moveFighter }) => {
         console.log("[SceneContextProvider] fighter updated", fighter);
         const serverFighterPosition = fighter?.coordinates // { x, z }
         if (!serverFighterPosition) { return }
+
+        if (!spawned) {
+            setPosition
+        }
+
         const localeFighterPosition = getMatrixPosition() // { x, z }
         if (serverFighterPosition.x === localeFighterPosition.x 
             && serverFighterPosition.z === localeFighterPosition.z) {
@@ -54,7 +63,17 @@ const SceneContextProvider = ({ children, fighter, moveFighter }) => {
         setMatrixPosition({ ...serverFighterPosition })
     }, [ fighter ]);
 
+    // spawn fighter on load
     useEffect(() => {
+        if (spawned) { return }
+        if (!matrix?.size, !fighter?.coordinates) { return }
+        setPosition(matrixCoordToWorld({ ...fighter.coordinates }))
+        setMatrixPosition({ ...fighter.coordinates })
+        setSpawned(true)
+    }, [ fighter, matrix ])
+
+    useEffect(() => {
+        if (!spawned) { return }
         if (!matrix.size) { return }
         const currentPosition = getMatrixPosition()
         if (!currentPosition || !targetPosition) { return }
