@@ -63,8 +63,8 @@ function App() {
     },
     onMessage: (event) => processIncomingMessage(event)
   };
-  // const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(socketUrl, socketOptions);
-  const sendJsonMessage = () => {}
+  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(socketUrl, socketOptions);
+  //const sendJsonMessage = () => {}
   const [isShopOpen, setIsShopOpen] = useState(false);  
 
   var [attackOption, setAttackOption] = useState('');
@@ -547,10 +547,9 @@ function App() {
     });
   }
 
-  function handlePing(event) {
-    var currCoords = event.coordinates;
-    var location = event.location;
-    console.log("Ping event: ", currCoords);
+  function handlePing(fighter) {
+    setFighter(fighter);
+    console.log("Ping fighter: ", fighter);
   }
 
   function handleUpdateNpc(npc) {
@@ -598,7 +597,7 @@ function App() {
         break;
 
         case "ping":
-          handlePing(msg);
+          handlePing(msg.fighter);
         break;
 
       case "update_npc":
@@ -802,13 +801,13 @@ function App() {
     });
   }
 
-  async function moveFighter(x, y) {
+  async function moveFighter(x, z) {
     console.log("Move fighter");
     var response = sendJsonMessage({
       type: "move_fighter",
       data: {
           x: x,
-          y: y,
+          z: z,
       }
 
     });
@@ -818,217 +817,184 @@ function App() {
     setIsShopOpen(true);
   }; 
 
-// <<<<<<< HEAD
-//   //refreshFigterItems();
-
-//   // return (
-//   //   <DndProvider backend={HTML5Backend}>
-//   //   <div className="App" style={appStyle}>
-// =======
-//   return (
-//     <DndProvider backend={HTML5Backend}>
-//     <div className="App" style={appStyle}>
-// >>>>>>> main
-
-  //     <ShopModal
-  //       isOpen={isShopOpen}
-  //       onClose={() => { setIsShopOpen(false); setAppStyle({}); }}
-  //       onClick={buyShopItem}
-  //     />
-
-
-  //     {/* Top bar */}
-  //     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '50px', backgroundColor: '#333', color: '#fff', padding: '0 20px' }}>
-  //       <div style={{ display: 'flex', alignItems: 'center' }}>
-  //         <img src="logo.png" alt="Logo" style={{ height: '30px', marginRight: '10px' }} />
-  //         <h3>My Fighting Game</h3>
-  //       </div>
-  //       <div>
-  //         <button onClick={createFighter}>New Fighter</button>
-  //         <button style={{ marginRight: '10px' }}>Settings</button>
-  //         <button>Logout</button>
-  //       </div>
-  //     </div>
-
-  //     {/* Main content */}
-  //     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
-
-
-
-
-
-// <<<<<<< HEAD
-  //       {/* Left section */}
-  //       <div style={{ width: '30%', padding: '0 10px' }}>
-  //         <img src="opponent.png" alt="Opponent" style={{ width: '100%', marginBottom: '10px' }} />
-  //         <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
-  //           <NPC target={target} setTarget={setTarget} damageData={damageData} npcs={npcList} currentTime={currentTime} getNpcHealth={getNpcHealth}/>
-  //         </div>
-  //         <div> 
-  //           <DamageTicker color="green" damages={damages} />
-  //           <DamageTicker color="red" damages={hits} />
-
-  //         </div>
-  //         <div>
-              
-  //             <Inventory items={inventoryItems} setItems={setInventoryItems} equipItem={equipItem} />
-// =======
-//         {/* Left section */}
-//         <div style={{ width: '30%', padding: '0 10px' }}>
-//           <img src="opponent.png" alt="Opponent" style={{ width: '100%', marginBottom: '10px' }} />
-//           <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
-//             <NPC target={target} setTarget={setTarget} damageData={damageData} npcs={npcList} currentTime={currentTime} getNpcHealth={getNpcHealth}/>
-//           </div>
-//           <div> 
-//             <DamageTicker color="red" damages={hits} />
-
-//           </div>
-//           <div>Money: {money}</div>
-//           <div>
-              
-//               <Inventory items={inventoryItems} setItems={setInventoryItems} equipItem={equipItem} generateItemName={generateItemName}/>
-// >>>>>>> main
-            
-              
-  //         </div>
-  //       </div>
-
-
-
-
-
-
-
-
-
-  //       {/* Middle section */}
-  //       <div style={{ width: '40%', padding: '0 10px' }}>
-  //         <h4>Game Chat</h4>
-  //         <div>
-
-  //           <button onClick={() => { setIsShopOpen(true); setAppStyle({ pointerEvents: "none" }); }}>Shop</button>
-
-  //           <button onClick={refreshFigterItems}>Refresh</button>
-  //         </div>
-           
-// <<<<<<< HEAD
-  //         <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
-  //           <div className="button-container">
-  //             <LoadingButton onClick={handleMoveSubmission} target={target} playerSpeed={playerAttackSpeed*10 + playerAgility/playerAgilityPointsPerSpeed}>Submit Move</LoadingButton>
-  //           </div>
-  //         </div>
-  //       </div>
-// =======
-//           <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
-//             <div className="button-container">
-//               <LoadingButton onClick={handleMoveSubmission} target={target} playerSpeed={playerAttackSpeed*10 + playerAgility/playerAgilityPointsPerSpeed}>Submit Move</LoadingButton>
-//             </div>
-//             <h4>Move Fighter ({coords.x},{coords.y})</h4>
-//             <MoveFighterForm moveFighter={moveFighter} />
-//           </div>
-
-//           <div>
-//             <ChatWindow ref={chatWindowRef} />
-//           </div>
-//         </div>
-// >>>>>>> main
-
-
-
-
-
-
-
-
-  //       {/* Right section */}
-  //       <div style={{ width: '30%', padding: '0 10px' }}>
-           
-
-
-  //         <h4>{PlayerID} [{playerLevel}]</h4>
-  //         <img src="my-fighter.png" alt="My Fighter" style={{ width: '100%', marginBottom: '10px' }} />
-           
-            
-  //         <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
-  //           <h5>Stats</h5>
-  //           <div><Fighter currentHealth={playerHealth} health={playerMaxHP} color="green" /></div>
-  //           <div>Exp: {playerExperience}</div>
-  //           <div>
-  //             <CharacterEquipment equipment={equipment} unequipItem={unequipItem}/>
-  //           </div>
-  //           <div style={{ display: 'flex', flexDirection: 'row' }}>
-  //             <div style={{ flex: 1, padding: '10px', backgroundColor: '#f0f0f0' }}>
-  //               <Stat
-  //                 name="Strength"
-  //                 value={attributes.Strength}
-  //                 onChange={handleAttributeChange}
-  //                 availablePoints={availablePoints}
-  //               />
-  //               <Stat
-  //                 name="Agility"
-  //                 value={attributes.Agility}
-  //                 onChange={handleAttributeChange}
-  //                 availablePoints={availablePoints}
-  //               />
-  //               <Stat
-  //                 name="Energy"
-  //                 value={attributes.Energy}
-  //                 onChange={handleAttributeChange}
-  //                 availablePoints={availablePoints}
-  //               />
-  //               <Stat
-  //                 name="Vitality"
-  //                 value={attributes.Vitality}
-  //                 onChange={handleAttributeChange}
-  //                 availablePoints={availablePoints}
-  //               />
-  //               <div>
-  //                 Available points: {availablePoints}{" "}
-  //                 <button onClick={resetAttributes}>Reset</button>
-  //               </div>
-  //               <button
-  //                 onClick={updateStats}
-  //               >
-  //                 Submit Stats
-  //               </button>
-  //             </div>
-  //             <div style={{ flex: 1, padding: '10px', backgroundColor: '#d9d9d9' }}>
-  //                 <p>Defence: {parseInt(playerAgility/4+playerItemsDefence)}</p>
-  //                 <p>Attack: {parseInt(playerStrength/4 + playerEnergy/4)}</p>
-  //                 <p>Speed: {parseInt(playerAttackSpeed + playerAgility/playerAgilityPointsPerSpeed)}</p>
-  //             </div>
-  //           </div>
-
-  //         </div>
-          
-  //       </div>
-  //     </div>
-
-
-
-
-
-
-
-
-
-
-  //     {/* Bottom bar */}
-  //     <div style={{ backgroundColor: '#333', color: '#fff', padding: '10px', marginTop: '50px' }}>
-  //       <button style={{ marginRight: '10px' }}>Fight Again</button>
-  //       <button>Choose Opponent</button>
-  //     </div>
-  //   </div>
-  // </DndProvider>
-  // );
 
   return (
-    <SceneContextProvider fighter={fighter} moveFighter={moveFighter}>
-      <Scene/>
-    </SceneContextProvider>
-  )
+
+    <DndProvider backend={HTML5Backend}>
+    <div className="App" style={appStyle}>
+      <div style={{height: 800}}>
+        <SceneContextProvider fighter={fighter} moveFighter={moveFighter}>
+          <Scene/>
+        </SceneContextProvider>
+      </div>
+      <ShopModal
+        isOpen={isShopOpen}
+        onClose={() => { setIsShopOpen(false); setAppStyle({}); }}
+        onClick={buyShopItem}
+      />
 
 
+      {/* Top bar */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '50px', backgroundColor: '#333', color: '#fff', padding: '0 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <img src="logo.png" alt="Logo" style={{ height: '30px', marginRight: '10px' }} />
+          <h3>My Fighting Game</h3>
+        </div>
+        <div>
+          <button onClick={createFighter}>New Fighter</button>
+          <button style={{ marginRight: '10px' }}>Settings</button>
+          <button>Logout</button>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+
+
+
+
+
+
+        {/* Left section */}
+        <div style={{ width: '30%', padding: '0 10px' }}>
+          <img src="opponent.png" alt="Opponent" style={{ width: '100%', marginBottom: '10px' }} />
+          <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
+            <NPC target={target} setTarget={setTarget} damageData={damageData} npcs={npcList} currentTime={currentTime} getNpcHealth={getNpcHealth}/>
+          </div>
+          <div> 
+            <DamageTicker color="red" damages={hits} />
+
+          </div>
+          <div>Money: {money}</div>
+          <div>
+              
+              <Inventory items={inventoryItems} setItems={setInventoryItems} equipItem={equipItem} generateItemName={generateItemName}/>
+
+            
+              
+          </div>
+        </div>
+
+
+
+
+
+
+
+
+
+        {/* Middle section */}
+        <div style={{ width: '40%', padding: '0 10px' }}>
+          <h4>Game Chat</h4>
+          <div>
+
+            <button onClick={() => { setIsShopOpen(true); setAppStyle({ pointerEvents: "none" }); }}>Shop</button>
+
+            <button onClick={refreshFigterItems}>Refresh</button>
+          </div>
+           
+
+          <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
+            <div className="button-container">
+              <LoadingButton onClick={handleMoveSubmission} target={target} playerSpeed={playerAttackSpeed*10 + playerAgility/playerAgilityPointsPerSpeed}>Submit Move</LoadingButton>
+            </div>
+            <h4>Move Fighter ({coords.x},{coords.y})</h4>
+            <MoveFighterForm moveFighter={moveFighter} />
+          </div>
+
+          <div>
+            <ChatWindow ref={chatWindowRef} />
+          </div>
+        </div>
+
+
+
+
+
+
+
+
+        {/* Right section */}
+        <div style={{ width: '30%', padding: '0 10px' }}>
+           
+
+
+          <h4>{PlayerID} [{playerLevel}]</h4>
+          <img src="my-fighter.png" alt="My Fighter" style={{ width: '100%', marginBottom: '10px' }} />
+           
+            
+          <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
+            <h5>Stats</h5>
+            <div><Fighter currentHealth={playerHealth} health={playerMaxHP} color="green" /></div>
+            <div>Exp: {playerExperience}</div>
+            <div>
+              <CharacterEquipment equipment={equipment} unequipItem={unequipItem}/>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <div style={{ flex: 1, padding: '10px', backgroundColor: '#f0f0f0' }}>
+                <Stat
+                  name="Strength"
+                  value={attributes.Strength}
+                  onChange={handleAttributeChange}
+                  availablePoints={availablePoints}
+                />
+                <Stat
+                  name="Agility"
+                  value={attributes.Agility}
+                  onChange={handleAttributeChange}
+                  availablePoints={availablePoints}
+                />
+                <Stat
+                  name="Energy"
+                  value={attributes.Energy}
+                  onChange={handleAttributeChange}
+                  availablePoints={availablePoints}
+                />
+                <Stat
+                  name="Vitality"
+                  value={attributes.Vitality}
+                  onChange={handleAttributeChange}
+                  availablePoints={availablePoints}
+                />
+                <div>
+                  Available points: {availablePoints}{" "}
+                  <button onClick={resetAttributes}>Reset</button>
+                </div>
+                <button
+                  onClick={updateStats}
+                >
+                  Submit Stats
+                </button>
+              </div>
+              <div style={{ flex: 1, padding: '10px', backgroundColor: '#d9d9d9' }}>
+                  <p>Defence: {parseInt(playerAgility/4+playerItemsDefence)}</p>
+                  <p>Attack: {parseInt(playerStrength/4 + playerEnergy/4)}</p>
+                  <p>Speed: {parseInt(playerAttackSpeed + playerAgility/playerAgilityPointsPerSpeed)}</p>
+              </div>
+            </div>
+
+          </div>
+          
+        </div>
+      </div>
+
+
+
+
+
+
+
+
+
+
+      {/* Bottom bar */}
+      <div style={{ backgroundColor: '#333', color: '#fff', padding: '10px', marginTop: '50px' }}>
+        <button style={{ marginRight: '10px' }}>Fight Again</button>
+        <button>Choose Opponent</button>
+      </div>
+    </div>
+  </DndProvider>
+  );
 }
 
 export default App;
