@@ -9,7 +9,7 @@ import Tween from "../utils/tween/tween"
 
 export const SceneContext = createContext()
 
-const SceneContextProvider = ({ children, fighter, moveFighter }) => {
+const SceneContextProvider = ({ children, fighter, moveFighter, npcList }) => {
     const [ matrix, setMatrix, position, setPosition ] = useCoordinatesSystem() //position in matrix & world
     const [ targetPosition, setTargetPosition ] = useState()
     const [ isFighterMoving, setIsFighterMoving ] = useState(false)
@@ -49,6 +49,11 @@ const SceneContextProvider = ({ children, fighter, moveFighter }) => {
     useEffect(() => {
         synchroniseFighterPosition()
     }, [ fighter ]);
+
+    useEffect(() => {
+        console.log("[SceneContextProvider] NPC list updated: ", npcList)
+    }, [ npcList ]);
+
     function synchroniseFighterPosition() {
         if (!spawned) { return }
         if (isFighterMoving) { return }

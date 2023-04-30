@@ -823,7 +823,7 @@ function App() {
     // <DndProvider backend={HTML5Backend}>
     // <div className="App" style={appStyle}>
     //  <div style={{height: 800}}>
-        <SceneContextProvider fighter={fighter} moveFighter={moveFighter}>
+        <SceneContextProvider fighter={fighter} moveFighter={moveFighter} npcList={npcList}>
           <Scene/>
         </SceneContextProvider>
     //  </div>
