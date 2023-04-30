@@ -73,7 +73,7 @@ const NPC = ({ npcs, currentTime, getNpcHealth, target, setTarget, damageData })
             className="npc"
             onClick={() => handleClick(npc)}
             style={{
-              width: "100px",
+              width: "130px",
               height: "50px",
               border: "1px solid black",
               position: "relative",
@@ -85,7 +85,7 @@ const NPC = ({ npcs, currentTime, getNpcHealth, target, setTarget, damageData })
               onChange={() => handleCheckmark(npc.id)}
               style={{ position: "absolute", top: "2px", left: "2px" }}
             />
-            <div className="npc-name">{npc.name}</div>
+            <div className="npc-name">{npc.id} ({npc.coordinates.x}, {npc.coordinates.y})</div>
             <div className="npc-healthbar" style={{ width: '100%', height: '5px', backgroundColor: 'lightgray' }}>
               <div className="npc-current-health" style={{ width: `${(getNpcHealth(npc.id)/npc.maxHealth) * 100}%`, height: '100%', backgroundColor: 'green' }}></div>
             </div>
