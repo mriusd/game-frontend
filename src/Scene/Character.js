@@ -13,11 +13,12 @@ const colors = {
 
 const Character = forwardRef((props, ref) => {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
-    const { matrix, direction, getMatrixPosition, position } = useContext(SceneContext)
+    const { matrix, direction, getMatrixPosition, position, isFighterMoving } = useContext(SceneContext)
     const camera = useThree(state => state.camera)
 
     // character rotation
     useEffect(() => {
+        if (isFighterMoving) { return }
         if (!ref.current) { return }
         ref.current.rotation.y = direction
     }, [ direction ])
