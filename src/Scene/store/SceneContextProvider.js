@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react"
+import { createContext, useEffect, useState, useRef } from "react"
 import { useCoordinatesSystem } from "../hooks/useCoordinatesSystem"
 import { getNextPosition } from "../utils/getNextPosition"
 
@@ -9,7 +9,7 @@ import Tween from "../utils/tween/tween"
 
 export const SceneContext = createContext()
 
-const SceneContextProvider = ({ children, fighter, moveFighter, npcList, droppedItems, damageData, playerDamage }) => {
+const SceneContextProvider = ({ children, fighter, moveFighter, npcList, droppedItems, damageData, playerDamageData }) => {
     const [ matrix, setMatrix, position, setPosition ] = useCoordinatesSystem() //position in matrix & world
     const [ targetPosition, setTargetPosition ] = useState()
     const [ isFighterMoving, setIsFighterMoving ] = useState(false)
@@ -54,6 +54,10 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
         console.log("[SceneContextProvider] NPC list updated: ", npcList)
     }, [ npcList ]);
 
+
+
+    // Dropped Items
+    const prevDroppedItemsRef = useRef();
     useEffect(() => {
         // Store the previous droppedItems in a ref
         prevDroppedItemsRef.current = droppedItems;
@@ -89,8 +93,8 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
 
     useEffect(() => {
         // Initiate hit animation for player
-        console.log("[SceneContextProvider] Last damage received by player (value is an int): ", playerDamage)
-    }, [ playerDamage ]);
+        console.log("[SceneContextProvider] Last damage received by player (value is an int): ", playerDamageData)
+    }, [ playerDamageData ]);
 
     function synchroniseFighterPosition() {
         if (!spawned) { return }

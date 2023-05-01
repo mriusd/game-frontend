@@ -115,7 +115,7 @@ function App() {
   const [money, setMoney] = useState(0);
   const [coords, setCoords] = useState({x:0, z:0});
   const [droppedItems, setDroppedItems] = useState([]);
-  const [playerDamage, setPlayerDamage] = useState(0);
+  const [playerDamageData, setPlayerDamageData] = useState(0);
 
 
 
@@ -362,7 +362,7 @@ function App() {
     {
       setPlayerHealth(opponentHealth);
 
-      setPlayerDamage(damage);
+      playerDamageData(damage);
       var fit = fighter;
       fighter.lastDmgTimestamp = lastDmgTimestamp;
       fighter.healthAfterLastDmg = opponentHealth;
@@ -836,7 +836,7 @@ function App() {
           npcList={npcList} 
           droppedItems={droppedItems} 
           damageData={damageData} 
-          playerDamage={playerDamage
+          playerDamageData={playerDamageData}
         >
           <Scene/>
         </SceneContextProvider>
