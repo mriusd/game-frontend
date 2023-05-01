@@ -117,11 +117,19 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
     // spawn fighter on load
     useEffect(() => {
         if (spawned) { return }
-        if (!matrix?.size, !fighter?.coordinates) { return }
-        setPosition(matrixCoordToWorld(matrix, { ...fighter.coordinates }))
-        setMatrixPosition({ ...fighter.coordinates })
-        setSpawned(true)
-    }, [ fighter, matrix ])
+        if (!matrix?.size || !fighter?.coordinates) { return }
+
+        const spawnFighter = () => {
+            setPosition(matrixCoordToWorld(matrix, { ...fighter.coordinates }))
+            setMatrixPosition({ ...fighter.coordinates })
+            setSpawned(true)
+        }
+
+        const timer = setTimeout(spawnFighter, 1000);
+
+        return () => clearTimeout(timer);
+    }, [fighter, matrix]);
+
 
     useEffect(() => {
         if (!spawned) { return }
