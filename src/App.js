@@ -46,7 +46,7 @@ function App() {
   const [images, setImages] = useState([]);
 
   // WebSocket
-  const socketUrl = 'ws://localhost:8080/ws'; // ws://149.100.159.50:8080/ws
+  const socketUrl = 'ws://149.100.159.50:8080/ws'; // ws://149.100.159.50:8080/ws
   const socketOptions = {
     onOpen: (event) => { 
       console.log('WebSocket connected!:', event); 
