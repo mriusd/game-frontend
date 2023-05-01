@@ -1,10 +1,10 @@
 import { createContext, useEffect, useState, useRef } from "react"
 import { useCoordinatesSystem } from "../hooks/useCoordinatesSystem"
-import { getNextPosition } from "../utils/getNextPosition"
+import { getNextPosition, getNearestEmptySquareToTarget } from "../utils/getNextPosition"
 
 import { CHARACTER_SETTINGS } from "../config"
 import { matrixCoordToWorld } from "../utils/matrixCoordToWorld"
-import { detectObjectChanges } from "../utils/detectObjectChanges"
+import { euclideanDistance } from "../utils/euclideanDistance"
 
 import Tween from "../utils/tween/tween"
 
@@ -85,24 +85,10 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
         if (!serverFighterPosition) { return }
 
         const localeFighterPosition = getMatrixPosition() // { x, z }
-        // TODO: decide which expression to use
-        // function euclideanDistance(coord1, coord2) {
-        //     deltaX = float64(coord1.x - coord2.x)
-        //     deltaZ = float64(coord1.z - coord2.z)
-        //     return Math.Sqrt(deltaX*deltaX + deltaZ*deltaZ)
-        // }
-        if (delayedIsFighterMoving) {
-            if (serverFighterPosition.x - localeFighterPosition.x < 2 
-                && serverFighterPosition.z - localeFighterPosition.z < 2) {
-                    return
-            }
-        } else {
-            if (serverFighterPosition.x === localeFighterPosition.x 
-                && serverFighterPosition.z === localeFighterPosition.z) {
-                    return
-            }
-        }
 
+        if (euclideanDistance(serverFighterPosition, localeFighterPosition, delayedIsFighterMoving ? 1 : 0)) {
+            return
+        }
 
         setMatrixPosition({ ...serverFighterPosition })
     }
@@ -191,7 +177,9 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
 
         if ( targetPosition.x === currentPosition.x && targetPosition.z === currentPosition.z ) { return }
         console.log('[STORE]:move:step')
-        const nextPosition = getNextPosition(currentPosition, targetPosition)
+        // const nextPosition = getNextPosition(currentPosition, targetPosition)
+        const nextPosition = getNearestEmptySquareToTarget(matrix, currentPosition, targetPosition)
+        if (!nextPosition) { return }
         const currentWorldPosition = matrixCoordToWorld(matrix, currentPosition)
         const nextWorldPosition = matrixCoordToWorld(matrix, nextPosition)
 

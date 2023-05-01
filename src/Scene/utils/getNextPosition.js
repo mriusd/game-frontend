@@ -1,3 +1,5 @@
+import { euclideanDistance } from "./euclideanDistance"
+
 export const getNextPosition = (current, target) => {
     let dx = target.x - current.x
     let dz = target.z - current.z
@@ -15,4 +17,26 @@ export const getNextPosition = (current, target) => {
     }
   
     return { x: nextX, z: nextZ }
+}
+
+// TODO: dont use filer
+export const getNearestEmptySquareToTarget = (matrix, currentPosition, targetPosition) => {
+  const availableNearestSquares = matrix.value.filter(_ => (
+    _.x === currentPosition.x - 1 && _.z === currentPosition.z + 0 && _.av ||
+    _.x === currentPosition.x + 1 && _.z === currentPosition.z + 0 && _.av ||
+    _.x === currentPosition.x + 0 && _.z === currentPosition.z - 1 && _.av ||
+    _.x === currentPosition.x + 0 && _.z === currentPosition.z + 1 && _.av ||
+    _.x === currentPosition.x - 1 && _.z === currentPosition.z - 1 && _.av ||
+    _.x === currentPosition.x - 1 && _.z === currentPosition.z + 1 && _.av ||
+    _.x === currentPosition.x + 1 && _.z === currentPosition.z - 1 && _.av ||
+    _.x === currentPosition.x + 1 && _.z === currentPosition.z + 1 && _.av
+  ))
+  if (!availableNearestSquares.length) { return null }
+  return availableNearestSquares.reduce((acc, value) => {
+    const newDistance = euclideanDistance(value, targetPosition)
+    return {
+      distance: newDistance < acc.distance ? newDistance : acc.distance,
+      square: newDistance < acc.distance ? value : acc.square
+    }
+  }, { distance: Infinity, square: null }).square
 }
