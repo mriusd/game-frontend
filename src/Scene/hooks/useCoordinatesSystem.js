@@ -197,7 +197,7 @@ export const useCoordinatesSystem = () => {
             }
             setMatrix(matrix)
             // setPosition(matrixCoordToWorld(matrix, matrix.value.find(_ => _.eq)))
-        }, 1000)
+        }, 0)
     }, [])
     return [ matrix, setMatrix, position, setPosition ]
 }

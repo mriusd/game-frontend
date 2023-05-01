@@ -10,6 +10,7 @@ import Light from "./Light"
 import World from "./World/World"
 import Character from "./Character"
 import Controller from "./Controller"
+import Npc from "./Npc"
 
 const Scene = memo(function Scene() {
     const store = useContext(SceneContext)
@@ -33,7 +34,7 @@ const Scene = memo(function Scene() {
                         {/* <fog attach="fog" color={0x000000} near={1} far={30} /> */}
                         {/* <OrbitControls /> */}
                         <Light />
-
+                        { store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />) }
                         <Character ref={characterRef} />
                         <World ref={worldRef} />
                         <Controller world={worldRef} character={characterRef} />
