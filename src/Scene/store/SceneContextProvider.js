@@ -66,25 +66,26 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
     useEffect(() => {
         const prevDroppedItems = prevDroppedItemsRef.current;
         if (prevDroppedItems) {
-          const addedItems = droppedItems.filter(
-            (item) => !prevDroppedItems.includes(item)
-          );
-          const removedItems = prevDroppedItems.filter(
-            (item) => !droppedItems.includes(item)
-          );
+          const addedItems = Object.keys(droppedItems).filter(
+            (key) => !(key in prevDroppedItems)
+          ).map(key => droppedItems[key]);
+
+          const removedItems = Object.keys(prevDroppedItems).filter(
+            (key) => !(key in droppedItems)
+          ).map(key => prevDroppedItems[key]);
 
           if (addedItems.length > 0) {
-            // this items must be rendered on the floor
+            // These items must be rendered on the floor
             console.log('[SceneContextProvider] Added items:', addedItems);
           }
 
           if (removedItems.length > 0) {
-            // this items should disapear from the floor
+            // These items should disappear from the floor
             console.log('[SceneContextProvider] Removed items:', removedItems);
           }
         }
         console.log('[SceneContextProvider] Dropped Items updated:', droppedItems);
-    }, [droppedItems]);
+      }, [droppedItems]);
 
     useEffect(() => {
         // Initiate hit animation for mobs
