@@ -48,6 +48,19 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
             return newMatrix
         }) 
     }
+    const setMatrixPointAvailibility = ({ x, y, z }, value) => {
+        if (!matrix.size) { return }
+        setMatrix(prev => {
+            const newMatrix = { ...prev }
+            const position = newMatrix.value.find(_ => _.x === x && _.z === z /*&& _.y === y*/)
+            if (!position) {
+                console.warn('[STORE<setMatrixAvailibility>]: Matrix point not found')
+                return newMatrix
+            }
+            position.av = value
+            return newMatrix
+        })
+    }
 
     useEffect(() => {
         synchroniseFighterPosition()
@@ -94,35 +107,35 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
 
 
     // Dropped Items
-    // const prevDroppedItemsRef = useRef();
-    // useEffect(() => {
-    //     // Store the previous droppedItems in a ref
-    //     prevDroppedItemsRef.current = droppedItems;
-    // }, [droppedItems]);
+    const prevDroppedItemsRef = useRef();
+    useEffect(() => {
+        // Store the previous droppedItems in a ref
+        prevDroppedItemsRef.current = droppedItems;
+    }, [droppedItems]);
 
-    // useEffect(() => {
-    //     const prevDroppedItems = prevDroppedItemsRef.current;
-    //     if (prevDroppedItems) {
-    //       const addedItems = Object.keys(droppedItems).filter(
-    //         (key) => !(key in prevDroppedItems)
-    //       ).map(key => droppedItems[key]);
+    useEffect(() => {
+        const prevDroppedItems = prevDroppedItemsRef.current;
+        if (prevDroppedItems) {
+          const addedItems = Object.keys(droppedItems).filter(
+            (key) => !(key in prevDroppedItems)
+          ).map(key => droppedItems[key]);
 
-    //       const removedItems = Object.keys(prevDroppedItems).filter(
-    //         (key) => !(key in droppedItems)
-    //       ).map(key => prevDroppedItems[key]);
+          const removedItems = Object.keys(prevDroppedItems).filter(
+            (key) => !(key in droppedItems)
+          ).map(key => prevDroppedItems[key]);
 
-    //       if (addedItems.length > 0) {
-    //         // These items must be rendered on the floor
-    //         console.log('[SceneContextProvider] Added items:', addedItems);
-    //       }
+          if (addedItems.length > 0) {
+            // These items must be rendered on the floor
+            console.log('[SceneContextProvider] Added items:', addedItems);
+          }
 
-    //       if (removedItems.length > 0) {
-    //         // These items should disappear from the floor
-    //         console.log('[SceneContextProvider] Removed items:', removedItems);
-    //       }
-    //     }
-    //     console.log('[SceneContextProvider] Dropped Items updated:', droppedItems);
-    //   }, [droppedItems]);
+          if (removedItems.length > 0) {
+            // These items should disappear from the floor
+            console.log('[SceneContextProvider] Removed items:', removedItems);
+          }
+        }
+        console.log('[SceneContextProvider] Dropped Items updated:', droppedItems);
+      }, [droppedItems]);
 
     // useEffect(() => {
     //     // Initiate hit animation for mobs
@@ -153,6 +166,7 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
         const targetMatrixPosition = matrix.value.find(_ => _.x === targetPosition.x && _.z === targetPosition.z /*&& _.y === y*/)
         if (!targetMatrixPosition) { return }
         // 
+        if (!targetMatrixPosition.av) { return }
 
         if ( targetPosition.x === currentPosition.x && targetPosition.z === currentPosition.z ) { return }
         console.log('[STORE]:move:step')
@@ -186,6 +200,7 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
         position,
         setMatrixPosition,
         setTargetPosition,
+        setMatrixPointAvailibility,
         direction,
         setDirection,
         isFighterMoving,
