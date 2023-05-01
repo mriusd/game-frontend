@@ -12,8 +12,16 @@ export const SceneContext = createContext()
 
 const SceneContextProvider = ({ children, fighter, moveFighter, npcList, droppedItems, damageData, playerDamageData }) => {
     const [ matrix, setMatrix, position, setPosition ] = useCoordinatesSystem() //position in matrix & world
-    const [ targetPosition, setTargetPosition ] = useState()
+    const [ currentMatrixPosition, setCurrentMatrixPosition ] = useState(null)
+    const [ targetPosition, _setTargetPosition ] = useState()
+    const setTargetPosition = ({ x, y, z }) => {
+        const cell = matrix.value.find(_ => _.x === x && _.z === z /*&& _.y === y*/)
+        console.warn('[STORE]: Position is not available', cell, matrix)
+        if (!cell.av) { return }
+        _setTargetPosition({ x, z })
+    }
     const [ isFighterMoving, setIsFighterMoving ] = useState(false)
+    const [ delayedIsFighterMoving, setDelayedIsFighterMoving ] = useState(false)
     const [ direction, setDirection ] = useState(0)
     const [ spawned, setSpawned ] = useState(false)
     const NpcList = useRef([])
@@ -45,10 +53,12 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
             newPosition.av = false
             newPosition.eq = true
 
+            setCurrentMatrixPosition(newPosition)
+
             return newMatrix
         }) 
     }
-    const setMatrixPointAvailibility = ({ x, y, z }, value) => {
+    const setMatrixCellAvailibility = ({ x, y, z }, value) => {
         if (!matrix.size) { return }
         setMatrix(prev => {
             const newMatrix = { ...prev }
@@ -68,7 +78,7 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
     function synchroniseFighterPosition() {
         if (!spawned) { return }
         if (!matrix?.size) { return }
-        if (isFighterMoving) { return }
+        // if (isFighterMoving) { return } // TODO: at all decide if this needed
 
         console.log("[SceneContextProvider] fighter updated", fighter);
         const serverFighterPosition = fighter?.coordinates // { x, z }
@@ -81,10 +91,18 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
         //     deltaZ = float64(coord1.z - coord2.z)
         //     return Math.Sqrt(deltaX*deltaX + deltaZ*deltaZ)
         // }
-        if (serverFighterPosition.x - localeFighterPosition.x < 2 
-            && serverFighterPosition.z - localeFighterPosition.z < 2) {
-                return
+        if (delayedIsFighterMoving) {
+            if (serverFighterPosition.x - localeFighterPosition.x < 2 
+                && serverFighterPosition.z - localeFighterPosition.z < 2) {
+                    return
+            }
+        } else {
+            if (serverFighterPosition.x === localeFighterPosition.x 
+                && serverFighterPosition.z === localeFighterPosition.z) {
+                    return
+            }
         }
+
 
         setMatrixPosition({ ...serverFighterPosition })
     }
@@ -152,15 +170,10 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
         if (spawned) { return }
         if (!matrix?.size || !fighter?.coordinates) { return }
 
-        const spawnFighter = () => {
-            setPosition(matrixCoordToWorld(matrix, { ...fighter.coordinates }))
-            setMatrixPosition({ ...fighter.coordinates })
-            setSpawned(true)
-        }
+        setPosition(matrixCoordToWorld(matrix, { ...fighter.coordinates }))
+        setMatrixPosition({ ...fighter.coordinates })
+        setSpawned(true)
 
-        const timer = setTimeout(spawnFighter, 1000);
-
-        return () => clearTimeout(timer);
     }, [fighter, matrix]);
 
 
@@ -199,7 +212,25 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
                 },
             }
         )
-    }, [ targetPosition, matrix ]) 
+    }, [ targetPosition, currentMatrixPosition/*, matrix*/ ]) 
+
+    // Add delay to prevent freeze on "checkpoint" when synchronising with server
+    // On delayed mooving "true" we render fighter in the same position as server
+    // Otherwise we render if fighter < 2 cells away from server
+    const timeout = useRef()
+    useEffect(() => {
+        clearTimeout(timeout.current)
+
+        if (isFighterMoving) {
+            setDelayedIsFighterMoving(true)
+            return
+        }
+
+        timeout.current = setTimeout(() => {
+            setDelayedIsFighterMoving(false)
+        }, 200) // 200ms delay
+    }, [ isFighterMoving ])
+    
 
     const value = {
         matrix,
@@ -208,7 +239,7 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
         position,
         setMatrixPosition,
         setTargetPosition,
-        setMatrixPointAvailibility,
+        setMatrixCellAvailibility,
         direction,
         setDirection,
         isFighterMoving,

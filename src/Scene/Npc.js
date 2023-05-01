@@ -6,7 +6,7 @@ import Tween from "./utils/tween/tween"
 
 // TODO: prevent move character on npc position
 const Npc = ({ npc }) => {
-    const { matrix, setMatrixPointAvailibility } = useContext(SceneContext)
+    const { matrix, setMatrixCellAvailibility } = useContext(SceneContext)
     const [spawned, setSpawned] = useState(false)
     const [currentMatrixPosition, setCurrentMatrixPosition] = useState(null)
     const [targetMatrixPosition, setTargetMatrixPosition] = useState(null)
@@ -18,20 +18,27 @@ const Npc = ({ npc }) => {
         console.log(`[NPC]: npc with id '${npc?.id}' updated`, npc)
         if (!npc?.isNpc) { return }
         if (npc?.coordinates) {
-            setCurrentMatrixPosition({ ...npc?.coordinates })
+            setTargetMatrixPosition({ ...npc?.coordinates })
+            toggleCellAvailability()
             return
         }
     }, [ npc ])
+    function toggleCellAvailability() {
+        if (!currentMatrixPosition || !targetMatrixPosition) { return }
+        setMatrixCellAvailibility(currentMatrixPosition, true)
+        setMatrixCellAvailibility(targetMatrixPosition, false)
+    }
 
 
     // Move npc
     useEffect(() => {
-        if (!currentMatrixPosition) { return }
+        if (!targetMatrixPosition) { return }
 
-        setTargetWorldPosition(matrixCoordToWorld(matrix, {...currentMatrixPosition}))
+        setTargetWorldPosition(matrixCoordToWorld(matrix, {...targetMatrixPosition}))
 
         if (!spawned) {
-            setCurrentWorldPosition(matrixCoordToWorld(matrix, {...currentMatrixPosition}))
+            setCurrentMatrixPosition(targetMatrixPosition)
+            setCurrentWorldPosition(matrixCoordToWorld(matrix, {...targetMatrixPosition}))
             setSpawned(true)
             return
         }
@@ -46,12 +53,13 @@ const Npc = ({ npc }) => {
                             setCurrentWorldPosition(state.value)
                         },
                         onComplete() {
+                            setCurrentMatrixPosition(targetMatrixPosition)
                             setCurrentWorldPosition(targetWorldPosition)
                         },
                     }
                 )
             }
-    }, [ currentMatrixPosition ])
+    }, [ targetMatrixPosition ])
 
 
     return (
