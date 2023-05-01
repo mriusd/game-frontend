@@ -362,7 +362,7 @@ function App() {
     {
       setPlayerHealth(opponentHealth);
 
-      playerDamageData(damage);
+      setPlayerDamageData(damage);
       var fit = fighter;
       fighter.lastDmgTimestamp = lastDmgTimestamp;
       fighter.healthAfterLastDmg = opponentHealth;
