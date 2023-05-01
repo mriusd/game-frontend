@@ -46,7 +46,7 @@ function App() {
   const [images, setImages] = useState([]);
 
   // WebSocket
-  const socketUrl = 'ws://149.100.159.50:8080/ws';
+  const socketUrl = 'ws://localhost:8080/ws';
   const socketOptions = {
     onOpen: (event) => { 
       console.log('WebSocket connected!:', event); 
@@ -113,12 +113,15 @@ function App() {
   const [damageData, setDamageData] = useState(null);
 
   const [money, setMoney] = useState(0);
-  const [coords, setCoords] = useState({x:0, y:0});
+  const [coords, setCoords] = useState({x:0, z:0});
+  const [droppedItems, setDroppedItems] = useState([]);
+  const [playerDamage, setPlayerDamage] = useState(0);
 
 
-  // useEffect(() => {
-  //   refreshFigterItems();
-  // }, []);
+
+  useEffect(() => {
+    refreshFigterItems();
+  }, []);
 
   async function sendAuth(target) {
     //chatWindowRef.current.writeMessageToLog('Authenticated');
@@ -359,6 +362,7 @@ function App() {
     {
       setPlayerHealth(opponentHealth);
 
+      setPlayerDamage(damage);
       var fit = fighter;
       fighter.lastDmgTimestamp = lastDmgTimestamp;
       fighter.healthAfterLastDmg = opponentHealth;
@@ -518,12 +522,14 @@ function App() {
     setNpcDead(npc.id, false);
   }
 
-  function handleItemDroppedEvent(event) {
-    var item = event.Item;
-    var itemHash = event.ItemHash;
-    var qty = event.Qty;
+  function handleDroppedItems(event) {
+    // var item = event.Item;
+    // var itemHash = event.ItemHash;
+    // var qty = event.Qty;
 
     //chatWindowRef.current.writeMessageToLog('Dropped '+generateItemName(item, qty),  () => { pickupDroppedItem(event) }, 'Pick up');
+    console.log("[handleDroppedItems] items=", event.droppedItems)
+    setDroppedItems(event.droppedItems);
   }
 
   function handleItemPickedEvent(item, fighter, qty) {
@@ -580,8 +586,8 @@ function App() {
           handleItemPickedEvent(msg.item, msg.fighter, msg.qty);
         break;
 
-        case "item_dropped":
-          handleItemDroppedEvent(msg.eventData);
+        case "dropped_items":
+          handleDroppedItems(msg.eventData);
         break;
 
         case "spawn_npc":
@@ -589,7 +595,7 @@ function App() {
         break;
 
         case "fighter_items":
-          updateFighterItems(msg.items, msg.attributes, msg.equipment, msg.stats, msg.npcs, msg.fighter, msg.money);
+          updateFighterItems(msg.items, msg.attributes, msg.equipment, msg.stats, msg.npcs, msg.fighter, msg.money, msg.droppedItems);
         break;
 
         case "damage_dealt":
@@ -606,7 +612,7 @@ function App() {
       }
   }
   // !!!!!!
-  function updateFighterItems(items, attributes, equipment, stats, npcs, fighter, money) {
+  function updateFighterItems(items, attributes, equipment, stats, npcs, fighter, money, droppedItems) {
     
     
     var attributes = JSON.parse(attributes);
@@ -636,6 +642,7 @@ function App() {
     setInventoryItems(newItems);
     setEquipment(equipment);
     setNpcList(npcs);    
+    setDroppedItems(droppedItems);
     setCoords(fighter.coordinates);
 
      var stats = JSON.parse(stats);
@@ -823,7 +830,14 @@ function App() {
     // <DndProvider backend={HTML5Backend}>
     // <div className="App" style={appStyle}>
     //  <div style={{height: 800}}>
-        <SceneContextProvider fighter={fighter} moveFighter={moveFighter} npcList={npcList}>
+        <SceneContextProvider 
+          fighter={fighter} 
+          moveFighter={moveFighter} 
+          npcList={npcList} 
+          droppedItems={droppedItems} 
+          damageData={damageData} 
+          playerDamage={playerDamage
+        >
           <Scene/>
         </SceneContextProvider>
     //  </div>

@@ -9,7 +9,7 @@ import Tween from "../utils/tween/tween"
 
 export const SceneContext = createContext()
 
-const SceneContextProvider = ({ children, fighter, moveFighter, npcList }) => {
+const SceneContextProvider = ({ children, fighter, moveFighter, npcList, droppedItems, damageData, playerDamage }) => {
     const [ matrix, setMatrix, position, setPosition ] = useCoordinatesSystem() //position in matrix & world
     const [ targetPosition, setTargetPosition ] = useState()
     const [ isFighterMoving, setIsFighterMoving ] = useState(false)
@@ -53,6 +53,44 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList }) => {
     useEffect(() => {
         console.log("[SceneContextProvider] NPC list updated: ", npcList)
     }, [ npcList ]);
+
+    useEffect(() => {
+        // Store the previous droppedItems in a ref
+        prevDroppedItemsRef.current = droppedItems;
+    }, [droppedItems]);
+
+    useEffect(() => {
+        const prevDroppedItems = prevDroppedItemsRef.current;
+        if (prevDroppedItems) {
+          const addedItems = droppedItems.filter(
+            (item) => !prevDroppedItems.includes(item)
+          );
+          const removedItems = prevDroppedItems.filter(
+            (item) => !droppedItems.includes(item)
+          );
+
+          if (addedItems.length > 0) {
+            // this items must be rendered on the floor
+            console.log('[SceneContextProvider] Added items:', addedItems);
+          }
+
+          if (removedItems.length > 0) {
+            // this items should disapear from the floor
+            console.log('[SceneContextProvider] Removed items:', removedItems);
+          }
+        }
+        console.log('[SceneContextProvider] Dropped Items updated:', droppedItems);
+    }, [droppedItems]);
+
+    useEffect(() => {
+        // Initiate hit animation for mobs
+        console.log("[SceneContextProvider] Damage data is the last damages to an NPC {npcId, damage}: ", damageData)
+    }, [ damageData ]);
+
+    useEffect(() => {
+        // Initiate hit animation for player
+        console.log("[SceneContextProvider] Last damage received by player (value is an int): ", playerDamage)
+    }, [ playerDamage ]);
 
     function synchroniseFighterPosition() {
         if (!spawned) { return }
