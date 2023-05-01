@@ -4,10 +4,12 @@ import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
 import { SceneContext } from "./store/SceneContextProvider"
 import Tween from "./utils/tween/tween"
 
+// TODO: prevent move character on npc position
 const Npc = ({ npc }) => {
-    const { matrix } = useContext(SceneContext)
+    const { matrix, setMatrixPointAvailibility } = useContext(SceneContext)
     const [spawned, setSpawned] = useState(false)
     const [currentMatrixPosition, setCurrentMatrixPosition] = useState(null)
+    const [targetMatrixPosition, setTargetMatrixPosition] = useState(null)
     const [targetWorldPosition, setTargetWorldPosition] = useState(null)
     const [currentWorldPosition, setCurrentWorldPosition] = useState(null)
 
