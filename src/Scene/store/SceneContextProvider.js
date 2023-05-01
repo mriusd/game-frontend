@@ -4,6 +4,7 @@ import { getNextPosition } from "../utils/getNextPosition"
 
 import { CHARACTER_SETTINGS } from "../config"
 import { matrixCoordToWorld } from "../utils/matrixCoordToWorld"
+import { detectObjectChanges } from "../utils/detectObjectChanges"
 
 import Tween from "../utils/tween/tween"
 
@@ -15,6 +16,8 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
     const [ isFighterMoving, setIsFighterMoving ] = useState(false)
     const [ direction, setDirection ] = useState(0)
     const [ spawned, setSpawned ] = useState(false)
+    const NpcList = useRef([])
+    
 
     const getMatrixPosition = () => {
         if (!matrix.size) { return }
@@ -49,56 +52,9 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
     useEffect(() => {
         synchroniseFighterPosition()
     }, [ fighter ]);
-
-    useEffect(() => {
-        console.log("[SceneContextProvider] NPC list updated: ", npcList)
-    }, [ npcList ]);
-
-
-
-    // Dropped Items
-    const prevDroppedItemsRef = useRef();
-    useEffect(() => {
-        // Store the previous droppedItems in a ref
-        prevDroppedItemsRef.current = droppedItems;
-    }, [droppedItems]);
-
-    useEffect(() => {
-        const prevDroppedItems = prevDroppedItemsRef.current;
-        if (prevDroppedItems) {
-          const addedItems = Object.keys(droppedItems).filter(
-            (key) => !(key in prevDroppedItems)
-          ).map(key => droppedItems[key]);
-
-          const removedItems = Object.keys(prevDroppedItems).filter(
-            (key) => !(key in droppedItems)
-          ).map(key => prevDroppedItems[key]);
-
-          if (addedItems.length > 0) {
-            // These items must be rendered on the floor
-            console.log('[SceneContextProvider] Added items:', addedItems);
-          }
-
-          if (removedItems.length > 0) {
-            // These items should disappear from the floor
-            console.log('[SceneContextProvider] Removed items:', removedItems);
-          }
-        }
-        console.log('[SceneContextProvider] Dropped Items updated:', droppedItems);
-      }, [droppedItems]);
-
-    useEffect(() => {
-        // Initiate hit animation for mobs
-        console.log("[SceneContextProvider] Damage data is the last damages to an NPC {npcId, damage}: ", damageData)
-    }, [ damageData ]);
-
-    useEffect(() => {
-        // Initiate hit animation for player
-        console.log("[SceneContextProvider] Last damage received by player (value is an int): ", playerDamageData)
-    }, [ playerDamageData ]);
-
     function synchroniseFighterPosition() {
         if (!spawned) { return }
+        if (!matrix?.size) { return }
         if (isFighterMoving) { return }
 
         console.log("[SceneContextProvider] fighter updated", fighter);
@@ -106,6 +62,12 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
         if (!serverFighterPosition) { return }
 
         const localeFighterPosition = getMatrixPosition() // { x, z }
+        // TODO: decide which expression to use
+        // function euclideanDistance(coord1, coord2) {
+        //     deltaX = float64(coord1.x - coord2.x)
+        //     deltaZ = float64(coord1.z - coord2.z)
+        //     return Math.Sqrt(deltaX*deltaX + deltaZ*deltaZ)
+        // }
         if (serverFighterPosition.x - localeFighterPosition.x < 2 
             && serverFighterPosition.z - localeFighterPosition.z < 2) {
                 return
@@ -113,6 +75,64 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
 
         setMatrixPosition({ ...serverFighterPosition })
     }
+
+    // Detect npc updates and add them to NpcList
+    // TODO: add npc removal
+    useEffect(() => {
+        console.log("[SceneContextProvider] NPC list updated: ", npcList)
+        if (!npcList?.length) { return }
+        npcList.forEach(serverNpc => {
+            const localeNpcIndex = NpcList.current.findIndex(localeNpc => localeNpc.id === serverNpc.id)
+            if (localeNpcIndex !== -1) {
+                NpcList.current[localeNpcIndex] = { ...serverNpc }
+                return
+            }
+            NpcList.current.push(serverNpc)
+        })
+    }, [ npcList ]);
+
+
+
+    // Dropped Items
+    // const prevDroppedItemsRef = useRef();
+    // useEffect(() => {
+    //     // Store the previous droppedItems in a ref
+    //     prevDroppedItemsRef.current = droppedItems;
+    // }, [droppedItems]);
+
+    // useEffect(() => {
+    //     const prevDroppedItems = prevDroppedItemsRef.current;
+    //     if (prevDroppedItems) {
+    //       const addedItems = Object.keys(droppedItems).filter(
+    //         (key) => !(key in prevDroppedItems)
+    //       ).map(key => droppedItems[key]);
+
+    //       const removedItems = Object.keys(prevDroppedItems).filter(
+    //         (key) => !(key in droppedItems)
+    //       ).map(key => prevDroppedItems[key]);
+
+    //       if (addedItems.length > 0) {
+    //         // These items must be rendered on the floor
+    //         console.log('[SceneContextProvider] Added items:', addedItems);
+    //       }
+
+    //       if (removedItems.length > 0) {
+    //         // These items should disappear from the floor
+    //         console.log('[SceneContextProvider] Removed items:', removedItems);
+    //       }
+    //     }
+    //     console.log('[SceneContextProvider] Dropped Items updated:', droppedItems);
+    //   }, [droppedItems]);
+
+    // useEffect(() => {
+    //     // Initiate hit animation for mobs
+    //     console.log("[SceneContextProvider] Damage data is the last damages to an NPC {npcId, damage}: ", damageData)
+    // }, [ damageData ]);
+
+    // useEffect(() => {
+    //     // Initiate hit animation for player
+    //     console.log("[SceneContextProvider] Last damage received by player (value is an int): ", playerDamageData)
+    // }, [ playerDamageData ]);
 
     // spawn fighter on load
     useEffect(() => {
@@ -147,7 +167,7 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
             {
                 duration: 200 / CHARACTER_SETTINGS.speed,
                 onChange(state) {
-                    console.log(state.value)
+                    // console.log(state.value)
                     setPosition(state.value)
                 },
                 onComplete() {
@@ -169,7 +189,8 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
         direction,
         setDirection,
         isFighterMoving,
-        spawned
+        spawned,
+        NpcList
     } 
 
     return (
