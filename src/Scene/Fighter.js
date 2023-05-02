@@ -11,6 +11,7 @@ import { euclideanDistance } from "./utils/euclideanDistance"
 import Tween from "./utils/tween/tween"
 
 const Fighter = ({ world }) => {
+    const ref = useRef()
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
     const camera = useThree(state => state.camera)
 
@@ -33,7 +34,7 @@ const Fighter = ({ world }) => {
         focusedMatrixPosition, // updates on mousedown on matrix
         focusedWorldPosition,  // updates on mousedown on matrix
         pointerWorldPosition // updates on mousemove && fighter move
-    } = useController(world, currentWorldPosition)
+    } = useController(world, ref)
 
     const [ managedDirection, setManagedDirection ] = useState(direction.current)
 
@@ -77,8 +78,8 @@ const Fighter = ({ world }) => {
 
     // Controll Fighter rotation
     useEffect(() => {
-        console.log('isMovingisMovingisMovingisMoving', isMoving)
         if (isMoving) { return }
+        console.log('----------->222', direction.current)
         console.log('[Fighter]: direction', direction.current)
         setManagedDirection(direction.current)
     }, [ direction.current ])
@@ -143,6 +144,7 @@ const Fighter = ({ world }) => {
     return (
         isSpawned && (
             <mesh 
+                ref={ref}
                 castShadow 
                 position={[currentWorldPosition.x, .5, currentWorldPosition.z]}
                 rotation={[0, managedDirection, 0]}

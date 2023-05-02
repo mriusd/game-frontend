@@ -2,14 +2,15 @@ import * as THREE from "three"
 import { clamp } from "three/src/math/MathUtils"
 import { useEffect, useRef, useContext } from "react"
 import { worldCoordToMatrix } from "../utils/worldCoordToMatrix"
-import { useThree } from "@react-three/fiber"
+import { useFrame, useThree } from "@react-three/fiber"
 import { SceneContext } from "../store/SceneContextProvider"
+
 
 const ANGLE_STEP = Math.PI / 4 // 8 directions
 const ANGLE_RANGE = Math.PI / 8 // Set a range of angles to rotate towards
 const MIN_ANGLE = Math.PI / 6 // Min angle on which detect rotation
 
-export const useController = (world, currentWorldPosition) => {
+export const useController = (world, fighter) => {
     const direction = useRef(0)
     const focusedMatrixPosition = useRef(null)
     const focusedWorldPosition = useRef(null)
@@ -20,11 +21,14 @@ export const useController = (world, currentWorldPosition) => {
     const pointer = useThree(state => state.pointer)
     const camera = useThree(state => state.camera)
 
-    useEffect(() => {
-        console.log('------HOOOK-----', currentWorldPosition)
-        if (!currentWorldPosition) { return }
+    // TODO: in future
+    // useEffect(() => {
+    //     if (!currentWorldPosition) { return }
+    //     pointerWorldPosition.current = calcPointerWorldPosition() || pointerWorldPosition.current
+    // }, [currentWorldPosition])
+    useFrame(() => {
         pointerWorldPosition.current = calcPointerWorldPosition() || pointerWorldPosition.current
-    }, [currentWorldPosition])
+    })
 
     function calcPointerWorldPosition() {
         raycaster.current.setFromCamera(pointer, camera)
@@ -52,14 +56,12 @@ export const useController = (world, currentWorldPosition) => {
 
     // Calc character rotation angle (direction)
     function mouseMove() {
-        pointerWorldPosition.current = calcPointerWorldPosition() || pointerWorldPosition.current
-
-        if (!currentWorldPosition) { return }
+        // if (!currentWorldPosition) { return }
 
         // Angle between object and mouse
         const angle = Math.atan2(
-            pointerWorldPosition.current.z - currentWorldPosition.z,
-            pointerWorldPosition.current.x - currentWorldPosition.x
+            pointerWorldPosition.current.z - fighter.current.position.z,
+            pointerWorldPosition.current.x - fighter.current.position.x
         )
 
         const targetAngle = Math.round(angle / ANGLE_STEP) * ANGLE_STEP
@@ -76,8 +78,7 @@ export const useController = (world, currentWorldPosition) => {
         } else {
             return
         }
-
-        console.log('--------------->>>>>>>>>', direction.current)
+        console.log('----------->', direction.current)
         direction.current = clamp(targetAngle, minAngle.value, maxAngle.value)
     }
 
