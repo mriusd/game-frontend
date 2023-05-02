@@ -1,6 +1,6 @@
-export const matrixCoordToWorld = (matrix, point) => {
+export const matrixCoordToWorld = (worldSize, point) => {
     return {
-        x: Math.round(point.x - matrix.size / 2 ),
-        z: Math.round(point.z - matrix.size / 2 ),
+        x: Math.round(point.x - worldSize / 2 ),
+        z: Math.round(point.z - worldSize / 2 ),
     }
 }

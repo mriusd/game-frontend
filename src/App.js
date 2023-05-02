@@ -95,7 +95,7 @@ function App() {
   const [appStyle, setAppStyle] = useState({});
   const [inventoryItems, setInventoryItems] = useState([]);
 
-  const [fighter, setFighter] = useState([]);
+  const [fighter, setFighter] = useState(null);
   const [stats, setStats] = useState([]);
   const [equipment, setEquipment] = useState({});
   const [playerItemsDefence, setPlayerItemsDefence] = useState(0);
@@ -344,7 +344,7 @@ function App() {
 
   function processDmgDealt(damage, opponent, player, opponentHealth, lastDmgTimestamp)   {
     //console.log("[processDmgDealt]  damage=", damage ," opponentId=", opponent, " player=", player, " opponentHealth=", opponentHealth);
-
+    if (!fighter) { return }
     if (player == PlayerID)
     {
 

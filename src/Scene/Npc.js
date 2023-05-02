@@ -1,12 +1,11 @@
-import { useEffect, useRef, useState, useContext } from "react"
-import { detectObjectChanges } from "./utils/detectObjectChanges"
+import { useEffect, useState, useContext } from "react"
 import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
 import { SceneContext } from "./store/SceneContextProvider"
 import Tween from "./utils/tween/tween"
 
 // TODO: prevent move character on npc position
 const Npc = ({ npc }) => {
-    const { matrix, setMatrixCellAvailibility } = useContext(SceneContext)
+    const { worldSize } = useContext(SceneContext)
     const [spawned, setSpawned] = useState(false)
     const [currentMatrixPosition, setCurrentMatrixPosition] = useState(null)
     const [targetMatrixPosition, setTargetMatrixPosition] = useState(null)
@@ -19,26 +18,20 @@ const Npc = ({ npc }) => {
         if (!npc?.isNpc) { return }
         if (npc?.coordinates) {
             setTargetMatrixPosition({ ...npc?.coordinates })
-            toggleCellAvailability()
             return
         }
     }, [ npc ])
-    function toggleCellAvailability() {
-        if (!currentMatrixPosition || !targetMatrixPosition) { return }
-        setMatrixCellAvailibility(currentMatrixPosition, true)
-        setMatrixCellAvailibility(targetMatrixPosition, false)
-    }
-
 
     // Move npc
     useEffect(() => {
         if (!targetMatrixPosition) { return }
+        if (!worldSize.current) { return }
 
-        setTargetWorldPosition(matrixCoordToWorld(matrix, {...targetMatrixPosition}))
+        setTargetWorldPosition(matrixCoordToWorld(worldSize.current, {...targetMatrixPosition}))
 
         if (!spawned) {
             setCurrentMatrixPosition(targetMatrixPosition)
-            setCurrentWorldPosition(matrixCoordToWorld(matrix, {...targetMatrixPosition}))
+            setCurrentWorldPosition(matrixCoordToWorld(worldSize.current, {...targetMatrixPosition}))
             setSpawned(true)
             return
         }
