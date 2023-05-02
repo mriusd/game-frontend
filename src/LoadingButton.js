@@ -17,7 +17,7 @@ const LoadingButton = ({ onClick, children, playerSpeed, target }) => {
   }, [onClick, playerSpeed]);
 
   useEffect(() => {
-    if (autoClick && !loading && target != 0) {
+    if (autoClick && !loading) {
       const timeSinceLastClick = Date.now() - lastClick;
       const timeToNextClick = Math.max(0, 60000 / playerSpeed - timeSinceLastClick);
       const timer = setTimeout(() => {

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useEventCloud } from './EventCloudContext';
+
+
 import ReactDOM from 'react-dom';
 import useWebSocket from 'react-use-websocket';
 import Web3 from 'web3';
-import FighterNFTAbi from './abi/FighterNFT.json';
-import ItemNFTAbi from './abi/ItemNFT.json';
 import Stat from "./FighterStat";
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -14,7 +15,7 @@ import { Dialog, DialogTitle } from '@material-ui/core';
 import "./App.css";
 import Inventory from './Inventory';
 import CharacterEquipment from './CharacterEquipment';
-import Fighter from './Fighter';
+import FighterDash from './Fighter';
 import DamageTicker from './DamageTicker';
 import LoadingButton from './LoadingButton';
 import NPC from './NPC';
@@ -24,6 +25,17 @@ import MoveFighterForm from './MoveFighterForm';
 
 import Scene from './Scene/Scene';
 import SceneContextProvider from './Scene/store/SceneContextProvider';
+
+
+
+
+
+
+
+import { Fighter } from './models/Fighter';
+import { ItemAttributes, ItemDroppedEvent } from './models/Items';
+import { common } from 'ethereumjs-util'; 
+
 
 const FighterNFTContractAddress = "0x1f3B499720eeDfe4B3a59478c2ab3cA7a3c2F45c";
 const ItemsNFTContractAddress = "0x5a6b2CAfF4a9019E56917Ee5d8A1918a66183e08";
@@ -41,6 +53,7 @@ const ITEM_SIZE = 40;
 const INVENTORY_SIZE = 8;
 
 function App() {
+  const { addDamageEvent } = useEventCloud();
   const chatWindowRef = useRef();
 
   const [images, setImages] = useState([]);
@@ -64,13 +77,10 @@ function App() {
     onMessage: (event) => processIncomingMessage(event)
   };
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(socketUrl, socketOptions);
-  //const sendJsonMessage = () => {}
+
   const [isShopOpen, setIsShopOpen] = useState(false);  
 
-  var [attackOption, setAttackOption] = useState('');
-  var [blockOption, setBlockOption] = useState('');
 
-  const [fightLog, setFightLog] = useState([]);
   const [playerHealth, setPlayerHealth] = useState(0);
   const [playerStrength, setPlayerStrength] = useState(0);
   const [playerAgility, setPlayerAgility] = useState(0);
@@ -95,7 +105,7 @@ function App() {
   const [appStyle, setAppStyle] = useState({});
   const [inventoryItems, setInventoryItems] = useState([]);
 
-  const [fighter, setFighter] = useState([]);
+  
   const [stats, setStats] = useState([]);
   const [equipment, setEquipment] = useState({});
   const [playerItemsDefence, setPlayerItemsDefence] = useState(0);
@@ -106,7 +116,7 @@ function App() {
   const [isBattle, setIsBattle] = useState(false);
   const [town, setTown] = useState("lorencia")
   const [location, setLocation] = useState(0)
-  const [npcList, setNpcList] = useState([]);
+  
   const [currentTime, setCurrentTime] = useState(0);
   const [battles, setBattles] = useState([]);
   const [target, setTarget] = useState(0);
@@ -114,9 +124,13 @@ function App() {
 
   const [money, setMoney] = useState(0);
   const [coords, setCoords] = useState({x:0, z:0});
-  const [droppedItems, setDroppedItems] = useState([]);
+  
   const [playerDamageData, setPlayerDamageData] = useState(0);
 
+  
+  const [fighter, setFighter] = useState<Fighter | null>(null);
+  const [droppedItems, setDroppedItems] = useState<Record<common.Hash, ItemDroppedEvent>>({});
+  const [npcList, setNpcList] = useState<Fighter[]>([]);
 
 
   useEffect(() => {
@@ -134,18 +148,6 @@ function App() {
       }
     });
   }
-
-  const handleDamageReceived = (npcId, damage) => {
-    // Set the damage data, which will trigger the floating damage animation
-    setDamageData({ npcId, damage });
-  };
-
-  useEffect(() => {
-    if (damageData) {
-      // Reset damageData after a short delay to prevent continuous triggering
-      setTimeout(() => setDamageData(null), 500);
-    }
-  }, [damageData]);
 
   // useEffect(() => {
   //   const connectToMetaMask = async () => {
@@ -166,40 +168,6 @@ function App() {
 
   //  connectToMetaMask();
   // }, []);
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setCurrentTime(prevTime => prevTime + 1);
-  //   }, 1000);
-
-  //   return () => {
-  //     clearInterval(interval);
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     updateHealth();      
-  //   }, 5000);
-
-  //   return () => clearInterval(interval);
-  // }, [fighter]);
-
-  // useEffect(() => {
-    
-  //   if (target !== 0) {
-  //     sendMove(target);
-  //   } else {
-  //     setTarget(getRandomAliveNpc());
-  //   }
-  // }, [target]);
-
-  // useEffect(() => {   
-  //   if (target == null) {
-  //       setTarget(getRandomAliveNpc());
-  //   }
-    
-  // }, [npcList]);
 
   function isExcellent(item) {
     if (item.lifeAfterMonsterIncrease == 1 || 
@@ -258,108 +226,18 @@ function App() {
     return itemName;
   }
 
-  function getRandomAliveNpc() {
-    const aliveNpcs = npcList.filter((npc) => !npc.isDead);
-
-    if (aliveNpcs.length === 0) {
-      return null;
-    }
-
-    const randomIndex = Math.floor(Math.random() * aliveNpcs.length);
-    return aliveNpcs[randomIndex].id;
-  }
-
-  function isNpc(id) {
-    for (var i=0; i<npcList.length; i++) {
-      if (parseInt(npcList[i].id) == parseInt(id)) {
-        return true;
-      } else {
-        return false;
-      }
-    } 
-  }
-
-  function getNpcIndex(id) {
-    for (var i=0; i<npcList.length; i++) {
-      if (parseInt(npcList[i].id) == parseInt(id)) {
-        return i;
-      } 
-    } 
-  }
-
-  function updateHealth() {
-    var health = getHealth(fighter);
-    setPlayerHealth(health);
-  }
-
-  function getHealth(fighter) {
-    //console.log("getHealth fighter", fighter);
-    const maxHealth = fighter.maxHealth;
-    const lastDmgTimestamp = fighter.lastDmgTimestamp;
-    const healthAfterLastDmg = fighter.healthAfterLastDmg;
-
-    const healthRegenRate = fighter.hpRegenerationRate;
-    const currentTime = Date.now();
-
-    var health;
-
-    health = parseInt(healthAfterLastDmg) + (Math.floor(((currentTime - lastDmgTimestamp)) / 5) * healthRegenRate);
-  
-    //console.log("[getHealth] fighter=", fighter.id," isDead=", fighter.isDead," maxHealth=", maxHealth, " lastDmgTimestamp=", lastDmgTimestamp, " healthAfterLastDmg=", healthAfterLastDmg, " healthRegenRate=", healthRegenRate, " health=", health);
-
-    return Math.min(maxHealth, health).toFixed(0);
-  }
-
-  function getNpcHealth(npcId) {
-    const npc = npcList.find((npc) => npc.id === npcId);
-
-    if (!npc) {
-      console.error(`NPC with ID ${npcId} not found in npcList`);
-      return 0; // Return a default value or handle it as per your requirement
-    }
-
-    return getHealth(npc);
-  }
-
-  function updateNpcHealth(npcId, newHealth, lastDmgTimestamp) {
-    for (var i = 0; i < npcList.length; i++)
-    {
-      if (npcList[i].id == npcId)
-      {
-        setNpcList((prevNpcList) =>
-          prevNpcList.map((npc) => {
-            if (npc.id === npcId) {
-              return {
-                ...npc,
-                healthAfterLastDmg: newHealth,
-                lastDmgTimestamp: lastDmgTimestamp,
-              };
-            }
-            return npc;
-          })
-        );
-      }
-    }
-  }
-
-  function processDmgDealt(damage, opponent, player, opponentHealth, lastDmgTimestamp)   {
+  function processDmgDealt(damage, opponent, player, opponentHealth, lastDmgTimestamp, opponentFighterObj) {
     //console.log("[processDmgDealt]  damage=", damage ," opponentId=", opponent, " player=", player, " opponentHealth=", opponentHealth);
 
-    if (player == PlayerID)
-    {
-
-      updateNpcHealth(opponent, opponentHealth, lastDmgTimestamp)
-      if (parseInt(opponentHealth) == 0)
-      {
-        setNpcDead(opponent, true);
-      }
-
-      setDamageData({ npcId: opponent, damage });
+    if (player == PlayerID) {
+      handleUpdateNpc(opponentFighterObj);
       
-      setDamages(prev => [...prev, damage])
-    }
-    else
-    {
+      // Use addDamageEvent from EventCloudContext
+      console.log('Calling addDamageEvent');
+      addDamageEvent({ npcId: opponent, damage });
+
+      setDamages((prev) => [...prev, damage]);
+    } else {
       setPlayerHealth(opponentHealth);
 
       setPlayerDamageData(damage);
@@ -367,7 +245,7 @@ function App() {
       fighter.lastDmgTimestamp = lastDmgTimestamp;
       fighter.healthAfterLastDmg = opponentHealth;
       setFighter(fighter);
-      setHits(prev => [...prev, damage])
+      setHits((prev) => [...prev, damage]);
     }
   }
 
@@ -383,13 +261,6 @@ function App() {
         return npc;
       })
     );
-  }
-
-  function isNpcDead(npcId) {
-    const npc = npcList.find((npc) => npc.id === npcId);
-    if (npc) {
-      return npc.isDead;
-    }
   }
 
   const updateStats = async () => {
@@ -516,20 +387,10 @@ function App() {
       });
   }
 
-  function spawnNpc(npc) {
-    console.log("Spawn NPC ", npc);
-    updateNpcHealth(npc.id, npc.maxHealth, npc.lastDmgTimestamp)
-    setNpcDead(npc.id, false);
-  }
-
-  function handleDroppedItems(event) {
-    // var item = event.Item;
-    // var itemHash = event.ItemHash;
-    // var qty = event.Qty;
-
+  function handleDroppedItems(droppedItems) {
     //chatWindowRef.current.writeMessageToLog('Dropped '+generateItemName(item, qty),  () => { pickupDroppedItem(event) }, 'Pick up');
-    console.log("[handleDroppedItems] items=", event.droppedItems)
-    setDroppedItems(event.droppedItems);
+    console.log("[handleDroppedItems] items=", droppedItems)
+    setDroppedItems(droppedItems);
   }
 
   function handleItemPickedEvent(item, fighter, qty) {
@@ -587,7 +448,7 @@ function App() {
         break;
 
         case "dropped_items":
-          handleDroppedItems(msg.eventData);
+          handleDroppedItems(msg.droppedItems);
         break;
 
         case "spawn_npc":
@@ -599,7 +460,7 @@ function App() {
         break;
 
         case "damage_dealt":
-          processDmgDealt(msg.damage, msg.opponent, msg.player, msg.opponentHealth, msg.lastDmgTimestamp)
+          processDmgDealt(msg.damage, msg.opponent, msg.player, msg.opponentHealth, msg.lastDmgTimestamp, msg.fighter)
         break;
 
         case "ping":
@@ -647,10 +508,10 @@ function App() {
 
      var stats = JSON.parse(stats);
 
-    //console.log("attributes", attributes)
+    console.log("fighter", fighter);
 
     setFighter(fighter);
-    setPlayerHealth(getHealth(fighter));
+    setPlayerHealth(fighter.CurrentHealth);
     setPlayerStrength(attributes.Strength);
     setPlayerAgility(attributes.Agility);
     setPlayerEnergy(attributes.Energy);
@@ -700,30 +561,6 @@ function App() {
     return false;
   }
 
-  function generateBattleReceipt(msg) {
-    var winner = msg.winner;
-
-    var battle = JSON.parse(msg.battle);
-    var opp1 = battle.Opponent1;
-    var opp2 = battle.Opponent2;
-
-    if (isNpc(opp1)) {
-      var npcs = npcList;
-      npcs[getNpcIndex(opp1)].inBattle = false;
-      setNpcList(npcs);
-    }
-
-    if (isNpc(opp2)) {
-      var npcs = npcList;
-      npcs[getNpcIndex(opp2)].inBattle = false;
-      setNpcList(npcs);
-    }
-
-
-    console.log("WINNER: ", winner);
-    //setIsBattle(false);
-  }
-
   function handleAttributeChange(name, value) {
     // setAttributes((prev) => ({
     //   ...prev,
@@ -769,40 +606,15 @@ function App() {
     setAvailablePoints(parseInt(playerMaxStats)-parseInt(playerStrength)-parseInt(playerAgility)-parseInt(playerEnergy)-parseInt(playerVitality));
   }
 
-  function getNpcMaxHealth(npcId) {
-    const npc = npcList.find((npc) => npc.id === npcId);
-    if (npc) {
-      return npc.maxHealth;
-    }
-    return null;
-  }
-  
-  async function handleMoveSubmission() {
-    if (target == 0) return;
-    if (isNpcDead(target) && getNpcHealth(target) < getNpcMaxHealth(target)) {
-      console.log("NPC Dead, finding new target");
-      var newTarget = getRandomAliveNpc();
 
-      if (newTarget != null) {
-        setTarget(newTarget);
-
-      } else {
-        console.log("No live mobs");
-        return;
-      }
-      
-    } else {
-      sendMove(target);
-    }    
-  }
-
-  async function sendMove(target) {
+  async function submitAttack() {
     var response = sendJsonMessage({
-      type: "record_move",
+      type: "submit_attack",
       data: {
-          opponentID: target,
+          opponentID: target.toString(),
           playerID: PlayerID,
-          skill: 0
+          skill: 4,
+          direction: {dx: 0, dy: 1}
       }
 
     });
@@ -826,68 +638,69 @@ function App() {
 
 
   return (
+    
+    <DndProvider backend={HTML5Backend}>
+    <div className="App" style={appStyle}>
+    {/*
+        // <SceneContextProvider 
+        //   fighter={fighter} 
+        //   moveFighter={moveFighter} 
+        //   npcList={npcList} 
+        //   droppedItems={droppedItems} 
+        //   damageData={damageData} 
+        //   playerDamageData={playerDamageData}
+        // >
+        //   <Scene/>
+        // </SceneContextProvider>
+    */}
 
-    // <DndProvider backend={HTML5Backend}>
-    // <div className="App" style={appStyle}>
-    //  <div style={{height: 800}}>
-        <SceneContextProvider 
-          fighter={fighter} 
-          moveFighter={moveFighter} 
-          npcList={npcList} 
-          droppedItems={droppedItems} 
-          damageData={damageData} 
-          playerDamageData={playerDamageData}
-        >
-          <Scene/>
-        </SceneContextProvider>
-    //  </div>
-    //   <ShopModal
-    //     isOpen={isShopOpen}
-    //     onClose={() => { setIsShopOpen(false); setAppStyle({}); }}
-    //     onClick={buyShopItem}
-    //   />
-
-
-    //   {/* Top bar */}
-    //   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '50px', backgroundColor: '#333', color: '#fff', padding: '0 20px' }}>
-    //     <div style={{ display: 'flex', alignItems: 'center' }}>
-    //       <img src="logo.png" alt="Logo" style={{ height: '30px', marginRight: '10px' }} />
-    //       <h3>My Fighting Game</h3>
-    //     </div>
-    //     <div>
-    //       <button onClick={createFighter}>New Fighter</button>
-    //       <button style={{ marginRight: '10px' }}>Settings</button>
-    //       <button>Logout</button>
-    //     </div>
-    //   </div>
-
-    //   {/* Main content */}
-    //   <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+      <ShopModal
+        isOpen={isShopOpen}
+        onClose={() => { setIsShopOpen(false); setAppStyle({}); }}
+        onClick={buyShopItem}
+      />
 
 
+      {/* Top bar */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '50px', backgroundColor: '#333', color: '#fff', padding: '0 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <img src="logo.png" alt="Logo" style={{ height: '30px', marginRight: '10px' }} />
+          <h3>My Fighting Game</h3>
+        </div>
+        <div>
+          <button onClick={createFighter}>New Fighter</button>
+          <button style={{ marginRight: '10px' }}>Settings</button>
+          <button>Logout</button>
+        </div>
+      </div>
 
+      {/* Main content */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
 
 
 
-    //     {/* Left section */}
-    //     <div style={{ width: '30%', padding: '0 10px' }}>
-    //       <img src="opponent.png" alt="Opponent" style={{ width: '100%', marginBottom: '10px' }} />
-    //       <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
-    //         <NPC target={target} setTarget={setTarget} damageData={damageData} npcs={npcList} currentTime={currentTime} getNpcHealth={getNpcHealth}/>
-    //       </div>
-    //       <div> 
-    //         <DamageTicker color="red" damages={hits} />
 
-    //       </div>
-    //       <div>Money: {money}</div>
-    //       <div>
+
+
+        {/* Left section */}
+        <div style={{ width: '30%', padding: '0 10px' }}>
+          <img src="opponent.png" alt="Opponent" style={{ width: '100%', marginBottom: '10px' }} />
+          <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
+            <NPC target={target} setTarget={setTarget} damageData={damageData} npcs={npcList} currentTime={currentTime}/>
+          </div>
+          <div> 
+            <DamageTicker color="red" damages={hits} />
+
+          </div>
+          <div>Money: {money}</div>
+          <div>
               
-    //           <Inventory items={inventoryItems} setItems={setInventoryItems} equipItem={equipItem} generateItemName={generateItemName}/>
+              <Inventory items={inventoryItems} setItems={setInventoryItems} equipItem={equipItem} generateItemName={generateItemName}/>
 
             
               
-    //       </div>
-    //     </div>
+          </div>
+        </div>
 
 
 
@@ -897,100 +710,100 @@ function App() {
 
 
 
-    //     {/* Middle section */}
-    //     <div style={{ width: '40%', padding: '0 10px' }}>
-    //       <h4>Game Chat</h4>
-    //       <div>
+        {/* Middle section */}
+        <div style={{ width: '40%', padding: '0 10px' }}>
+          <h4>Game Chat</h4>
+          <div>
 
-    //         <button onClick={() => { setIsShopOpen(true); setAppStyle({ pointerEvents: "none" }); }}>Shop</button>
+            <button onClick={() => { setIsShopOpen(true); setAppStyle({ pointerEvents: "none" }); }}>Shop</button>
 
-    //         <button onClick={refreshFigterItems}>Refresh</button>
-    //       </div>
+            <button onClick={refreshFigterItems}>Refresh</button>
+          </div>
            
 
-    //       <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
-    //         <div className="button-container">
-    //           <LoadingButton onClick={handleMoveSubmission} target={target} playerSpeed={playerAttackSpeed*10 + playerAgility/playerAgilityPointsPerSpeed}>Submit Move</LoadingButton>
-    //         </div>
-    //         <h4>Move Fighter ({coords.x},{coords.y})</h4>
-    //         <MoveFighterForm moveFighter={moveFighter} />
-    //       </div>
+          <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
+            <div className="button-container">
+              <LoadingButton onClick={submitAttack} target={target} playerSpeed={playerAttackSpeed*10 + playerAgility/playerAgilityPointsPerSpeed}>Submit Move</LoadingButton>
+            </div>
+            <h4>Move Fighter ({coords.x},{coords.z})</h4>
+            <MoveFighterForm moveFighter={moveFighter} />
+          </div>
 
-    //       <div>
-    //         <ChatWindow ref={chatWindowRef} />
-    //       </div>
-    //     </div>
-
-
+          <div>
+            <ChatWindow ref={chatWindowRef} />
+          </div>
+        </div>
 
 
 
 
 
 
-    //     {/* Right section */}
-    //     <div style={{ width: '30%', padding: '0 10px' }}>
+
+
+        {/* Right section */}
+        <div style={{ width: '30%', padding: '0 10px' }}>
            
 
 
-    //       <h4>{PlayerID} [{playerLevel}]</h4>
-    //       <img src="my-fighter.png" alt="My Fighter" style={{ width: '100%', marginBottom: '10px' }} />
+          <h4>{PlayerID} [{playerLevel}]</h4>
+          <img src="my-fighter.png" alt="My Fighter" style={{ width: '100%', marginBottom: '10px' }} />
            
             
-    //       <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
-    //         <h5>Stats</h5>
-    //         <div><Fighter currentHealth={playerHealth} health={playerMaxHP} color="green" /></div>
-    //         <div>Exp: {playerExperience}</div>
-    //         <div>
-    //           <CharacterEquipment equipment={equipment} unequipItem={unequipItem}/>
-    //         </div>
-    //         <div style={{ display: 'flex', flexDirection: 'row' }}>
-    //           <div style={{ flex: 1, padding: '10px', backgroundColor: '#f0f0f0' }}>
-    //             <Stat
-    //               name="Strength"
-    //               value={attributes.Strength}
-    //               onChange={handleAttributeChange}
-    //               availablePoints={availablePoints}
-    //             />
-    //             <Stat
-    //               name="Agility"
-    //               value={attributes.Agility}
-    //               onChange={handleAttributeChange}
-    //               availablePoints={availablePoints}
-    //             />
-    //             <Stat
-    //               name="Energy"
-    //               value={attributes.Energy}
-    //               onChange={handleAttributeChange}
-    //               availablePoints={availablePoints}
-    //             />
-    //             <Stat
-    //               name="Vitality"
-    //               value={attributes.Vitality}
-    //               onChange={handleAttributeChange}
-    //               availablePoints={availablePoints}
-    //             />
-    //             <div>
-    //               Available points: {availablePoints}{" "}
-    //               <button onClick={resetAttributes}>Reset</button>
-    //             </div>
-    //             <button
-    //               onClick={updateStats}
-    //             >
-    //               Submit Stats
-    //             </button>
-    //           </div>
-    //           <div style={{ flex: 1, padding: '10px', backgroundColor: '#d9d9d9' }}>
-    //               <p>Defence: {parseInt(playerAgility/4+playerItemsDefence)}</p>
-    //               <p>Attack: {parseInt(playerStrength/4 + playerEnergy/4)}</p>
-    //               <p>Speed: {parseInt(playerAttackSpeed + playerAgility/playerAgilityPointsPerSpeed)}</p>
-    //           </div>
-    //         </div>
+          <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
+            <h5>Stats</h5>
+            <div><FighterDash fighter={fighter} color="green" /></div>
+            <div>Exp: {playerExperience}</div>
+            <div>
+              <CharacterEquipment equipment={equipment} unequipItem={unequipItem}/>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <div style={{ flex: 1, padding: '10px', backgroundColor: '#f0f0f0' }}>
+                <Stat
+                  name="Strength"
+                  value={attributes.Strength}
+                  onChange={handleAttributeChange}
+                  availablePoints={availablePoints}
+                />
+                <Stat
+                  name="Agility"
+                  value={attributes.Agility}
+                  onChange={handleAttributeChange}
+                  availablePoints={availablePoints}
+                />
+                <Stat
+                  name="Energy"
+                  value={attributes.Energy}
+                  onChange={handleAttributeChange}
+                  availablePoints={availablePoints}
+                />
+                <Stat
+                  name="Vitality"
+                  value={attributes.Vitality}
+                  onChange={handleAttributeChange}
+                  availablePoints={availablePoints}
+                />
+                <div>
+                  Available points: {availablePoints}{" "}
+                  <button onClick={resetAttributes}>Reset</button>
+                </div>
+                <button
+                  onClick={updateStats}
+                >
+                  Submit Stats
+                </button>
+              </div>
+              <div style={{ flex: 1, padding: '10px', backgroundColor: '#d9d9d9' }}>
+                  <p>Defence: {parseInt(playerAgility/4+playerItemsDefence)}</p>
+                  <p>Attack: {parseInt(playerStrength/4 + playerEnergy/4)}</p>
+                  <p>Speed: {parseInt(playerAttackSpeed + playerAgility/playerAgilityPointsPerSpeed)}</p>
+              </div>
+            </div>
 
-    //       </div>
+          </div>
           
-    //     </div>
-    //   </div>
+        </div>
+      </div>
 
 
 
@@ -1001,13 +814,14 @@ function App() {
 
 
 
-    //   {/* Bottom bar */}
-    //   <div style={{ backgroundColor: '#333', color: '#fff', padding: '10px', marginTop: '50px' }}>
-    //     <button style={{ marginRight: '10px' }}>Fight Again</button>
-    //     <button>Choose Opponent</button>
-    //   </div>
-  //   </div>
-  // </DndProvider>
+      {/* Bottom bar */}
+      <div style={{ backgroundColor: '#333', color: '#fff', padding: '10px', marginTop: '50px' }}>
+        <button style={{ marginRight: '10px' }}>Fight Again</button>
+        <button>Choose Opponent</button>
+      </div>
+    </div>
+  </DndProvider>
+  
   );
 }
 

@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 
-const Fighter = ({ health, color, currentHealth }) => {
-  //const [currentHealth, setCurrentHealth] = useState(health);
+const Fighter = ({ fighter, color }) => {
+  if (!fighter) {
+    return <div>Fighter not available</div>;
+  }
 
   const healthBarStyles = {
     width: '100%',
@@ -11,7 +13,7 @@ const Fighter = ({ health, color, currentHealth }) => {
   };
 
   const currentHealthBarStyles = {
-    width: `${(currentHealth / health) * 100}%`,
+    width: `${(fighter.currentHealth / fighter.maxHealth) * 100}%`,
     height: '20px',
     backgroundColor: color,
     borderRadius: '10px'
@@ -23,7 +25,7 @@ const Fighter = ({ health, color, currentHealth }) => {
   };
 
   const decreaseHealth = (amount) => {
-    const newHealth = currentHealth - amount;
+    const newHealth = fighter.currentHealth;
     //setCurrentHealth(newHealth < 0 ? 0 : newHealth);
   };
 
@@ -32,7 +34,7 @@ const Fighter = ({ health, color, currentHealth }) => {
       <div style={healthBarStyles}>
         <div style={currentHealthBarStyles}></div>
       </div>
-      <p style={healthTextStyles}>{currentHealth} / {health}</p>
+      <p style={healthTextStyles}>{fighter.currentHealth} / {fighter.maxHealth}</p>
     </div>
   );
 };
