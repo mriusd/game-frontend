@@ -1,6 +1,6 @@
 import * as THREE from "three"
 import { clamp } from "three/src/math/MathUtils"
-import type { RefObject } from "react" 
+import { RefObject, useState } from "react" 
 import { useRef, useEffect } from "react"
 import { Object3D } from "three"
 import { useSceneContext } from "store/SceneContext"
@@ -11,37 +11,45 @@ const ANGLE_STEP = Math.PI / 4 // 8 directions
 const ANGLE_RANGE = Math.PI / 8 // Set a range of angles to rotate towards
 const MIN_ANGLE = Math.PI / 6 // Min angle on which detect rotation
 
+const saveDirection = { value: 0 }
+const savePointerWorldCoordinate = { value: null }
+const saveCurrentWorldCoordinate = { value: null }
+
 interface Props { world: RefObject<Object3D | null> }
 const Controller = ({ world }: Props) => {
     const { 
         worldSize, 
         currentWorldCoordinate,
+
         controller: {
-            direction,
-            focusedMatrixCoordinate,
-            focusedWorldCoordinate,
+            setDirection,
+            setFocusedMatrixCoordinate,
+            setFocusedWorldCoordinate,
+            setPointerWorldCoordinate,
             pointerWorldCoordinate
         }
     } = useSceneContext()
     const raycaster = useRef(new THREE.Raycaster())
     const pointer = useThree(state => state.pointer)
     const camera = useThree(state => state.camera)
+    const [isHolding, setIsHolding] = useState(false)
+
+    useFrame(() => {
+        if (isHolding) {
+            if (!world.current) { return }
+            if (!savePointerWorldCoordinate.value) { return }
+            setFocusedMatrixCoordinate(worldCoordToMatrix(worldSize.current, savePointerWorldCoordinate.value))
+            setFocusedWorldCoordinate(savePointerWorldCoordinate.value)
+        }
+    })
 
     useEffect(() => {
-        if (!currentWorldCoordinate) { return }
-        // @ts-expect-error
-        pointerWorldCoordinate.current = calcpointerWorldCoordinate() || pointerWorldCoordinate.current
+        savePointerWorldCoordinate.value = calcPointerWorldCoordinate() || savePointerWorldCoordinate.value
+        setPointerWorldCoordinate(savePointerWorldCoordinate.value)
+        saveCurrentWorldCoordinate.value = currentWorldCoordinate
     }, [currentWorldCoordinate])
-    // useFrame(() => {
-    //     // @ts-expect-error
-    //     pointerWorldCoordinate.current = calcpointerWorldCoordinate() || pointerWorldCoordinate.current
-    // })
 
-    // useFrame(() => {
-    //     console.log(currentWorldCoordinate)
-    // })
-
-    function calcpointerWorldCoordinate() {
+    function calcPointerWorldCoordinate() {
         if (!world.current) { return }
         raycaster.current.setFromCamera(pointer, camera)
         const intersections = raycaster.current.intersectObject(world.current)
@@ -53,45 +61,43 @@ const Controller = ({ world }: Props) => {
     useEffect(() => {
         window.addEventListener("mousedown", mouseDown)
         window.addEventListener("mousemove", mouseMove)
+        window.addEventListener("mouseup", mouseUp)
         return () => {
             window.removeEventListener("mousedown", mouseDown)
             window.removeEventListener("mousemove", mouseMove)
+            window.removeEventListener("mouseup", mouseUp)
         }
     }, [])
 
     // Set world mouse position
     function mouseDown() {
+        setIsHolding(true)
+
         if (!world.current) { return }
-        if (!pointerWorldCoordinate.current) { return }
-        console.log({ ...pointerWorldCoordinate.current, z: pointerWorldCoordinate.current.z - 0.5 }, worldCoordToMatrix(worldSize.current!, pointerWorldCoordinate.current))
-        // @ts-expect-error
-        focusedMatrixCoordinate.current = worldCoordToMatrix(worldSize.current!, pointerWorldCoordinate.current!)
-        // @ts-expect-error
-        focusedWorldCoordinate.current = pointerWorldCoordinate.current
+        if (!savePointerWorldCoordinate.value) { return }
+        setFocusedMatrixCoordinate(worldCoordToMatrix(worldSize.current, savePointerWorldCoordinate.value))
+        setFocusedWorldCoordinate(savePointerWorldCoordinate.value)
     }
 
     // Calc character rotation angle (direction)
     function mouseMove() {
-        console.log('mousemove')
-
-        // @ts-expect-error
-        pointerWorldCoordinate.current = calcpointerWorldCoordinate() || pointerWorldCoordinate.current
+        savePointerWorldCoordinate.value = calcPointerWorldCoordinate() || savePointerWorldCoordinate.value
+        setPointerWorldCoordinate(savePointerWorldCoordinate.value)
         
-        if (!pointerWorldCoordinate.current) { return }
-        if (!currentWorldCoordinate) { return }
-        if (direction.current === null) { return }
+        if (!savePointerWorldCoordinate.value) { return }
+        if (!saveCurrentWorldCoordinate.value) { return }
 
         // Angle between object and mouse
         const angle = Math.atan2(
-            pointerWorldCoordinate.current.z - currentWorldCoordinate.z,
-            pointerWorldCoordinate.current.x - currentWorldCoordinate.x
+            savePointerWorldCoordinate.value.x - saveCurrentWorldCoordinate.value.x,
+            savePointerWorldCoordinate.value.z - saveCurrentWorldCoordinate.value.z,
         )
 
         const targetAngle = Math.round(angle / ANGLE_STEP) * ANGLE_STEP
 
-        const angleDelta = angle - direction.current
-        const minAngle = { value: direction.current - ANGLE_RANGE }
-        const maxAngle = { value: direction.current + ANGLE_RANGE }
+        const angleDelta = angle - saveDirection.value
+        const minAngle = { value: saveDirection.value - ANGLE_RANGE }
+        const maxAngle = { value: saveDirection.value + ANGLE_RANGE }
 
         if (angleDelta > MIN_ANGLE) {
             maxAngle.value += angleDelta
@@ -101,9 +107,12 @@ const Controller = ({ world }: Props) => {
         } else {
             return
         }
+        saveDirection.value = clamp(targetAngle, minAngle.value, maxAngle.value)
+        setDirection(saveDirection.value)
+    }
 
-        // @ts-expect-error
-        direction.current = clamp(targetAngle, minAngle.value, maxAngle.value)
+    function mouseUp() {
+        setIsHolding(false)
     }
 
     return <></>

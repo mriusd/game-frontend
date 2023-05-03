@@ -3,6 +3,7 @@ import { useEventCloud } from "EventCloudContext"
 import type { Fighter } from "interfaces/fighter.interface"
 import type { Coordinate } from "interfaces/coordinate.interface"
 import type { ISceneContext } from "interfaces/sceneContext.interface"
+import type { OccupiedCoordinate } from "interfaces/occupied.interface"
 
 
 export const SceneContext = createContext({})
@@ -34,12 +35,27 @@ const SceneContextProvider = ({ children }: Props) => {
     
     const [ currentMatrixCoordinate, setCurrentMatrixCoordinate ] = useState<Coordinate | null>(null)
     const [ currentWorldCoordinate, setCurrentWorldCoordinate ] = useState<Coordinate | null>(null)
-    const direction = useRef<number>(0)
-    const focusedMatrixCoordinate = useRef<Coordinate | null>(null)
-    const focusedWorldCoordinate = useRef<Coordinate | null>(null)
-    const pointerWorldCoordinate = useRef<Coordinate | null>(null)
 
-    const worldSize = useRef<number>(12)
+    const [direction, setDirection] = useState<number>(0)
+    const [focusedMatrixCoordinate, setFocusedMatrixCoordinate] = useState<Coordinate | null>(null)
+    const [focusedWorldCoordinate, setFocusedWorldCoordinate] = useState<Coordinate | null>(null)
+    const [pointerWorldCoordinate, setPointerWorldCoordinate] = useState<Coordinate | null>(null)
+
+    const [occupiedCoords, _setOccupedCoords] = useState<OccupiedCoordinate[]>([])
+    function setOccupedCoords(item: OccupiedCoordinate) {
+        if (!item.coordinates || !item.id) { return console.warn("[SceneContextProvider] setOccupedCoords: invalid item") }
+        _setOccupedCoords((state: OccupiedCoordinate[]) => {
+            const newState = [ ...state ]
+            const itemIndex = newState.findIndex((occupiedCoord: OccupiedCoordinate) => occupiedCoord.id === item.id)
+            if (itemIndex === -1) {
+                newState.push(item)
+                return newState
+            }
+            return [...newState.slice(0, itemIndex), ...newState.slice(itemIndex+1), item]
+        })
+    }
+
+    const worldSize = useRef<number>(13) 
     const NpcList = useRef<Fighter[]>([])
     const Fighter = useRef<Fighter | null>(null)
 
@@ -57,7 +73,6 @@ const SceneContextProvider = ({ children }: Props) => {
         if (!fighter) { return }
         Fighter.current = fighter
     }, [fighter]);
-
 
     // Detect npc updates and add them to NpcList
     // TODO: add npc removal
@@ -129,11 +144,13 @@ const SceneContextProvider = ({ children }: Props) => {
         currentWorldCoordinate, setCurrentWorldCoordinate,
 
         controller: {
-            direction,
-            focusedMatrixCoordinate,
-            focusedWorldCoordinate,
-            pointerWorldCoordinate
-        }
+            direction, setDirection,
+            focusedMatrixCoordinate, setFocusedMatrixCoordinate,
+            focusedWorldCoordinate, setFocusedWorldCoordinate,
+            pointerWorldCoordinate, setPointerWorldCoordinate
+        },
+
+        occupiedCoords, setOccupedCoords
     }
 
     return (

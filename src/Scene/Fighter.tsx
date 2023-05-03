@@ -1,6 +1,7 @@
 import * as THREE from "three"
 import { useEffect, useState, useRef } from "react"
 import { useThree } from "@react-three/fiber"
+import { useTexture } from "@react-three/drei"
 import { CAMERA_POSITION } from "./config"
 import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
 import { getNextPosition } from "./utils/getNextPosition"
@@ -34,6 +35,8 @@ const Fighter = () => {
     const [ targetMatrixCoordinate, setTargetMatrixCoordinate ] = useState<Coordinate | null>(null)
     // const [ targetWorldPosition, setTargetWorldPosition ] = useState(null) // we use 1 cell move instead
 
+    const [ saveFocusedMatrixCoordinate, setSaveFocusedMatrixCoordinate ] = useState<Coordinate | null>(null)
+
     const [ isMoving, setIsMoving ] = useState<boolean>(false)
      // Unlike 'isMoving', 'isStaying' sets to TRUE with delay, but sets to FALSE as 'isMoving' immediately
     const [ isStaying, setIsStaying ] = useState<boolean>(false)
@@ -41,7 +44,7 @@ const Fighter = () => {
 
 
 
-    const [ managedDirection, setManagedDirection ] = useState<number>(direction.current || 0)
+    const [ managedDirection, setManagedDirection ] = useState<number>(direction)
 
     // Manage fighter changes from server
     useEffect(() => {
@@ -84,18 +87,25 @@ const Fighter = () => {
 
     // Controll Fighter rotation
     useEffect(() => {
-        if (direction.current === null) { return }
         if (isMoving) { return }
-        console.log('[Fighter]: direction', direction.current)
-        setManagedDirection(direction.current)
-    }, [ direction.current ])
+        console.log('[Fighter]: direction changed', direction)
+        setManagedDirection(direction)
+    }, [ direction ])
 
     // Set position to move to
     useEffect(() => {
+        console.log('[Fighter]: Set target position')
         if (!isSpawned) { return }
-        if (!focusedMatrixCoordinate.current) { return }
-        setTargetMatrixCoordinate(focusedMatrixCoordinate.current)
-    }, [ focusedMatrixCoordinate.current ])
+        if (!focusedMatrixCoordinate) { return }
+        setSaveFocusedMatrixCoordinate(focusedMatrixCoordinate)
+    }, [ focusedMatrixCoordinate ])
+    useEffect(() => {
+        if (isMoving) { return }
+        if (!saveFocusedMatrixCoordinate) { return } 
+        if (targetMatrixCoordinate?.x !== saveFocusedMatrixCoordinate.x && targetMatrixCoordinate?.z !== saveFocusedMatrixCoordinate.z) {
+            setTargetMatrixCoordinate(saveFocusedMatrixCoordinate)
+        }
+    }, [saveFocusedMatrixCoordinate, currentMatrixCoordinate])
 
     // Add delay to prevent freeze on "checkpoint" when synchronising with server
     // On delayed mooving "true" we render fighter in the same position as server
@@ -116,14 +126,13 @@ const Fighter = () => {
 
     // Fighter movement
     useEffect(() => {
-        console.log('[Fighter]: Move cell', currentMatrixCoordinate, targetMatrixCoordinate)
+        console.log('[Fighter]: Move cell (from->to)', currentMatrixCoordinate, targetMatrixCoordinate)
         if (!worldSize.current) { return }
         if (!isSpawned) { return }
         if (!currentMatrixCoordinate || !targetMatrixCoordinate) { return }
         if (!inWorld(worldSize.current, targetMatrixCoordinate)) { return }
         if ( targetMatrixCoordinate.x === currentMatrixCoordinate.x && targetMatrixCoordinate.z === currentMatrixCoordinate.z ) { return }
 
-        console.log('[Fighter]: Move 1 cell')
         const nextMatrixPosition = getNextPosition(currentMatrixCoordinate, targetMatrixCoordinate)
         // const nextPosition = getNearestEmptySquareToTarget(matrix, currentPosition, targetPosition)
         if (!nextMatrixPosition) { return }
@@ -148,6 +157,9 @@ const Fighter = () => {
         )
     }, [ targetMatrixCoordinate, currentMatrixCoordinate ]) 
 
+
+      const colorMap = useTexture('/logo512.png');
+
     if (!currentWorldCoordinate) {
         return <></>
     }
@@ -159,7 +171,12 @@ const Fighter = () => {
             rotation={[0, managedDirection, 0]}
         >
             <boxGeometry args={[1, 1]}/>
-            <meshStandardMaterial color={0x444444}/>
+            <meshBasicMaterial attach="material-0" color="0x000000" /> {/* px */}
+            <meshBasicMaterial attach="material-1" color="0x000000"  /> {/* nx */}
+            <meshBasicMaterial attach="material-2" color="0x000000" /> {/* py */}
+            <meshBasicMaterial attach="material-3" color="0x000000" /> {/* ny */}
+            <meshBasicMaterial attach="material-4" color="0x000000" map={colorMap}/> {/* pz */}
+            <meshBasicMaterial attach="material-5" color="0x000000"  /> {/* nz */}
         </mesh>
     )
 }
