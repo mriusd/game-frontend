@@ -9,7 +9,7 @@ export interface EventCloud {
     removeEvent: any
     fighter: Fighter 
     npcList: Fighter[] 
-    droppedItems: any 
+    droppedItems: any
     money: any 
     equipment: any 
     moveFighter: (coordinate: Coordinate) => void 
@@ -17,4 +17,8 @@ export interface EventCloud {
     target: any
     setTarget: any
     refreshFighterItems: any
+    generateItemName: any
+    isExcellent: any
+    pickupDroppedItem: any
+    backpack: any
 }

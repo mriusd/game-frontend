@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './LoadingButton.css';
-import { useEventCloud } from './EventCloudContext.tsx';
+import { useEventCloud } from './EventCloudContext';
 
 const LoadingButton = ({ children }) => {
   const { 

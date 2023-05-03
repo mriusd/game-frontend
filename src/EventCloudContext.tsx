@@ -7,8 +7,12 @@ import type { EventCloud } from 'interfaces/eventCloud.interface';
 import type { Fighter } from 'interfaces/fighter.interface';
 import type { FighterEquipment } from 'interfaces/fighterEquipment.interface';
 import type { ItemAttributes, ItemDroppedEvent } from 'interfaces/item.interface'
+import type { Backpack, BackpackSlot } from './models/Backpack';
 // @ts-expect-error
-import { common } from 'ethereumjs-util'; 
+import { common } from 'ethereumjs-util';  
+
+
+
 
 const EventCloudContext = createContext({});
 
@@ -27,7 +31,8 @@ export const EventCloudProvider = ({ children }) => {
   const [droppedItems, setDroppedItems] = useState<Record<common.Hash, ItemDroppedEvent>>({});
   const [npcList, setNpcList]           = useState<Fighter[]>([]);
   const [equipment, setEquipment]       = useState<FighterEquipment | null>(null);
-
+  const [backpack, setBackpack]         = useState<Backpack | null>(null);
+ 
   const [money, setMoney] = useState(0);
   const [target, setTarget] = useState(0);
 
@@ -91,12 +96,12 @@ export const EventCloudProvider = ({ children }) => {
   }
 
   function pickupDroppedItem (event) {
-    console.log("Pickup ", event.ItemHash, event.Item);
+    console.log("Pickup ", event.itemHash, event.item);
 
     var response = sendJsonMessage({
       type: "pickup_dropped_item",
       data: {
-          itemHash: event.ItemHash,
+          itemHash: event.itemHash,
       }
 
     });
@@ -136,7 +141,7 @@ export const EventCloudProvider = ({ children }) => {
         break;
 
         case "fighter_items":
-          handleFighterItems(msg.items, msg.attributes, msg.equipment, msg.stats, msg.npcs, msg.fighter, msg.money, msg.droppedItems);
+          handleFighterItems(msg.items, msg.attributes, msg.equipment, msg.stats, msg.npcs, msg.fighter, msg.money, msg.droppedItems, msg.backpack);
         break;
 
         case "damage_dealt":
@@ -175,7 +180,7 @@ export const EventCloudProvider = ({ children }) => {
     }
   }
 
-  function handleFighterItems(items, attributes, equipment, stats, npcs, fighter, money, droppedItems) {
+  function handleFighterItems(items, attributes, equipment, stats, npcs, fighter, money, droppedItems, backpack) {
     
     
     var attributes = JSON.parse(attributes);
@@ -190,10 +195,13 @@ export const EventCloudProvider = ({ children }) => {
     setEquipment(equipment);
     setNpcList(npcs);    
     setDroppedItems(droppedItems);
+    setBackpack(backpack);
+
+
 
      var stats = JSON.parse(stats);
 
-    console.log("fighter", fighter);
+    console.log("backpack", backpack);
 
     setFighter(fighter);
     
@@ -330,7 +338,11 @@ export const EventCloudProvider = ({ children }) => {
         submitAttack,
         target,
         setTarget,
-        refreshFighterItems
+        refreshFighterItems,
+        generateItemName,
+        isExcellent,
+        pickupDroppedItem,
+        backpack
       }}>
       {children}
     </EventCloudContext.Provider>
