@@ -1,43 +1,54 @@
 import React, { useState, useEffect } from 'react';
+import { FighterEquipment } from './models/FighterEquipment';
+import { ItemAttributes } from './models/Items';
 import './CharacterEquipment.css';
 
-const CharacterEquipment = ({equipment, unequipItem}) => {
+import { useEventCloud } from './EventCloudContext.tsx';
+
+const CharacterEquipment = () => {
+
+  const { 
+    equipment,
+    unequipItem
+  } = useEventCloud();
+  
   const [isPop, setPop] = useState(false);
 
-  const [helmet, setHelmet] = useState(null);
-  const [armour, setArmour] = useState(null);
-  const [pants, setPants] = useState(null);
-  const [gloves, setGloves] = useState(null);
-  const [boots, setBoots] = useState(null);
-  const [leftHand, setLeftHand] = useState(null);
-  const [rightHand, setRightHand] = useState(null);
-  const [leftRing, setLeftRing] = useState(null);
-  const [rightRing, setRightRing] = useState(null);
-  const [pendant, setPendant] = useState(null);
-  const [wings, setWings] = useState(null);
+  const [helmet, setHelmet] = useState<ItemAttributes | null>(null);
+  const [armour, setArmour] = useState<ItemAttributes | null>(null);
+  const [pants, setPants] = useState<ItemAttributes | null>(null);
+  const [gloves, setGloves] = useState<ItemAttributes | null>(null);
+  const [boots, setBoots] = useState<ItemAttributes | null>(null);
+  const [leftHand, setLeftHand] = useState<ItemAttributes | null>(null);
+  const [rightHand, setRightHand] = useState<ItemAttributes | null>(null);
+  const [leftRing, setLeftRing] = useState<ItemAttributes | null>(null);
+  const [rightRing, setRightRing] = useState<ItemAttributes | null>(null);
+  const [pendant, setPendant] = useState<ItemAttributes | null>(null);
+  const [wings, setWings] = useState<ItemAttributes | null>(null);
 
   useEffect(() => {
     console.log("CharacterEquipment", equipment);
-    if (typeof(equipment.armour) != 'undefined')
-    { 
-      setHelmet(equipment.helm);
-      setArmour(equipment.armour);
-      setPants(equipment.pants);
-      setGloves(equipment.gloves);
-      setBoots(equipment.boots);
-      setLeftHand(equipment.leftHand);
-      setRightHand(equipment.rightHand);
-      setLeftRing(equipment.leftRing);
-      setRightRing(equipment.rightRing);
-      setPendant(equipment.pendant);
-      setWings(equipment.wings);
+    if (!equipment) { return }
+    setHelmet(equipment.helmSlot);
+    setArmour(equipment.armourSlot);
+    setPants(equipment.pantsSlot);
+    setGloves(equipment.glovesSlot);
+    setBoots(equipment.bootsSlot);
+    setLeftHand(equipment.leftHandSlot);
+    setRightHand(equipment.rightHandSlot);
+    setLeftRing(equipment.leftRingSlot);
+    setRightRing(equipment.rightRingSlot);
+    setPendant(equipment.pendSlot);
+    setWings(equipment.wingsSlot);
 
-      setPop(true);
-    }
+    setPop(true);
+    
       
   }, [equipment]);
 
-
+  if (!equipment) {
+    return (<div>Waiting for equipment object...</div>);
+  }
   return (
     <div className="character-equipment">
       <div className="slot">

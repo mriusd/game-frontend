@@ -1,25 +1,32 @@
 import React, { useState, useEffect } from "react";
 import FloatingDamage from "./FloatingDamage";
 import "./NPC.css";
+import { useEventCloud } from './EventCloudContext.tsx';
 
-const NPC = ({ npcs, currentTime, getNpcHealth, target, setTarget, damageData }) => {
+const NPC = ({ npcs, currentTime, target, setTarget }) => {
+  const [latestDamageEvent, setLatestDamageEvent] = useState(null);
+
+  const { events, setEvents } = useEventCloud();
+  const { removeEvent } = useEventCloud();
   const [npcState, setNpcState] = useState(npcs);
 
   const [floatingDamages, setFloatingDamages] = useState({});
 
-  useEffect(() => {
-    //console.log(`damageData `, damageData);
-    if (damageData) {
-      // Check if the current NPC's ID matches the ID in damageData
-      const npc = npcState.find((npc) => npc.id === damageData.npcId);
+   useEffect(() => {
+    const damageEvents = events.filter((event) => event.type === 'damage');
 
-      if (npc) {
-        // Trigger the floating damage animation for this NPC
-        console.log(`NPC with ID ${npc.id} received ${damageData.damage} damage.`);
-        triggerFloatingDamage(damageData.npcId, damageData.damage);
-      }
+    if (damageEvents.length > 0) {
+      damageEvents.forEach((damageEvent) => {
+        console.log(`NPC with ID ${damageEvent.npcId} received ${damageEvent.damage} damage.`);
+        triggerFloatingDamage(damageEvent.npcId, damageEvent.damage);
+        removeEvent(damageEvent);
+      });
+      
     }
-  }, [damageData]);
+  }, [events]);
+
+
+
 
   const triggerFloatingDamage = (npcId, damage) => {
     setFloatingDamages((prevDamages) => ({
@@ -41,17 +48,11 @@ const NPC = ({ npcs, currentTime, getNpcHealth, target, setTarget, damageData })
   }, [npcs]);
 
   const handleClick = (npc) => {
-    if (getNpcHealth(npc.id) < npc.maxHealth) {
-      console.log('Mob unavailable')
-      
-    } else {
-      setNpcState((prevState) =>
-        prevState.map((n) =>
-          n.id === npc.id ? { ...n, inBattle: true } : n
-        )
-      );
-      //initiateBattle(npc.id);
-    }    
+    setNpcState((prevState) =>
+      prevState.map((n) =>
+        n.id === npc.id ? { ...n, inBattle: true } : n
+      )
+    );
   };
 
   const handleCheckmark = (npcId) => {
@@ -65,8 +66,6 @@ const NPC = ({ npcs, currentTime, getNpcHealth, target, setTarget, damageData })
         const isDead = npc.isDead;
         const timeLeft = npc.lastDmgTimestamp + 5000 - currentTime;
         const progress = (timeLeft / 5000) * 100;
-        // console.log('getNpcHealth(npc.id)', npc.id, getNpcHealth(npc.id))
-        // console.log('getNpcHealth NPC', npc)
         return (
           <div
             key={npc.id}
@@ -85,9 +84,9 @@ const NPC = ({ npcs, currentTime, getNpcHealth, target, setTarget, damageData })
               onChange={() => handleCheckmark(npc.id)}
               style={{ position: "absolute", top: "2px", left: "2px" }}
             />
-            <div className="npc-name">{npc.id} ({npc.coordinates.x}, {npc.coordinates.y})</div>
+            <div className="npc-name">{npc.id} ({npc.coordinates.x}, {npc.coordinates.z})</div>
             <div className="npc-healthbar" style={{ width: '100%', height: '5px', backgroundColor: 'lightgray' }}>
-              <div className="npc-current-health" style={{ width: `${(getNpcHealth(npc.id)/npc.maxHealth) * 100}%`, height: '100%', backgroundColor: 'green' }}></div>
+              <div className="npc-current-health" style={{ width: `${(npc.currentHealth/npc.maxHealth) * 100}%`, height: '100%', backgroundColor: 'green' }}></div>
             </div>
             {isDead && (
               <div className="npc-respawn-progress" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: '50%', clipPath: `inset(0 ${progress}% 0 0)` }}></div>

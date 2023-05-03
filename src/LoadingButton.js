@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './LoadingButton.css';
+import { useEventCloud } from './EventCloudContext.tsx';
 
-const LoadingButton = ({ onClick, children, playerSpeed, target }) => {
+const LoadingButton = ({ children }) => {
+  const { 
+    fighter,
+    submitAttack
+  } = useEventCloud();
+
   const [loading, setLoading] = useState(false);
   const [autoClick, setAutoClick] = useState(false);
   const [lastClick, setLastClick] = useState(Date.now());
@@ -10,28 +16,29 @@ const LoadingButton = ({ onClick, children, playerSpeed, target }) => {
     console.log("handleClick called");
     setLoading(true);
     setLastClick(Date.now());
-    await onClick();
+    await submitAttack();
     setTimeout(() => {
       setLoading(false);
-    }, 60000 / playerSpeed);
-  }, [onClick, playerSpeed]);
+    }, 60000 / fighter?.attackSpeed);
+  }, [submitAttack, fighter?.attackSpeed]);
 
   useEffect(() => {
-    if (autoClick && !loading && target != 0) {
+    if (!fighter) { return }
+    if (autoClick && !loading) {
       const timeSinceLastClick = Date.now() - lastClick;
-      const timeToNextClick = Math.max(0, 60000 / playerSpeed - timeSinceLastClick);
+      const timeToNextClick = Math.max(0, 60000 / fighter.attackSpeed - timeSinceLastClick);
       const timer = setTimeout(() => {
         handleClick();
       }, timeToNextClick);
       return () => clearTimeout(timer);
     }
-  }, [autoClick, loading, handleClick, playerSpeed, lastClick, target]);
+  }, [autoClick, loading, handleClick, lastClick]);
 
   const handleCheckboxChange = (e) => {
     setAutoClick(e.target.checked);
   };
 
-  const animationDuration = `${60000 / playerSpeed}ms`;
+  const animationDuration = `${60000 / fighter?.attackSpeed}ms`;
 
   return (
     <div>
