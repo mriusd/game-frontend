@@ -1,17 +1,21 @@
+import * as THREE from "three"
+import { Object3D } from "three"
+
 import { Canvas } from "@react-three/fiber"
-import { Suspense, useRef, useContext, memo } from "react"
-import { SceneContext } from "./store/SceneContextProvider"
+import { Suspense, useRef, memo } from "react"
+import { useSceneContext } from "store/SceneContext"
 
 import { CAMERA_POSITION } from "./config"
 
 import Light from "./Light"
-import World from "./World/World"
+import World from "./World"
 import Fighter from "./Fighter"
 import Npc from "./Npc"
+import Controller from "./Controller"
 
 const Scene = memo(function Scene() {
-    const store = useContext(SceneContext)
-    const worldRef = useRef()
+    const store = useSceneContext()
+    const worldRef = useRef<Object3D | null>(null)
     return (
         <Suspense fallback={<span>loading...</span>}>
             {
@@ -20,7 +24,7 @@ const Scene = memo(function Scene() {
                     <Canvas
                         shadows
                         camera={{
-                            position: CAMERA_POSITION,
+                            position: new THREE.Vector3(...CAMERA_POSITION),
                             near: 0.1,
                             far: 60,
                             fov: 45,
@@ -29,9 +33,10 @@ const Scene = memo(function Scene() {
                         {/* <color attach="background" args={[0x000000]} /> */}
                         {/* <fog attach="fog" color={0x000000} near={1} far={30} /> */}
                         <Light />
-                        { store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />) }
-                        <Fighter world={worldRef} />
+                        { store.NpcList.current!.map(npc => <Npc key={npc?.id} npc={npc} />) }
+                        <Fighter  />
                         <World ref={worldRef} />
+                        <Controller world={worldRef} />
                     </Canvas>
                 ) 
                 :

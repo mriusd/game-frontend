@@ -1,15 +1,51 @@
-import { createContext, useEffect, useState, useRef } from "react"
+import { createContext, useEffect, useState, useRef, useContext, ReactNode } from "react"
+import { useEventCloud } from "EventCloudContext"
+import type { Fighter } from "interfaces/fighter.interface"
+import type { Coordinate } from "interfaces/coordinate.interface"
+import type { ISceneContext } from "interfaces/sceneContext.interface"
 
-export const SceneContext = createContext()
 
-const SceneContextProvider = ({ children, fighter, moveFighter, npcList, droppedItems, damageData, playerDamageData }) => {
-    const worldSize = useRef(12)
+export const SceneContext = createContext({})
 
-    const NpcList = useRef([])
-    const Fighter = useRef(null)
+export const useSceneContext = (): ISceneContext => {
+    const context = useContext(SceneContext) as ISceneContext
+    if (!context) {
+        throw new Error(`useSceneContext must be used within a SceneContextProvider`)
+    }
+    return context
+}
 
-    const [isLoaded, setIsLoaded] = useState(false)
+interface Props { children: ReactNode | ReactNode[] }
+const SceneContextProvider = ({ children }: Props) => {
+    const { 
+        PlayerID, 
+        addDamageEvent, 
+        fighter, 
+        npcList, 
+        droppedItems, 
+        money, 
+        equipment,
+        moveFighter,
+        submitAttack,
+        target,
+        setTarget,
+        refreshFighterItems 
+    } = useEventCloud()
+    
+    const [ currentMatrixCoordinate, setCurrentMatrixCoordinate ] = useState<Coordinate | null>(null)
+    const [ currentWorldCoordinate, setCurrentWorldCoordinate ] = useState<Coordinate | null>(null)
+    const direction = useRef<number>(0)
+    const focusedMatrixCoordinate = useRef<Coordinate | null>(null)
+    const focusedWorldCoordinate = useRef<Coordinate | null>(null)
+    const pointerWorldCoordinate = useRef<Coordinate | null>(null)
+
+    const worldSize = useRef<number>(12)
+    const NpcList = useRef<Fighter[]>([])
+    const Fighter = useRef<Fighter | null>(null)
+
+    const [isLoaded, setIsLoaded] = useState<boolean>(false)
     useEffect(() => {
+        console.log(Fighter.current, worldSize.current)
         if (isLoaded) { return }
         setIsLoaded(
             !!Fighter.current && !!worldSize.current
@@ -28,7 +64,7 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
     useEffect(() => {
         if (!npcList?.length) { return }
         console.log("[SceneContextProvider] NPC list updated: ", npcList)
-        npcList.forEach(serverNpc => {
+        npcList.forEach((serverNpc: Fighter) => {
             const localeNpcIndex = NpcList.current.findIndex(localeNpc => localeNpc.id === serverNpc.id)
             if (localeNpcIndex !== -1) {
                 NpcList.current[localeNpcIndex] = { ...serverNpc }
@@ -87,12 +123,22 @@ const SceneContextProvider = ({ children, fighter, moveFighter, npcList, dropped
         NpcList,
         Fighter,
         moveFighter,
-        isLoaded
+        isLoaded,
+
+        currentMatrixCoordinate, setCurrentMatrixCoordinate,
+        currentWorldCoordinate, setCurrentWorldCoordinate,
+
+        controller: {
+            direction,
+            focusedMatrixCoordinate,
+            focusedWorldCoordinate,
+            pointerWorldCoordinate
+        }
     }
 
     return (
         <SceneContext.Provider value={value}>
-            {children}
+            { children }
         </SceneContext.Provider>
     )
 }

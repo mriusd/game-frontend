@@ -1,13 +1,13 @@
 
 import * as THREE from "three"
-import { forwardRef, useContext } from "react"
-import { SceneContext } from "../store/SceneContextProvider"
+import { RefObject, forwardRef } from "react"
+import { useSceneContext } from "store/SceneContext"
 
 const World = forwardRef((props, ref) => {
-    const { worldSize } = useContext(SceneContext) 
+    const { worldSize } = useSceneContext()
 
-    const colors = {
-        GRAY: 0x6C6C6C
+    if (!worldSize.current) {
+        return <></>
     }
 
     const segmentsSize = 1
@@ -17,10 +17,11 @@ const World = forwardRef((props, ref) => {
     const sizeY = segmentsSize * segmentsY
 
     const geometry = new THREE.PlaneGeometry(sizeX, sizeY, segmentsX, segmentsY)
-    const material = new THREE.MeshStandardMaterial({ color: colors.GRAY })
+    const material = new THREE.MeshStandardMaterial({ color: 0x6C6C6C })
 
     return (
         <mesh 
+            // @ts-expect-error
             ref={ref} 
             receiveShadow 
             rotation={[Math.PI / -2, 0, 0]}

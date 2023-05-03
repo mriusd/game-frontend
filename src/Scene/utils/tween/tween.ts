@@ -4,9 +4,16 @@
  * @version 1.0.0
  */
 import Ease, { Lerp } from "./easing"
+export interface TweenState {
+    value: any
+    state: {
+        hole: number
+        nothole: number
+    }
+}
 
 const Tween = {
-    to(from, to, { duration = 1000, renderDelay = 0, delay = 0, onChange = (context) => {}, onComplete = () => {}, ease = Ease.Line }) {
+    to(from: any, to: any, { duration = 1000, renderDelay = 0, delay = 0, onChange = (context: TweenState) => {}, onComplete = () => {}, ease = Ease.Line }) {
         const MainStartTime = performance.now()
         let startTime = MainStartTime
         let complete = false
@@ -29,11 +36,12 @@ const Tween = {
                 }
                 onChange({ value, state: t })
             }
+            // @ts-expect-error
             if ( complete ) { onComplete({ value, state: t }) }
             if ( !complete ) { requestAnimationFrame(render) }
         })
 
-        function deepObject(from, to, value, t) {
+        function deepObject(from: any, to: any, value: any, t: number) {
             Object.keys(from).forEach(key => {
                 if (typeof from[key] === 'number') {
                     value[key] = Lerp(from[key], to[key], ease(t))

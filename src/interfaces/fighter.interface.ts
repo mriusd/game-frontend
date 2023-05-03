@@ -1,6 +1,5 @@
-import { Coordinate } from './Coordinate';
-import { Damage } from './Damage';
-import { ItemAttributes } from './Items';
+import type { Coordinate } from "./coordinate.interface"; 
+import type { Damage } from "./damage.interface";
 
 export interface Fighter {
     id: string;

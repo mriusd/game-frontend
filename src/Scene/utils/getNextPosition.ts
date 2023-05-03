@@ -1,6 +1,7 @@
 import { euclideanDistance } from "./euclideanDistance"
+import type { Coordinate } from "interfaces/coordinate.interface"
 
-export const getNextPosition = (current, target) => {
+export const getNextPosition = (current: Coordinate, target: Coordinate) => {
     let dx = target.x - current.x
     let dz = target.z - current.z
   
@@ -20,7 +21,7 @@ export const getNextPosition = (current, target) => {
 }
 
 // TODO: dont use filer
-export const getNearestEmptySquareToTarget = (matrix, currentPosition, targetPosition) => {
+export const getNearestEmptySquareToTarget = (matrix: any, currentPosition: Coordinate, targetPosition: Coordinate) => {
   const availableNearestSquares = matrix.value.filter(_ => (
     _.x === currentPosition.x - 1 && _.z === currentPosition.z + 0 && _.av ||
     _.x === currentPosition.x + 1 && _.z === currentPosition.z + 0 && _.av ||
