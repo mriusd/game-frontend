@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import FloatingDamage from "./FloatingDamage";
 import "./NPC.css";
-import { useEventCloud } from './EventCloudContext';
+import { useEventCloud } from './EventCloudContext.tsx';
 
-const NPC = ({ npcs, currentTime, target, setTarget, damageData }) => {
+const NPC = ({ npcs, currentTime, target, setTarget }) => {
   const [latestDamageEvent, setLatestDamageEvent] = useState(null);
 
   const { events, setEvents } = useEventCloud();
+  const { removeEvent } = useEventCloud();
   const [npcState, setNpcState] = useState(npcs);
 
   const [floatingDamages, setFloatingDamages] = useState({});
@@ -18,10 +19,9 @@ const NPC = ({ npcs, currentTime, target, setTarget, damageData }) => {
       damageEvents.forEach((damageEvent) => {
         console.log(`NPC with ID ${damageEvent.npcId} received ${damageEvent.damage} damage.`);
         triggerFloatingDamage(damageEvent.npcId, damageEvent.damage);
+        removeEvent(damageEvent);
       });
-
-      // Remove processed damage events
-      setEvents((prevEvents) => prevEvents.filter((event) => !damageEvents.includes(event)));
+      
     }
   }, [events]);
 

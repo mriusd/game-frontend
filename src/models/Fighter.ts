@@ -1,6 +1,6 @@
 import { Coordinate } from './Coordinate';
 import { Damage } from './Damage';
-import { Backpack } from './Backpack';
+import { ItemAttributes } from './Items';
 
 export interface Fighter {
     id: string;
@@ -23,7 +23,15 @@ export interface Fighter {
     isClosed: boolean;
     skill: number;
     spawnCoords: Coordinate;
-    backpack: Backpack | null;
     currentHealth: number;
     currentMana: number;
+    lastMoveTimestamp: number;
+
+    strength: number; 
+    agility: number; 
+    energy: number;
+    vitality: number;
+
+    level: number;
+    experience: number;
 }
