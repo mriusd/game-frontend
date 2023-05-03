@@ -11,8 +11,8 @@ const World = forwardRef((props, ref) => {
     }
 
     const segmentsSize = 1
-    const segmentsX = worldSize.current+1
-    const segmentsY = worldSize.current+1
+    const segmentsX = worldSize.current
+    const segmentsY = worldSize.current
     const sizeX = segmentsSize * segmentsX
     const sizeY = segmentsSize * segmentsY
 
@@ -28,7 +28,7 @@ const World = forwardRef((props, ref) => {
             geometry={geometry}
             material={material}
         >
-            <gridHelper args={[worldSize.current+1, worldSize.current+1, 0xFFFFFF, 0xFFFFFF]} position={[0, 0.001, 0]} rotation={[Math.PI / -2, 0, 0]} />
+            <gridHelper args={[worldSize.current, worldSize.current, 0xFFFFFF, 0xFFFFFF]} position={[0, 0.001, 0]} rotation={[Math.PI / -2, 0, 0]} />
         </mesh>
     )
 })
