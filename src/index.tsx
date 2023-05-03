@@ -1,18 +1,14 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import './index.css';
-import App from './App.tsx';
+import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { EventCloudProvider } from './EventCloudContext.tsx';
+import { EventCloudProvider } from './EventCloudContext';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
   <EventCloudProvider>
     <App />
-    </EventCloudProvider>
-  </React.StrictMode>
-  
+  </EventCloudProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

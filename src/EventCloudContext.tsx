@@ -1,15 +1,19 @@
+// @ts-nocheck
+
 import { createContext, useContext, useState, useEffect } from 'react';
 import useWebSocket from 'react-use-websocket';
+import type { EventCloud } from 'interfaces/eventCloud.interface';
 
-import { Fighter } from './models/Fighter';
-import { FighterEquipment } from './models/FighterEquipment';
-import { ItemAttributes, ItemDroppedEvent } from './models/Items';
+import type { Fighter } from 'interfaces/fighter.interface';
+import type { FighterEquipment } from 'interfaces/fighterEquipment.interface';
+import type { ItemAttributes, ItemDroppedEvent } from 'interfaces/item.interface'
+// @ts-expect-error
 import { common } from 'ethereumjs-util'; 
 
-const EventCloudContext = createContext();
+const EventCloudContext = createContext({});
 
-export const useEventCloud = () => {
-  return useContext(EventCloudContext);
+export const useEventCloud = (): EventCloud => {
+  return useContext(EventCloudContext) as EventCloud;
 };
 
 export const EventCloudProvider = ({ children }) => {
@@ -34,6 +38,7 @@ export const EventCloudProvider = ({ children }) => {
   const socketOptions = {
     onOpen: (event) => { 
       console.log('WebSocket connected!:', event); 
+      // @ts-expect-error
       sendAuth(); 
     },
     onError: (event) => {
@@ -51,6 +56,7 @@ export const EventCloudProvider = ({ children }) => {
     var response = sendJsonMessage({
       type: "auth",
       data: {
+        // @ts-expect-error
           playerID: parseInt(PlayerID),
           userAddress: UserAddress,
           locationHash: "lorencia_0_0"

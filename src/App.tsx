@@ -1,18 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useEventCloud } from './EventCloudContext.tsx';
-
-import ReactDOM from 'react-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useEventCloud } from './EventCloudContext';
 
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import "./App.css";
-import CharacterEquipment from './CharacterEquipment.tsx';
+import CharacterEquipment from './CharacterEquipment';
 import FighterDash from './FighterDash';
 import LoadingButton from './LoadingButton';
 import NPC from './NPC';
 
 import Scene from './Scene/Scene';
-import SceneContextProvider from './Scene/store/SceneContextProvider';
+import SceneContextProvider from 'store/SceneContext';
 
 
 function App() {
@@ -39,16 +37,10 @@ function App() {
     
     <DndProvider backend={HTML5Backend}>
     <div className="App">
-      <div>
-        <SceneContextProvider 
-          fighter={fighter} 
-          moveFighter={moveFighter} 
-          npcList={npcList} 
-          droppedItems={droppedItems} 
-        >
+      <div className='scene'>
+        <SceneContextProvider>
           <Scene/>
         </SceneContextProvider>
-    
       </div>
 
       {/* Top bar 

@@ -3,7 +3,7 @@
  * @version 1.0.0
  */
 
-const Lerp = ( start, end, t = 0.075 ) => {
+const Lerp = ( start: number, end: number, t = 0.075 ) => {
     return start + (end - start) * t
 }
 
@@ -81,10 +81,10 @@ const Ease = {
     InOutCustom,
 }
 
-function pow(t, times = 2) {
+function pow(t: number, times = 2) {
     return Math.pow(t, times)
 }
-function flip(t) {
+function flip(t: number) {
     return ( 1 - t )
 }
 

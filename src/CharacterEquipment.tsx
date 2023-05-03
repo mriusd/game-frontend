@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { FighterEquipment } from './models/FighterEquipment';
-import { ItemAttributes } from './models/Items';
+import { useState, useEffect } from 'react';
+import type { FighterEquipment } from 'interfaces/fighterEquipment.interface';
+import type { ItemAttributes } from 'interfaces/item.interface';
 import './CharacterEquipment.css';
 
-import { useEventCloud } from './EventCloudContext.tsx';
+import { useEventCloud } from './EventCloudContext';
 
 const CharacterEquipment = () => {
 
   const { 
     equipment,
+    // @ts-expect-error
     unequipItem
   } = useEventCloud();
   
