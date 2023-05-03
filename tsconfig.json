@@ -1,8 +1,38 @@
 {
-    "compilerOptions": {
-      "jsx": "react-jsx",
-      // "strict": true,
-      "baseUrl": "src",
-      "esModuleInterop": true,
-    },
-  }
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "baseUrl": "src",
+    "esModuleInterop": true,
+  },
+}
+
+// {
+//   "compilerOptions": {
+//     "jsx": "react-jsx",
+//     "module": "commonjs",
+//     "moduleResolution": "node",
+//     "resolveJsonModule": true,
+//     "esModuleInterop": true,
+//     "allowSyntheticDefaultImports": true,
+//     "sourceMap": true,
+//     "outDir": "dist",
+//     "strict": true,
+//     "noImplicitAny": true,
+//     "strictNullChecks": true,
+//     "strictFunctionTypes": true,
+//     "strictBindCallApply": true,
+//     "strictPropertyInitialization": true,
+//     "noImplicitThis": true,
+//     "alwaysStrict": true,
+//     "skipLibCheck": true,
+//     "forceConsistentCasingInFileNames": true,
+//     "baseUrl": "src",
+//     "paths": {
+//       "*": ["src/*"]
+//     },
+//     "lib": ["es6", "dom"],
+//     "types": ["node", "jest"]
+//   },
+//   "include": ["src"],
+//   "exclude": ["node_modules"]
+// }
