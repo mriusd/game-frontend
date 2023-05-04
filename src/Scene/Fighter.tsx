@@ -12,6 +12,7 @@ import { useSceneContext } from '../store/SceneContext'
 import type { Coordinate } from "interfaces/coordinate.interface"
 import { useLoadAssets } from "store/LoadAssetsContext"
 import { isOccupiedCoordinate } from "./utils/isOccupiedCoordinate"
+import { isDiagonal } from "./utils/isDiaginal"
 
 const Fighter = () => {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
@@ -157,9 +158,12 @@ const Fighter = () => {
         setIsMoving(true)
         moveFighter && moveFighter({ ...nextMatrixPosition })
 
+        const duration = 60000 / fighter.movementSpeed // 1m * 60s * 1000ms / speed
+        const clampedDuration = isDiagonal(currentMatrixCoordinate, nextMatrixPosition) ?  duration * 1.41 : duration
+
         Tween.to(currentWorldCoordinate, nextWorldPosition,
             {
-                duration: 60000 / fighter.movementSpeed, // 1m * 60s * 1000ms / speed
+                duration: clampedDuration, 
                 onChange(state) {
                     // console.log(state.value)
                     setCurrentWorldCoordinate(state.value)
