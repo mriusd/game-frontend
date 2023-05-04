@@ -3,8 +3,8 @@ import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
 import Tween from "./utils/tween/tween"
 import { Coordinate } from "interfaces/coordinate.interface"
 import { useSceneContext } from "store/SceneContext"
+import { NpcTest } from "./models/NpcTest"
 
-// TODO: prevent move character on npc position
 const Npc = ({ npc }) => {
     const { worldSize } = useSceneContext()
     const [spawned, setSpawned] = useState<boolean>(false)
@@ -44,7 +44,7 @@ const Npc = ({ npc }) => {
                     {
                         duration: 400,
                         onChange(state: { value: Coordinate }) {
-                            console.log(state.value)
+                            // console.log(state.value)
                             setCurrentWorldPosition(state.value)
                         },
                         onComplete() {
@@ -61,10 +61,11 @@ const Npc = ({ npc }) => {
     }
 
     return (
-        <mesh castShadow position={[currentWorldPosition!.x, .5, currentWorldPosition!.z]}>
-            <boxGeometry args={[1, 1]} />
-            <meshStandardMaterial color={0x000FED} />
-        </mesh>
+        <NpcTest
+            position={[currentWorldPosition.x, .25, currentWorldPosition.z]}
+            // rotation={[0, direction, 0]}
+            scale={.005}
+        />
     )
 }
 
