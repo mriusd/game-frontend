@@ -9,7 +9,7 @@ import FighterDash from './FighterDash';
 import LoadingButton from './LoadingButton';
 import DroppedItemsList from './DroppedItemsList';
 import NPC from './NPC';
-//import Backpack from './Backpack';
+import Backpack from './Backpack';
 
 import Scene from './Scene/Scene';
 import SceneContextProvider from './store/SceneContext';
@@ -89,11 +89,10 @@ function App() {
               <LoadingButton>Submit Move</LoadingButton>
             </div>
           </div>
-          {/*
           <div>
             <Backpack />
           </div>
-          */}
+          
         </div>
 
         {/* Right section */}
