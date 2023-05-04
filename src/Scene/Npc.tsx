@@ -6,7 +6,7 @@ import Tween from "./utils/tween/tween"
 import { Coordinate } from "interfaces/coordinate.interface"
 import { useSceneContext } from "store/SceneContext"
 import { useLoadAssets } from "store/LoadAssetsContext"
-import { useAnimations } from "@react-three/drei"
+import { Box, useAnimations } from "@react-three/drei"
 
 const Npc = ({ npc }) => {
     const { worldSize } = useSceneContext()
@@ -88,11 +88,15 @@ const Npc = ({ npc }) => {
     }
 
     return (
-            <primitive 
-                ref={animationTarget}
-                object={model}
-                position={[currentWorldPosition.x, .4, currentWorldPosition.z]}
-                scale={.006}
+            // <primitive 
+            //     ref={animationTarget}
+            //     object={model}
+            //     position={[currentWorldPosition.x, .4, currentWorldPosition.z]}
+            //     scale={.006}
+            //     rotation={[0, direction, 0]}
+            // />
+            <Box
+                position={[currentWorldPosition.x, .5, currentWorldPosition.z]}
                 rotation={[0, direction, 0]}
             />
     )
