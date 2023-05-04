@@ -6,6 +6,7 @@ import { Object3D } from "three"
 import { useSceneContext } from "store/SceneContext"
 import { useFrame, useThree } from "@react-three/fiber"
 import { worldCoordToMatrix } from "Scene/utils/worldCoordToMatrix"
+import { Coordinate } from "interfaces/coordinate.interface"
 
 const ANGLE_STEP = Math.PI / 4 // 8 directions
 const ANGLE_RANGE = Math.PI / 8 // Set a range of angles to rotate towards
@@ -14,12 +15,16 @@ const MIN_ANGLE = Math.PI / 6 // Min angle on which detect rotation
 const saveDirection = { value: 0 }
 const savePointerWorldCoordinate = { value: null }
 const saveCurrentWorldCoordinate = { value: null }
+const saveIsMoving = { value: false }
 
 interface Props { world: RefObject<Object3D | null> }
 const Controller = ({ world }: Props) => {
     const { 
         worldSize, 
         currentWorldCoordinate,
+        nextWorldCoordinate,
+
+        isMoving,
 
         controller: {
             setDirection,
@@ -49,6 +54,10 @@ const Controller = ({ world }: Props) => {
         saveCurrentWorldCoordinate.value = currentWorldCoordinate
     }, [currentWorldCoordinate])
 
+    useEffect(() => {
+        saveIsMoving.value = isMoving
+    }, [isMoving])
+
     function calcPointerWorldCoordinate() {
         if (!world.current) { return }
         raycaster.current.setFromCamera(pointer, camera)
@@ -69,10 +78,14 @@ const Controller = ({ world }: Props) => {
         }
     }, [])
 
+    // Calc direction on character move, depending on next position
+    useEffect(() => {
+        calcDirection(nextWorldCoordinate)
+    }, [nextWorldCoordinate])
+
     // Set world mouse position
     function mouseDown() {
         setIsHolding(true)
-
         if (!world.current) { return }
         if (!savePointerWorldCoordinate.value) { return }
         setFocusedMatrixCoordinate(worldCoordToMatrix(worldSize.current, savePointerWorldCoordinate.value))
@@ -81,16 +94,20 @@ const Controller = ({ world }: Props) => {
 
     // Calc character rotation angle (direction)
     function mouseMove() {
+        if (saveIsMoving.value) { return }
         savePointerWorldCoordinate.value = calcPointerWorldCoordinate() || savePointerWorldCoordinate.value
         setPointerWorldCoordinate(savePointerWorldCoordinate.value)
-        
-        if (!savePointerWorldCoordinate.value) { return }
+        calcDirection(savePointerWorldCoordinate.value)
+    }
+
+    function calcDirection(worldCoordinate: Coordinate) {
+        if (!worldCoordinate) { return }
         if (!saveCurrentWorldCoordinate.value) { return }
 
         // Angle between object and mouse
         const angle = Math.atan2(
-            savePointerWorldCoordinate.value.x - saveCurrentWorldCoordinate.value.x,
-            savePointerWorldCoordinate.value.z - saveCurrentWorldCoordinate.value.z,
+            worldCoordinate.x - saveCurrentWorldCoordinate.value.x,
+            worldCoordinate.z - saveCurrentWorldCoordinate.value.z,
         )
 
         const targetAngle = Math.round(angle / ANGLE_STEP) * ANGLE_STEP

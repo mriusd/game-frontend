@@ -18,23 +18,26 @@ export const useSceneContext = (): ISceneContext => {
 
 interface Props { children: ReactNode | ReactNode[] }
 const SceneContextProvider = ({ children }: Props) => {
-    const { 
-        PlayerID, 
-        addDamageEvent, 
-        fighter, 
-        npcList, 
-        droppedItems, 
-        money, 
+    const {
+        PlayerID,
+        addDamageEvent,
+        fighter,
+        npcList,
+        droppedItems,
+        money,
         equipment,
         moveFighter,
         submitAttack,
         target,
         setTarget,
-        refreshFighterItems 
+        refreshFighterItems
     } = useEventCloud()
-    
-    const [ currentMatrixCoordinate, setCurrentMatrixCoordinate ] = useState<Coordinate | null>(null)
-    const [ currentWorldCoordinate, setCurrentWorldCoordinate ] = useState<Coordinate | null>(null)
+
+    const [isMoving, setIsMoving] = useState<boolean>(false)
+    const [currentMatrixCoordinate, setCurrentMatrixCoordinate] = useState<Coordinate | null>(null)
+    const [currentWorldCoordinate, setCurrentWorldCoordinate] = useState<Coordinate | null>(null)
+    const [nextMatrixCoordinate, setNextMatrixCoordinate] = useState<Coordinate | null>(null)
+    const [nextWorldCoordinate, setNextWorldCoordinate] = useState<Coordinate | null>(null)
 
     const [direction, setDirection] = useState<number>(0)
     const [focusedMatrixCoordinate, setFocusedMatrixCoordinate] = useState<Coordinate | null>(null)
@@ -45,50 +48,33 @@ const SceneContextProvider = ({ children }: Props) => {
     function setOccupedCoords(item: OccupiedCoordinate) {
         if (!item.coordinates || !item.id) { return console.warn("[SceneContextProvider] setOccupedCoords: invalid item") }
         _setOccupedCoords((state: OccupiedCoordinate[]) => {
-            const newState = [ ...state ]
+            const newState = [...state]
             const itemIndex = newState.findIndex((occupiedCoord: OccupiedCoordinate) => occupiedCoord.id === item.id)
             if (itemIndex === -1) {
                 newState.push(item)
                 return newState
             }
-            return [...newState.slice(0, itemIndex), ...newState.slice(itemIndex+1), item]
+            return [...newState.slice(0, itemIndex), ...newState.slice(itemIndex + 1), item]
         })
     }
 
-    const worldSize = useRef<number>(13) 
-    const NpcList = useRef<Fighter[]>([])
-    const Fighter = useRef<Fighter | null>(null)
-
+    const worldSize = useRef<number>(13)
     const [isLoaded, setIsLoaded] = useState<boolean>(false)
     useEffect(() => {
-        console.log(Fighter.current, worldSize.current)
         if (isLoaded) { return }
         setIsLoaded(
-            !!Fighter.current && !!worldSize.current
+            !!fighter && !!worldSize.current
         )
-    }, [Fighter.current, worldSize.current])
-
+    }, [fighter, worldSize.current])
 
     useEffect(() => {
-        if (!fighter) { return }
-        Fighter.current = fighter
-    }, [fighter]);
-
-    // Detect npc updates and add them to NpcList
-    // TODO: add npc removal
-    useEffect(() => {
-        if (!npcList?.length) { return }
-        console.log("[SceneContextProvider] NPC list updated: ", npcList)
-        npcList.forEach((serverNpc: Fighter) => {
-            const localeNpcIndex = NpcList.current.findIndex(localeNpc => localeNpc.id === serverNpc.id)
-            if (localeNpcIndex !== -1) {
-                NpcList.current[localeNpcIndex] = { ...serverNpc }
-                return
-            }
-            NpcList.current.push(serverNpc)
-        })
-    }, [npcList]);
-
+        if (!npcList) { return }
+        npcList.forEach((npc) => setOccupedCoords({
+            id: npc.id,
+            coordinates: npc.coordinates
+        }))
+        console.log('npclist', npcList)
+    }, [ npcList ])
 
     // Dropped Items
     const prevDroppedItemsRef = useRef();
@@ -135,13 +121,17 @@ const SceneContextProvider = ({ children }: Props) => {
 
     const value = {
         worldSize,
-        NpcList,
-        Fighter,
+        npcList,
+        fighter,
         moveFighter,
         isLoaded,
 
+        isMoving, setIsMoving,
+
         currentMatrixCoordinate, setCurrentMatrixCoordinate,
         currentWorldCoordinate, setCurrentWorldCoordinate,
+        nextMatrixCoordinate, setNextMatrixCoordinate,
+        nextWorldCoordinate, setNextWorldCoordinate,
 
         controller: {
             direction, setDirection,
@@ -155,7 +145,7 @@ const SceneContextProvider = ({ children }: Props) => {
 
     return (
         <SceneContext.Provider value={value}>
-            { children }
+            {children}
         </SceneContext.Provider>
     )
 }
