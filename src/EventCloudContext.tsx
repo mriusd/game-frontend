@@ -22,7 +22,7 @@ export const useEventCloud = (): EventCloud => {
 
 export const EventCloudProvider = ({ children }) => {
   const PlayerID = 1;
-  const UserAddress = "0xC1FcD8e0e55499D25811FAEFd0418FEabd5e4E1e";
+  const UserAddress = process.env.REACT_APP_USER_WALLET;
 
   const [events, setEvents] = useState([]);
   const [latestDamageEvent, setLatestDamageEvent] = useState(null);
@@ -117,6 +117,28 @@ export const EventCloudProvider = ({ children }) => {
       });
   }
 
+  function updateItemBackpackPosition(itemHash, coords) {
+    var response = sendJsonMessage({
+        type: "update_backpack_item_position",
+        data: {
+            itemHash: itemHash,
+            position: coords
+        }
+
+      });
+  }
+
+  function dropBackpackItem(itemHash, coords) {
+    var response = sendJsonMessage({
+        type: "drop_backpack_item",
+        data: {
+            itemHash: itemHash,
+            position: coords
+        }
+
+      });
+  }
+
   
 
   
@@ -152,10 +174,19 @@ export const EventCloudProvider = ({ children }) => {
           handlePing(msg.fighter);
         break;
 
-      case "update_npc":
+        case "update_npc":
           handleUpdateNpc(msg.npc);
         break;
+
+        case "backpack_update":
+          handleUpdateBackpack(msg.backpack);
+        break;
       }
+  }
+
+  function handleUpdateBackpack (newBackpack) {
+      console.log("[handleUpdateBackpack] ", newBackpack)
+    setBackpack(newBackpack);
   }
 
   function handlePing(fighter) {
@@ -342,7 +373,9 @@ export const EventCloudProvider = ({ children }) => {
         generateItemName,
         isExcellent,
         pickupDroppedItem,
-        backpack
+        backpack,
+        updateItemBackpackPosition,
+        dropBackpackItem
       }}>
       {children}
     </EventCloudContext.Provider>

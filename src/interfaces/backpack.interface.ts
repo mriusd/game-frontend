@@ -1,11 +1,12 @@
 import { ItemAttributes } from './item.interface';
 
-interface BackpackSlot {
+export interface BackpackSlot {
   itemAttributes: ItemAttributes;
   qty: number;
+  itemHash: string;
 }
 
-interface Backpack {
+export interface Backpack {
   grid: boolean[][];
   items: Map<string, BackpackSlot>;
 }
