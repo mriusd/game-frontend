@@ -34,7 +34,7 @@ const Fighter = ({ fighter, color }) => {
       <div style={healthBarStyles}>
         <div style={currentHealthBarStyles}></div>
       </div>
-      <p style={healthTextStyles}>{fighter.currentHealth} / {fighter.maxHealth}</p>
+      <p style={null}>{fighter.currentHealth} / {fighter.maxHealth}</p>
     </div>
   );
 };

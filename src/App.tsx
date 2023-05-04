@@ -7,10 +7,12 @@ import "./App.css";
 import CharacterEquipment from './CharacterEquipment';
 import FighterDash from './FighterDash';
 import LoadingButton from './LoadingButton';
+import DroppedItemsList from './DroppedItemsList';
 import NPC from './NPC';
+//import Backpack from './Backpack';
 
 import Scene from './Scene/Scene';
-import SceneContextProvider from 'store/SceneContext';
+import SceneContextProvider from './store/SceneContext';
 
 
 function App() {
@@ -60,10 +62,6 @@ function App() {
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
 
 
-
-
-
-
         {/* Left section */}
         <div style={{ width: '30%', padding: '0 10px' }}>
           <img src="opponent.png" alt="Opponent" style={{ width: '100%', marginBottom: '10px' }} />
@@ -71,13 +69,10 @@ function App() {
             <NPC target={target} setTarget={setTarget} npcs={npcList}/>
           </div>
           <div>Money: {money}</div>
+          <div>
+            <DroppedItemsList />
+          </div>
         </div>
-
-
-
-
-
-
 
 
 
@@ -89,11 +84,16 @@ function App() {
           </div>
            
 
-          <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '400px', overflowY: 'auto' }}>
+          <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px', height: '50px', overflowY: 'auto' }}>
             <div className="button-container">
               <LoadingButton>Submit Move</LoadingButton>
             </div>
           </div>
+          {/*
+          <div>
+            <Backpack />
+          </div>
+          */}
         </div>
 
         {/* Right section */}

@@ -1,0 +1,29 @@
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #ccc;
+}
+
+.gridItem {
+  width: 12.5%; /* Adjust this value to fit your desired grid size */
+  height: 0;
+  padding-bottom: 12.5%; /* Equal to the width percentage */
+  position: relative;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+}
+
+.square {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #fff;
+}
+
+.occupied .square {
+  background-color: #f00; /* Change this to the desired color for occupied squares */
+}
