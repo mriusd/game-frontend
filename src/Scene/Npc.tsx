@@ -16,6 +16,7 @@ const Npc = ({ npc }) => {
     const [targetMatrixPosition, setTargetMatrixPosition] = useState<Coordinate | null>(null)
     const [targetWorldPosition, setTargetWorldPosition] = useState<Coordinate | null>(null)
     const [currentWorldPosition, setCurrentWorldPosition] = useState<Coordinate | null>(null)
+    const [direction, setDirection] = useState<number>(0)
 
     const model = useMemo(() => SkeletonUtils.clone(gltf.current.npc.scene), [gltf.current])
     useEffect(() => {
@@ -32,7 +33,6 @@ const Npc = ({ npc }) => {
     const { mixer, actions } = useAnimations(gltf.current.npc.animations, animationTarget)
     useEffect(() => {
         if (!mixer) { return }
-        // if (!actions.jump) { return }
         setTimeout(() => {
             actions?.jump?.setDuration(1).play()
         }, Math.random() * 1000)
@@ -44,7 +44,9 @@ const Npc = ({ npc }) => {
         if (!npc?.isNpc) { return }
         if (npc?.coordinates) {
             setTargetMatrixPosition({ ...npc?.coordinates })
-            return
+        }
+        if (npc?.direction) {
+            setDirection(Math.atan2(npc.direction.dx, npc.direction.dz))
         }
     }, [ npc ])
 
@@ -81,7 +83,7 @@ const Npc = ({ npc }) => {
             }
     }, [ targetMatrixPosition ])
 
-    if (!spawned) {
+    if (!spawned || npc.isDead) {
         return <></>
     }
 
@@ -91,7 +93,7 @@ const Npc = ({ npc }) => {
                 object={model}
                 position={[currentWorldPosition.x, .4, currentWorldPosition.z]}
                 scale={.006}
-                // rotation={[0, direction, 0]}
+                rotation={[0, direction, 0]}
             />
     )
 }
