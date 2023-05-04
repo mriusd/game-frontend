@@ -33,3 +33,6 @@ const LoadAssetsContextProvider = ({ children }) => {
 }
 
 export default LoadAssetsContextProvider
+
+useGLTF.preload('models/fighter_test/scene.gltf')
+useGLTF.preload('models/npc_test/scene.gltf')

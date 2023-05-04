@@ -17,6 +17,16 @@ const Fighter = () => {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
     const camera = useThree(state => state.camera)
     const { gltf } = useLoadAssets()
+    useEffect(() => {
+        if (!gltf.current.fighter) { return }
+        gltf.current.fighter.scene.traverse((child) => {
+            // @ts-expect-error
+            if (child.isMesh) {
+                child.castShadow = true
+                child.receiveShadow = true
+            }
+        }) 
+    }, [gltf.current.fighter])
 
     const { 
         fighter, 

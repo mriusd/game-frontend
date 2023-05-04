@@ -32,7 +32,7 @@ const Scene = memo(function Scene() {
                     {/* <fog attach="fog" color={0x000000} near={1} far={30} /> */}
                     <Light />
                     {store.npcList.map(npc => <Npc key={npc?.id} npc={npc} />)}
-                    <Fighter />
+                    <Fighter/>
                     <World ref={worldRef} />
                     <Controller world={worldRef} />
                 </LoadAssetsContextProvider>

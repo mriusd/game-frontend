@@ -73,6 +73,7 @@ const SceneContextProvider = ({ children }: Props) => {
             id: npc.id,
             coordinates: npc.coordinates
         }))
+        console.log('npclist', npcList)
     }, [ npcList ])
 
     // Dropped Items
