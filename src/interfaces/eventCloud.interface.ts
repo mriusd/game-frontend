@@ -1,5 +1,6 @@
-import type { Fighter } from "./fighter.interface"
-import type { Coordinate } from "./coordinate.interface"
+import type { Fighter } from "./fighter.interface";
+import type { Coordinate } from "./coordinate.interface";
+import { BackpackSlot } from './backpack.interface';
 
 export interface EventCloud {
     PlayerID: any 
@@ -11,7 +12,7 @@ export interface EventCloud {
     npcList: Fighter[] 
     droppedItems: any
     money: any 
-    equipment: any 
+    equipment: Record<number, BackpackSlot> 
     moveFighter: (coordinate: Coordinate) => void 
     submitAttack: any
     target: any
@@ -23,4 +24,8 @@ export interface EventCloud {
     backpack: any
     updateItemBackpackPosition: any
     dropBackpackItem: any
+    selectedSkill: number
+    setSelectedSkill: any
+    equipBackpackItem: any
+    unequipBackpackItem: any
 }
