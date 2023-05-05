@@ -1,9 +1,11 @@
+import * as THREE from "three"
 import type { Coordinate } from "interfaces/coordinate.interface"
+import { clamp } from "three/src/math/MathUtils"
 
 export const worldCoordToMatrix = (worldSize: number, coordinate: Coordinate) => {
-    // minus 0.5 to center the point
+    const sqsize = (worldSize - 1) / 2
     return {
-        x: Math.round(coordinate.x + worldSize / 2  - 0.5),
-        z: Math.round(coordinate.z + worldSize / 2  - 0.5),
+        x: Math.min(Math.max(Math.floor(coordinate.x + sqsize), 0), worldSize-1),
+        z: Math.min(Math.max(Math.floor(coordinate.z + sqsize), 0), worldSize-1)
     }
 }

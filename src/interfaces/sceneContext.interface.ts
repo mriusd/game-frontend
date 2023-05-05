@@ -6,6 +6,7 @@ import type { OccupiedCoordinate } from "./occupied.interface"
 export interface ISceneContext {
     worldSize: RefObject<number>
     npcList: Fighter[]
+    NpcList: RefObject<Fighter[]>
     fighter: Fighter | null
     moveFighter: (coordinate: Coordinate) => void
     isLoaded: boolean,

@@ -42,7 +42,7 @@ export const EventCloudProvider = ({ children }) => {
   const socketUrl = process.env.REACT_APP_WS_URL; // ws://149.100.159.50:8080/ws
   const socketOptions = {
     onOpen: (event) => { 
-      console.log('WebSocket connected!:', event); 
+      //@console.log('WebSocket connected!:', event); 
       // @ts-expect-error
       sendAuth(); 
     },
@@ -50,7 +50,7 @@ export const EventCloudProvider = ({ children }) => {
       console.error('WebSocket error:', event)
     },
     onClose: (event) => {
-      console.log('WebSocket closed:', event);
+      //@console.log('WebSocket closed:', event);
     },
     onMessage: (event) => processIncomingMessage(event)
   };
@@ -70,7 +70,7 @@ export const EventCloudProvider = ({ children }) => {
   }
 
   async function moveFighter({x, z}) {
-    console.log("Move fighter",x ,z);
+    //@console.log("Move fighter",x ,z);
     var response = sendJsonMessage({
       type: "move_fighter",
       data: {
@@ -82,7 +82,7 @@ export const EventCloudProvider = ({ children }) => {
   }
 
   async function submitAttack() {
-    console.log("Submit attack");
+    //@console.log("Submit attack");
     var response = sendJsonMessage({
       type: "submit_attack",
       data: {
@@ -96,7 +96,7 @@ export const EventCloudProvider = ({ children }) => {
   }
 
   function pickupDroppedItem (event) {
-    console.log("Pickup ", event.itemHash, event.item);
+    //@console.log("Pickup ", event.itemHash, event.item);
 
     var response = sendJsonMessage({
       type: "pickup_dropped_item",
@@ -147,7 +147,7 @@ export const EventCloudProvider = ({ children }) => {
   // Event processing logic here  
   function processIncomingMessage(event) {
       var msg = JSON.parse(event.data);
-      console.log("New message", msg);
+      //@console.log("New message", msg);
 
       switch (msg.action) {
         case "item_picked":
@@ -185,23 +185,23 @@ export const EventCloudProvider = ({ children }) => {
   }
 
   function handleUpdateBackpack (newBackpack) {
-      console.log("[handleUpdateBackpack] ", newBackpack)
+      //@console.log("[handleUpdateBackpack] ", newBackpack)
     setBackpack(newBackpack);
   }
 
   function handlePing(fighter) {
     setFighter(fighter);
-    console.log("Ping fighter: ", fighter);
+    //@console.log("Ping fighter: ", fighter);
   }
 
   function handleDamage(damage, opponent, player, opponentHealth, lastDmgTimestamp, opponentFighterObj) {
-    //console.log("[handleDamage]  damage=", damage ," opponentId=", opponent, " player=", player, " opponentHealth=", opponentHealth);
+    ////@console.log("[handleDamage]  damage=", damage ," opponentId=", opponent, " player=", player, " opponentHealth=", opponentHealth);
 
     if (player == PlayerID) {
       handleUpdateNpc(opponentFighterObj);
       
       // Use addDamageEvent from EventCloudContext
-      //console.log('Calling addDamageEvent');
+      ////@console.log('Calling addDamageEvent');
       addDamageEvent({ npcId: opponent, damage });
 
     } else {
@@ -232,11 +232,11 @@ export const EventCloudProvider = ({ children }) => {
 
      var stats = JSON.parse(stats);
 
-    console.log("backpack", backpack);
+    //@console.log("backpack", backpack);
 
     setFighter(fighter);
     
-    //console.log("[updateFighterItems] ", attributes);
+    ////@console.log("[updateFighterItems] ", attributes);
 
     //setAvailablePoints(parseInt(stats.maxStatPoints) - parseInt(stats.totalStatPoints));
 
@@ -262,7 +262,7 @@ export const EventCloudProvider = ({ children }) => {
   }
 
   function handleDroppedItems(droppedItems) {
-    console.log("[handleDroppedItems] items=", droppedItems)
+    //@console.log("[handleDroppedItems] items=", droppedItems)
     setDroppedItems(droppedItems);
   }
 
@@ -278,7 +278,7 @@ export const EventCloudProvider = ({ children }) => {
 
   // Helpers
   function generateItemName(item, qty) {
-    //console.log("[generateItemName] ", item.name);
+    ////@console.log("[generateItemName] ", item.name);
     var itemName = item.name;
     
     if (item.itemLevel > 0) {

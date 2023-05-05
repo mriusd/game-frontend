@@ -1,8 +1,9 @@
 import type { Coordinate } from "interfaces/coordinate.interface"
 
 export const matrixCoordToWorld = (worldSize: number, coordinate: Coordinate) => {
+    const sqsize = (worldSize - 1) / 2
     return {
-        x: Math.round(coordinate.x - worldSize / 2 ),
-        z: Math.round(coordinate.z - worldSize / 2 ),
+        x: coordinate.x - sqsize,
+        z: coordinate.z - sqsize,
     }
 }

@@ -58,7 +58,8 @@ const SceneContextProvider = ({ children }: Props) => {
         })
     }
 
-    const worldSize = useRef<number>(13)
+    const worldSize = useRef<number>(12)
+    const NpcList = useRef<Fighter[]>([])
     const [isLoaded, setIsLoaded] = useState<boolean>(false)
     useEffect(() => {
         if (isLoaded) { return }
@@ -67,14 +68,26 @@ const SceneContextProvider = ({ children }: Props) => {
         )
     }, [fighter, worldSize.current])
 
+        // Detect npc updates and add them to NpcList
+    // TODO: add npc removal
     useEffect(() => {
-        if (!npcList) { return }
-        npcList.forEach((npc) => setOccupedCoords({
-            id: npc.id,
-            coordinates: npc.coordinates
-        }))
-        console.log('npclist', npcList)
-    }, [ npcList ])
+        if (!npcList?.length) { return }
+        console.log("[SceneContextProvider] NPC list updated: ", npcList)
+        npcList.forEach((serverNpc: Fighter) => {
+            // const localeNpcIndex = NpcList.current.findIndex(localeNpc => localeNpc.id === serverNpc.id)
+            // if (localeNpcIndex !== -1) {
+            //     NpcList.current[localeNpcIndex] = { ...serverNpc }
+            //     return
+            // }
+            // NpcList.current.push(serverNpc)
+            setOccupedCoords({
+                id: serverNpc.id,
+                coordinates: serverNpc.coordinates
+            })
+        })
+
+        NpcList.current = [...npcList]
+    }, [npcList]);
 
     // Dropped Items
     const prevDroppedItemsRef = useRef();
@@ -122,6 +135,7 @@ const SceneContextProvider = ({ children }: Props) => {
     const value = {
         worldSize,
         npcList,
+        NpcList,
         fighter,
         moveFighter,
         isLoaded,

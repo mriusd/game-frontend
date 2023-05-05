@@ -6,7 +6,8 @@ import Tween from "./utils/tween/tween"
 import { Coordinate } from "interfaces/coordinate.interface"
 import { useSceneContext } from "store/SceneContext"
 import { useLoadAssets } from "store/LoadAssetsContext"
-import { useAnimations } from "@react-three/drei"
+import { Box, useAnimations } from "@react-three/drei"
+import { getMoveDuration } from './utils/getMoveDuration';
 
 const Npc = ({ npc }) => {
     const { worldSize } = useSceneContext()
@@ -40,9 +41,10 @@ const Npc = ({ npc }) => {
 
     // Fill changed npc properties
     useEffect(() => {
-        console.log(`[NPC]: npc with id '${npc?.id}' updated`, npc)
+        // console.log(`[NPC]: npc with id '${npc?.id}' updated`, npc)
         if (!npc?.isNpc) { return }
         if (npc?.coordinates) {
+            console.log('[NPC] Set position to,', npc.id, npc.coordinates, matrixCoordToWorld(worldSize.current, {...npc.coordinates}))
             setTargetMatrixPosition({ ...npc?.coordinates })
         }
         if (npc?.direction) {
@@ -55,7 +57,8 @@ const Npc = ({ npc }) => {
         if (!targetMatrixPosition) { return }
         if (!worldSize.current) { return }
 
-        setTargetWorldPosition(matrixCoordToWorld(worldSize.current, {...targetMatrixPosition}))
+        const _targetWorldPosition = matrixCoordToWorld(worldSize.current, {...targetMatrixPosition})
+        setTargetWorldPosition(_targetWorldPosition)
 
         if (!spawned) {
             setCurrentMatrixPosition(targetMatrixPosition)
@@ -63,25 +66,25 @@ const Npc = ({ npc }) => {
             setSpawned(true)
             return
         }
-        
-        if (!currentWorldPosition || !targetWorldPosition) { return }
-        if (currentWorldPosition.x !== targetWorldPosition.x 
-            || currentWorldPosition.z !== targetWorldPosition.z) {
-                Tween.to(currentWorldPosition, targetWorldPosition,
+
+        if (!currentWorldPosition || !_targetWorldPosition) { return }
+        if (currentWorldPosition.x !== _targetWorldPosition.x 
+            || currentWorldPosition.z !== _targetWorldPosition.z) {
+                Tween.to(currentWorldPosition, _targetWorldPosition,
                     {
-                        duration: 400,
+                        duration: getMoveDuration(npc.movementSpeed, currentMatrixPosition, targetMatrixPosition),
                         onChange(state: { value: Coordinate }) {
                             // console.log(state.value)
                             setCurrentWorldPosition(state.value)
                         },
                         onComplete() {
                             setCurrentMatrixPosition(targetMatrixPosition)
-                            setCurrentWorldPosition(targetWorldPosition)
+                            setCurrentWorldPosition(_targetWorldPosition)
                         },
                     }
                 )
             }
-    }, [ targetMatrixPosition ])
+    }, [ targetMatrixPosition, currentMatrixPosition ])
 
     if (!spawned || npc.isDead) {
         return <></>
@@ -95,6 +98,10 @@ const Npc = ({ npc }) => {
                 scale={.006}
                 rotation={[0, direction, 0]}
             />
+            // <Box
+            //     position={[currentWorldPosition.x, .4, currentWorldPosition.z]}
+            //     rotation={[0, direction, 0]}
+            // />
     )
 }
 
