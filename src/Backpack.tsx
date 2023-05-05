@@ -3,13 +3,22 @@ import { useEventCloud } from './EventCloudContext';
 import type { ItemAttributes } from 'interfaces/item.interface';
 import type { BackpackSlot } from 'interfaces/backpack.interface';
 import type { Coordinate } from 'interfaces/coordinate.interface';
+import EquipmentSlot from './EquipmentSlot'; // Import the EquipmentSlot component
+
 
 import './Backpack.css';
 
 const Backpack = () => {
-  const { backpack, updateItemBackpackPosition, dropBackpackItem } = useEventCloud();
+
+  const { backpack, updateItemBackpackPosition, dropBackpackItem, equipBackpackItem } = useEventCloud();
   const [draggedItem, setDraggedItem] = React.useState({ itemHash: '', x: 0, y: 0 });
 
+  const handleDropItemToEquipmentSlot = (slot: number, itemHash: string) => {
+    console.log('Dropped item:', itemHash, 'to slot:', slot);
+
+    // Perform the desired action here, such as equipping the item to the slot
+    equipBackpackItem(itemHash, slot)
+  };
 
   const renderItemRectangle = (itemAttributes: ItemAttributes, itemHash: string, key: string) => {
 	  if (!itemAttributes) {
@@ -23,8 +32,8 @@ const Backpack = () => {
 	  const left = x * 12.5;
 	  const top = y * 12.5;
 
-	  const handleButtonClick = () => {
-	    console.log("Button clicked for item:", itemHash);
+	  const handleDrop = () => {
+	    console.log("Drop item:", itemHash);
 	    // Perform desired action here
 	    dropBackpackItem(itemHash, {x: 0, z: 0});
 	  };
@@ -36,7 +45,7 @@ const Backpack = () => {
 	      key={"backpack_item_" + itemHash}
 	      draggable="true"
 			onDragStart={(e) => {
-			  e.dataTransfer.setData("text/plain", key);
+			  e.dataTransfer.setData("text/plain", itemHash);
 			  setDraggedItem({
 			    itemHash,
 			    x: Number(key.split(",")[0]),
@@ -83,11 +92,12 @@ const Backpack = () => {
 	    >
 	      <button
         className="itemRectangleButton"
-        onClick={handleButtonClick}
+
+        onClick={handleDrop}
         style={{
           position: "absolute",
-          bottom: "5px",
-          right: "5px",
+          bottom: "3px",
+          right: "3px",
         }}
       >
         DR
@@ -200,7 +210,12 @@ const renderGridItems = () => {
     <div>
       <h2>Backpack</h2>
       <div className="grid">{renderGridItems()}</div>
+
+      <h2>Equipment Slots</h2>
+      <EquipmentSlot onDropItem={handleDropItemToEquipmentSlot} />
+
     </div>
+
   );
 };
 
