@@ -9,7 +9,7 @@ import FighterDash from './FighterDash';
 import LoadingButton from './LoadingButton';
 import DroppedItemsList from './DroppedItemsList';
 import NPC from './NPC';
-//import Backpack from './Backpack';
+import Backpack from './Backpack';
 
 import Scene from './Scene/Scene';
 import SceneContextProvider from './store/SceneContext';
@@ -39,11 +39,13 @@ function App() {
     
     <DndProvider backend={HTML5Backend}>
     <div className="App">
+    {/*
       <div className='scene'>
         <SceneContextProvider>
           <Scene/>
         </SceneContextProvider>
       </div>
+      */}
 
       {/* Top bar 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '50px', backgroundColor: '#333', color: '#fff', padding: '0 20px' }}>
@@ -89,11 +91,10 @@ function App() {
               <LoadingButton>Submit Move</LoadingButton>
             </div>
           </div>
-          {/*
           <div>
             <Backpack />
           </div>
-          */}
+          
         </div>
 
         {/* Right section */}

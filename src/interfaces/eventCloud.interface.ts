@@ -21,4 +21,6 @@ export interface EventCloud {
     isExcellent: any
     pickupDroppedItem: any
     backpack: any
+    updateItemBackpackPosition: any
+    dropBackpackItem: any
 }
