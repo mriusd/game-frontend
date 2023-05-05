@@ -7,6 +7,7 @@ import { useSceneContext } from "store/SceneContext"
 import { useFrame, useThree } from "@react-three/fiber"
 import { worldCoordToMatrix } from "Scene/utils/worldCoordToMatrix"
 import { Coordinate } from "interfaces/coordinate.interface"
+import { PerspectiveCamera } from "@react-three/drei"
 
 const ANGLE_STEP = Math.PI / 4 // 8 directions
 const ANGLE_RANGE = Math.PI / 8 // Set a range of angles to rotate towards
@@ -19,6 +20,7 @@ const saveIsMoving = { value: false }
 
 interface Props { world: RefObject<Object3D | null> }
 const Controller = ({ world }: Props) => {
+    const center = new THREE.Vector3()
     const { 
         worldSize, 
         currentWorldCoordinate,
@@ -38,6 +40,9 @@ const Controller = ({ world }: Props) => {
     const pointer = useThree(state => state.pointer)
     const camera = useThree(state => state.camera)
     const [isHolding, setIsHolding] = useState(false)
+    const raycasterOrigin = new THREE.Vector3(0, 0, 0)
+    const raycasterDirection = new THREE.Vector3(0, -1, 0)
+
 
     useFrame(() => {
         if (isHolding) {
@@ -49,22 +54,27 @@ const Controller = ({ world }: Props) => {
     })
 
     useEffect(() => {
-        savePointerWorldCoordinate.value = calcPointerWorldCoordinate() || savePointerWorldCoordinate.value
-        setPointerWorldCoordinate(savePointerWorldCoordinate.value)
         saveCurrentWorldCoordinate.value = currentWorldCoordinate
+
+        const coordinate = calcPointerCoordinate()
+        if (!coordinate) { return }
+        savePointerWorldCoordinate.value = coordinate
+        setPointerWorldCoordinate(savePointerWorldCoordinate.value)
     }, [currentWorldCoordinate])
 
     useEffect(() => {
         saveIsMoving.value = isMoving
     }, [isMoving])
 
-    function calcPointerWorldCoordinate() {
-        if (!world.current) { return }
+    function calcPointerCoordinate() {
+        if (!world.current) { return null }
+
         raycaster.current.setFromCamera(pointer, camera)
         const intersections = raycaster.current.intersectObject(world.current)
         const point = intersections[0]?.point
-        // console.log('point', {...point, z: point.z - 0.5})
-        return point ? {...point} : null
+
+        if (!point) { return null }
+        return point
     }
 
     useEffect(() => {
@@ -94,9 +104,13 @@ const Controller = ({ world }: Props) => {
 
     // Calc character rotation angle (direction)
     function mouseMove() {
-        if (saveIsMoving.value) { return }
-        savePointerWorldCoordinate.value = calcPointerWorldCoordinate() || savePointerWorldCoordinate.value
+        const coordinate = calcPointerCoordinate()
+        if ( !coordinate ) { return }
+        savePointerWorldCoordinate.value = coordinate
         setPointerWorldCoordinate(savePointerWorldCoordinate.value)
+        console.log(savePointerWorldCoordinate.value, worldCoordToMatrix(worldSize.current, savePointerWorldCoordinate.value))
+
+        if (saveIsMoving.value) { return }
         calcDirection(savePointerWorldCoordinate.value)
     }
 

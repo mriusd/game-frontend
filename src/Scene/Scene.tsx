@@ -5,6 +5,7 @@ import { Canvas } from "@react-three/fiber"
 import { useRef, memo } from "react"
 import { useSceneContext } from "store/SceneContext"
 import LoadAssetsContextProvider from "store/LoadAssetsContext"
+import { OrbitControls } from "@react-three/drei"
 
 import { CAMERA_POSITION } from "./config"
 
@@ -30,8 +31,9 @@ const Scene = memo(function Scene() {
                 <LoadAssetsContextProvider>
                     {/* <color attach="background" args={[0x000000]} /> */}
                     {/* <fog attach="fog" color={0x000000} near={1} far={30} /> */}
+                    {/* <OrbitControls/> */}
                     <Light />
-                    {store.npcList.map(npc => <Npc key={npc?.id} npc={npc} />)}
+                    {store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />)}
                     <Fighter/>
                     <World ref={worldRef} />
                     <Controller world={worldRef} />

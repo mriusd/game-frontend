@@ -12,7 +12,7 @@ import { useSceneContext } from '../store/SceneContext'
 import type { Coordinate } from "interfaces/coordinate.interface"
 import { useLoadAssets } from "store/LoadAssetsContext"
 import { isOccupiedCoordinate } from "./utils/isOccupiedCoordinate"
-import { isDiagonal } from "./utils/isDiaginal"
+import { getMoveDuration } from "./utils/getMoveDuration"
 
 const Fighter = () => {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
@@ -114,9 +114,7 @@ const Fighter = () => {
     useEffect(() => {
         if (isMoving) { return }
         if (!saveFocusedMatrixCoordinate) { return } 
-        if (targetMatrixCoordinate?.x !== saveFocusedMatrixCoordinate.x && targetMatrixCoordinate?.z !== saveFocusedMatrixCoordinate.z) {
-            setTargetMatrixCoordinate(saveFocusedMatrixCoordinate)
-        }
+        setTargetMatrixCoordinate(saveFocusedMatrixCoordinate)
     }, [saveFocusedMatrixCoordinate, currentMatrixCoordinate])
 
     // Add delay to prevent freeze on "checkpoint" when synchronising with server
@@ -142,6 +140,7 @@ const Fighter = () => {
         if (!isSpawned) { return }
         if (!currentMatrixCoordinate || !targetMatrixCoordinate) { return }
         if (!inWorld(worldSize.current, targetMatrixCoordinate)) { return }
+        // console.log('after in world',targetMatrixCoordinate, currentMatrixCoordinate)
         if (targetMatrixCoordinate.x === currentMatrixCoordinate.x && targetMatrixCoordinate.z === currentMatrixCoordinate.z) { return }
         console.log('[Fighter]: Move cell (from->to)', currentMatrixCoordinate, targetMatrixCoordinate)
 
@@ -149,6 +148,7 @@ const Fighter = () => {
         const nextWorldPosition = matrixCoordToWorld(worldSize.current, nextMatrixPosition)
         // const nextPosition = getNearestEmptySquareToTarget(matrix, currentPosition, targetPosition)
         if (!nextMatrixPosition) { return }
+        console.log('[FFF]: nextMatrix to server', nextMatrixPosition)
         
         // Used in controller for direction
         setNextMatrixCoordinate(nextMatrixPosition) 
@@ -158,12 +158,9 @@ const Fighter = () => {
         setIsMoving(true)
         moveFighter && moveFighter({ ...nextMatrixPosition })
 
-        const duration = 60000 / fighter.movementSpeed // 1m * 60s * 1000ms / speed
-        const clampedDuration = isDiagonal(currentMatrixCoordinate, nextMatrixPosition) ?  duration * 1.41 : duration
-
         Tween.to(currentWorldCoordinate, nextWorldPosition,
             {
-                duration: clampedDuration, 
+                duration: getMoveDuration(fighter.movementSpeed, currentMatrixCoordinate, nextMatrixPosition), 
                 onChange(state) {
                     // console.log(state.value)
                     setCurrentWorldCoordinate(state.value)
