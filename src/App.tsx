@@ -4,15 +4,16 @@ import { useEventCloud } from './EventCloudContext';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import "./App.css";
-import CharacterEquipment from './CharacterEquipment';
 import FighterDash from './FighterDash';
 import LoadingButton from './LoadingButton';
 import DroppedItemsList from './DroppedItemsList';
 import NPC from './NPC';
 import Backpack from './Backpack';
+import ToggleSkillButton from './ToggleSkillButton';
 
 import Scene from './Scene/Scene';
 import SceneContextProvider from './store/SceneContext';
+
 
 
 function App() {
@@ -90,6 +91,9 @@ function App() {
             <div className="button-container">
               <LoadingButton>Submit Move</LoadingButton>
             </div>
+            <div>
+              <ToggleSkillButton/>
+            </div>
           </div>
           <div>
             <Backpack />
@@ -109,7 +113,7 @@ function App() {
             <div><FighterDash fighter={fighter} color="green" /></div>
             <div>Exp: {fighter?.experience}</div>
             <div>
-              <CharacterEquipment/>
+              
             </div>
           </div>  
         </div>

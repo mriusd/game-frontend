@@ -5,9 +5,9 @@ import useWebSocket from 'react-use-websocket';
 import type { EventCloud } from 'interfaces/eventCloud.interface';
 
 import type { Fighter } from 'interfaces/fighter.interface';
-import type { FighterEquipment } from 'interfaces/fighterEquipment.interface';
 import type { ItemAttributes, ItemDroppedEvent } from 'interfaces/item.interface'
-import type { Backpack, BackpackSlot } from './models/Backpack';
+import type { Backpack, BackpackSlot } from 'interfaces/backpack.interface';
+import type { Equipment } from 'interfaces/equipment.interface';
 // @ts-expect-error
 import { common } from 'ethereumjs-util';  
 
@@ -30,11 +30,12 @@ export const EventCloudProvider = ({ children }) => {
   const [fighter, setFighter]           = useState<Fighter | null>(null);
   const [droppedItems, setDroppedItems] = useState<Record<common.Hash, ItemDroppedEvent>>({});
   const [npcList, setNpcList]           = useState<Fighter[]>([]);
-  const [equipment, setEquipment]       = useState<FighterEquipment | null>(null);
+  const [equipment, setEquipment]       = useState<Record<number, BackpackSlot | null>>(null);
   const [backpack, setBackpack]         = useState<Backpack | null>(null);
  
   const [money, setMoney] = useState(0);
   const [target, setTarget] = useState(0);
+  const [selectedSkill, setSelectedSkill] = useState(4);
 
   const [town, setTown] = useState("lorencia")
 
@@ -88,7 +89,7 @@ export const EventCloudProvider = ({ children }) => {
       data: {
           opponentID: target.toString(),
           playerID: PlayerID.toString(),
-          skill: 4,
+          skill: selectedSkill,
           direction: {dx: 0, dy: 1}
       }
 
@@ -130,15 +131,35 @@ export const EventCloudProvider = ({ children }) => {
 
   function dropBackpackItem(itemHash, coords) {
     var response = sendJsonMessage({
-        type: "drop_backpack_item",
-        data: {
-            itemHash: itemHash,
-            position: coords
-        }
+      type: "drop_backpack_item",
+      data: {
+          itemHash: itemHash,
+          position: coords
+      }
 
-      });
+    });
   }
 
+  function equipBackpackItem(itemHash, slot) {
+    var response = sendJsonMessage({
+      type: "equip_backpack_item",
+      data: {
+          itemHash: itemHash,
+          slot: slot
+      }
+    });
+  }
+
+  function unequipBackpackItem(itemHash, coords) {
+    var response = sendJsonMessage({
+      type: "unequip_backpack_item",
+      data: {
+          itemHash: itemHash,
+          position: coords
+      }
+
+    });
+  }
   
 
   
@@ -179,14 +200,15 @@ export const EventCloudProvider = ({ children }) => {
         break;
 
         case "backpack_update":
-          handleUpdateBackpack(msg.backpack);
+          handleUpdateBackpack(msg.backpack, msg.equipment);
         break;
       }
   }
 
-  function handleUpdateBackpack (newBackpack) {
-      console.log("[handleUpdateBackpack] ", newBackpack)
+  function handleUpdateBackpack (newBackpack, newEquipment) {
+    console.log("[handleUpdateBackpack] ", newBackpack, newEquipment)
     setBackpack(newBackpack);
+    setEquipment(newEquipment);
   }
 
   function handlePing(fighter) {
@@ -217,7 +239,7 @@ export const EventCloudProvider = ({ children }) => {
     var attributes = JSON.parse(attributes);
     var fighter = JSON.parse(fighter);
     var npcs = JSON.parse(npcs);
-    var equipment = JSON.parse(equipment);
+    //var equipment = JSON.parse(equipment);
     
     var newItems = [];
     var itemDefence = 0;
@@ -375,7 +397,11 @@ export const EventCloudProvider = ({ children }) => {
         pickupDroppedItem,
         backpack,
         updateItemBackpackPosition,
-        dropBackpackItem
+        dropBackpackItem,
+        selectedSkill,
+        setSelectedSkill,
+        equipBackpackItem,
+        unequipBackpackItem
       }}>
       {children}
     </EventCloudContext.Provider>

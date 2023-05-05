@@ -1,6 +1,7 @@
 import type { Coordinate } from "./coordinate.interface"; 
 import type { Damage } from "./damage.interface";
 import type { Direction } from "./direction.interface";
+import type { Skill } from "./skill.interface";
 
 export interface Fighter {
     id: string;
@@ -36,4 +37,6 @@ export interface Fighter {
     experience: number;
 
     direction: Direction;
+
+    skills: Record<number, Skill>;
 }
