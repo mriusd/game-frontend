@@ -8,6 +8,7 @@ import { useSceneContext } from "store/SceneContext"
 import { useLoadAssets } from "store/LoadAssetsContext"
 import { Box, useAnimations } from "@react-three/drei"
 import { getMoveDuration } from './utils/getMoveDuration';
+import HealthBar from './components/HealthBar';
 
 const Npc = ({ npc }) => {
     const { worldSize } = useSceneContext()
@@ -43,8 +44,15 @@ const Npc = ({ npc }) => {
     useEffect(() => {
         // console.log(`[NPC]: npc with id '${npc?.id}' updated`, npc)
         if (!npc?.isNpc) { return }
+        if (npc?.isDead) {
+            console.log(`[NPC]: npc with id '${npc?.id}' is dead`)
+            setSpawned(false)
+            setTargetMatrixPosition(null)
+            setCurrentMatrixPosition(null)
+            return 
+        }
         if (npc?.coordinates) {
-            console.log('[NPC] Set position to,', npc.id, npc.coordinates, matrixCoordToWorld(worldSize.current, {...npc.coordinates}))
+            // console.log('[NPC] Set position to,', npc.id, npc.coordinates, matrixCoordToWorld(worldSize.current, {...npc.coordinates}))
             setTargetMatrixPosition({ ...npc?.coordinates })
         }
         if (npc?.direction) {
@@ -86,22 +94,22 @@ const Npc = ({ npc }) => {
             }
     }, [ targetMatrixPosition, currentMatrixPosition ])
 
-    if (!spawned || npc.isDead) {
+    if (!spawned) {
         return <></>
     }
 
     return (
+        <>
+            <HealthBar object={npc} target={animationTarget} />
             <primitive 
                 ref={animationTarget}
                 object={model}
                 position={[currentWorldPosition.x, .4, currentWorldPosition.z]}
                 scale={.006}
                 rotation={[0, direction, 0]}
-            />
-            // <Box
-            //     position={[currentWorldPosition.x, .4, currentWorldPosition.z]}
-            //     rotation={[0, direction, 0]}
-            // />
+            >
+            </primitive>
+        </>
     )
 }
 

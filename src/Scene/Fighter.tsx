@@ -105,7 +105,7 @@ const Fighter = () => {
 
     // Set position to move to
     useEffect(() => {
-        console.log('[Fighter]: Set target position')
+        // console.log('[Fighter]: Set target position')
         if (!isSpawned) { return }
         if (!focusedMatrixCoordinate) { return }
         if (isOccupiedCoordinate(occupiedCoords, focusedMatrixCoordinate)) { return }
@@ -142,13 +142,13 @@ const Fighter = () => {
         if (!inWorld(worldSize.current, targetMatrixCoordinate)) { return }
         // console.log('after in world',targetMatrixCoordinate, currentMatrixCoordinate)
         if (targetMatrixCoordinate.x === currentMatrixCoordinate.x && targetMatrixCoordinate.z === currentMatrixCoordinate.z) { return }
-        console.log('[Fighter]: Move cell (from->to)', currentMatrixCoordinate, targetMatrixCoordinate)
+        // console.log('[Fighter]: Move cell (from->to)', currentMatrixCoordinate, targetMatrixCoordinate)
 
         const nextMatrixPosition = getNearestEmptySquareToTarget(occupiedCoords, currentMatrixCoordinate, targetMatrixCoordinate)
         const nextWorldPosition = matrixCoordToWorld(worldSize.current, nextMatrixPosition)
         // const nextPosition = getNearestEmptySquareToTarget(matrix, currentPosition, targetPosition)
         if (!nextMatrixPosition) { return }
-        console.log('[FFF]: nextMatrix to server', nextMatrixPosition)
+        // console.log('[FFF]: nextMatrix to server', nextMatrixPosition)
         
         // Used in controller for direction
         setNextMatrixCoordinate(nextMatrixPosition) 
@@ -177,7 +177,7 @@ const Fighter = () => {
 
     // Toggle movement animation
     useEffect(() => {
-        console.log('[Fighter]: Toggle isMoving animation', mixer, actions)
+        // console.log('[Fighter]: Toggle isMoving animation', mixer, actions)
         if (isStaying) {
             actions.Scene?.fadeOut(.1).stop()
         } else {
