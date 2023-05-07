@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, memo } from "react"
 import { useThree } from "@react-three/fiber"
 import { useAnimations } from "@react-three/drei"
 import { CAMERA_POSITION } from "./config"
@@ -14,7 +14,7 @@ import { useLoadAssets } from "store/LoadAssetsContext"
 import { isOccupiedCoordinate } from "./utils/isOccupiedCoordinate"
 import { getMoveDuration } from "./utils/getMoveDuration"
 
-const Fighter = () => {
+const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
     const camera = useThree(state => state.camera)
     const { gltf } = useLoadAssets()
@@ -146,7 +146,7 @@ const Fighter = () => {
 
         const nextMatrixPosition = getNearestEmptySquareToTarget(occupiedCoords, currentMatrixCoordinate, targetMatrixCoordinate)
         const nextWorldPosition = matrixCoordToWorld(worldSize.current, nextMatrixPosition)
-        // const nextPosition = getNearestEmptySquareToTarget(matrix, currentPosition, targetPosition)
+
         if (!nextMatrixPosition) { return }
         // console.log('[FFF]: nextMatrix to server', nextMatrixPosition)
         
@@ -200,6 +200,6 @@ const Fighter = () => {
             castShadow 
         />
     )
-}
+})
 
 export default Fighter

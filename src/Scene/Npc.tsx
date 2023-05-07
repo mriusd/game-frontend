@@ -1,6 +1,6 @@
 // @ts-expect-error 
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
-import { useEffect, useState, useRef, useMemo } from "react"
+import { useEffect, useState, useRef, useMemo, memo } from "react"
 import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
 import Tween from "./utils/tween/tween"
 import { Coordinate } from "interfaces/coordinate.interface"
@@ -9,8 +9,11 @@ import { useLoadAssets } from "store/LoadAssetsContext"
 import { Box, useAnimations } from "@react-three/drei"
 import { getMoveDuration } from './utils/getMoveDuration';
 import HealthBar from './components/HealthBar';
+import type { Mesh } from 'three';
+import type { Fighter } from 'interfaces/fighter.interface';
 
-const Npc = ({ npc }) => {
+interface Props { npc: Fighter }
+const Npc = memo(function Npc({ npc }: Props) {
     const { worldSize } = useSceneContext()
     const { gltf } = useLoadAssets()
     const [spawned, setSpawned] = useState<boolean>(false)
@@ -23,7 +26,7 @@ const Npc = ({ npc }) => {
     const model = useMemo(() => SkeletonUtils.clone(gltf.current.npc.scene), [gltf.current])
     useEffect(() => {
         if (!model) { return }
-        model.traverse((child) => {
+        model.traverse((child: Mesh) => {
             if (child.isMesh) {
                 child.castShadow = true
                 child.receiveShadow = true
@@ -111,6 +114,6 @@ const Npc = ({ npc }) => {
             </primitive>
         </>
     )
-}
+})
 
 export default Npc

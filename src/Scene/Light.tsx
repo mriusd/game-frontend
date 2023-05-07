@@ -1,8 +1,8 @@
 import * as THREE from "three"
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, memo } from "react"
 import { useSceneContext } from "store/SceneContext"
 
-const Light = () => {
+const Light = memo(function Light() {
     const { currentWorldCoordinate } = useSceneContext()
     const shadowlightRef = useRef<THREE.DirectionalLight | null>(null)
     const shadowlightPosition = useMemo(() => new THREE.Vector3(0, 100, 80), [])
@@ -27,9 +27,6 @@ const Light = () => {
     //     // shadowlightRef.current.shadow.camera.bottom = 100
     // }, [shadowlightRef.current])
 
-
-
-
     return (
         <>
             <ambientLight color={0xFFFFFF} intensity={0.3} />
@@ -41,6 +38,6 @@ const Light = () => {
             />
         </>
     )
-}
+})
 
 export default Light

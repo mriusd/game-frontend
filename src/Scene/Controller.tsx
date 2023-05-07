@@ -1,13 +1,12 @@
 import * as THREE from "three"
 import { clamp } from "three/src/math/MathUtils"
-import { RefObject, useState } from "react" 
+import { RefObject, useState, memo } from "react" 
 import { useRef, useEffect } from "react"
 import { Object3D } from "three"
 import { useSceneContext } from "store/SceneContext"
 import { useFrame, useThree } from "@react-three/fiber"
 import { worldCoordToMatrix } from "Scene/utils/worldCoordToMatrix"
 import { Coordinate } from "interfaces/coordinate.interface"
-import { PerspectiveCamera } from "@react-three/drei"
 
 const ANGLE_STEP = Math.PI / 4 // 8 directions
 const ANGLE_RANGE = Math.PI / 8 // Set a range of angles to rotate towards
@@ -19,7 +18,7 @@ const saveCurrentWorldCoordinate = { value: null }
 const saveIsMoving = { value: false }
 
 interface Props { world: RefObject<Object3D | null> }
-const Controller = ({ world }: Props) => {
+const Controller = memo(function Controller({ world }: Props) {
     const center = new THREE.Vector3()
     const { 
         worldSize, 
@@ -40,8 +39,6 @@ const Controller = ({ world }: Props) => {
     const pointer = useThree(state => state.pointer)
     const camera = useThree(state => state.camera)
     const [isHolding, setIsHolding] = useState(false)
-    const raycasterOrigin = new THREE.Vector3(0, 0, 0)
-    const raycasterDirection = new THREE.Vector3(0, -1, 0)
 
 
     useFrame(() => {
@@ -154,6 +151,6 @@ const Controller = ({ world }: Props) => {
     }
 
     return <></>
-}
+})
 
 export default Controller
