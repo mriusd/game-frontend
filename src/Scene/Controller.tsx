@@ -98,6 +98,7 @@ const Controller = ({ world }: Props) => {
         setIsHolding(true)
         if (!world.current) { return }
         if (!savePointerWorldCoordinate.value) { return }
+        if (!saveCurrentWorldCoordinate.value) { return }
         setFocusedMatrixCoordinate(worldCoordToMatrix(worldSize.current, savePointerWorldCoordinate.value))
         setFocusedWorldCoordinate(savePointerWorldCoordinate.value)
     }
@@ -106,9 +107,10 @@ const Controller = ({ world }: Props) => {
     function mouseMove() {
         const coordinate = calcPointerCoordinate()
         if ( !coordinate ) { return }
+        if (!saveCurrentWorldCoordinate.value) { return }
         savePointerWorldCoordinate.value = coordinate
         setPointerWorldCoordinate(savePointerWorldCoordinate.value)
-        console.log(savePointerWorldCoordinate.value, worldCoordToMatrix(worldSize.current, savePointerWorldCoordinate.value))
+        // console.log(savePointerWorldCoordinate.value, worldCoordToMatrix(worldSize.current, savePointerWorldCoordinate.value))
 
         if (saveIsMoving.value) { return }
         calcDirection(savePointerWorldCoordinate.value)
