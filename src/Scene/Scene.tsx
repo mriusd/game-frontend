@@ -14,6 +14,7 @@ import World from "./World"
 import Fighter from "./Fighter"
 import Npc from "./Npc"
 import Controller from "./Controller"
+import DroppedItem from "./DroppedItem"
 
 const Scene = memo(function Scene() {
     const store = useSceneContext()
@@ -34,6 +35,7 @@ const Scene = memo(function Scene() {
                     {/* <OrbitControls/> */}
                     <Light />
                     {store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />)}
+                    {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
                     <Fighter/>
                     <World ref={worldRef} />
                     <Controller world={worldRef} />

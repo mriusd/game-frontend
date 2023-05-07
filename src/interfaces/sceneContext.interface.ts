@@ -4,14 +4,16 @@ import type { Fighter } from "./fighter.interface"
 import type { OccupiedCoordinate } from "./occupied.interface"
 
 export interface ISceneContext {
+    html: HTMLElement | null
     worldSize: RefObject<number>
     npcList: Fighter[]
     NpcList: RefObject<Fighter[]>
+    DroppedItems: RefObject<any[]>
     fighter: Fighter | null
     moveFighter: (coordinate: Coordinate) => void
     isLoaded: boolean,
 
-    isMoving: boolean, setIsMoving: (boolean: boolean) => void,
+    isMoving: boolean, setIsMoving: (value: boolean) => void,
 
     currentMatrixCoordinate: Coordinate | null, setCurrentMatrixCoordinate: (coordinate: Coordinate) => void,
     currentWorldCoordinate: Coordinate | null, setCurrentWorldCoordinate: (coordinate: Coordinate) => void,
@@ -27,5 +29,6 @@ export interface ISceneContext {
         pointerWorldCoordinate: Coordinate | null, setPointerWorldCoordinate: (coordinate: Coordinate) => void
     },
 
+    isAnyItemHovered: RefObject<boolean>,
     occupiedCoords: OccupiedCoordinate[], setOccupedCoords: (item: OccupiedCoordinate) => void
 }

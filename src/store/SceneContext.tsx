@@ -4,6 +4,7 @@ import type { Fighter } from "interfaces/fighter.interface"
 import type { Coordinate } from "interfaces/coordinate.interface"
 import type { ISceneContext } from "interfaces/sceneContext.interface"
 import type { OccupiedCoordinate } from "interfaces/occupied.interface"
+import type { ItemDroppedEvent } from "interfaces/item.interface"
 
 
 export const SceneContext = createContext({})
@@ -34,6 +35,7 @@ const SceneContextProvider = ({ children }: Props) => {
     } = useEventCloud()
 
     const [isMoving, setIsMoving] = useState<boolean>(false)
+    const [html, setHTML] = useState<HTMLElement | null>(null)
     const [currentMatrixCoordinate, setCurrentMatrixCoordinate] = useState<Coordinate | null>(null)
     const [currentWorldCoordinate, setCurrentWorldCoordinate] = useState<Coordinate | null>(null)
     const [nextMatrixCoordinate, setNextMatrixCoordinate] = useState<Coordinate | null>(null)
@@ -58,8 +60,11 @@ const SceneContextProvider = ({ children }: Props) => {
         })
     }
 
+    const isAnyItemHovered = useRef<boolean>(false)
+
     const worldSize = useRef<number>(12)
     const NpcList = useRef<Fighter[]>([])
+    const DroppedItems = useRef<any[]>([])
     const [isLoaded, setIsLoaded] = useState<boolean>(false)
     useEffect(() => {
         if (isLoaded) { return }
@@ -72,7 +77,7 @@ const SceneContextProvider = ({ children }: Props) => {
     // TODO: add npc removal
     useEffect(() => {
         if (!npcList?.length) { return }
-        console.log("[SceneContextProvider] NPC list updated: ", npcList)
+        // console.log("[SceneContextProvider] NPC list updated: ", npcList)
         npcList.forEach((serverNpc: Fighter) => {
             // const localeNpcIndex = NpcList.current.findIndex(localeNpc => localeNpc.id === serverNpc.id)
             // if (localeNpcIndex !== -1) {
@@ -92,7 +97,9 @@ const SceneContextProvider = ({ children }: Props) => {
     // Dropped Items
     const prevDroppedItemsRef = useRef();
     useEffect(() => {
-        if (!droppedItems?.length) { return }
+        console.log('Dropped Items updated,', Object.values(droppedItems))
+        if (!Object.values(droppedItems)?.length) { return }
+        DroppedItems.current = Object.values(droppedItems);
         // Store the previous droppedItems in a ref
         prevDroppedItemsRef.current = droppedItems;
     }, [droppedItems]);
@@ -132,7 +139,14 @@ const SceneContextProvider = ({ children }: Props) => {
     //     console.log("[SceneContextProvider] Last damage received by player (value is an int): ", playerDamageData)
     // }, [ playerDamageData ]);
 
+    useEffect(() => {
+        const html = document.querySelector(".scene")
+        if (!html) { console.error('[SceneContext]: Html Element not found') }
+        setHTML(html as HTMLElement)
+    }, [])
+
     const value = {
+        html,
         worldSize,
         npcList,
         NpcList,
@@ -154,7 +168,10 @@ const SceneContextProvider = ({ children }: Props) => {
             pointerWorldCoordinate, setPointerWorldCoordinate
         },
 
-        occupiedCoords, setOccupedCoords
+        occupiedCoords, setOccupedCoords,
+
+        isAnyItemHovered,
+        DroppedItems
     }
 
     return (

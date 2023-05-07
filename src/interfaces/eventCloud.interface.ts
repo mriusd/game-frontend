@@ -1,6 +1,7 @@
 import type { Fighter } from "./fighter.interface";
 import type { Coordinate } from "./coordinate.interface";
 import { BackpackSlot } from './backpack.interface';
+import type { ItemDroppedEvent } from "./item.interface"; 
 
 export interface EventCloud {
     PlayerID: any 
@@ -18,9 +19,9 @@ export interface EventCloud {
     target: any
     setTarget: any
     refreshFighterItems: any
-    generateItemName: any
+    generateItemName: (item: any, qty: any) => string
     isExcellent: any
-    pickupDroppedItem: any
+    pickupDroppedItem: (droppedItem: ItemDroppedEvent) => void
     backpack: any
     updateItemBackpackPosition: any
     dropBackpackItem: any

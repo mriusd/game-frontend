@@ -45,7 +45,8 @@ const EquipmentSlot: React.FC<EquipmentSlotProps> = ({ onDropItem }) => {
         <div>{slotType}: </div>
         {equipment[key] && (
           <div>
-            {generateItemName(equipment[key].itemAttributes)}
+            {/* denis: Error */}
+            {/* {generateItemName(equipment[key].itemAttributes)} */}
             <button
               onClick={() => {handleDrop(equipment[key].itemHash)}}
             >
