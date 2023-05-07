@@ -47,11 +47,17 @@ const SceneContextProvider = ({ children }: Props) => {
     const [pointerWorldCoordinate, setPointerWorldCoordinate] = useState<Coordinate | null>(null)
 
     const [occupiedCoords, _setOccupedCoords] = useState<OccupiedCoordinate[]>([])
-    function setOccupedCoords(item: OccupiedCoordinate) {
+    function setOccupedCoords(item: OccupiedCoordinate, action: 'add' | 'remove') {
         if (!item.coordinates || !item.id) { return console.warn("[SceneContextProvider] setOccupedCoords: invalid item") }
         _setOccupedCoords((state: OccupiedCoordinate[]) => {
             const newState = [...state]
             const itemIndex = newState.findIndex((occupiedCoord: OccupiedCoordinate) => occupiedCoord.id === item.id)
+            
+            if (action === 'remove') {
+                if (itemIndex === -1) { return newState }
+                return [...newState.slice(0, itemIndex), ...newState.slice(itemIndex + 1)]
+            }
+            
             if (itemIndex === -1) {
                 newState.push(item)
                 return newState
@@ -85,10 +91,17 @@ const SceneContextProvider = ({ children }: Props) => {
             //     return
             // }
             // NpcList.current.push(serverNpc)
+            if (serverNpc.isDead) {
+                setOccupedCoords({
+                    id: serverNpc.id,
+                    coordinates: serverNpc.coordinates
+                }, 'remove')
+                return
+            }
             setOccupedCoords({
                 id: serverNpc.id,
                 coordinates: serverNpc.coordinates
-            })
+            }, 'add')
         })
 
         NpcList.current = [...npcList]
@@ -98,7 +111,6 @@ const SceneContextProvider = ({ children }: Props) => {
     const prevDroppedItemsRef = useRef();
     useEffect(() => {
         console.log('Dropped Items updated,', Object.values(droppedItems))
-        if (!Object.values(droppedItems)?.length) { return }
         DroppedItems.current = Object.values(droppedItems);
         // Store the previous droppedItems in a ref
         prevDroppedItemsRef.current = droppedItems;
