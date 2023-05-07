@@ -21,6 +21,7 @@ interface Props { world: RefObject<Object3D | null> }
 const Controller = memo(function Controller({ world }: Props) {
     const center = new THREE.Vector3()
     const { 
+        html,
         worldSize, 
         currentWorldCoordinate,
         nextWorldCoordinate,
@@ -76,17 +77,16 @@ const Controller = memo(function Controller({ world }: Props) {
     }
 
     useEffect(() => {
-        const scene = document.querySelector(".scene")
-        if (!scene) { return }
-        scene.addEventListener("mousedown", mouseDown)
-        scene.addEventListener("mousemove", mouseMove)
-        scene.addEventListener("mouseup", mouseUp)
+        if (!html) { return }
+        html.addEventListener("mousedown", mouseDown)
+        html.addEventListener("mousemove", mouseMove)
+        html.addEventListener("mouseup", mouseUp)
         return () => {
-            scene.removeEventListener("mousedown", mouseDown)
-            scene.removeEventListener("mousemove", mouseMove)
-            scene.removeEventListener("mouseup", mouseUp)
+            html.removeEventListener("mousedown", mouseDown)
+            html.removeEventListener("mousemove", mouseMove)
+            html.removeEventListener("mouseup", mouseUp)
         }
-    }, [])
+    }, [html])
 
     // Calc direction on character move, depending on next position
     useEffect(() => {
