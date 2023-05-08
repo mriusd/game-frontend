@@ -5,6 +5,8 @@ import type { Coordinate } from "interfaces/coordinate.interface"
 import type { ISceneContext } from "interfaces/sceneContext.interface"
 import type { OccupiedCoordinate } from "interfaces/occupied.interface"
 import type { ItemDroppedEvent } from "interfaces/item.interface"
+import { Direction } from "interfaces/direction.interface"
+import type { Skill } from "interfaces/skill.interface"
 
 
 export const SceneContext = createContext({})
@@ -29,8 +31,8 @@ const SceneContextProvider = ({ children }: Props) => {
         equipment,
         moveFighter,
         submitAttack,
-        target,
-        setTarget,
+        target: eventTarget,
+        setTarget: setEventTarget,
         refreshFighterItems
     } = useEventCloud()
 
@@ -66,7 +68,15 @@ const SceneContextProvider = ({ children }: Props) => {
         })
     }
 
-    const isAnyItemHovered = useRef<boolean>(false)
+    const [ target, _setTarget ] = useState<{ target: Fighter, skill: Skill } | null>(null)
+    const setTarget = (target: Fighter | null, skill: Skill | null) => {
+        if (target && skill) {
+            setEventTarget(target.id)
+            _setTarget({ target, skill })
+            return
+        }
+        _setTarget(null)
+    }
 
     const worldSize = useRef<number>(12)
     const NpcList = useRef<Fighter[]>([])
@@ -79,8 +89,7 @@ const SceneContextProvider = ({ children }: Props) => {
         )
     }, [fighter, worldSize.current])
 
-        // Detect npc updates and add them to NpcList
-    // TODO: add npc removal
+    // Detect npc updates and add them to NpcList
     useEffect(() => {
         if (!npcList?.length) { return }
         // console.log("[SceneContextProvider] NPC list updated: ", npcList)
@@ -108,37 +117,9 @@ const SceneContextProvider = ({ children }: Props) => {
     }, [npcList]);
 
     // Dropped Items
-    const prevDroppedItemsRef = useRef();
     useEffect(() => {
         console.log('Dropped Items updated,', Object.values(droppedItems))
         DroppedItems.current = Object.values(droppedItems);
-        // Store the previous droppedItems in a ref
-        prevDroppedItemsRef.current = droppedItems;
-    }, [droppedItems]);
-
-    useEffect(() => {
-        if (!droppedItems?.length) { return }
-        const prevDroppedItems = prevDroppedItemsRef.current;
-        if (prevDroppedItems) {
-            const addedItems = Object.keys(droppedItems).filter(
-                (key) => !(key in prevDroppedItems)
-            ).map(key => droppedItems[key]);
-
-            const removedItems = Object.keys(prevDroppedItems).filter(
-                (key) => !(key in droppedItems)
-            ).map(key => prevDroppedItems[key]);
-
-            if (addedItems.length > 0) {
-                // These items must be rendered on the floor
-                console.log('[SceneContextProvider] Added items:', addedItems);
-            }
-
-            if (removedItems.length > 0) {
-                // These items should disappear from the floor
-                console.log('[SceneContextProvider] Removed items:', removedItems);
-            }
-        }
-        console.log('[SceneContextProvider] Dropped Items updated:', droppedItems);
     }, [droppedItems]);
 
     // useEffect(() => {
@@ -182,8 +163,9 @@ const SceneContextProvider = ({ children }: Props) => {
 
         occupiedCoords, setOccupedCoords,
 
-        isAnyItemHovered,
-        DroppedItems
+        DroppedItems,
+
+        target, setTarget
     }
 
     return (

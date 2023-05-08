@@ -1,5 +1,5 @@
 // @ts-expect-error 
-import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js'
 import { useEffect, useState, useRef, useMemo, memo } from "react"
 import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
 import Tween from "./utils/tween/tween"
@@ -7,14 +7,18 @@ import { Coordinate } from "interfaces/coordinate.interface"
 import { useSceneContext } from "store/SceneContext"
 import { useLoadAssets } from "store/LoadAssetsContext"
 import { Box, useAnimations } from "@react-three/drei"
-import { getMoveDuration } from './utils/getMoveDuration';
-import HealthBar from './components/HealthBar';
-import type { Mesh } from 'three';
-import type { Fighter } from 'interfaces/fighter.interface';
+import { getMoveDuration } from './utils/getMoveDuration'
+import HealthBar from './components/HealthBar'
+import type { Mesh } from 'three'
+import type { Fighter } from 'interfaces/fighter.interface'
+import Name from './components/Name'
+import { useEventCloud } from 'EventCloudContext'
+import { setCursorPointer } from './utils/setCursorPointer'
+import { ThreeEvent } from '@react-three/fiber'
 
 interface Props { npc: Fighter }
 const Npc = memo(function Npc({ npc }: Props) {
-    const { worldSize } = useSceneContext()
+    const { worldSize, html, setTarget, fighter } = useSceneContext()
     const { gltf } = useLoadAssets()
     const [spawned, setSpawned] = useState<boolean>(false)
     const [currentMatrixPosition, setCurrentMatrixPosition] = useState<Coordinate | null>(null)
@@ -22,6 +26,7 @@ const Npc = memo(function Npc({ npc }: Props) {
     const [targetWorldPosition, setTargetWorldPosition] = useState<Coordinate | null>(null)
     const [currentWorldPosition, setCurrentWorldPosition] = useState<Coordinate | null>(null)
     const [direction, setDirection] = useState<number>(0)
+    const nameColor = useRef<0xFFFFFF | 0xFFFF00>(0xFFFFFF)
 
     const model = useMemo(() => SkeletonUtils.clone(gltf.current.npc.scene), [gltf.current])
     useEffect(() => {
@@ -97,14 +102,37 @@ const Npc = memo(function Npc({ npc }: Props) {
             }
     }, [ targetMatrixPosition, currentMatrixPosition ])
 
+
+    // Set target & hover
+    const handlePointerEnter = () => {
+        nameColor.current = 0xFFFF00
+        setCursorPointer(html, true)
+    }
+    const handlePointerLeave = () => {
+        nameColor.current = 0xFFFFFF
+        setCursorPointer(html, false)
+    }
+    const handleLeftClick = () => {
+        // setTarget(npc, fighter.skills[0])
+    }
+    // const handleRightClick = (event: ThreeEvent<PointerEvent>) => {
+    //     // onContextMenu
+    //     console.log('Right CLick', event)
+    //     setTarget(npc, fighter.skills[1])
+    // }
+
     if (!spawned) {
         return <></>
     }
 
     return (
-        <>
-            <HealthBar object={npc} target={animationTarget} />
+        <group>
+            <Name value={npc?.name} target={animationTarget} offset={.05} color={nameColor.current} />
+            <HealthBar object={npc} target={animationTarget} offset={.45} />
             <primitive 
+                onPointerMove={handlePointerEnter}
+                onPointerLeave={handlePointerLeave}
+                onPointerDown={handleLeftClick}
                 ref={animationTarget}
                 object={model}
                 position={[currentWorldPosition.x, .4, currentWorldPosition.z]}
@@ -112,7 +140,7 @@ const Npc = memo(function Npc({ npc }: Props) {
                 rotation={[0, direction, 0]}
             >
             </primitive>
-        </>
+        </group>
     )
 })
 

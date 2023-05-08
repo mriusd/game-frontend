@@ -17,7 +17,7 @@ export interface EventCloud {
     moveFighter: (coordinate: Coordinate) => void 
     submitAttack: any
     target: any
-    setTarget: any
+    setTarget: (targetId: number | string) => void
     refreshFighterItems: any
     generateItemName: (item: any, qty: any) => string
     isExcellent: any

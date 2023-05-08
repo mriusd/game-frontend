@@ -13,6 +13,7 @@ import type { Coordinate } from "interfaces/coordinate.interface"
 import { useLoadAssets } from "store/LoadAssetsContext"
 import { isOccupiedCoordinate } from "./utils/isOccupiedCoordinate"
 import { getMoveDuration } from "./utils/getMoveDuration"
+import Name from "./components/Name"
 
 const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
@@ -33,6 +34,7 @@ const Fighter = memo(function Fighter() {
         fighter, 
         moveFighter, 
         worldSize,
+        target, setTarget,
 
         isMoving, setIsMoving,
 
@@ -79,7 +81,7 @@ const Fighter = memo(function Fighter() {
     function spawnFighter() {
         if (!worldSize.current) { return }
         if (!fighter.coordinates) { return console.warn("[Fighter]: No 'coordinates' in response") }
-        console.log('[Fighter]: spawned')
+        // console.log('[Fighter]: spawned')
         setServerMatrixCoordinate({ ...fighter.coordinates })
         setCurrentMatrixCoordinate({ ...fighter.coordinates })
         setCurrentWorldCoordinate(matrixCoordToWorld(worldSize.current, {...fighter.coordinates}))
@@ -140,15 +142,11 @@ const Fighter = memo(function Fighter() {
         if (!isSpawned) { return }
         if (!currentMatrixCoordinate || !targetMatrixCoordinate) { return }
         if (!inWorld(worldSize.current, targetMatrixCoordinate)) { return }
-        // console.log('after in world',targetMatrixCoordinate, currentMatrixCoordinate)
-        if (targetMatrixCoordinate.x === currentMatrixCoordinate.x && targetMatrixCoordinate.z === currentMatrixCoordinate.z) { return }
         // console.log('[Fighter]: Move cell (from->to)', currentMatrixCoordinate, targetMatrixCoordinate)
 
-        const nextMatrixPosition = getNearestEmptySquareToTarget(occupiedCoords, currentMatrixCoordinate, targetMatrixCoordinate)
-        const nextWorldPosition = matrixCoordToWorld(worldSize.current, nextMatrixPosition)
-
+        const nextMatrixPosition = getNearestEmptySquareToTarget(occupiedCoords, currentMatrixCoordinate, targetMatrixCoordinate, target)
         if (!nextMatrixPosition) { return }
-        // console.log('[FFF]: nextMatrix to server', nextMatrixPosition)
+        const nextWorldPosition = matrixCoordToWorld(worldSize.current, nextMatrixPosition)
         
         // Used in controller for direction
         setNextMatrixCoordinate(nextMatrixPosition) 
@@ -191,14 +189,17 @@ const Fighter = memo(function Fighter() {
     }
 
     return (
-        <primitive 
-            ref={animationTarget}
-            object={gltf.current.fighter.scene}
-            position={[currentWorldCoordinate.x, -.1, currentWorldCoordinate.z]}
-            scale={.7}
-            rotation={[0, direction, 0]}
-            castShadow 
-        />
+        <group>
+            <Name value="MyName()_()" target={animationTarget} />
+            <primitive 
+                ref={animationTarget}
+                object={gltf.current.fighter.scene}
+                position={[currentWorldCoordinate.x, -.1, currentWorldCoordinate.z]}
+                scale={.7}
+                rotation={[0, direction, 0]}
+                castShadow 
+            />
+        </group>
     )
 })
 

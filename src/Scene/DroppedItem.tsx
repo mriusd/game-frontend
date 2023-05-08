@@ -37,6 +37,12 @@ const DroppedItem = memo(function DroppedItem({ item }: any) {
     }, [textRef.current, isActive.current])
 
     useEffect(() => {
+        setTimeout(() => {
+            isActive.current = true
+        }, 30)
+    }, [])
+
+    useEffect(() => {
         console.log(item, 'item')
         if (item?.coords) {
             setCurrentWorldCoordinate(matrixCoordToWorld(worldSize.current, item.coords))
@@ -45,10 +51,8 @@ const DroppedItem = memo(function DroppedItem({ item }: any) {
 
     const handlePointerEnter = () => {
         if (!itemRef.current) { return }
-        console.log(textBackgroundRef.current)
         if (!textBackgroundRef.current) { return }
         setCursorPointer(html, true)
-        isActive.current = true 
         textBackgroundRef.current.material = backgroundBillboardMaterialActive
         itemRef.current.material = materialActive
     }

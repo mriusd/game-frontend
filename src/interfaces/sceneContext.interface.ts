@@ -2,6 +2,7 @@ import type { RefObject } from "react"
 import type { Coordinate } from "./coordinate.interface" 
 import type { Fighter } from "./fighter.interface"
 import type { OccupiedCoordinate } from "./occupied.interface"
+import type { Skill } from "./skill.interface"
 
 export interface ISceneContext {
     html: HTMLElement | null
@@ -29,6 +30,7 @@ export interface ISceneContext {
         pointerWorldCoordinate: Coordinate | null, setPointerWorldCoordinate: (coordinate: Coordinate) => void
     },
 
-    isAnyItemHovered: RefObject<boolean>,
-    occupiedCoords: OccupiedCoordinate[], setOccupedCoords: (item: OccupiedCoordinate) => void
+    occupiedCoords: OccupiedCoordinate[], setOccupedCoords: (item: OccupiedCoordinate) => void,
+
+    target: { target: Fighter, skill: Skill } | null, setTarget: (target: Fighter | null, skill: Skill | null) => void
 }
