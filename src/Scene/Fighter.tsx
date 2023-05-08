@@ -34,6 +34,7 @@ const Fighter = memo(function Fighter() {
         fighter, 
         moveFighter, 
         worldSize,
+        target, setTarget,
 
         isMoving, setIsMoving,
 
@@ -141,15 +142,11 @@ const Fighter = memo(function Fighter() {
         if (!isSpawned) { return }
         if (!currentMatrixCoordinate || !targetMatrixCoordinate) { return }
         if (!inWorld(worldSize.current, targetMatrixCoordinate)) { return }
-        // console.log('after in world',targetMatrixCoordinate, currentMatrixCoordinate)
-        if (targetMatrixCoordinate.x === currentMatrixCoordinate.x && targetMatrixCoordinate.z === currentMatrixCoordinate.z) { return }
         // console.log('[Fighter]: Move cell (from->to)', currentMatrixCoordinate, targetMatrixCoordinate)
 
-        const nextMatrixPosition = getNearestEmptySquareToTarget(occupiedCoords, currentMatrixCoordinate, targetMatrixCoordinate)
-        const nextWorldPosition = matrixCoordToWorld(worldSize.current, nextMatrixPosition)
-
+        const nextMatrixPosition = getNearestEmptySquareToTarget(occupiedCoords, currentMatrixCoordinate, targetMatrixCoordinate, target)
         if (!nextMatrixPosition) { return }
-        // console.log('[FFF]: nextMatrix to server', nextMatrixPosition)
+        const nextWorldPosition = matrixCoordToWorld(worldSize.current, nextMatrixPosition)
         
         // Used in controller for direction
         setNextMatrixCoordinate(nextMatrixPosition) 

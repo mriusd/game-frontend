@@ -10,8 +10,9 @@ interface Props {
     value: string
     target: RefObject<Mesh | Group>
     offset?: number
+    color?: number
 }
-const Name = function Name({ value, target, offset = .4 }: Props) {
+const Name = function Name({ value, target, offset = .4, color = 0xFFFFFF }: Props) {
     const textRef = useRef<Mesh | null>(null)
     const textBillboardMaterial = useMemo(() => createBillboardMaterial(new THREE.MeshBasicMaterial()), [])
     const textBoundingBox = useRef<ReturnType<typeof getMeshDimensions> | null>(null)
@@ -34,7 +35,7 @@ const Name = function Name({ value, target, offset = .4 }: Props) {
     return (
         <Text 
             ref={textRef}
-            color={0xFFFFFF} 
+            color={color} 
             fillOpacity={1}
             anchorX="center" 
             anchorY="middle" 
