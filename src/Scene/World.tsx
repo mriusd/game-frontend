@@ -21,9 +21,13 @@ const World = memo(forwardRef(function World(props, ref) {
     const geometry = new THREE.PlaneGeometry(sizeX, sizeY, segmentsX, segmentsY)
     const material = new THREE.MeshStandardMaterial({ color: 0x6C6C6C })
 
+    const handleMove = (e) => {
+        console.log(e)
+    }
 
     return (
         <mesh 
+            onPointerMove={handleMove}
             // @ts-expect-error
             ref={ref} 
             receiveShadow 

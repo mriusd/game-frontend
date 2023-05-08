@@ -113,7 +113,7 @@ const Npc = memo(function Npc({ npc }: Props) {
         setCursorPointer(html, false)
     }
     const handleLeftClick = () => {
-        setTarget(npc, fighter.skills[0])
+        // setTarget(npc, fighter.skills[0])
     }
     // const handleRightClick = (event: ThreeEvent<PointerEvent>) => {
     //     // onContextMenu

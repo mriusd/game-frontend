@@ -6,7 +6,9 @@ import { Object3D } from "three"
 import { useSceneContext } from "store/SceneContext"
 import { useFrame, useThree } from "@react-three/fiber"
 import { worldCoordToMatrix } from "Scene/utils/worldCoordToMatrix"
+import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
 import { Coordinate } from "interfaces/coordinate.interface"
+import { Box, Sphere } from "@react-three/drei"
 
 const ANGLE_STEP = Math.PI / 4 // 8 directions
 const ANGLE_RANGE = Math.PI / 8 // Set a range of angles to rotate towards
@@ -33,13 +35,18 @@ const Controller = memo(function Controller({ world }: Props) {
             setFocusedMatrixCoordinate,
             setFocusedWorldCoordinate,
             setPointerWorldCoordinate,
-            pointerWorldCoordinate
+            pointerWorldCoordinate,
         }
     } = useSceneContext()
     const raycaster = useRef(new THREE.Raycaster())
     const pointer = useThree(state => state.pointer)
     const camera = useThree(state => state.camera)
     const [isHolding, setIsHolding] = useState(false)
+
+
+    const [testWorldCoordinates, setTestWorldCoordinates] = useState<Coordinate>({ x: 0, z: 0 })
+    const [testMatrixCoordinates, setTestMatrixCoordinates] = useState<Coordinate>({ x: 0, z: 0 })
+
 
 
     useFrame(() => {
@@ -71,8 +78,11 @@ const Controller = memo(function Controller({ world }: Props) {
 
         raycaster.current.setFromCamera(pointer, camera)
         const intersections = raycaster.current.intersectObject(world.current)
+        // console.log(intersections[0])
         const point = intersections[0]?.point
         if (!point) { return null }
+        setTestMatrixCoordinates(matrixCoordToWorld(worldSize.current, worldCoordToMatrix(worldSize.current, point)))
+        setTestWorldCoordinates(point)
         return point
     }
 
@@ -150,7 +160,14 @@ const Controller = memo(function Controller({ world }: Props) {
         setIsHolding(false)
     }
 
-    return <></>
+    return (
+        <group>
+            <Box position={[testWorldCoordinates.x, .2, testWorldCoordinates.z]} args={[.2, .2, .2]}/>
+            <Box material-color="hotpink" position={[testMatrixCoordinates.x, .4, testMatrixCoordinates.z]} args={[.4, .4, .4]}/>
+
+        </group>
+    )
+
 })
 
 export default Controller
