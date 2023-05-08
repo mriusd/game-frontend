@@ -30,7 +30,6 @@ const SceneContextProvider = ({ children }: Props) => {
         money,
         equipment,
         moveFighter,
-        submitAttack,
         target: eventTarget,
         setTarget: setEventTarget,
         refreshFighterItems
