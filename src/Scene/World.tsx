@@ -22,22 +22,22 @@ const World = memo(forwardRef(function World(props, ref) {
     const material = new THREE.MeshStandardMaterial({ color: 0x6C6C6C })
 
     const handleMove = (e) => {
-        console.log(e)
+        // console.log(e)
     }
 
     return (
-        <mesh 
-            onPointerMove={handleMove}
-            // @ts-expect-error
-            ref={ref} 
-            receiveShadow 
-            rotation={[Math.PI / -2, 0, 0]}
-            geometry={geometry}
-            material={material}
-        >
-            <gridHelper args={[worldSize.current, worldSize.current, 0xFFFFFF, 0xFFFFFF]} position={[0, 0.001, 0]} rotation={[Math.PI / -2, 0, 0]} />
-        </mesh>
-        
+        <>
+            <mesh 
+                onPointerMove={handleMove}
+                // @ts-expect-error
+                ref={ref} 
+                receiveShadow 
+                rotation={[Math.PI / -2, 0, 0]}
+                geometry={geometry}
+                material={material}
+            />
+            <gridHelper args={[worldSize.current, worldSize.current, 0xFFFFFF, 0xFFFFFF]} position={[0, 0.001, 0]} rotation={[0, 0, 0]} />
+        </>
     )
 }))
 

@@ -44,7 +44,6 @@ const Controller = memo(function Controller({ world }: Props) {
     const [isHolding, setIsHolding] = useState(false)
 
 
-    const [testWorldCoordinates, setTestWorldCoordinates] = useState<Coordinate>({ x: 0, z: 0 })
     const [testMatrixCoordinates, setTestMatrixCoordinates] = useState<Coordinate>({ x: 0, z: 0 })
 
 
@@ -78,11 +77,9 @@ const Controller = memo(function Controller({ world }: Props) {
 
         raycaster.current.setFromCamera(pointer, camera)
         const intersections = raycaster.current.intersectObject(world.current)
-        // console.log(intersections[0])
         const point = intersections[0]?.point
         if (!point) { return null }
         setTestMatrixCoordinates(matrixCoordToWorld(worldSize.current, worldCoordToMatrix(worldSize.current, point)))
-        setTestWorldCoordinates(point)
         return point
     }
 
@@ -162,9 +159,7 @@ const Controller = memo(function Controller({ world }: Props) {
 
     return (
         <group>
-            <Box position={[testWorldCoordinates.x, .2, testWorldCoordinates.z]} args={[.2, .2, .2]}/>
-            <Box material-color="hotpink" position={[testMatrixCoordinates.x, .4, testMatrixCoordinates.z]} args={[.4, .4, .4]}/>
-
+            <Box material-color="hotpink" position={[testMatrixCoordinates.x, 0, testMatrixCoordinates.z]} args={[1, .01, 1]}/>
         </group>
     )
 

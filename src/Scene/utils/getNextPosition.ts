@@ -28,7 +28,7 @@ export const getNearestEmptySquareToTarget = (occupiedCoordinates: OccupiedCoord
     }
   }, { distance: Infinity, square: null })
 
-  if (data.distance <= minDistance + 0.5) { return null }
+  // if (data.distance <= minDistance + 0.5) { return null }
 
   return data.square
 }
