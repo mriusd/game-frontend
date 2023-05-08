@@ -1,5 +1,5 @@
 // @ts-expect-error 
-import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js'
 import { useEffect, useState, useRef, useMemo, memo } from "react"
 import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
 import Tween from "./utils/tween/tween"
@@ -7,10 +7,11 @@ import { Coordinate } from "interfaces/coordinate.interface"
 import { useSceneContext } from "store/SceneContext"
 import { useLoadAssets } from "store/LoadAssetsContext"
 import { Box, useAnimations } from "@react-three/drei"
-import { getMoveDuration } from './utils/getMoveDuration';
-import HealthBar from './components/HealthBar';
-import type { Mesh } from 'three';
-import type { Fighter } from 'interfaces/fighter.interface';
+import { getMoveDuration } from './utils/getMoveDuration'
+import HealthBar from './components/HealthBar'
+import type { Mesh } from 'three'
+import type { Fighter } from 'interfaces/fighter.interface'
+import Name from './components/Name'
 
 interface Props { npc: Fighter }
 const Npc = memo(function Npc({ npc }: Props) {
@@ -102,8 +103,9 @@ const Npc = memo(function Npc({ npc }: Props) {
     }
 
     return (
-        <>
-            <HealthBar object={npc} target={animationTarget} />
+        <group>
+            <Name value={npc?.name} target={animationTarget} offset={.05} />
+            <HealthBar object={npc} target={animationTarget} offset={.45} />
             <primitive 
                 ref={animationTarget}
                 object={model}
@@ -112,7 +114,7 @@ const Npc = memo(function Npc({ npc }: Props) {
                 rotation={[0, direction, 0]}
             >
             </primitive>
-        </>
+        </group>
     )
 })
 

@@ -2,17 +2,27 @@ import * as THREE from "three"
 import { useFrame } from "@react-three/fiber"
 import { useEffect, useRef, memo } from "react"
 import { Sprite, Shader } from "three"
+import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
 
-const HealthBar = memo(function HealthBar({ object, target }: any) {
+const HealthBar = memo(function HealthBar({ object, target, offset = 0 }: any) {
     const bar = useRef<Sprite | null>(null)
     const shader = useRef<Shader | null>(null)
+    const textBoundingBox = useRef<ReturnType<typeof getMeshDimensions> | null>(null)
+
+    useEffect(() => {
+        if (!target.current) { return }
+        setTimeout(() => {
+            textBoundingBox.current = getMeshDimensions(target.current)
+        }, 30)
+    }, [target.current])
 
     useFrame(() => {
         if (!bar.current) { return }
         if (!object) { return }
         if (!target.current) { return }
+        if (!textBoundingBox.current) { return }
         const { x, y, z } = target.current.position
-        bar.current.position.set(x, y + 1, z)
+        bar.current.position.set(x, y + textBoundingBox.current.height + offset, z)
     })
 
     const onBeforeCompile = (_shader: Shader) => {
@@ -70,7 +80,7 @@ const HealthBar = memo(function HealthBar({ object, target }: any) {
     }, [ object ])
 
     return (
-        <sprite ref={bar}>
+        <sprite visible={!!object && !!target.current && !!textBoundingBox.current} ref={bar}>
             <spriteMaterial attach="material" onBeforeCompile={onBeforeCompile} />
         </sprite>
     )

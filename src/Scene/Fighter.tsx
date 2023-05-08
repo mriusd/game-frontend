@@ -13,6 +13,7 @@ import type { Coordinate } from "interfaces/coordinate.interface"
 import { useLoadAssets } from "store/LoadAssetsContext"
 import { isOccupiedCoordinate } from "./utils/isOccupiedCoordinate"
 import { getMoveDuration } from "./utils/getMoveDuration"
+import Name from "./components/Name"
 
 const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
@@ -79,7 +80,7 @@ const Fighter = memo(function Fighter() {
     function spawnFighter() {
         if (!worldSize.current) { return }
         if (!fighter.coordinates) { return console.warn("[Fighter]: No 'coordinates' in response") }
-        console.log('[Fighter]: spawned')
+        // console.log('[Fighter]: spawned')
         setServerMatrixCoordinate({ ...fighter.coordinates })
         setCurrentMatrixCoordinate({ ...fighter.coordinates })
         setCurrentWorldCoordinate(matrixCoordToWorld(worldSize.current, {...fighter.coordinates}))
@@ -191,14 +192,17 @@ const Fighter = memo(function Fighter() {
     }
 
     return (
-        <primitive 
-            ref={animationTarget}
-            object={gltf.current.fighter.scene}
-            position={[currentWorldCoordinate.x, -.1, currentWorldCoordinate.z]}
-            scale={.7}
-            rotation={[0, direction, 0]}
-            castShadow 
-        />
+        <group>
+            <Name value="MyName()_()" target={animationTarget} />
+            <primitive 
+                ref={animationTarget}
+                object={gltf.current.fighter.scene}
+                position={[currentWorldCoordinate.x, -.1, currentWorldCoordinate.z]}
+                scale={.7}
+                rotation={[0, direction, 0]}
+                castShadow 
+            />
+        </group>
     )
 })
 
