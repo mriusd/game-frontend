@@ -82,7 +82,7 @@ export const EventCloudProvider = ({ children }) => {
     });
   }
 
-  async function submitAttack() {
+  async function submitSkill(direction: Direction) {
     //@console.log("Submit attack");
     var response = sendJsonMessage({
       type: "submit_attack",
@@ -90,7 +90,21 @@ export const EventCloudProvider = ({ children }) => {
           opponentID: target.toString(),
           playerID: PlayerID.toString(),
           skill: selectedSkill,
-          direction: {dx: 0, dy: 1}
+          direction: direction
+      }
+
+    });
+  }
+
+  async function submitMalee(direction: Direction) {
+    //@console.log("Submit attack");
+    var response = sendJsonMessage({
+      type: "submit_attack",
+      data: {
+          opponentID: target.toString(),
+          playerID: PlayerID.toString(),
+          skill: 0,
+          direction: direction
       }
 
     });
@@ -392,7 +406,8 @@ export const EventCloudProvider = ({ children }) => {
         money, 
         equipment, 
         moveFighter, 
-        submitAttack,
+        submitSkill,
+        submitMalee,
         target,
         setTarget,
         refreshFighterItems,

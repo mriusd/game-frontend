@@ -27,7 +27,6 @@ function App() {
     money, 
     equipment,
     moveFighter,
-    submitAttack,
     target,
     setTarget,
     refreshFighterItems 

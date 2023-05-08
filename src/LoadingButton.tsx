@@ -5,7 +5,7 @@ import { useEventCloud } from './EventCloudContext';
 const LoadingButton = ({ children }) => {
   const { 
     fighter,
-    submitAttack
+    submitSkill
   } = useEventCloud();
 
   const [loading, setLoading] = useState(false);
@@ -16,11 +16,11 @@ const LoadingButton = ({ children }) => {
     console.log("handleClick called");
     setLoading(true);
     setLastClick(Date.now());
-    await submitAttack();
+    await submitSkill({dx: 0, dz: 1});
     setTimeout(() => {
       setLoading(false);
     }, 60000 / fighter?.attackSpeed);
-  }, [submitAttack, fighter?.attackSpeed]);
+  }, [submitSkill, fighter?.attackSpeed]);
 
   useEffect(() => {
     if (!fighter) { return }
