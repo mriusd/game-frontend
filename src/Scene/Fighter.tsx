@@ -114,10 +114,11 @@ const Fighter = memo(function Fighter() {
         setSaveFocusedMatrixCoordinate(focusedMatrixCoordinate)
     }, [ focusedMatrixCoordinate ])
     useEffect(() => {
-        if (isMoving) { return }
+        // use isStaying instead isMoving to prevent "jumping" on checkpoint, and instead set new target on move end in TWEEN
+        if (!isStaying) { return }
         if (!saveFocusedMatrixCoordinate) { return } 
         setTargetMatrixCoordinate(saveFocusedMatrixCoordinate)
-    }, [saveFocusedMatrixCoordinate/*, currentMatrixCoordinate*/])
+    }, [saveFocusedMatrixCoordinate, isMoving])
 
     // Add delay to prevent freeze on "checkpoint" when synchronising with server
     // On delayed mooving "true" we render fighter in the same position as server
@@ -138,6 +139,7 @@ const Fighter = memo(function Fighter() {
 
     // Fighter movement
     useEffect(() => {
+        if (isMoving) { return }
         if (!worldSize.current) { return }
         if (!isSpawned) { return }
         if (!currentMatrixCoordinate || !targetMatrixCoordinate) { return }
@@ -152,6 +154,7 @@ const Fighter = memo(function Fighter() {
         setNextMatrixCoordinate(nextMatrixPosition) 
         setNextWorldCoordinate(nextWorldPosition)
         // 
+        console.log('----> START MOVE <----')
 
         setIsMoving(true)
         moveFighter && moveFighter({ ...nextMatrixPosition })
@@ -164,9 +167,10 @@ const Fighter = memo(function Fighter() {
                     setCurrentWorldCoordinate(state.value)
                 },
                 onComplete() {
-                    setCurrentWorldCoordinate(nextWorldPosition)
+                    // setCurrentWorldCoordinate(nextWorldPosition)
                     setCurrentMatrixCoordinate(nextMatrixPosition)
                     setIsMoving(false)
+                    setTargetMatrixCoordinate(saveFocusedMatrixCoordinate)
                 },
             }
         )
