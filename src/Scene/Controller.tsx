@@ -1,6 +1,6 @@
 import * as THREE from "three"
 import { clamp } from "three/src/math/MathUtils"
-import { RefObject, useState, memo } from "react" 
+import { RefObject, useState, memo, useMemo } from "react" 
 import { useRef, useEffect } from "react"
 import { Object3D } from "three"
 import { useSceneContext } from "store/SceneContext"
@@ -8,7 +8,8 @@ import { useFrame, useThree } from "@react-three/fiber"
 import { worldCoordToMatrix } from "Scene/utils/worldCoordToMatrix"
 import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
 import { Coordinate } from "interfaces/coordinate.interface"
-import { Box, Sphere } from "@react-three/drei"
+import { Box } from "@react-three/drei"
+import { isOccupiedCoordinate } from "./utils/isOccupiedCoordinate"
 
 const ANGLE_STEP = Math.PI / 4 // 8 directions
 const ANGLE_RANGE = Math.PI / 8 // Set a range of angles to rotate towards
@@ -36,7 +37,8 @@ const Controller = memo(function Controller({ world }: Props) {
             setFocusedWorldCoordinate,
             setPointerWorldCoordinate,
             pointerWorldCoordinate,
-        }
+        },
+        occupiedCoords
     } = useSceneContext()
     const raycaster = useRef(new THREE.Raycaster())
     const pointer = useThree(state => state.pointer)
@@ -44,8 +46,12 @@ const Controller = memo(function Controller({ world }: Props) {
     const [isHolding, setIsHolding] = useState(false)
 
 
+    const [testWorldCoordinates, setTestWorldCoordinates] = useState<Coordinate>({ x: 0, z: 0 })
     const [testMatrixCoordinates, setTestMatrixCoordinates] = useState<Coordinate>({ x: 0, z: 0 })
-
+    const isOccupiedColorForTest = useMemo(() => {
+        console.log(occupiedCoords, testMatrixCoordinates)
+        return isOccupiedCoordinate(occupiedCoords, testMatrixCoordinates) ? 0xFF0000 : 0x00FF00
+    }, [ testMatrixCoordinates, occupiedCoords ])
 
 
     useFrame(() => {
@@ -79,7 +85,11 @@ const Controller = memo(function Controller({ world }: Props) {
         const intersections = raycaster.current.intersectObject(world.current)
         const point = intersections[0]?.point
         if (!point) { return null }
-        setTestMatrixCoordinates(matrixCoordToWorld(worldSize.current, worldCoordToMatrix(worldSize.current, point)))
+
+        // for testing
+        setTestMatrixCoordinates(worldCoordToMatrix(worldSize.current, point))
+        setTestWorldCoordinates(matrixCoordToWorld(worldSize.current, worldCoordToMatrix(worldSize.current, point)))
+        // 
         return point
     }
 
@@ -159,7 +169,9 @@ const Controller = memo(function Controller({ world }: Props) {
 
     return (
         <group>
-            <Box material-color="hotpink" position={[testMatrixCoordinates.x, 0, testMatrixCoordinates.z]} args={[1, .01, 1]}/>
+            <Box position={[testWorldCoordinates.x, 0, testWorldCoordinates.z]} args={[1, .01, 1]}>
+                <meshBasicMaterial color={isOccupiedColorForTest} opacity={.5} transparent={true} />
+            </Box>
         </group>
     )
 
