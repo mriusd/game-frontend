@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
+import { useEventCloud } from './EventCloudContext';
 
-const Fighter = ({ fighter, color }) => {
+const Fighter = ({ color }) => {
+  const { fighter } = useEventCloud();
   if (!fighter) {
     return <div>Fighter not available</div>;
   }
@@ -35,7 +37,12 @@ const Fighter = ({ fighter, color }) => {
         <div style={currentHealthBarStyles}></div>
       </div>
       <p style={null}>{fighter.currentHealth} / {fighter.maxHealth}</p>
+      <div> 
+        <p>Damage: {fighter.damage}</p>
+        <p>Defence: {fighter.defence}</p>
+      </div>
     </div>
+
   );
 };
 
