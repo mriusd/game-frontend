@@ -33,6 +33,9 @@ export interface Fighter {
     energy: number;
     vitality: number;
 
+    damage: number;
+    defence: number;
+
     level: number;
     experience: number;
 

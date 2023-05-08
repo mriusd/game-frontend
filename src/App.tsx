@@ -110,7 +110,7 @@ function App() {
             
           <div style={{ backgroundColor: '#ddd', padding: '10px', borderRadius: '5px' }}>
             <h5>Stats</h5>
-            <div><FighterDash fighter={fighter} color="green" /></div>
+            <div><FighterDash color="green" /></div>
             <div>Exp: {fighter?.experience}</div>
             <div>
               

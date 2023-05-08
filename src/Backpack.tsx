@@ -10,7 +10,7 @@ import './Backpack.css';
 
 const Backpack = () => {
 
-  const { backpack, updateItemBackpackPosition, dropBackpackItem, equipBackpackItem } = useEventCloud();
+  const { backpack, updateItemBackpackPosition, dropBackpackItem, equipBackpackItem, generateItemName } = useEventCloud();
   const [draggedItem, setDraggedItem] = React.useState({ itemHash: '', x: 0, y: 0 });
 
   const handleDropItemToEquipmentSlot = (slot: number, itemHash: string) => {
@@ -90,6 +90,7 @@ const Backpack = () => {
 	        zIndex: 10,
 	      }}
 	    >
+	    {generateItemName(itemAttributes, 1)}
 	      <button
         className="itemRectangleButton"
 
