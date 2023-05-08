@@ -117,7 +117,7 @@ const Fighter = memo(function Fighter() {
         if (isMoving) { return }
         if (!saveFocusedMatrixCoordinate) { return } 
         setTargetMatrixCoordinate(saveFocusedMatrixCoordinate)
-    }, [saveFocusedMatrixCoordinate, currentMatrixCoordinate])
+    }, [saveFocusedMatrixCoordinate/*, currentMatrixCoordinate*/])
 
     // Add delay to prevent freeze on "checkpoint" when synchronising with server
     // On delayed mooving "true" we render fighter in the same position as server

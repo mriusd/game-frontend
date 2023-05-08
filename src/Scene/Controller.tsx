@@ -49,7 +49,7 @@ const Controller = memo(function Controller({ world }: Props) {
     const [testWorldCoordinates, setTestWorldCoordinates] = useState<Coordinate>({ x: 0, z: 0 })
     const [testMatrixCoordinates, setTestMatrixCoordinates] = useState<Coordinate>({ x: 0, z: 0 })
     const isOccupiedColorForTest = useMemo(() => {
-        console.log(occupiedCoords, testMatrixCoordinates)
+        // console.log(occupiedCoords, testMatrixCoordinates)
         return isOccupiedCoordinate(occupiedCoords, testMatrixCoordinates) ? 0xFF0000 : 0x00FF00
     }, [ testMatrixCoordinates, occupiedCoords ])
 
