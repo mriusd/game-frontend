@@ -15,6 +15,7 @@ import Fighter from "./Fighter"
 import Npc from "./Npc"
 import Controller from "./Controller"
 import DroppedItem from "./DroppedItem"
+import FloatingDamage from "./FloatingDamage/FloatingDamage"
 
 const Scene = memo(function Scene() {
     const store = useSceneContext()
@@ -39,6 +40,7 @@ const Scene = memo(function Scene() {
                     <Fighter/>
                     <World ref={worldRef} />
                     <Controller world={worldRef} />
+                    <FloatingDamage/>
                 </LoadAssetsContextProvider>
             </Canvas>
     )

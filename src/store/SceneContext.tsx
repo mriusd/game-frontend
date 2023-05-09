@@ -1,12 +1,12 @@
 import { createContext, useEffect, useState, useRef, useContext, ReactNode } from "react"
 import { useEventCloud } from "EventCloudContext"
-import type { Fighter } from "interfaces/fighter.interface"
+import type { Fighter, FighterRef } from "interfaces/fighter.interface"
 import type { Coordinate } from "interfaces/coordinate.interface"
 import type { ISceneContext } from "interfaces/sceneContext.interface"
 import type { OccupiedCoordinate } from "interfaces/occupied.interface"
 import type { ItemDroppedEvent } from "interfaces/item.interface"
-import { Direction } from "interfaces/direction.interface"
 import type { Skill } from "interfaces/skill.interface"
+import type { FighterBoundingBox } from "interfaces/fighter.interface"
 
 
 export const SceneContext = createContext({})
@@ -32,7 +32,7 @@ const SceneContextProvider = ({ children }: Props) => {
         moveFighter,
         target: eventTarget,
         setTarget: setEventTarget,
-        refreshFighterItems
+        refreshFighterItems,
     } = useEventCloud()
 
     const [isMoving, setIsMoving] = useState<boolean>(false)
@@ -98,6 +98,25 @@ const SceneContextProvider = ({ children }: Props) => {
 
     const worldSize = useRef<number>(12)
     const NpcList = useRef<Fighter[]>([])
+    // TODO: store npc refs, to have acces there position and boinding box
+    const npcRefs = useRef<FighterRef[]>([])
+    const [npcBoundingBox, _setNpcBoundingBox] = useState<FighterBoundingBox[]>([])
+    const setNpcBoundingBox = (item: FighterBoundingBox, action: 'add' | 'remove') => {
+        _setNpcBoundingBox(state => {
+            const newState = [...state]
+            const itemIndex = newState.findIndex((boundingBox: FighterBoundingBox) => boundingBox.id === item.id)
+            if (action === 'add') {
+                if (itemIndex === -1) {
+                    newState.push(item)
+                    return newState
+                }
+                return state
+            }
+            if (itemIndex === -1) { return state }
+            return [...newState.slice(0, itemIndex), ...newState.slice(itemIndex + 1)]
+        })
+    }
+    // 
     const DroppedItems = useRef<any[]>([])
     const [isLoaded, setIsLoaded] = useState<boolean>(false)
     useEffect(() => {
@@ -140,16 +159,6 @@ const SceneContextProvider = ({ children }: Props) => {
         DroppedItems.current = Object.values(droppedItems);
     }, [droppedItems]);
 
-    // useEffect(() => {
-    //     // Initiate hit animation for mobs
-    //     console.log("[SceneContextProvider] Damage data is the last damages to an NPC {npcId, damage}: ", damageData)
-    // }, [ damageData ]);
-
-    // useEffect(() => {
-    //     // Initiate hit animation for player
-    //     console.log("[SceneContextProvider] Last damage received by player (value is an int): ", playerDamageData)
-    // }, [ playerDamageData ]);
-
     useEffect(() => {
         const html = document.querySelector(".scene")
         if (!html) { console.error('[SceneContext]: Html Element not found') }
@@ -160,6 +169,7 @@ const SceneContextProvider = ({ children }: Props) => {
         html,
         worldSize,
         npcList,
+        npcBoundingBox, setNpcBoundingBox,
         NpcList,
         fighter,
         moveFighter,

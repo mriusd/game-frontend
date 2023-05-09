@@ -1,4 +1,5 @@
 export interface Damage {
-    fighterId: BigInt;
+    // fighterId: BigInt;
+    npcId: BigInt;
     damage: BigInt;
 }

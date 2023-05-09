@@ -1,15 +1,15 @@
 import type { RefObject } from "react"
 import type { Coordinate } from "./coordinate.interface" 
-import type { Fighter } from "./fighter.interface"
+import type { Fighter, FighterBoundingBox } from "./fighter.interface"
 import type { OccupiedCoordinate } from "./occupied.interface"
 import type { Skill } from "./skill.interface"
-import { ItemDroppedEvent } from "./item.interface"
+import type { ItemDroppedEvent } from "./item.interface"
 
 export interface ISceneContext {
     html: HTMLElement | null
     worldSize: RefObject<number>
-    npcList: Fighter[]
     NpcList: RefObject<Fighter[]>
+    npcBoundingBox: FighterBoundingBox[], setNpcBoundingBox: (item: FighterBoundingBox, action: 'add' | 'remove') => void,
     DroppedItems: RefObject<any[]>
     fighter: Fighter | null
     moveFighter: (coordinate: Coordinate) => void
