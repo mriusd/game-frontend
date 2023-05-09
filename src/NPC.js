@@ -19,7 +19,7 @@ const NPC = ({ npcs, currentTime, target, setTarget }) => {
       damageEvents.forEach((damageEvent) => {
         console.log(`NPC with ID ${damageEvent.npcId} received ${damageEvent.damage} damage.`);
         triggerFloatingDamage(damageEvent.npcId, damageEvent.damage);
-        removeEvent(damageEvent);
+        // removeEvent(damageEvent); // denis: i remove it in scene
       });
       
     }

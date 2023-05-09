@@ -1,3 +1,4 @@
+import { Group, Mesh } from "three";
 import type { Coordinate } from "./coordinate.interface"; 
 import type { Damage } from "./damage.interface";
 import type { Direction } from "./direction.interface";
@@ -42,4 +43,16 @@ export interface Fighter {
     direction: Direction;
 
     skills: Record<number, Skill>;
+}
+
+export interface FighterBoundingBox {
+    id: string;
+    width: number;
+    height: number;
+    depth: number
+}
+
+export interface FighterRef {
+    id: string;
+    ref: Mesh | Group;
 }
