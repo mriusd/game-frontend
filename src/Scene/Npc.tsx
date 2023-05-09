@@ -6,19 +6,17 @@ import Tween from "./utils/tween/tween"
 import { Coordinate } from "interfaces/coordinate.interface"
 import { useSceneContext } from "store/SceneContext"
 import { useLoadAssets } from "store/LoadAssetsContext"
-import { Box, useAnimations } from "@react-three/drei"
+import { useAnimations } from "@react-three/drei"
 import { getMoveDuration } from './utils/getMoveDuration'
 import HealthBar from './components/HealthBar'
 import type { Mesh } from 'three'
 import type { Fighter } from 'interfaces/fighter.interface'
 import Name from './components/Name'
-import { useEventCloud } from 'EventCloudContext'
 import { setCursorPointer } from './utils/setCursorPointer'
-import { ThreeEvent } from '@react-three/fiber'
 
 interface Props { npc: Fighter }
 const Npc = memo(function Npc({ npc }: Props) {
-    const { worldSize, html, setTarget, fighter } = useSceneContext()
+    const { worldSize, html, setTarget, fighter, setHoveredItems } = useSceneContext()
     const { gltf } = useLoadAssets()
     const [spawned, setSpawned] = useState<boolean>(false)
     const [currentMatrixPosition, setCurrentMatrixPosition] = useState<Coordinate | null>(null)
@@ -57,6 +55,8 @@ const Npc = memo(function Npc({ npc }: Props) {
             setSpawned(false)
             setTargetMatrixPosition(null)
             setCurrentMatrixPosition(null)
+            // Remove hover on delete
+            handlePointerLeave()
             return 
         }
         if (npc?.coordinates) {
@@ -102,18 +102,24 @@ const Npc = memo(function Npc({ npc }: Props) {
             }
     }, [ targetMatrixPosition, currentMatrixPosition ])
 
+    // Remove hover on delete
+    // useEffect(() => {
+    //     return () => setHoveredItems(npc, 'remove')
+    // }, [])
 
     // Set target & hover
     const handlePointerEnter = () => {
         nameColor.current = 0xFFFF00
         setCursorPointer(html, true)
+        setHoveredItems(npc, 'add')
     }
     const handlePointerLeave = () => {
         nameColor.current = 0xFFFFFF
         setCursorPointer(html, false)
+        setHoveredItems(npc, 'remove')
     }
     const handleLeftClick = () => {
-        // setTarget(npc, fighter.skills[0])
+        setTarget(npc, fighter.skills[0])
     }
     // const handleRightClick = (event: ThreeEvent<PointerEvent>) => {
     //     // onContextMenu

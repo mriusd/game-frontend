@@ -4,7 +4,7 @@ import { useThree } from "@react-three/fiber"
 import { useAnimations } from "@react-three/drei"
 import { CAMERA_POSITION } from "./config"
 import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
-import { getNearestEmptySquareToTarget } from "./utils/getNextPosition"
+import { getNearestEmptySquareToTarget, getTargetSquareWithAttackDistance } from "./utils/getNextPosition"
 import { inWorld } from "./utils/inWorld"
 import { euclideanDistance } from "./utils/euclideanDistance"
 import Tween from "./utils/tween/tween"
@@ -14,6 +14,8 @@ import { useLoadAssets } from "store/LoadAssetsContext"
 import { isOccupiedCoordinate } from "./utils/isOccupiedCoordinate"
 import { getMoveDuration } from "./utils/getMoveDuration"
 import Name from "./components/Name"
+import { useEventCloud } from "EventCloudContext"
+import { calcDirection } from "./utils/calcDirection"
 
 const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
@@ -30,11 +32,13 @@ const Fighter = memo(function Fighter() {
         }) 
     }, [gltf.current.fighter])
 
+    const { submitMalee } = useEventCloud()
     const { 
         fighter, 
         moveFighter, 
         worldSize,
         target, setTarget,
+        itemTarget, setItemTarget,
 
         isMoving, setIsMoving,
 
@@ -65,6 +69,11 @@ const Fighter = memo(function Fighter() {
 
     const animationTarget = useRef()
     const { mixer, actions } = useAnimations(gltf.current.fighter.animations, animationTarget)
+
+    // const [attacks, _setAttacks] = useState([])
+    // const setAttacks = (attack: ) => {
+    //     _setAttacks()
+    // }
 
     // Manage fighter changes from server
     useEffect(() => {
@@ -107,7 +116,7 @@ const Fighter = memo(function Fighter() {
 
     // Set position to move to
     useEffect(() => {
-        // console.log('[Fighter]: Set target position')
+        console.log('[Fighter]: Set target position')
         if (!isSpawned) { return }
         if (!focusedMatrixCoordinate) { return }
         if (isOccupiedCoordinate(occupiedCoords, focusedMatrixCoordinate)) { return }
@@ -119,6 +128,25 @@ const Fighter = memo(function Fighter() {
         if (!saveFocusedMatrixCoordinate) { return } 
         setTargetMatrixCoordinate(saveFocusedMatrixCoordinate)
     }, [saveFocusedMatrixCoordinate, isMoving])
+        // Set target position to move on Object click
+    useEffect(() => {
+        console.log(target, itemTarget)
+        // For attack target
+        if (target && target?.skill) {
+            const attackDistance = target.skill.activeDistance
+            const objectCoordinate = target.target.coordinates
+            const targetCoordinate = getTargetSquareWithAttackDistance(occupiedCoords, currentMatrixCoordinate, objectCoordinate, attackDistance)
+            setSaveFocusedMatrixCoordinate(targetCoordinate)
+            submitMalee(calcDirection(currentMatrixCoordinate, objectCoordinate))
+            setTarget(null, null)
+            return
+        }
+        // For item target
+        if (itemTarget) {
+            setSaveFocusedMatrixCoordinate(itemTarget.coords)
+            setItemTarget(null)
+        }
+    }, [target, itemTarget])
 
     // Add delay to prevent freeze on "checkpoint" when synchronising with server
     // On delayed mooving "true" we render fighter in the same position as server
@@ -146,7 +174,7 @@ const Fighter = memo(function Fighter() {
         if (!inWorld(worldSize.current, targetMatrixCoordinate)) { return }
         // console.log('[Fighter]: Move cell (from->to)', currentMatrixCoordinate, targetMatrixCoordinate)
 
-        const nextMatrixPosition = getNearestEmptySquareToTarget(occupiedCoords, currentMatrixCoordinate, targetMatrixCoordinate, target)
+        const nextMatrixPosition = getNearestEmptySquareToTarget(occupiedCoords, currentMatrixCoordinate, targetMatrixCoordinate)
         if (!nextMatrixPosition) { return }
         const nextWorldPosition = matrixCoordToWorld(worldSize.current, nextMatrixPosition)
         
@@ -154,7 +182,7 @@ const Fighter = memo(function Fighter() {
         setNextMatrixCoordinate(nextMatrixPosition) 
         setNextWorldCoordinate(nextWorldPosition)
         // 
-        console.log('----> START MOVE <----')
+        // console.log('----> START MOVE <----')
 
         setIsMoving(true)
         moveFighter && moveFighter({ ...nextMatrixPosition })

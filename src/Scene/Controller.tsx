@@ -19,6 +19,7 @@ const saveDirection = { value: 0 }
 const savePointerWorldCoordinate = { value: null }
 const saveCurrentWorldCoordinate = { value: null }
 const saveIsMoving = { value: false }
+const saveHoveredItems = { value: [] }
 
 interface Props { world: RefObject<Object3D | null> }
 const Controller = memo(function Controller({ world }: Props) {
@@ -30,6 +31,7 @@ const Controller = memo(function Controller({ world }: Props) {
         nextWorldCoordinate,
 
         isMoving,
+        hoveredItems,
 
         controller: {
             setDirection,
@@ -50,8 +52,9 @@ const Controller = memo(function Controller({ world }: Props) {
     const [testMatrixCoordinates, setTestMatrixCoordinates] = useState<Coordinate>({ x: 0, z: 0 })
     const isOccupiedColorForTest = useMemo(() => {
         // console.log(occupiedCoords, testMatrixCoordinates)
-        return isOccupiedCoordinate(occupiedCoords, testMatrixCoordinates) ? 0xFF0000 : 0x00FF00
-    }, [ testMatrixCoordinates, occupiedCoords ])
+        const colorOccupied = isOccupiedCoordinate(occupiedCoords, testMatrixCoordinates) ? 0xFF0000 : 0x00FF00
+        return hoveredItems.length ? 0x000000 : colorOccupied
+    }, [ testMatrixCoordinates, occupiedCoords, hoveredItems ])
 
 
     useFrame(() => {
@@ -60,6 +63,7 @@ const Controller = memo(function Controller({ world }: Props) {
             if (!savePointerWorldCoordinate.value) { return }
             const coordinate = calcPointerCoordinate()
             if (!coordinate) { return }
+            if (saveHoveredItems.value?.length) { return }
             setFocusedMatrixCoordinate(worldCoordToMatrix(worldSize.current, savePointerWorldCoordinate.value))
             setFocusedWorldCoordinate(savePointerWorldCoordinate.value)
         }
@@ -77,6 +81,9 @@ const Controller = memo(function Controller({ world }: Props) {
     useEffect(() => {
         saveIsMoving.value = isMoving
     }, [isMoving])
+    useEffect(() => {
+        saveHoveredItems.value = hoveredItems
+    }, [hoveredItems])
 
     function calcPointerCoordinate() {
         if (!world.current) { return null }
@@ -90,6 +97,9 @@ const Controller = memo(function Controller({ world }: Props) {
         setTestMatrixCoordinates(worldCoordToMatrix(worldSize.current, point))
         setTestWorldCoordinates(matrixCoordToWorld(worldSize.current, worldCoordToMatrix(worldSize.current, point)))
         // 
+
+        if (saveHoveredItems.value?.length) { return null }
+
         return point
     }
 
@@ -118,6 +128,7 @@ const Controller = memo(function Controller({ world }: Props) {
         if (!saveCurrentWorldCoordinate.value) { return }
         const coordinate = calcPointerCoordinate()
         if (!coordinate) { return }
+        if (saveHoveredItems.value?.length) { return }
         setFocusedMatrixCoordinate(worldCoordToMatrix(worldSize.current, savePointerWorldCoordinate.value))
         setFocusedWorldCoordinate(savePointerWorldCoordinate.value)
     }
@@ -125,8 +136,9 @@ const Controller = memo(function Controller({ world }: Props) {
     // Calc character rotation angle (direction)
     function mouseMove() {
         const coordinate = calcPointerCoordinate()
-        if ( !coordinate ) { return }
+        // if ( !coordinate ) { return } 
         if (!saveCurrentWorldCoordinate.value) { return }
+
         savePointerWorldCoordinate.value = coordinate
         setPointerWorldCoordinate(savePointerWorldCoordinate.value)
         // console.log(savePointerWorldCoordinate.value, worldCoordToMatrix(worldSize.current, savePointerWorldCoordinate.value))
