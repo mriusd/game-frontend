@@ -61,7 +61,7 @@ const Fighter = memo(function Fighter() {
 
      // Unlike 'isMoving', 'isStaying' sets to TRUE with delay, but sets to FALSE as 'isMoving' immediately
     const [ isStaying, setIsStaying ] = useState<boolean>(false)
-    const ENTER_TO_ISSTAYING_DELAY = 200 //ms
+    const ENTER_TO_ISSTAYING_DELAY = 50 //ms
 
     const animationTarget = useRef()
     const { mixer, actions } = useAnimations(gltf.current.fighter.animations, animationTarget)
