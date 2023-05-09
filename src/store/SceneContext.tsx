@@ -70,11 +70,30 @@ const SceneContextProvider = ({ children }: Props) => {
     const [ target, _setTarget ] = useState<{ target: Fighter, skill: Skill } | null>(null)
     const setTarget = (target: Fighter | null, skill: Skill | null) => {
         if (target && skill) {
+            // Send to server if we used skill, otherwise just set target to object
             setEventTarget(target.id)
             _setTarget({ target, skill })
             return
         }
         _setTarget(null)
+    }
+    const [ itemTarget, setItemTarget ] = useState<ItemDroppedEvent | null>(null)
+
+    const [ hoveredItems, _setHoveredItems ] = useState<Fighter[]>([])
+    const setHoveredItems = (item: Fighter, action: 'add' | 'remove') => {
+        _setHoveredItems(state => {
+            const newState = [...state]
+            const itemIndex = newState.findIndex((hoveredItem: Fighter) => hoveredItem.id === item.id)
+            if (action === 'add') {
+                if (itemIndex === -1) {
+                    newState.push(item)
+                    return newState
+                }
+                return state
+            }
+            if (itemIndex === -1) { return state }
+            return [...newState.slice(0, itemIndex), ...newState.slice(itemIndex + 1)]
+        })
     }
 
     const worldSize = useRef<number>(12)
@@ -145,6 +164,7 @@ const SceneContextProvider = ({ children }: Props) => {
         fighter,
         moveFighter,
         isLoaded,
+        hoveredItems, setHoveredItems,
 
         isMoving, setIsMoving,
 
@@ -164,7 +184,8 @@ const SceneContextProvider = ({ children }: Props) => {
 
         DroppedItems,
 
-        target, setTarget
+        target, setTarget,
+        itemTarget, setItemTarget
     }
 
     return (

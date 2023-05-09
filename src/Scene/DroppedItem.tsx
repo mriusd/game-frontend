@@ -9,11 +9,13 @@ import { useEventCloud } from "EventCloudContext"
 import { Text } from "@react-three/drei"
 import { createBillboardMaterial } from "./helpers/createBillboardMaterial"
 import { getMeshDimensions } from "./utils/getMeshDimensions"
+import type { ItemDroppedEvent } from "interfaces/item.interface"
 
-const DroppedItem = memo(function DroppedItem({ item }: any) {
+interface Props { item: ItemDroppedEvent }
+const DroppedItem = memo(function DroppedItem({ item }: Props) {
     const itemRef = useRef<Mesh | null>(null)    
     const { pickupDroppedItem, generateItemName } = useEventCloud()
-    const { worldSize, html } = useSceneContext()
+    const { worldSize, html, setHoveredItems, setItemTarget } = useSceneContext()
     const [ currentWorldCoordinate, setCurrentWorldCoordinate ] = useState<Coordinate | null>(null)
     const rotationY = useMemo(() => Math.random() * Math.PI * 2, [])
     const offsetX = useMemo(() => Math.random() * .5 - .25, [])
@@ -40,32 +42,39 @@ const DroppedItem = memo(function DroppedItem({ item }: any) {
         setTimeout(() => {
             isActive.current = true
         }, 30)
+        return () => {
+            handlePointerLeave()
+        }
     }, [])
 
     useEffect(() => {
-        console.log(item, 'item')
+        // console.log(item, 'item')
         if (item?.coords) {
             setCurrentWorldCoordinate(matrixCoordToWorld(worldSize.current, item.coords))
         }
     }, [item])
 
     const handlePointerEnter = () => {
+        setCursorPointer(html, true)
+        // @ts-expect-error
+        setHoveredItems(item, 'add')
         if (!itemRef.current) { return }
         if (!textBackgroundRef.current) { return }
-        setCursorPointer(html, true)
         textBackgroundRef.current.material = backgroundBillboardMaterialActive
         itemRef.current.material = materialActive
     }
     const handlePointerLeave = () => {
+        setCursorPointer(html, false)
+        // @ts-expect-error
+        setHoveredItems(item, 'remove')
         if (!itemRef.current) { return }
         if (!textBackgroundRef.current) { return }
-        setCursorPointer(html, false)
         textBackgroundRef.current.material = backgroundBillboardMaterial
         itemRef.current.material = material
     }
     const handlePointerClick = () => {
         pickupDroppedItem(item)
-        handlePointerLeave()
+        setItemTarget(item)
     }
 
 
@@ -74,11 +83,12 @@ const DroppedItem = memo(function DroppedItem({ item }: any) {
     }
 
     return (
-        <group>
+        <group
+            onPointerMove={handlePointerEnter}
+            onPointerLeave={handlePointerLeave}
+            onPointerDown={handlePointerClick}
+        >
                 <group 
-                    onPointerMove={handlePointerEnter}
-                    onPointerLeave={handlePointerLeave}
-                    onPointerDown={handlePointerClick}
                     visible={!!isActive.current}
                     position={[position.x, position.y + 1, position.z]}
                 >
@@ -100,9 +110,6 @@ const DroppedItem = memo(function DroppedItem({ item }: any) {
                 </group>
             <mesh 
                 ref={itemRef}
-                onPointerMove={handlePointerEnter}
-                onPointerLeave={handlePointerLeave}
-                onPointerDown={handlePointerClick}
                 castShadow 
                 position={position} 
                 rotation={[0, rotationY, 0]}
