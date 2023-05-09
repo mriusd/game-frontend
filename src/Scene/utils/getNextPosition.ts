@@ -5,9 +5,7 @@ import { isOccupiedCoordinate } from "./isOccupiedCoordinate"
 import type { Fighter } from "interfaces/fighter.interface"
 import type { Skill } from "interfaces/skill.interface"
 
-export const getNearestEmptySquareToTarget = (occupiedCoordinates: OccupiedCoordinate[], currentMatrixCoordinate: Coordinate, targetMatrixCoordinate: Coordinate, attack: { target: Fighter, skill: Skill } | null) => {
-  if (targetMatrixCoordinate.x === currentMatrixCoordinate.x && targetMatrixCoordinate.z === currentMatrixCoordinate.z) { return null }
-  const minDistance = attack ? attack.skill.activeDistance : 0
+const getAvailableNearestSquares = (occupiedCoordinates: OccupiedCoordinate[], currentMatrixCoordinate: Coordinate) => {
   const nearestSquares = [
     { x: currentMatrixCoordinate.x - 1, z: currentMatrixCoordinate.z + 0 },
     { x: currentMatrixCoordinate.x + 1, z: currentMatrixCoordinate.z + 0 },
@@ -18,17 +16,25 @@ export const getNearestEmptySquareToTarget = (occupiedCoordinates: OccupiedCoord
     { x: currentMatrixCoordinate.x + 1, z: currentMatrixCoordinate.z - 1 },
     { x: currentMatrixCoordinate.x + 1, z: currentMatrixCoordinate.z + 1 }
   ]
-  const availableNearestSquares = nearestSquares.filter(coordinate => !isOccupiedCoordinate(occupiedCoordinates, coordinate))
-  if (!availableNearestSquares.length) { return null }
-  const data = availableNearestSquares.reduce((acc, value) => {
-    const newDistance = euclideanDistance(value, targetMatrixCoordinate)
-    return {
-      distance: newDistance < acc.distance ? newDistance : acc.distance,
-      square: newDistance < acc.distance ? value : acc.square
-    }
-  }, { distance: Infinity, square: null })
+  return nearestSquares.filter(coordinate => !isOccupiedCoordinate(occupiedCoordinates, coordinate))
+}
 
-  // if (data.distance <= minDistance + 0.5) { return null }
+export const getNearestEmptySquareToTarget = (occupiedCoordinates: OccupiedCoordinate[], currentMatrixCoordinate: Coordinate, targetMatrixCoordinate: Coordinate, attack: { target: Fighter, skill: Skill } | null) => {
+  if (targetMatrixCoordinate.x === currentMatrixCoordinate.x && targetMatrixCoordinate.z === currentMatrixCoordinate.z) { return null }
+
+  const currentDistance = euclideanDistance(currentMatrixCoordinate, targetMatrixCoordinate)
+  const availableNearestSquares = getAvailableNearestSquares(occupiedCoordinates, currentMatrixCoordinate)
+  const sortedSquares = availableNearestSquares.map(square => ({
+    square,
+    distance: euclideanDistance(square, targetMatrixCoordinate)
+  })).sort((a, b) => a.distance - b.distance)
+
+  if (currentDistance <= sortedSquares[0].distance) { return null }
+
+  const data = {
+    distance: sortedSquares[0].distance,
+    square: sortedSquares[0].square
+  }
 
   return data.square
 }
