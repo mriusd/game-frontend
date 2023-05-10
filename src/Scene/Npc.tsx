@@ -16,7 +16,7 @@ import { setCursorPointer } from './utils/setCursorPointer'
 
 interface Props { npc: Fighter }
 const Npc = memo(function Npc({ npc }: Props) {
-    const { worldSize, html, setTarget, fighter, setHoveredItems } = useSceneContext()
+    const { worldSize, html, setTarget, fighter, setHoveredItems, setSceneObject, getSceneObject } = useSceneContext()
     const { gltf } = useLoadAssets()
     const [spawned, setSpawned] = useState<boolean>(false)
     const [currentMatrixPosition, setCurrentMatrixPosition] = useState<Coordinate | null>(null)
@@ -102,10 +102,15 @@ const Npc = memo(function Npc({ npc }: Props) {
             }
     }, [ targetMatrixPosition, currentMatrixPosition ])
 
-    // Remove hover on delete
-    // useEffect(() => {
-    //     return () => setHoveredItems(npc, 'remove')
-    // }, [])
+    // Save ref to object to store & rm on unmount
+    useEffect(() => {
+        if (animationTarget.current) {
+            setSceneObject(npc.id, animationTarget.current, 'add')
+        }
+        return () => {
+            setSceneObject(npc.id, animationTarget.current, 'remove')
+        }
+    }, [animationTarget.current])
 
     // Set target & hover
     const handlePointerEnter = () => {
@@ -132,7 +137,7 @@ const Npc = memo(function Npc({ npc }: Props) {
     }
 
     return (
-        <group>
+        <group name='npc'>
             <Name value={npc?.name} target={animationTarget} offset={.05} color={nameColor.current} />
             <HealthBar object={npc} target={animationTarget} offset={.45} />
             <primitive 

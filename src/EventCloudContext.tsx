@@ -246,7 +246,6 @@ export const EventCloudProvider = ({ children }) => {
       addDamageEvent({ npcId: opponent, damage, dmgType });
 
     } else {
-
       setFighter(opponentFighterObj);
     }
   }

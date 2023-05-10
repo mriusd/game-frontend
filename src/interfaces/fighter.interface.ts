@@ -44,15 +44,3 @@ export interface Fighter {
 
     skills: Record<number, Skill>;
 }
-
-export interface FighterBoundingBox {
-    id: string;
-    width: number;
-    height: number;
-    depth: number
-}
-
-export interface FighterRef {
-    id: string;
-    ref: Mesh | Group;
-}
