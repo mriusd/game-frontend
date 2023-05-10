@@ -9,13 +9,17 @@ import type { ObjectData } from "./sceneData.interface"
 
 export interface ISceneContext {
     html: HTMLElement | null
+
     worldSize: RefObject<number>
+    chunkSize: RefObject<number>
+    chunksPerAxis: RefObject<number>
+
     NpcList: RefObject<Fighter[]>
     setSceneObject: (id: string, object: Mesh | Group, action: 'add' | 'remove') => void, getSceneObject: (id: string) => ObjectData | null,
     DroppedItems: RefObject<any[]>
     fighter: Fighter | null
     moveFighter: (coordinate: Coordinate) => void
-    isLoaded: boolean,
+    isLoaded: boolean
 
     isMoving: boolean, setIsMoving: (value: boolean) => void,
     hoveredItems: Fighter[], setHoveredItems: (item: Fighter, action: 'add' | 'remove') => void,
