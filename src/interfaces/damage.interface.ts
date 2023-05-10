@@ -1,6 +1,7 @@
 export interface Damage {
     npcId: BigInt;
     damage: BigInt;
+    dmgType: any
 }
 
 export interface DamageType  {
@@ -9,15 +10,3 @@ export interface DamageType  {
     isDouble: boolean
     isIgnoreDefence: boolean
 }
-
-/*
-    Damage colors:
-    
-    if isIgnoreDefence { light yelow }
-    else if isExcellent { light green }
-    else if isCritical { light blue }
-    else { yellow }
-
-    if double { display twice damage/2 }
-
-*/

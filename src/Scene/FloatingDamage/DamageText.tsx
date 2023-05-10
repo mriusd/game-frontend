@@ -8,7 +8,7 @@ import type { ObjectData } from "interfaces/sceneData.interface"
 interface Props { color: number, value: string, target: ObjectData, onComplete: () => void }
 const DamageText = ({ color, value, target, onComplete }: Props) => {
     const textRef = useRef<THREE.Mesh | null>(null)
-    const textBillboardMaterial = useMemo(() => createBillboardMaterial(new THREE.MeshBasicMaterial()), [])
+    const textBillboardMaterial = useMemo(() => createBillboardMaterial(new THREE.MeshBasicMaterial({ transparent: true })), [])
 
     useEffect(() => {
         if (!textRef.current) { return }
@@ -17,16 +17,18 @@ const DamageText = ({ color, value, target, onComplete }: Props) => {
 
         const { x, z } = target.ref.position
         const { height } = target.dimensions
-        const from = { opacity: 1, offsetY: .5 }
-        const to = { opacity: 1, offsetY: 1 }
+        const from = { opacity: 1.5, offsetY: .5 }
+        const to = { opacity: 0, offsetY: 1.3 }
 
         textRef.current!.position.set(x, height+from.offsetY, z)
+                console.log(textRef.current.material)
 
         Tween.to(from, to, {
             duration: 700,
             onChange(state) {
-                textRef.current!.position.y = height + state.value.offsetY
-                // textRef.current!.material.opacity = state.value.opacity
+                textRef.current.position.y = height + state.value.offsetY
+                // @ts-expect-error
+                textRef.current.material.uniforms['customAlpha'].value = state.value.opacity
             },
             onComplete() {
                 onComplete()
