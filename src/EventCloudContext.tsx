@@ -202,7 +202,7 @@ export const EventCloudProvider = ({ children }) => {
         break;
 
         case "damage_dealt":
-          console.log("[damage_dealt]  msg=", msg);
+          //console.log("[damage_dealt]  msg=", msg);
           handleDamage(msg.damage, msg.opponent, msg.player, msg.opponentHealth, msg.lastDmgTimestamp, msg.fighter, msg.type)
         break;
 
@@ -247,8 +247,7 @@ export const EventCloudProvider = ({ children }) => {
 
     } else {
 
-      setPlayerDamageData(damage);
-      setFighter(fighter);
+      setFighter(opponentFighterObj);
     }
   }
 
