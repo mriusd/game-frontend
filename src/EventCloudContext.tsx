@@ -202,7 +202,8 @@ export const EventCloudProvider = ({ children }) => {
         break;
 
         case "damage_dealt":
-          handleDamage(msg.damage, msg.opponent, msg.player, msg.opponentHealth, msg.lastDmgTimestamp, msg.fighter)
+          //console.log("[damage_dealt]  msg=", msg);
+          handleDamage(msg.damage, msg.opponent, msg.player, msg.opponentHealth, msg.lastDmgTimestamp, msg.fighter, msg.type)
         break;
 
         case "ping":
@@ -234,20 +235,18 @@ export const EventCloudProvider = ({ children }) => {
     //@console.log("Ping fighter: ", fighter);
   }
 
-  function handleDamage(damage, opponent, player, opponentHealth, lastDmgTimestamp, opponentFighterObj) {
-    ////@console.log("[handleDamage]  damage=", damage ," opponentId=", opponent, " player=", player, " opponentHealth=", opponentHealth);
+  function handleDamage(damage, opponent, player, opponentHealth, lastDmgTimestamp, opponentFighterObj, dmgType) {
+    //console.log("[handleDamage]  damage=", damage ," dmgType=", dmgType);
 
     if (player == PlayerID) {
       handleUpdateNpc(opponentFighterObj);
       
       // Use addDamageEvent from EventCloudContext
       ////@console.log('Calling addDamageEvent');
-      addDamageEvent({ npcId: opponent, damage });
+      addDamageEvent({ npcId: opponent, damage, dmgType });
 
     } else {
-
-      // setPlayerDamageData(damage);
-      setFighter(fighter);
+      setFighter(opponentFighterObj);
     }
   }
 
