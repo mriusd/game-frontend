@@ -202,7 +202,7 @@ export const EventCloudProvider = ({ children }) => {
         break;
 
         case "damage_dealt":
-          handleDamage(msg.damage, msg.opponent, msg.player, msg.opponentHealth, msg.lastDmgTimestamp, msg.fighter)
+          handleDamage(msg.damage, msg.opponent, msg.player, msg.opponentHealth, msg.lastDmgTimestamp, msg.fighter, msg.type)
         break;
 
         case "ping":
