@@ -4,10 +4,10 @@ export interface Damage {
 }
 
 export interface DamageType  {
-    isCritical: bool
-    isExcellent: bool
-    isDouble: bool
-    isIgnoreDefence: bool
+    isCritical: boolean
+    isExcellent: boolean
+    isDouble: boolean
+    isIgnoreDefence: boolean
 }
 
 /*
@@ -16,6 +16,7 @@ export interface DamageType  {
     if isIgnoreDefence { light yelow }
     else if isExcellent { light green }
     else if isCritical { light blue }
+    else { yellow }
 
     if double { display twice damage/2 }
 
