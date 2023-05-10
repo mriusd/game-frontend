@@ -1,0 +1,10 @@
+.command-line {
+  width: 100%;
+  display: flex;
+}
+
+.command-line input {
+  flex-grow: 1;
+  padding: 5px;
+  font-size: 16px;
+}
