@@ -31,4 +31,5 @@ export interface EventCloud {
     setSelectedSkill: any
     equipBackpackItem: any
     unequipBackpackItem: any
+    sendCommand: (text: string) => void
 }

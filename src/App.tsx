@@ -10,6 +10,7 @@ import DroppedItemsList from './DroppedItemsList';
 import NPC from './NPC';
 import Backpack from './Backpack';
 import ToggleSkillButton from './ToggleSkillButton';
+import CommandLine from './CommandLine';
 
 
 import Scene from './Scene/Scene';
@@ -60,6 +61,11 @@ function App() {
         </div>
       </div>
       */}
+      <div>
+        <CommandLine />
+      </div>
+
+
       {/* Main content */}
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
 

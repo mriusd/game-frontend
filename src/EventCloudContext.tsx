@@ -174,6 +174,13 @@ export const EventCloudProvider = ({ children }) => {
 
     });
   }
+
+  function sendCommand(text) {
+    var response = sendJsonMessage({
+      type: "message",
+      data: { text }
+    });
+  }
   
 
   
@@ -215,9 +222,7 @@ export const EventCloudProvider = ({ children }) => {
         break;
 
         case "backpack_update":
-
           handleUpdateBackpack(msg.backpack, msg.equipment);
-
         break;
       }
   }
@@ -236,13 +241,13 @@ export const EventCloudProvider = ({ children }) => {
   }
 
   function handleDamage(damage, opponent, player, opponentHealth, lastDmgTimestamp, opponentFighterObj, dmgType) {
-    //console.log("[handleDamage]  damage=", damage ," dmgType=", dmgType);
+    console.log("[handleDamage]  damage=", damage ," dmgType=", dmgType);
 
     if (player == PlayerID) {
       handleUpdateNpc(opponentFighterObj);
       
       // Use addDamageEvent from EventCloudContext
-      ////@console.log('Calling addDamageEvent');
+      console.log('Calling addDamageEvent', { npcId: opponent, damage: damage, dmgType: dmgType }, dmgType);
       addDamageEvent({ npcId: opponent, damage, dmgType });
 
     } else {
@@ -420,7 +425,8 @@ export const EventCloudProvider = ({ children }) => {
         selectedSkill,
         setSelectedSkill,
         equipBackpackItem,
-        unequipBackpackItem
+        unequipBackpackItem,
+        sendCommand
       }}>
       {children}
     </EventCloudContext.Provider>
