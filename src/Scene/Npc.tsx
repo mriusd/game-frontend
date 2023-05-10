@@ -24,7 +24,7 @@ const Npc = memo(function Npc({ npc }: Props) {
     const [targetWorldPosition, setTargetWorldPosition] = useState<Coordinate | null>(null)
     const [currentWorldPosition, setCurrentWorldPosition] = useState<Coordinate | null>(null)
     const [direction, setDirection] = useState<number>(0)
-    const nameColor = useRef<0xFFFFFF | 0xFFFF00>(0xFFFFFF)
+    const nameColor = useRef<0xFFFFFF | 0xFF3300>(0xFFFFFF)
 
     const model = useMemo(() => SkeletonUtils.clone(gltf.current.npc.scene), [gltf.current])
     useEffect(() => {
@@ -114,7 +114,7 @@ const Npc = memo(function Npc({ npc }: Props) {
 
     // Set target & hover
     const handlePointerEnter = () => {
-        nameColor.current = 0xFFFF00
+        nameColor.current = 0xFF3300
         setCursorPointer(html, true)
         setHoveredItems(npc, 'add')
     }

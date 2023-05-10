@@ -4,6 +4,8 @@ import type { Damage } from "interfaces/damage.interface"
 import DamageText from "./DamageText"
 import { useSceneContext } from "store/SceneContext"
 import type { ObjectData } from "interfaces/sceneData.interface"
+import { getDamageColor } from "Scene/utils/getDamageColor"
+import { getDamageValue } from "Scene/utils/getDamageValue"
 
 interface TriggerDamage {
     label: string
@@ -11,20 +13,37 @@ interface TriggerDamage {
     remove: () => void
     color: number
     target: ObjectData
+    message: string
 }
 
 const FloatingDamage = memo(function FloatingDamage() {
     const { events, removeEvent } = useEventCloud()
-    const { worldSize, NpcList, getSceneObject } = useSceneContext()
+    const { NpcList, getSceneObject } = useSceneContext()
 
     const triggerDamage = useRef<TriggerDamage[]>([])
     const removeTriggerDamage = (label: string) => {
         triggerDamage.current = triggerDamage.current.filter((_: TriggerDamage) => _.label !== label)
     }
 
+    const createDamage = (damageEvent: Damage, target: ObjectData) => {
+        const label = `${damageEvent.npcId}${Date.now() * Math.random()}${damageEvent.damage}`
+        return {
+            label,
+            target,
+            event: damageEvent,
+            message: getDamageValue(damageEvent),
+            remove: () => {
+                removeTriggerDamage(label)
+                removeEvent(damageEvent)
+            },
+            color: getDamageColor(damageEvent),
+        }
+    }
+
     // Generate damage indicators
     useEffect(() => {
         const damageEvents = events.filter((event: any) => event.type === 'damage')
+        console.log('damageEvents', damageEvents)
         if (damageEvents.length > 0) {
             damageEvents.forEach((damageEvent: Damage) => {
                 const npc = NpcList.current.find(npc => npc?.id === String(damageEvent.npcId))
@@ -33,18 +52,15 @@ const FloatingDamage = memo(function FloatingDamage() {
 
                 const target = getSceneObject(npc.id)
                 if (!target) { return }
-                
-                const label = `${damageEvent.npcId}${Date.now() * Math.random()}${damageEvent.damage}`
-                triggerDamage.current.push({
-                    label,
-                    target,
-                    event: damageEvent,
-                    remove: () => {
-                        removeTriggerDamage(label)
-                        removeEvent(damageEvent)
-                    },
-                    color: 0xFF0000 * Math.abs(Math.random() - .5),
-                })
+
+                triggerDamage.current.push(createDamage(damageEvent, target))
+
+                // Send one more if double
+                if (damageEvent.dmgType.isDouble) {
+                    setTimeout(() => {
+                        triggerDamage.current.push(createDamage(damageEvent, target))
+                    }, 100)
+                }
             })
         }
     }, [events])
@@ -55,7 +71,7 @@ const FloatingDamage = memo(function FloatingDamage() {
                 <DamageText
                     key={_.label}
                     color={_.color}
-                    value={`${String(_.event.damage)}`}
+                    value={_.message}
                     target={_.target}
                     onComplete={() => _.remove()}
                 />

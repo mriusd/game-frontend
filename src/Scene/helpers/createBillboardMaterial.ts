@@ -6,6 +6,9 @@ export function createBillboardMaterial(baseMaterial: Material, opts?: any) {
     baseMaterial,
     Object.assign(
       {
+        uniforms: {
+          customAlpha: { value: 1 },
+        },
         vertexMainOutro: `
             vec4 mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );
             vec3 scale = vec3(
@@ -17,6 +20,12 @@ export function createBillboardMaterial(baseMaterial: Material, opts?: any) {
             mvPosition.xyz += position * scale;
             gl_Position = projectionMatrix * mvPosition;
         `,
+        fragmentDefs: `
+            uniform float customAlpha;
+        `,
+        fragmentMainOutro: `
+            gl_FragColor = vec4( gl_FragColor.rgb, gl_FragColor.a * clamp(0., 1., customAlpha) );
+        `
       },
       opts
     )
