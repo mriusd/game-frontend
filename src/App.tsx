@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useEventCloud } from './EventCloudContext';
+import { useSceneContext } from './store/SceneContext';
 
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -61,7 +62,6 @@ function App() {
           <Scene/>
         </SceneContextProvider>
       </div>
-     
 
       {/* Top bar 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '50px', backgroundColor: '#333', color: '#fff', padding: '0 20px' }}>

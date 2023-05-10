@@ -42,6 +42,7 @@ const FloatingDamage = memo(function FloatingDamage() {
 
     // Generate damage indicators
     useEffect(() => {
+        console.log('events', events)
         const damageEvents = events.filter((event: any) => event.type === 'damage')
         console.log('damageEvents', damageEvents)
         if (damageEvents.length > 0) {

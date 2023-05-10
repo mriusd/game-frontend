@@ -98,7 +98,10 @@ const SceneContextProvider = ({ children }: Props) => {
         })
     }
 
-    const worldSize = useRef<number>(12)
+    const worldSize = useRef<number>(1200)
+    const chunkSize = useRef<number>(60)
+    const chunksPerAxis = useRef<number>(worldSize.current / chunkSize.current)
+
     const NpcList = useRef<Fighter[]>([])
 
     // Store npc refs, to have acces there position, boinding box etc
@@ -171,7 +174,11 @@ const SceneContextProvider = ({ children }: Props) => {
 
     const value = {
         html,
+
         worldSize,
+        chunkSize,
+        chunksPerAxis,
+
         npcList,
         setSceneObject, getSceneObject,
         NpcList,
