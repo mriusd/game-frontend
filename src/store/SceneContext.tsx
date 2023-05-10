@@ -1,12 +1,14 @@
 import { createContext, useEffect, useState, useRef, useContext, ReactNode } from "react"
 import { useEventCloud } from "EventCloudContext"
-import type { Fighter, FighterRef } from "interfaces/fighter.interface"
+import type { Fighter } from "interfaces/fighter.interface"
 import type { Coordinate } from "interfaces/coordinate.interface"
 import type { ISceneContext } from "interfaces/sceneContext.interface"
 import type { OccupiedCoordinate } from "interfaces/occupied.interface"
 import type { ItemDroppedEvent } from "interfaces/item.interface"
 import type { Skill } from "interfaces/skill.interface"
-import type { FighterBoundingBox } from "interfaces/fighter.interface"
+import { Group, Mesh } from "three"
+import type { SceneData, ObjectData } from "interfaces/sceneData.interface"
+import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
 
 
 export const SceneContext = createContext({})
@@ -98,25 +100,27 @@ const SceneContextProvider = ({ children }: Props) => {
 
     const worldSize = useRef<number>(12)
     const NpcList = useRef<Fighter[]>([])
-    // TODO: store npc refs, to have acces there position and boinding box
-    const npcRefs = useRef<FighterRef[]>([])
-    const [npcBoundingBox, _setNpcBoundingBox] = useState<FighterBoundingBox[]>([])
-    const setNpcBoundingBox = (item: FighterBoundingBox, action: 'add' | 'remove') => {
-        _setNpcBoundingBox(state => {
-            const newState = [...state]
-            const itemIndex = newState.findIndex((boundingBox: FighterBoundingBox) => boundingBox.id === item.id)
-            if (action === 'add') {
-                if (itemIndex === -1) {
-                    newState.push(item)
-                    return newState
+
+    // Store npc refs, to have acces there position, boinding box etc
+    const sceneData = useRef<SceneData>({})
+    const setSceneObject = (id: string, object: Mesh | Group, action: 'add' | 'remove') => {
+        if (action === 'add') {
+            sceneData.current = {
+                ...sceneData.current,
+                [id]: {
+                    id,
+                    ref: object,
+                    dimensions: getMeshDimensions(object)
                 }
-                return state
             }
-            if (itemIndex === -1) { return state }
-            return [...newState.slice(0, itemIndex), ...newState.slice(itemIndex + 1)]
-        })
+            return
+        }
+        delete sceneData.current[id]
     }
-    // 
+    const getSceneObject = (id: string): ObjectData | null => {
+        return sceneData.current[id] || null
+    }
+
     const DroppedItems = useRef<any[]>([])
     const [isLoaded, setIsLoaded] = useState<boolean>(false)
     useEffect(() => {
@@ -169,7 +173,7 @@ const SceneContextProvider = ({ children }: Props) => {
         html,
         worldSize,
         npcList,
-        npcBoundingBox, setNpcBoundingBox,
+        setSceneObject, getSceneObject,
         NpcList,
         fighter,
         moveFighter,

@@ -1,23 +1,21 @@
-import * as THREE from "three"
 import { useEventCloud } from "EventCloudContext"
 import { useEffect, useRef, memo } from "react"
 import type { Damage } from "interfaces/damage.interface"
 import DamageText from "./DamageText"
 import { useSceneContext } from "store/SceneContext"
-import { Coordinate } from "interfaces/coordinate.interface"
-import { matrixCoordToWorld } from "Scene/utils/matrixCoordToWorld"
+import type { ObjectData } from "interfaces/sceneData.interface"
 
 interface TriggerDamage {
     label: string
     event: Damage
     remove: () => void
     color: number
-    coordinates: Coordinate
+    target: ObjectData
 }
 
 const FloatingDamage = memo(function FloatingDamage() {
     const { events, removeEvent } = useEventCloud()
-    const { worldSize, NpcList } = useSceneContext()
+    const { worldSize, NpcList, getSceneObject } = useSceneContext()
 
     const triggerDamage = useRef<TriggerDamage[]>([])
     const removeTriggerDamage = (label: string) => {
@@ -33,19 +31,21 @@ const FloatingDamage = memo(function FloatingDamage() {
                 if (!npc) { return }
                 // console.log(`[FloatingDamage]: ID ${damageEvent.npcId} received ${damageEvent.damage} damage.`)
 
+                const target = getSceneObject(npc.id)
+                if (!target) { return }
+                
                 const label = `${damageEvent.npcId}${Date.now() * Math.random()}${damageEvent.damage}`
                 triggerDamage.current.push({
                     label,
+                    target,
                     event: damageEvent,
                     remove: () => {
                         removeTriggerDamage(label)
                         removeEvent(damageEvent)
                     },
                     color: 0xFF0000 * Math.abs(Math.random() - .5),
-                    coordinates: matrixCoordToWorld(worldSize.current, npc.coordinates)
                 })
             })
-
         }
     }, [events])
 
@@ -55,8 +55,8 @@ const FloatingDamage = memo(function FloatingDamage() {
                 <DamageText
                     key={_.label}
                     color={_.color}
-                    value={`-${String(_.event.damage)}`}
-                    position={_.coordinates}
+                    value={`${String(_.event.damage)}`}
+                    target={_.target}
                     onComplete={() => _.remove()}
                 />
             ))}

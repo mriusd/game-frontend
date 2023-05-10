@@ -246,7 +246,7 @@ export const EventCloudProvider = ({ children }) => {
 
     } else {
 
-      setPlayerDamageData(damage);
+      // setPlayerDamageData(damage);
       setFighter(fighter);
     }
   }
