@@ -244,7 +244,7 @@ export const EventCloudProvider = ({ children }) => {
   }
 
   function handleDamage(damage, opponent, player, opponentHealth, lastDmgTimestamp, opponentFighterObj, dmgType) {
-    console.log("[handleDamage]  damage=", damage ," dmgType=", dmgType);
+    // console.log("[handleDamage]  damage=", damage ," dmgType=", dmgType);
 
     if (player == PlayerID) {
       handleUpdateNpc(opponentFighterObj);

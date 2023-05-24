@@ -21,7 +21,7 @@ const LoadAssetsContextProvider = ({ children }) => {
     // @ts-expect-error
     gltf.current.npc = useGLTF('models/npc_test/scene.gltf')
     // @ts-expect-error
-    gltf.current.tree = useGLTF('models/decor/tree/tree.gltf')
+    gltf.current.tree = useGLTF('models/decor/tree/scene.gltf')
 
     const value: ILoadAssetsContext = {
         gltf
