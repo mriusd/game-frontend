@@ -16,6 +16,7 @@ import Npc from "./Npc"
 import Controller from "./Controller"
 import DroppedItem from "./DroppedItem"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"
+import Decor from "./Decor"
 
 const Scene = memo(function Scene() {
     const store = useSceneContext()
@@ -38,6 +39,7 @@ const Scene = memo(function Scene() {
                     <Light />
                     {store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />)}
                     {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
+                    {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)}
                     <Fighter />
                     <Chunks ref={worldRef} />
                     <Controller world={worldRef} />
