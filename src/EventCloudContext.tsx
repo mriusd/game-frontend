@@ -8,6 +8,7 @@ import type { Fighter } from 'interfaces/fighter.interface';
 import type { ItemAttributes, ItemDroppedEvent } from 'interfaces/item.interface'
 import type { Backpack, BackpackSlot } from 'interfaces/backpack.interface';
 import type { Equipment } from 'interfaces/equipment.interface';
+import type { MapObject } from 'interfaces/mapObject.interface';
 // @ts-expect-error
 import { common } from 'ethereumjs-util';  
 
@@ -32,6 +33,7 @@ export const EventCloudProvider = ({ children }) => {
   const [npcList, setNpcList]           = useState<Fighter[]>([]);
   const [equipment, setEquipment]       = useState<Record<number, BackpackSlot | null>>(null);
   const [backpack, setBackpack]         = useState<Backpack | null>(null);
+  const [mapObjects, setMapObjects]     = useState<MapObject[]>([]);
  
   const [money, setMoney] = useState(0);
   const [target, setTarget] = useState(0);
@@ -174,6 +176,13 @@ export const EventCloudProvider = ({ children }) => {
 
     });
   }
+
+  function sendCommand(text) {
+    var response = sendJsonMessage({
+      type: "message",
+      data: { text }
+    });
+  }
   
 
   
@@ -182,7 +191,7 @@ export const EventCloudProvider = ({ children }) => {
   // Event processing logic here  
   function processIncomingMessage(event) {
       var msg = JSON.parse(event.data);
-      //@console.log("New message", msg);
+      //console.log("New message", msg);
 
       switch (msg.action) {
         case "item_picked":
@@ -207,7 +216,7 @@ export const EventCloudProvider = ({ children }) => {
         break;
 
         case "ping":
-          handlePing(msg.fighter);
+          handlePing(msg.fighter, msg.mapObjects);
         break;
 
         case "update_npc":
@@ -215,9 +224,7 @@ export const EventCloudProvider = ({ children }) => {
         break;
 
         case "backpack_update":
-
           handleUpdateBackpack(msg.backpack, msg.equipment);
-
         break;
       }
   }
@@ -230,19 +237,20 @@ export const EventCloudProvider = ({ children }) => {
 
   }
 
-  function handlePing(fighter) {
+  function handlePing(fighter, mapObjects) {
     setFighter(fighter);
-    //@console.log("Ping fighter: ", fighter);
+    setMapObjects(mapObjects);
+    //console.log("Ping fighter: ", fighter, mapObjects);
   }
 
   function handleDamage(damage, opponent, player, opponentHealth, lastDmgTimestamp, opponentFighterObj, dmgType) {
-    //console.log("[handleDamage]  damage=", damage ," dmgType=", dmgType);
+    console.log("[handleDamage]  damage=", damage ," dmgType=", dmgType);
 
     if (player == PlayerID) {
       handleUpdateNpc(opponentFighterObj);
       
       // Use addDamageEvent from EventCloudContext
-      ////@console.log('Calling addDamageEvent');
+      console.log('Calling addDamageEvent', { npcId: opponent, damage: damage, dmgType: dmgType }, dmgType);
       addDamageEvent({ npcId: opponent, damage, dmgType });
 
     } else {
@@ -419,7 +427,9 @@ export const EventCloudProvider = ({ children }) => {
         selectedSkill,
         setSelectedSkill,
         equipBackpackItem,
-        unequipBackpackItem
+        unequipBackpackItem,
+        sendCommand,
+        mapObjects
       }}>
       {children}
     </EventCloudContext.Provider>

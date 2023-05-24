@@ -11,12 +11,28 @@ import DroppedItemsList from './DroppedItemsList';
 import NPC from './NPC';
 import Backpack from './Backpack';
 import ToggleSkillButton from './ToggleSkillButton';
+import CommandLine from './CommandLine';
 
 
 import Scene from './Scene/Scene';
 import SceneContextProvider from './store/SceneContext';
 
 
+// Commandments
+//
+// FOR PLAYERS
+// /move <map name> - teleport map 
+// /trade - initiate trade (point at other player)
+// /party - join/initiate party (point at other player)
+// <text> - local chat
+// ~<text> - party chat
+// @<text> - guild chat
+//
+// FOR DEVS
+// /slide <x: int> <z: int> - move char to coords
+// /spawn <npcName: string> - spawn an NPC (eg: spider, bull)
+// /make <itemName: string> [+<lvl>] [+<add points>] [l] [exc]  - make item (eg: /make brass armour +9 +8 l exc  | /make nodachi)
+//
 
 function App() {
   const { 
@@ -60,6 +76,11 @@ function App() {
         </div>
       </div>
       */}
+      <div>
+        <CommandLine />
+      </div>
+
+
       {/* Main content */}
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
 

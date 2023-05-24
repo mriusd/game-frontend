@@ -3,6 +3,7 @@ import type { Coordinate } from "./coordinate.interface";
 import { BackpackSlot } from './backpack.interface';
 import type { ItemDroppedEvent } from "./item.interface"; 
 import type { Direction } from "./direction.interface"; 
+import type { MapObject } from "./mapObject.interface"; 
 
 export interface EventCloud {
     PlayerID: any 
@@ -31,4 +32,6 @@ export interface EventCloud {
     setSelectedSkill: any
     equipBackpackItem: any
     unequipBackpackItem: any
+    sendCommand: (text: string) => void
+    mapObjects: MapObject[]
 }
