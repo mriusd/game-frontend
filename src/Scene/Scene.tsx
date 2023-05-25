@@ -33,8 +33,8 @@ const Scene = memo(function Scene() {
                 }}
             >
                 <LoadAssetsContextProvider>
-                    {/* <color attach="background" args={[0x000000]} /> */}
-                    {/* <fog attach="fog" color={0x000000} near={1} far={30} /> */}
+                    <color attach="background" args={[0x000000]} />
+                    {/* <fog attach="fog" color={0x000000} near={20} far={60} /> */}
                     {/* <OrbitControls/> */}
                     <Light />
                     {store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />)}

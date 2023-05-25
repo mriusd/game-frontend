@@ -17,7 +17,7 @@ import ReuseModel from './components/ReuseModel'
 
 interface Props { 
     objectData: {
-        coordinates: Coordinate
+        location: Coordinate
         rotation: { x: number, y: number, z: number }
         scale: { x: number, y: number, z: number }
     } 
@@ -27,7 +27,7 @@ const Npc = memo(function Npc({ objectData }: Props) {
     const { gltf } = useLoadAssets()
 
     const model = useMemo(() => gltf.current.tree, [objectData])
-    const worldCoordinate = useMemo(() => matrixCoordToWorld(worldSize.current, objectData.coordinates), [objectData])
+    const worldCoordinate = useMemo(() => matrixCoordToWorld(worldSize.current, objectData.location), [objectData])
     const modelRef = useRef<THREE.Mesh | null>(null)
 
     // // Save ref to object to store & rm on unmount

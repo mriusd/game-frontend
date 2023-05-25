@@ -1,5 +1,5 @@
-export const CAMERA_POSITION = [ -6.5, 6.5, 6.5 ] // used for camera, to save distance to object
-// export const CAMERA_POSITION = [ 0, 8, 8 ] // for dev
+export const CAMERA_POSITION = [ -10, 10, 10 ] // used for camera, to save distance to object
+// export const CAMERA_POSITION = [ -20, 20, 20 ] // for dev
 export const DAMAGE_COLORS = {
     ignoreDefence: 0xFFE600,
     excellent: 0x00FF19,

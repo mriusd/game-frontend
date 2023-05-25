@@ -35,6 +35,7 @@ const SceneContextProvider = ({ children }: Props) => {
         target: eventTarget,
         setTarget: setEventTarget,
         refreshFighterItems,
+        mapObjects,
     } = useEventCloud()
 
     const [isMoving, setIsMoving] = useState<boolean>(false)
@@ -134,6 +135,11 @@ const SceneContextProvider = ({ children }: Props) => {
     }, [fighter, worldSize.current])
 
     const VisibleDecor = useRef<any[]>([])
+    useEffect(() => {
+        if (!mapObjects) { return }
+        // console.log('[SceneContext]: MapObjects updated', mapObjects)
+        VisibleDecor.current = mapObjects
+    }, [mapObjects])
 
     // Detect npc updates and add them to NpcList
     useEffect(() => {
