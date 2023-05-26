@@ -1,14 +1,16 @@
 
 import * as THREE from "three"
-import { forwardRef, useEffect, useMemo, useRef } from "react"
+import { forwardRef, useEffect, useMemo, useRef, useState } from "react"
 import { useSceneContext } from "store/SceneContext"
 import { memo } from "react"
 import { Coordinate } from "interfaces/coordinate.interface"
-import { makeNoise2D } from "open-simplex-noise"
-import { clamp } from "three/src/math/MathUtils"
+// import { makeNoise2D } from "open-simplex-noise"
+// import { clamp } from "three/src/math/MathUtils"
+import { useTexture } from "@react-three/drei"
+import { worldCoordToMatrix } from "./utils/worldCoordToMatrix"
 
 const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
-    const { chunkSize, currentWorldCoordinate } = useSceneContext()
+    const { chunkSize, chunksPerAxis, worldSize, currentWorldCoordinate } = useSceneContext()
 
     const segmentsSize = 1
     const segmentsX = chunkSize.current
@@ -20,73 +22,62 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
 
     const planeBufferSize = useRef([...new Array(4)])
     const planeBuffer = useRef<{ [key: number]: THREE.Mesh | null }>({})
+    const planeTextureUrlBuffer = useRef<{ [key: number]: string }>({})
     const gridHelper = useRef<THREE.GridHelper | null>(null)
-    const isGenerated = useRef(false)
 
     useEffect(() => {
         if (!currentWorldCoordinate) { return }
         updatePlanePositions(currentWorldCoordinate)
+        // Show grid for testing in chunk   
+        updateGridHelperPosition(currentWorldCoordinate)
     }, [currentWorldCoordinate, planeBuffer.current])
 
-    function generateTerrainColors(geometry: THREE.BufferGeometry, offsetX: number, offsetY: number, noiseScale: number) {
-        const noise2D = makeNoise2D(Date.now());
-        const colors = [];
-        // @ts-expect-error
-        const positions = geometry.getAttribute('position').array;
-
-        for (let i = 0; i < positions.length; i += 3) {
-            const x = positions[i];
-            const z = positions[i + 1];
-            const heightValue = clamp(0, noise2D((x + offsetX) * noiseScale, (z + offsetY) * noiseScale), 1);
-            colors.push(new THREE.Color(0x180A0A * heightValue));
-        }
-
-        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors.map(c => c.toArray()).flat(), 3));
-    }
     function updatePlanePositions(characterPosition: Coordinate) {
         const { xIndex, zIndex } = getChunkIndices(characterPosition);
 
         for (let i = 0; i < planeBufferSize.current.length; i++) {
-            const plane = planeBuffer.current[i];
+            const plane = planeBuffer.current[i]
 
             // Calculate the x and y offsets for each plane
-            const xOffset = (i % 2) * chunkSize.current;
-            const yOffset = Math.floor(i / 2) * chunkSize.current;
+            const xOffset = (i % 2) * chunkSize.current
+            const yOffset = Math.floor(i / 2) * chunkSize.current
 
             const x = (xIndex * chunkSize.current) + xOffset;
             const z = (zIndex * chunkSize.current) + yOffset;
             if (plane.position.x === x && plane.position.z === z) { return }
             console.log('[Chunks]: chunks recalculated')
 
+            // Set new texture to chunk
+            const textureZ = (x + worldSize.current / 2) / chunksPerAxis.current / 10
+            const textureX = (z + worldSize.current / 2) / chunksPerAxis.current / 10
+            planeTextureUrlBuffer.current[i] = `worlds/lorencia_ground/${textureX}_${textureZ}.png`
+            if (textureX < 0 || textureZ < 0 || textureX > chunksPerAxis.current || textureZ > chunksPerAxis.current) {
+                planeTextureUrlBuffer.current[i] = ''
+            }
             // Set the plane position based on the current chunk index and offsets
             plane.position.set(x, 0, z);
-
-            // Show grid for testing in chunk   
-            updateGridHelperPosition(characterPosition)
-
-
-
-            if (!isGenerated.current) {
-                // Generate terrain colors for the plane
-                const noiseScale = .05;
-                generateTerrainColors(plane.geometry, x, z, noiseScale);
-            }
         }
-        isGenerated.current = true
     }
     function getChunkIndices(position: Coordinate) {
         const xIndex = Math.floor(position.x / chunkSize.current)
         const zIndex = Math.floor(position.z / chunkSize.current)
         return { xIndex, zIndex }
     }
+    // Different cuz we put the plain with offset
+    function getChunkIndicesForHelper(position: Coordinate) {
+        const xIndex = Math.floor((position.x + chunkSize.current / 2) / chunkSize.current)
+        const zIndex = Math.floor((position.z + chunkSize.current / 2) / chunkSize.current)
+        return { xIndex, zIndex }
+    }
     function updateGridHelperPosition(characterPosition: Coordinate) {
-        const { xIndex, zIndex } = getChunkIndices(characterPosition)
+        const { xIndex, zIndex } = getChunkIndicesForHelper(characterPosition)
+        console.log('xIndex, zIndex', xIndex, zIndex)
 
         // Set the GridHelper position based on the current chunk index
         gridHelper.current.position.set(
-            xIndex * chunkSize.current + chunkSize.current / 2,
+            xIndex * chunkSize.current,
             0.001,
-            zIndex * chunkSize.current + chunkSize.current / 2
+            zIndex * chunkSize.current
         );
     }
 
@@ -102,29 +93,43 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
                         index={i}
                         // @ts-expect-error
                         ref={(ref) => planeBuffer.current[i] = ref}
-                        material={material}
+                        textureUrl={planeTextureUrlBuffer.current[i] || ''}
                         geometry={geometry}
                     />
                 ))}
             </group>
-            <gridHelper ref={gridHelper} args={[chunkSize.current, chunkSize.current, 0x6B6B6B, 0x6B6B6B]} rotation={[0, 0, 0]} />
+            <gridHelper ref={gridHelper} args={[sizeX, sizeY, 0x4B4B4B, 0x4B4B4B]} rotation={[0, 0, 0]} />
         </>
     )
 }))
 
-interface SwapChunkProps { geometry: THREE.PlaneGeometry, material: THREE.MeshStandardMaterial, index: number }
-const SwapChunk = forwardRef(({ geometry, material, index }: SwapChunkProps, ref: any) => {
+interface SwapChunkProps { geometry: THREE.PlaneGeometry, textureUrl: string, index: number }
+const SwapChunk = forwardRef(({ geometry, textureUrl, index }: SwapChunkProps, ref: any) => {
+    const isHovered = useRef(false)
+
     return (
         <mesh
             ref={ref}
             name={`swap-chunk-${index}`}
             receiveShadow
             rotation={[Math.PI / -2, 0, 0]}
-            material={material}
             geometry={geometry}
-        ></mesh>
+            onPointerMove={() => isHovered.current = true}
+            onPointerLeave={() => isHovered.current = false}
+        >
+            { 
+                isHovered.current && textureUrl ? <ChunkMaterial textureUrl={textureUrl} /> :
+                textureUrl ? <ChunkMaterial textureUrl={textureUrl} /> : <meshStandardMaterial color={0x000000}/>
+            }
+        </mesh>
     )
 })
+
+interface ChunkMaterialProps { textureUrl: string, opacity?: number, transparent?: boolean }
+const ChunkMaterial = ({ textureUrl, ...props }: ChunkMaterialProps) => {
+    const textures = useTexture({ map: textureUrl })
+    return <meshStandardMaterial {...textures} {...props} />
+}
 
 
 export default Chunks

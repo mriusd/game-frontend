@@ -16,6 +16,7 @@ import Npc from "./Npc"
 import Controller from "./Controller"
 import DroppedItem from "./DroppedItem"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"
+import Decor from "./Decor"
 
 const Scene = memo(function Scene() {
     const store = useSceneContext()
@@ -32,12 +33,13 @@ const Scene = memo(function Scene() {
                 }}
             >
                 <LoadAssetsContextProvider>
-                    {/* <color attach="background" args={[0x000000]} /> */}
-                    {/* <fog attach="fog" color={0x000000} near={1} far={30} /> */}
+                    <color attach="background" args={[0x000000]} />
+                    {/* <fog attach="fog" color={0x000000} near={20} far={60} /> */}
                     {/* <OrbitControls/> */}
                     <Light />
                     {store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />)}
                     {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
+                    {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)}
                     <Fighter />
                     <Chunks ref={worldRef} />
                     <Controller world={worldRef} />
