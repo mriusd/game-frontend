@@ -13,7 +13,7 @@ const HealthBar = memo(function HealthBar({ object, target, offset = 0 }: any) {
         if (!target.current) { return }
         setTimeout(() => {
             textBoundingBox.current = getMeshDimensions(target.current)
-        }, 30)
+        }, 100)
     }, [target.current])
 
     useFrame(() => {

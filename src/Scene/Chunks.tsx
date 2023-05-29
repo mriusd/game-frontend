@@ -7,7 +7,6 @@ import { Coordinate } from "interfaces/coordinate.interface"
 // import { makeNoise2D } from "open-simplex-noise"
 // import { clamp } from "three/src/math/MathUtils"
 import { useTexture } from "@react-three/drei"
-import { worldCoordToMatrix } from "./utils/worldCoordToMatrix"
 
 const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
     const { chunkSize, chunksPerAxis, worldSize, currentWorldCoordinate } = useSceneContext()
@@ -18,7 +17,6 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
     const sizeX = segmentsSize * segmentsX
     const sizeY = segmentsSize * segmentsY
     const geometry = useMemo(() => new THREE.PlaneGeometry(sizeX, sizeY, segmentsX, segmentsY), [])
-    const material = useMemo(() => new THREE.MeshStandardMaterial({ color: 0x6C6C6C, vertexColors: true }), [])
 
     const planeBufferSize = useRef([...new Array(4)])
     const planeBuffer = useRef<{ [key: number]: THREE.Mesh | null }>({})
