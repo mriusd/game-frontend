@@ -17,7 +17,7 @@ const LoadAssetsContextProvider = ({ children }) => {
     const gltf = useRef<{[key: string]: GLTF}>({})
 
     // @ts-expect-error
-    gltf.current.fighter = useGLTF('models/fighter_test/scene.gltf')
+    gltf.current.fighter = useGLTF('models/character/character.gltf')
     // @ts-expect-error
     gltf.current.npc = useGLTF('models/npc_test/scene.gltf')
     // @ts-expect-error
@@ -36,6 +36,6 @@ const LoadAssetsContextProvider = ({ children }) => {
 
 export default LoadAssetsContextProvider
 
-useGLTF.preload('models/fighter_test/scene.gltf')
+useGLTF.preload('models/character/character.gltf')
 useGLTF.preload('models/npc_test/scene.gltf')
 useGLTF.preload('models/decor/tree/tree.gltf')

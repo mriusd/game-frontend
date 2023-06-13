@@ -208,10 +208,14 @@ const Fighter = memo(function Fighter() {
     // Toggle movement animation
     useEffect(() => {
         // console.log('[Fighter]: Toggle isMoving animation', mixer, actions)
+        console.log(actions)
         if (isStaying) {
-            actions.Scene?.fadeOut(.1).stop()
+            actions['run-loop']?.fadeOut(.1).stop()
+            actions['standing-loop']?.play()
+
         } else {
-            actions.Scene?.setDuration(60 / fighter.movementSpeed * 4).fadeIn(.1).play()
+            actions['standing-loop']?.fadeOut(.1).stop()
+            actions['run-loop']?.setDuration(60 / fighter.movementSpeed * 4).play()
         }
     }, [ isStaying ])
 
@@ -222,12 +226,12 @@ const Fighter = memo(function Fighter() {
 
     return (
         <group>
-            <Name value="MyName()_()" target={animationTarget} />
+            <Name value="MyName()_()" target={animationTarget} offset={.4} />
             <primitive 
                 ref={animationTarget}
                 object={gltf.current.fighter.scene}
-                position={[currentWorldCoordinate.x, -.1, currentWorldCoordinate.z]}
-                scale={.7}
+                position={[currentWorldCoordinate.x, 0, currentWorldCoordinate.z]}
+                scale={1}
                 rotation={[0, direction, 0]}
                 castShadow 
             />
