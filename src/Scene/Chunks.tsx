@@ -7,6 +7,7 @@ import { Coordinate } from "interfaces/coordinate.interface"
 // import { makeNoise2D } from "open-simplex-noise"
 // import { clamp } from "three/src/math/MathUtils"
 import { useTexture } from "@react-three/drei"
+import { clamp } from "three/src/math/MathUtils"
 
 const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
     const { chunkSize, chunksPerAxis, worldSize, currentWorldCoordinate } = useSceneContext()
@@ -46,8 +47,9 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
             console.log('[Chunks]: chunks recalculated')
 
             // Set new texture to chunk
-            const textureZ = (x + worldSize.current / 2) / chunksPerAxis.current / 10
-            const textureX = (z + worldSize.current / 2) / chunksPerAxis.current / 10
+            // TODO: Remove Clamp, FIXME: fix error index chunk calculation
+            const textureZ = clamp(0, 5, (x + worldSize.current / 2) / chunksPerAxis.current / 10)
+            const textureX = clamp(0, 5, (z + worldSize.current / 2) / chunksPerAxis.current / 10)
             planeTextureUrlBuffer.current[i] = `worlds/lorencia_ground/${textureX}_${textureZ}.png`
             if (textureX < 0 || textureZ < 0 || textureX > chunksPerAxis.current || textureZ > chunksPerAxis.current) {
                 planeTextureUrlBuffer.current[i] = ''
@@ -69,7 +71,7 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
     }
     function updateGridHelperPosition(characterPosition: Coordinate) {
         const { xIndex, zIndex } = getChunkIndicesForHelper(characterPosition)
-        console.log('xIndex, zIndex', xIndex, zIndex)
+        // console.log('xIndex, zIndex', xIndex, zIndex)
 
         // Set the GridHelper position based on the current chunk index
         gridHelper.current.position.set(

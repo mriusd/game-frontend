@@ -1,3 +1,5 @@
+import styles from './Scene.module.scss'
+
 import * as THREE from "three"
 import { Object3D } from "three"
 
@@ -17,12 +19,13 @@ import Controller from "./Controller"
 import DroppedItem from "./DroppedItem"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"
 import Decor from "./Decor"
+import UserInterface from './UserInterface/UserInterface'
 
 const Scene = memo(function Scene() {
     const store = useSceneContext()
     const worldRef = useRef<Object3D | null>(null)
     return (
-        <>
+        <div id="scene" className={styles.scene}>
             <Canvas
                 shadows
                 camera={{
@@ -44,23 +47,16 @@ const Scene = memo(function Scene() {
                     <Chunks ref={worldRef} />
                     <Controller world={worldRef} />
                     <FloatingDamage />
+                    <UserInterface />
                 </LoadAssetsContextProvider>
                 <Stats/>
             </Canvas>
-            <div style={{
-                position: 'absolute',
-                top: '30px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                fontSize: '20px',
-                color: 'white',
-                userSelect: 'none'
-            }}>
+            <div className={styles.coordinates}>
                 <div>World size [{store.worldSize.current}x{store.worldSize.current}]</div>
                 <div>Server coordinate [ X: {store.currentMatrixCoordinate?.x} Z: {store.currentMatrixCoordinate?.z} ]</div>
                 <div>World coordinate [ X: {store.currentWorldCoordinate?.x.toFixed(0)} Z: {store.currentWorldCoordinate?.z.toFixed(0)} ]</div>
             </div>
-        </>
+        </div>
     )
 })
 

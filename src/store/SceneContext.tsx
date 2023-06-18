@@ -175,7 +175,7 @@ const SceneContextProvider = ({ children }: Props) => {
     }, [droppedItems]);
 
     useEffect(() => {
-        const html = document.querySelector(".scene")
+        const html = document.getElementById("scene")
         if (!html) { console.error('[SceneContext]: Html Element not found') }
         setHTML(html as HTMLElement)
     }, [])
