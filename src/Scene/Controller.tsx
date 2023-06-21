@@ -10,7 +10,7 @@ import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
 import { Coordinate } from "interfaces/coordinate.interface"
 import { Box } from "@react-three/drei"
 import { isOccupiedCoordinate } from "./utils/isOccupiedCoordinate"
-import { useUiStore } from "store/uiStore"
+import { useBackpackStore } from "store/backpackStore"
 
 const ANGLE_STEP = Math.PI / 4 // 8 directions
 const ANGLE_RANGE = Math.PI / 8 // Set a range of angles to rotate towards
@@ -56,7 +56,6 @@ const Controller = memo(function Controller({ world }: Props) {
         return hoveredItems.length ? 0x000000 : colorOccupied
     }, [ testMatrixCoordinates, occupiedCoords, hoveredItems ])
 
-
     useFrame(() => {
         if (isHolding) {
             if (!world.current) { return }
@@ -64,7 +63,7 @@ const Controller = memo(function Controller({ world }: Props) {
             const coordinate = calcPointerCoordinate()
             if (!coordinate) { return }
             if (saveHoveredItems.value?.length) { return }
-            if (useUiStore.getState().isBackpackOpened) { return }
+            if (useBackpackStore.getState().isOpened) { return }
             setFocusedMatrixCoordinate(worldCoordToMatrix(worldSize.current, savePointerWorldCoordinate.value))
             setFocusedWorldCoordinate(savePointerWorldCoordinate.value)
         }
@@ -100,7 +99,7 @@ const Controller = memo(function Controller({ world }: Props) {
         // 
 
         if (saveHoveredItems.value?.length) { return null }
-        if (useUiStore.getState().isBackpackOpened) { return }
+        if (useBackpackStore.getState().isOpened) { return }
 
         return point
     }

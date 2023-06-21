@@ -6,7 +6,7 @@ import { useMemo, memo } from "react"
 import { forwardRef } from 'react'
 
 
-interface Props { gltf: any, position?: number[], rotation?: number[], scale?: number[] }
+interface Props { gltf: any, position?: number[], rotation?: number[], scale?: number[], onPointerEnter?: (e?: any) => void, onPointerLeave?: (e?: any) => void }
 const ReuseModel = memo(forwardRef(function ReuseModel({ gltf, ...props }: Props, ref: any) {
     // const { worldSize, html, setTarget, fighter, setHoveredItems, setSceneObject, getSceneObject } = useSceneContext()
 
@@ -23,6 +23,8 @@ const ReuseModel = memo(forwardRef(function ReuseModel({ gltf, ...props }: Props
 
     return (
         <primitive
+            onPointerEnter={props.onPointerEnter}
+            onPointerLeave={props.onPointerLeave}
             ref={ref}
             name={model.name}
             object={model}

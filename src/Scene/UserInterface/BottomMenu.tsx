@@ -2,10 +2,10 @@ import { Flex, Box } from "@react-three/flex"
 import { Box as Cube } from "@react-three/drei"
 import { uiUnits } from "Scene/utils/uiUnits"
 import Button from "./Button"
-import { useUiStore } from "store/uiStore"
+import { useBackpackStore } from "store/backpackStore" 
 
 const BottomMenu = () => {
-    const toggleBackpack = useUiStore(state => state.toggleBackpack)
+    const toggleBackpack = useBackpackStore(state => state.toggle)
     const click = () => {
         console.log('click')
         toggleBackpack()

@@ -3,11 +3,12 @@ import { Box as Cube, ScreenSpace, Html } from "@react-three/drei"
 import { useThree } from "@react-three/fiber"
 import { Box, Flex } from "@react-three/flex"
 import { useMemo } from "react"
+import { memo } from "react"
 
-import Backpack from "./Backpack"
+import Backpack from "./Backpack/Backpack"
 import BottomMenu from "./BottomMenu"
 
-const UserInterface = () => {
+const UserInterface = memo(function UserInterface() {
     const store = useSceneContext()
     const { camera } = useThree() 
 
@@ -23,6 +24,6 @@ const UserInterface = () => {
             <BottomMenu/>
         </ScreenSpace>
     )
-}
+})
 
 export default UserInterface
