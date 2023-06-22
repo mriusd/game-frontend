@@ -4,7 +4,9 @@ import { getMeshDimensions } from 'Scene/utils/getMeshDimensions';
 
 export interface BackpackStoreInterface {
     // Backpack settings
-    size: number
+    width: number
+    height: number
+    cellSize: number
 
     // Open/close functionality
     isOpened: boolean
@@ -19,7 +21,9 @@ export interface BackpackStoreInterface {
 }
 
 export const useBackpackStore = create<BackpackStoreInterface>((set, get) => ({
-    size: 8,
+    width: 8,
+    height: 8,
+    cellSize: 1,
     isOpened: false,
     open: () => set({ isOpened: true }),
     close: () => set({ isOpened: false }),

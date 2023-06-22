@@ -14,6 +14,7 @@ import { useEventCloud } from 'EventCloudContext'
 import { useTexture } from '@react-three/drei'
 import BackpackItem from './BackpackItem'
 import { useBackpackStore } from 'store/backpackStore'
+import { shallow } from 'zustand/shallow'
 
 const colors = {
     DARK: '#DDDDDD',
@@ -23,15 +24,18 @@ const colors = {
 const Backpack = memo(function Backpack() {
     const slotsPlaneRef = useRef<THREE.Mesh | null>(null)
 
-    const size = useBackpackStore(state => state.size)
-    const isOpened = useBackpackStore(state => state.isOpened)
     const setSlotsPlane = useBackpackStore(state => state.setSlotsPlane)
+    const [backpackWidth, backpackHeight, isOpened] = useBackpackStore(state => 
+        [state.width, state.height, state.isOpened], 
+        shallow
+    )
+
 
     // TODO:FIXME:CPU HOLE: state from EventCloud triggers alot of rerenders
     const { backpack } = useEventCloud()
 
     // Load backpack texture
-    const { map } = useTexture({ map: '/assets/backpack-grid.png' })
+    const texture = useTexture({ map: '/assets/backpack-grid.png' })
     
     // Transform items to Array for rendering
     const items = useMemo(() => {
@@ -61,16 +65,26 @@ const Backpack = memo(function Backpack() {
     return (
         <Plane position={[0, 0, uiUnits(-10)]} visible={isOpened} args={[uiUnits(40), uiUnits(40), 1]}>
             <meshBasicMaterial color={'black'} transparent={true} opacity={.8} />
+            {/* Backpack slots */}
             <Plane
                 ref={slotsPlaneRef}
                 name='backpack-slots-plane'
                 position={[uiUnits(5), uiUnits(0), uiUnits(1)]} 
-                args={[uiUnits(size), uiUnits(size)]} 
+                args={[uiUnits(backpackWidth), uiUnits(backpackHeight)]} 
             >
-                <meshBasicMaterial map={map}/>
-                {/* <group name='backpack-items'> */}
-                    { items.map(item => <BackpackItem key={item.itemHash} item={item} />) }
-                {/* </group> */}
+                <meshBasicMaterial map={texture.map}/>
+                <group name='backpack-items'>
+                    {items?.length && items.map(item => <BackpackItem key={item.itemHash} item={item} />) }
+                </group>
+            </Plane>
+
+            {/* Equiped on character items slots */}
+            <Plane
+                name='equpment-slots-plane'
+                position={[uiUnits(-5), uiUnits(0), uiUnits(1)]} 
+                args={[uiUnits(4), uiUnits(8)]} 
+            >
+                <meshBasicMaterial color={'black'}/>
             </Plane>
         </Plane>
     )

@@ -9,18 +9,9 @@ import Backpack from "./Backpack/Backpack"
 import BottomMenu from "./BottomMenu"
 
 const UserInterface = memo(function UserInterface() {
-    const store = useSceneContext()
-    const { camera } = useThree() 
-
     return (
         <ScreenSpace name="user-interface" depth={.1}>
             <Backpack/>
-            {/* <Flex flexDir="row">
-                <Box centerAnchor margin={.1}>
-                    <Cube args={[1, 1, 1]}/>
-                </Box>
-            </Flex> */}
-            {/* <Cube position={[0, 0, -5]} args={[1, 1, 1]}/> */}
             <BottomMenu/>
         </ScreenSpace>
     )

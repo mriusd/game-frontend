@@ -21,11 +21,14 @@ import FloatingDamage from "./FloatingDamage/FloatingDamage"
 import Decor from "./Decor"
 import UserInterface from './UserInterface/UserInterface'
 
+import { useUiStore } from 'store/uiStore'
+
 const Scene = memo(function Scene() {
     const store = useSceneContext()
     const worldRef = useRef<Object3D | null>(null)
+    const eventsNode = useUiStore(state => state.eventsNode)
     return (
-        <div id="scene" className={styles.scene}>
+        <div ref={eventsNode} id="scene" className={styles.scene}>
             <Canvas
                 shadows
                 camera={{
