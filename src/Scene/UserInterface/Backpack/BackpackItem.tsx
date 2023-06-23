@@ -1,30 +1,27 @@
 import * as THREE from 'three'
-import { Box, Html, Plane } from "@react-three/drei"
-import { RefObject, useEffect, useMemo, useRef } from "react"
+import { Plane } from "@react-three/drei"
+import { RefObject, useMemo, useRef } from "react"
 import { useBackpackStore } from "store/backpackStore";
 import { shallow } from 'zustand/shallow'
-import { uiUnits } from 'Scene/utils/uiUnits';
-import { useFrame } from '@react-three/fiber';
+import { uiUnits, fromUiUnits } from 'Scene/utils/uiUnits';
+import { ThreeEvent, useFrame } from '@react-three/fiber';
 import { useUiStore } from 'store/uiStore';
 import { useThree } from '@react-three/fiber';
-import ReuseModel from 'Scene/components/ReuseModel';
 import { useLoadAssets } from 'store/LoadAssetsContext';
 import SlotModel from 'Scene/components/SlotModel'
 import { memo } from 'react';
 
 interface Props {
-    slotsPointer: RefObject<{ x: number; y: number; } | null>
     item: { qty: number; itemHash: string; itemAttributes: any; slot: number }
 }
 
-const BackpackItem = memo(function BackpackItem({ item, slotsPointer }: Props) {
+const BackpackItem = memo(function BackpackItem({ item }: Props) {
     console.log('----> Rerender Backpack Item')
     // For test
     const { gltf } = useLoadAssets()
 
     const itemPlaneRef = useRef<THREE.Mesh | null>(null)
     const itemRef = useRef<THREE.Mesh | null>(null)
-
 
     const [ cellSize, slots ] = useBackpackStore(
         state => [state.cellSize, state.slots], 
@@ -68,68 +65,87 @@ const BackpackItem = memo(function BackpackItem({ item, slotsPointer }: Props) {
     const isDragging = useRef<boolean>(false)
     const pointer = useThree(state => state.pointer)
 
-    // Draft for test
-    const pointerDown = useRef<THREE.Vec2>()
-    // 
+    const pointerStart = useRef<{ x: number; y: number; }>(null)
+    const positionStart = useRef<{ x: number; y: number; }>(null)
 
     // Hover Effects
     const onPointerEnter = () => {
+        if (isDragging.current) { return }
         isHovered.current = true
-        setCursor('pointer')
         // @ts-expect-error
         itemPlaneRef.current.material.opacity = .2
+        setCursor('pointer')
     }
     const onPointerLeave = () => {
+        if (isDragging.current) { return }
         isHovered.current = false
-        setCursor('default')
         // @ts-expect-error
         itemPlaneRef.current.material.opacity = .1
         // Reset rotation
         itemRef.current.rotation.y = 0
+        setCursor('default')
     }
+
     // Draggable Effects
-    const onPointerDown = () => {
+    const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
         isDragging.current = true
+        // TODO: FIXME: When u click on model u hook wrong object, prevent hooking on model
+        positionStart.current = { x: e.object.position.x, y: e.object.position.y }
+        pointerStart.current = { x: pointer.x, y: pointer.y }
         setCursor('grabbing')
 
-
+        console.log(e.object)
+        console.log('pointer.x', pointer.x * 0.1)
+        console.log('pointerStart.x', pointerStart.current.x * 0.1)
+        console.log('uv.x', positionStart.current.x)
     }
+
     const onPointerUp = () => {
         isDragging.current = false
+        positionStart.current = null
+        pointerStart.current = null
         setCursor('default')
+
         // Reset position
-        // itemPlaneRef.current.position.set(itemPlanePosition.x, itemPlanePosition.y, itemPlanePosition.z)
+        itemPlaneRef.current.position.set(itemPlanePosition.x, itemPlanePosition.y, itemPlanePosition.z)
     }
 
-    useFrame(({ raycaster }) => {
+    useFrame(() => {
         if (itemRef.current && isHovered.current) {
             itemRef.current.rotation.y += 0.015
         }
-        if (itemPlaneRef.current && isDragging.current) {
-            // TODO: Thats works good, but
-            // * 1. Need to subtract current UV
-            // * 2. Add 1 invisible plane for movement, cuz now u cant move object out backpack slots
-            // * 3. Provide calculated coordinates another way, which wont initiate Items rerender
-            itemPlaneRef.current.position.x = slotsPointer.current.x
-            // itemPlaneRef.current.position.y = slotsPointer.current.y
+        if (itemPlaneRef.current && isDragging.current && positionStart.current && pointerStart.current) {
+            if (positionStart.current.x === 0 && pointerStart.current.x !== 0) { return }
+            if (positionStart.current.y === 0 && pointerStart.current.y !== 0) { return }
+            // TODO: Thats works good, but we have problem cuz PerspectiveCamera
+            // * I shouldnt directly use POINTER coordinates, get them another way via intersaction
+            // * Then i wouldnt need to calc edge (pointerStart - positionStart) and just use intersected directly
+            itemPlaneRef.current.position.x = (pointer.x * 0.1) - (pointerStart.current.x * 0.1 - positionStart.current.x)
+            itemPlaneRef.current.position.y = (pointer.y * 0.1) - (pointerStart.current.y * 0.1 - positionStart.current.y)
+        
+            getCellsCollision()
         }
     })
+
+    function getCellsCollision() {
+        // TODO: DRAFT
+        // console.log(itemPlaneRef.current.position.y)
+        // console.log(Math.round(fromUiUnits(itemPlaneRef.current.position.x)))
+        // console.log(Math.abs(Math.round(fromUiUnits(itemPlaneRef.current.position.y)) - 4))
+    }
 
 
     return (
         <Plane 
             ref={itemPlaneRef}
             onPointerEnter={onPointerEnter}
-            onPointerLeave={() => {onPointerLeave(); onPointerUp()}}
+            onPointerLeave={onPointerLeave}
             onPointerDown={onPointerDown}
             onPointerUp={onPointerUp}
             position={itemPlanePosition} 
             args={[uiUnits(itemPlaneWidth), uiUnits(itemPlaneHeight)]}
         >
             <meshBasicMaterial color={'#FFC700'} transparent={true} opacity={.1} />
-            {/* <Box ref={itemRef} position={[0,0,0]} args={[uiUnits(itemScale), uiUnits(itemScale), uiUnits(itemScale)]}>
-                <meshBasicMaterial color={'red'} />
-            </Box> */}
             <SlotModel position={[0, 0, 0]} ref={itemRef} scale={[uiUnits(itemScale), uiUnits(itemScale), uiUnits(itemScale)]} gltf={gltf.current.sword} />
         </Plane>
 
