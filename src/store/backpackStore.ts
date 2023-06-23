@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { create } from "zustand";
 import { getMeshDimensions } from 'Scene/utils/getMeshDimensions';
+import { RefObject, createRef } from 'react';
 
 export interface BackpackStoreInterface {
     // Backpack settings
@@ -14,10 +15,8 @@ export interface BackpackStoreInterface {
     close: () => void
     toggle: () => void
 
-    // Slots plane, where objects are placed
-    slotsPlane: THREE.Mesh | null
-    setSlotsPlane: (plane: THREE.Mesh) => void
-    planeBoundingBox: { width: number; height: number; depth: number } | null
+    // Slots plane, used for coordinates as a placeholder; hover/focus events...
+    slots: RefObject<{[key: number]: THREE.Mesh}>
 }
 
 export const useBackpackStore = create<BackpackStoreInterface>((set, get) => ({
@@ -28,7 +27,5 @@ export const useBackpackStore = create<BackpackStoreInterface>((set, get) => ({
     open: () => set({ isOpened: true }),
     close: () => set({ isOpened: false }),
     toggle: () => set(state => ({ isOpened: !state.isOpened })),
-    slotsPlane: null,
-    planeBoundingBox: null,
-    setSlotsPlane: (plane) => set(() => ({ slotsPlane: plane, planeBoundingBox: getMeshDimensions(plane) })),
+    slots: createRef()
 }))

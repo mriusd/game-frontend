@@ -12,6 +12,8 @@ import type { MapObject } from 'interfaces/mapObject.interface';
 // @ts-expect-error
 import { common } from 'ethereumjs-util';  
 
+import { useEventStore } from 'store/EventStore';
+
 
 
 
@@ -230,11 +232,13 @@ export const EventCloudProvider = ({ children }) => {
   }
 
 
+  const updateBackpack = useEventStore(state => state.updateBackpack);
+
   function handleUpdateBackpack (newBackpack, newEquipment) {
     console.log("[handleUpdateBackpack] ", newBackpack, newEquipment)
     setBackpack(newBackpack);
+    updateBackpack(newBackpack);
     setEquipment(newEquipment);
-
   }
 
   function handlePing(fighter, mapObjects) {
@@ -274,6 +278,7 @@ export const EventCloudProvider = ({ children }) => {
     setNpcList(npcs);    
     setDroppedItems(droppedItems);
     setBackpack(backpack);
+    updateBackpack(backpack);
 
 
 

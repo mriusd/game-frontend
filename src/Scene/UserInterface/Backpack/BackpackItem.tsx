@@ -1,6 +1,6 @@
 import * as THREE from 'three'
-import { Box, Plane } from "@react-three/drei"
-import { useMemo, useRef } from "react"
+import { Box, Html, Plane } from "@react-three/drei"
+import { RefObject, useEffect, useMemo, useRef } from "react"
 import { useBackpackStore } from "store/backpackStore";
 import { shallow } from 'zustand/shallow'
 import { uiUnits } from 'Scene/utils/uiUnits';
@@ -9,14 +9,16 @@ import { useUiStore } from 'store/uiStore';
 import { useThree } from '@react-three/fiber';
 import ReuseModel from 'Scene/components/ReuseModel';
 import { useLoadAssets } from 'store/LoadAssetsContext';
+import SlotModel from 'Scene/components/SlotModel'
 import { memo } from 'react';
 
 interface Props {
+    slotsPointer: RefObject<{ x: number; y: number; } | null>
     item: { qty: number; itemHash: string; itemAttributes: any; slot: number }
 }
 
-const BackpackItem = memo(function BackpackItem({ item }: Props) {
-
+const BackpackItem = memo(function BackpackItem({ item, slotsPointer }: Props) {
+    console.log('----> Rerender Backpack Item')
     // For test
     const { gltf } = useLoadAssets()
 
@@ -24,8 +26,8 @@ const BackpackItem = memo(function BackpackItem({ item }: Props) {
     const itemRef = useRef<THREE.Mesh | null>(null)
 
 
-    const [ backpackWidth, backpackHeight, cellSize, slotsPlane, planeBoundingBox ] = useBackpackStore(
-        state => [state.width, state.height, state.cellSize, state.slotsPlane, state.planeBoundingBox], 
+    const [ cellSize, slots ] = useBackpackStore(
+        state => [state.cellSize, state.slots], 
         shallow
     )
     const setCursor = useUiStore(state => state.setCursor)
@@ -39,31 +41,26 @@ const BackpackItem = memo(function BackpackItem({ item }: Props) {
     }, [cellSize, item])
 
     const itemPlanePosition = useMemo(() => {
-        if (!slotsPlane) { return }
+        if (!slots.current) { return new THREE.Vector3(0, 0, 0) }
+        const slot = slots.current[item.slot]
+        if (!slot) { return new THREE.Vector3(0, 0, 0) }
+        const slotCell = slot.parent
+        const slotRow = slotCell.parent
+        const slotColumn = slotRow.parent
+        const slotWrapper = slotColumn.parent
 
-        // Calc position to set in (0,0)
-        // const x0 = (slotsPlane.position.x) - (planeBoundingBox.width) - (planeBoundingBox.width * itemWidth / planeBoundingBox.width / size)
-        // const y0 = (slotsPlane.position.y) + (planeBoundingBox.height / 2) + (planeBoundingBox.height * itemHeight / planeBoundingBox.height / size)
-        const x0 = slotsPlane.position.x - backpackWidth/2
-        const y0 = slotsPlane.position.y + backpackHeight/2
-        const z0 = slotsPlane.position.z
+        // Calc position based on all parents
+        let x = slot.position.x + slotCell.position.x + slotRow.position.x + slotColumn.position.x + slotWrapper.position.x
+        let y = slot.position.y + slotCell.position.y + slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
+        let z = slot.position.z + slotCell.position.z + slotRow.position.z + slotColumn.position.z + slotWrapper.position.z
 
-        // Get item location
-        const [posX, posY] = String(item.slot).split(',').map(item => Number(item))
+        // Take into account size of element
+        x += (item.itemAttributes.itemWidth - 1) * uiUnits(cellSize) / 2
+        y -= (item.itemAttributes.itemHeight - 1) * uiUnits(cellSize) / 2
 
-        // Translate position based on provided location data
-        const addX = item.itemAttributes.itemWidth % 2 === 0 ? 1 : .5
-        const addY = item.itemAttributes.itemHeight % 2 === 0 ? 1 : .5
 
-        const offsetX = ( posX + addX ) * cellSize
-        const offsetY = ( posY + addY ) * cellSize
-
-        const x = x0 + offsetX
-        const y = y0 - offsetY
-        const z = z0
-
-        return new THREE.Vector3(uiUnits(x), uiUnits(y), uiUnits(z))
-    }, [slotsPlane, item])
+        return new THREE.Vector3(x, y, z)
+    }, [ item, slots.current ])
 
 
     // Mouse Intercations
@@ -80,14 +77,13 @@ const BackpackItem = memo(function BackpackItem({ item }: Props) {
         isHovered.current = true
         setCursor('pointer')
         // @ts-expect-error
-        itemPlaneRef.current.material.opacity = .3
-        console.log(itemPlaneRef.current.position, {x: uiUnits(pointer.x), y: uiUnits(pointer.y)})
+        itemPlaneRef.current.material.opacity = .2
     }
     const onPointerLeave = () => {
         isHovered.current = false
         setCursor('default')
         // @ts-expect-error
-        itemPlaneRef.current.material.opacity = 0
+        itemPlaneRef.current.material.opacity = .1
         // Reset rotation
         itemRef.current.rotation.y = 0
     }
@@ -96,7 +92,6 @@ const BackpackItem = memo(function BackpackItem({ item }: Props) {
         isDragging.current = true
         setCursor('grabbing')
 
-        pointerDown.current = {x: pointer.x, y: pointer.y}
 
     }
     const onPointerUp = () => {
@@ -107,23 +102,19 @@ const BackpackItem = memo(function BackpackItem({ item }: Props) {
     }
 
     useFrame(({ raycaster }) => {
-
         if (itemRef.current && isHovered.current) {
             itemRef.current.rotation.y += 0.015
         }
         if (itemPlaneRef.current && isDragging.current) {
-            const pointerDeltaX = pointer.x - pointerDown.current.x
-            const pointerDeltaY = pointer.y - pointerDown.current.y
-            console.log(pointerDeltaX, pointerDeltaY)
-            itemPlaneRef.current.position.x = itemPlanePosition.x + pointerDeltaX/10
-            itemPlaneRef.current.position.y = itemPlanePosition.y + pointerDeltaY/10
+            // TODO: Thats works good, but
+            // * 1. Need to subtract current UV
+            // * 2. Add 1 invisible plane for movement, cuz now u cant move object out backpack slots
+            // * 3. Provide calculated coordinates another way, which wont initiate Items rerender
+            itemPlaneRef.current.position.x = slotsPointer.current.x
+            // itemPlaneRef.current.position.y = slotsPointer.current.y
         }
     })
 
-    // Return nothing if no plane ref for placing item
-    if (!slotsPlane) {
-        return <></>
-    }
 
     return (
         <Plane 
@@ -135,11 +126,11 @@ const BackpackItem = memo(function BackpackItem({ item }: Props) {
             position={itemPlanePosition} 
             args={[uiUnits(itemPlaneWidth), uiUnits(itemPlaneHeight)]}
         >
-            <meshBasicMaterial color={'#125408'} transparent={true} opacity={0} />
+            <meshBasicMaterial color={'#FFC700'} transparent={true} opacity={.1} />
             {/* <Box ref={itemRef} position={[0,0,0]} args={[uiUnits(itemScale), uiUnits(itemScale), uiUnits(itemScale)]}>
                 <meshBasicMaterial color={'red'} />
             </Box> */}
-            <ReuseModel /*position={[uiUnits(-.1), 0, uiUnits(.2)]}*/ ref={itemRef} scale={[uiUnits(itemScale), uiUnits(itemScale), uiUnits(itemScale)]} gltf={gltf.current.sword} />
+            <SlotModel position={[0, 0, 0]} ref={itemRef} scale={[uiUnits(itemScale), uiUnits(itemScale), uiUnits(itemScale)]} gltf={gltf.current.sword} />
         </Plane>
 
     )
