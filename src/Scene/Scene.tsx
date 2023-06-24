@@ -29,14 +29,14 @@ const Scene = memo(function Scene() {
     const store = useSceneContext()
     const worldRef = useRef<Object3D | null>(null)
     const eventsNode = useUiStore(state => state.eventsNode)
-    // START: HTML Events Manager
-    const [listen, stopListen, _handlers] = useHTMLEvents(state => [state.listen, state.stopListen, state._handlers], shallow)
-    useEffect(() => {
-        const node = eventsNode.current
-        listen(node)
-        return () => stopListen(node)
-    }, [])
-    // END: HTML Events Manager
+    // // START: HTML Events Manager
+    // const [listen, stopListen, _handlers] = useHTMLEvents(state => [state.listen, state.stopListen, state._handlers], shallow)
+    // useEffect(() => {
+    //     const node = eventsNode.current
+    //     listen(node)
+    //     return () => stopListen(node)
+    // }, [])
+    // // END: HTML Events Manager
     return (
         <div ref={eventsNode} id="scene" className={styles.scene}>
             <Canvas

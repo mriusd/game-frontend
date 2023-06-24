@@ -8,34 +8,39 @@ import BackpackItem from './BackpackItem'
 import { useBackpackStore } from 'store/backpackStore'
 import { shallow } from 'zustand/shallow'
 import { useEventStore } from 'store/EventStore'
-import { useFrame, useThree } from '@react-three/fiber'
+import { ThreeEvent, useFrame, useThree } from '@react-three/fiber'
 import { useUiStore } from 'store/uiStore'
 import { getCoordInUISpace } from 'Scene/utils/getCoordInUiSpace'
 import { useHTMLEvents } from 'store/htmlEvents'
+import { Coordinate } from 'interfaces/coordinate.interface'
 
 const colors = {
     DARK: '#131313',
-    LIGHT: '#202020'
+    LIGHT: '#202020',
+    RED: '#512727'
 }
 
 const Backpack = memo(function Backpack() {
+    console.log('[CPU CHECK]: Rerender <Backpack>')
     const backpack = useEventStore(state => state.backpack)
     const [backpackWidth, backpackHeight, isOpened, slots] = useBackpackStore(state => 
         [state.width, state.height, state.isOpened, state.slots], 
         shallow
-    )
-    
+    )    
     // Transform items to Array for rendering
     const items = useMemo(() => {
         if (!backpack) { return }
         return Object.keys(backpack.items).map(slot => ({ ...backpack.items[slot], slot }))
     }, [backpack])
 
+    const setCursor = useUiStore(state => state.setCursor)
 
-    console.log('----> Rerender Backpack')
-    useEffect(() => {
-        console.log('backpack', backpack)
-    }, [backpack])
+    const isItemPinned = useRef<boolean>(false)
+    const pinnedItemEvent = useRef<ThreeEvent<PointerEvent> | null>(null)
+
+    const isItemHovered = useRef<boolean>(false)
+    const hoveredItemEvent = useRef<ThreeEvent<PointerEvent> | null>(null)
+    const hoveredItemModel = useRef<THREE.Object3D | null>(null)
 
     const setRef = (ref: any, x: number, y: number) => {
         if (!slots.current) {
@@ -45,31 +50,87 @@ const Backpack = memo(function Backpack() {
         return slots.current[x+','+y] = ref
     }
 
-    // const pointer = useThree(state => state.pointer)
-    // const camera = useThree(state => state.camera)
+    // Hover Effects
+    const onPointerEnter = (e: ThreeEvent<PointerEvent>) => {
+        if (isItemPinned.current || pinnedItemEvent.current) { return }
+        isItemHovered.current = true
+        hoveredItemModel.current = getSlotModel(e)
+        setCursor('pointer')
 
-    // TODO: Change Events System
-    // const [add, remove] = useHTMLEvents(state => [state.add, state.remove], shallow)
-    // useEffect(() => {
-    //     const id = 'backpack_test'
-    //     const raycaster = new THREE.Raycaster()
-    //     raycaster.setFromCamera(pointer, camera)
-    //     add(id, 'mousemove', () => {
-    //         if (!test.current) { return }
-    //         console.log(getCoordInUISpace(raycaster))
-    //         // test.current.position.copy(getCoordInUISpace(raycaster))
-    //     })
-    //     return () => remove(id)
-    // }, [])
-    // 
+        hoveredItemEvent.current = e
+        // @ts-expect-error
+        hoveredItemEvent.current.object.parent.material.opacity = .2
+    }
+    function getSlotModel(e: ThreeEvent<PointerEvent>) {
+        const name = 'slot-model'
+        const model = e.object.parent.children.find(object => object.name === name)
+        return model || null
+    }
+    const onPointerLeave = (e: ThreeEvent<PointerEvent>) => {
+        if (isItemPinned.current || pinnedItemEvent.current) { return }
+        isItemHovered.current = false
+        hoveredItemModel.current && (hoveredItemModel.current.rotation.y = 0)
+        hoveredItemModel.current = null
+        setCursor('default')
 
-    const test = useRef<THREE.Mesh | null>(null)
+        if (hoveredItemEvent.current) {
+            // @ts-expect-error
+            hoveredItemEvent.current.object.parent.material.opacity = .1
+            hoveredItemEvent.current = null
+        }
+    }
+    const onClick = (e: ThreeEvent<PointerEvent>) => {
+        // If we Pinning already, we have to prevent click on another Item, otherwise -- error
+        if (isItemPinned.current && e.object !== pinnedItemEvent.current.object) { return }
+        // 
+        isItemPinned.current = !isItemPinned.current
+        if (isItemPinned.current) {
+            pinnedItemEvent.current = e
+            // @ts-expect-error
+            hoveredItemEvent.current.object.parent.material.opacity = 0 // TODO: sometimes get error over here
+            // Display previous cell
+            setPrevCellColor(pinnedItemEvent.current, true)
+        } else {
+            setPrevCellColor(pinnedItemEvent.current, false)
+            // @ts-expect-error
+            hoveredItemEvent.current.object.parent.material.opacity = .2
+            pinnedItemEvent.current = null
+        }
+    }
+    function setPrevCellColor(pinnedItemEvent: ThreeEvent<PointerEvent>, show: boolean) {
+        const cellCoordinate = pinnedItemEvent.object.parent.userData.item.slot.split(',').map((_:string)=>Number(_))
+        const itemWidth = pinnedItemEvent.object.parent.userData.item.itemAttributes.itemWidth
+        const itemHeight = pinnedItemEvent.object.parent.userData.item.itemAttributes.itemHeight
+
+        for (let i = 0; i < itemHeight; i++) {
+            for (let j = 0; j < itemWidth; j++) {
+                const cell = slots.current[`${cellCoordinate[0]+j},${cellCoordinate[1]+i}`]
+                if (!cell) { return console.error('[Backpack]: Cell not found') }
+
+                if (show) {
+                    cell.material.color = new THREE.Color(colors.RED)
+                } else {
+                    cell.material.color = new THREE.Color(cell.userData.color)
+                }
+            }
+        }
+    }
     useFrame(({ raycaster }) => {
-        if (!test.current) { return }
-        const coord = getCoordInUISpace(raycaster)
-        if (!coord) { return }
-        test.current.position.copy(coord)
+        // Pin item
+        if (pinnedItemEvent.current && isItemPinned.current) {
+            const projectedPointer = getCoordInUISpace(raycaster)
+            if (!projectedPointer) { return }
+            pinnedItemEvent.current.object.parent.position.copy(projectedPointer)
+        }
+        // Rotate pinned or hovered item
+        if (hoveredItemModel.current && isItemHovered.current) {
+            hoveredItemModel.current.rotation.y += 0.05
+        }
     })
+
+    if (!items) {
+        return <></>
+    }
 
     return (
         <group visible={isOpened}>
@@ -85,15 +146,11 @@ const Backpack = memo(function Backpack() {
                             <Box name='row' key={'_'+j}>
                                 <Plane 
                                     name='slot-cell' 
+                                    ref={(r) => setRef(r, j, i)} 
                                     args={[uiUnits(1), uiUnits(1), 1]}
+                                    userData={{slot: { x: j, y: i }, color: (i + j) % 2 === 0 ? colors.DARK : colors.LIGHT,  type: 'backpack'}}
                                 >
                                     <meshBasicMaterial color={(i + j) % 2 === 0 ? colors.DARK : colors.LIGHT} />
-                                    <group 
-                                        name='slot'
-                                        ref={(r) => setRef(r, j, i)} 
-                                        position={[0, 0, 0]}
-                                        userData={{slot: { x: j, y: i }, type: 'backpack'}}
-                                    ></group>
                                 </Plane>
                             </Box>
                         ))}
@@ -111,10 +168,15 @@ const Backpack = memo(function Backpack() {
             </Plane>
                 
             <group name='backpack-items'>
-                {items?.length && items.map(item => <BackpackItem key={item.itemHash} item={item} />) }
-                <Plane ref={test} args={[uiUnits(1),uiUnits(1),1]}>
-                    <meshBasicMaterial color={'red'} />
-                </Plane>
+                {items?.length && items.map(item => 
+                    <BackpackItem 
+                        onClick={onClick}
+                        onPointerEnter={onPointerEnter}
+                        onPointerLeave={onPointerLeave}
+                        key={item.itemHash} 
+                        item={item} 
+                    />) 
+                }
             </group>
         </group>
 

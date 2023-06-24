@@ -9,7 +9,7 @@ import { forwardRef } from 'react'
 interface Props { gltf: any, position?: number[], rotation?: number[], scale?: number[], onPointerEnter?: (e?: any) => void, onPointerLeave?: (e?: any) => void }
 const SlotModel = memo(forwardRef(function SlotModel({ gltf, ...props }: Props, ref: any) {
     // const { worldSize, html, setTarget, fighter, setHoveredItems, setSceneObject, getSceneObject } = useSceneContext()
-    const isMounted = useRef<boolean>(false)
+    // const isMounted = useRef<boolean>(false)
     const model = useMemo<THREE.Mesh>(() => SkeletonUtils.clone(gltf.scene), [gltf])
 
     // const animationTarget = useRef()
@@ -45,7 +45,7 @@ const SlotModel = memo(forwardRef(function SlotModel({ gltf, ...props }: Props, 
             onPointerEnter={props.onPointerEnter}
             onPointerLeave={props.onPointerLeave}
             ref={ref}
-            name={model.name}
+            name="slot-model"
             object={model}
             {...props}
         >
