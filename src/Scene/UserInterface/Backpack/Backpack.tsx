@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Flex, Box } from '@react-three/flex'
 import { Plane } from '@react-three/drei'
 import { uiUnits } from 'Scene/utils/uiUnits'
@@ -8,6 +8,10 @@ import BackpackItem from './BackpackItem'
 import { useBackpackStore } from 'store/backpackStore'
 import { shallow } from 'zustand/shallow'
 import { useEventStore } from 'store/EventStore'
+import { useFrame, useThree } from '@react-three/fiber'
+import { useUiStore } from 'store/uiStore'
+import { getCoordInUISpace } from 'Scene/utils/getCoordInUiSpace'
+import { useHTMLEvents } from 'store/htmlEvents'
 
 const colors = {
     DARK: '#131313',
@@ -41,9 +45,35 @@ const Backpack = memo(function Backpack() {
         return slots.current[x+','+y] = ref
     }
 
+    // const pointer = useThree(state => state.pointer)
+    // const camera = useThree(state => state.camera)
+
+    // TODO: Change Events System
+    // const [add, remove] = useHTMLEvents(state => [state.add, state.remove], shallow)
+    // useEffect(() => {
+    //     const id = 'backpack_test'
+    //     const raycaster = new THREE.Raycaster()
+    //     raycaster.setFromCamera(pointer, camera)
+    //     add(id, 'mousemove', () => {
+    //         if (!test.current) { return }
+    //         console.log(getCoordInUISpace(raycaster))
+    //         // test.current.position.copy(getCoordInUISpace(raycaster))
+    //     })
+    //     return () => remove(id)
+    // }, [])
+    // 
+
+    const test = useRef<THREE.Mesh | null>(null)
+    useFrame(({ raycaster }) => {
+        if (!test.current) { return }
+        const coord = getCoordInUISpace(raycaster)
+        if (!coord) { return }
+        test.current.position.copy(coord)
+    })
+
     return (
-        <group position={[0, 0, uiUnits(-10)]} visible={isOpened}>
-            <Plane name='background-plane' args={[uiUnits(40), uiUnits(40), 1]}>
+        <group visible={isOpened}>
+            <Plane name='background-plane' position={[0,0,0]} args={[uiUnits(40), uiUnits(40), 1]}>
                 <meshBasicMaterial color={'black'} transparent={true} opacity={.8} />
             </Plane>
 
@@ -56,7 +86,6 @@ const Backpack = memo(function Backpack() {
                                 <Plane 
                                     name='slot-cell' 
                                     args={[uiUnits(1), uiUnits(1), 1]}
-                                    // layers={raycasterLayer}
                                 >
                                     <meshBasicMaterial color={(i + j) % 2 === 0 ? colors.DARK : colors.LIGHT} />
                                     <group 
@@ -83,6 +112,9 @@ const Backpack = memo(function Backpack() {
                 
             <group name='backpack-items'>
                 {items?.length && items.map(item => <BackpackItem key={item.itemHash} item={item} />) }
+                <Plane ref={test} args={[uiUnits(1),uiUnits(1),1]}>
+                    <meshBasicMaterial color={'red'} />
+                </Plane>
             </group>
         </group>
 

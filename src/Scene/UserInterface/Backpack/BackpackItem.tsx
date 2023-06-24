@@ -98,6 +98,8 @@ const BackpackItem = memo(function BackpackItem({ item }: Props) {
         console.log('pointer.x', pointer.x * 0.1)
         console.log('pointerStart.x', pointerStart.current.x * 0.1)
         console.log('uv.x', positionStart.current.x)
+        console.log('pointer.y', pointer.y * 0.1)
+        console.log(itemPlaneRef.current)
     }
 
     const onPointerUp = () => {
@@ -122,7 +124,6 @@ const BackpackItem = memo(function BackpackItem({ item }: Props) {
             // * Then i wouldnt need to calc edge (pointerStart - positionStart) and just use intersected directly
             itemPlaneRef.current.position.x = (pointer.x * 0.1) - (pointerStart.current.x * 0.1 - positionStart.current.x)
             itemPlaneRef.current.position.y = (pointer.y * 0.1) - (pointerStart.current.y * 0.1 - positionStart.current.y)
-        
             getCellsCollision()
         }
     })

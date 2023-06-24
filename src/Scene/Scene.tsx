@@ -4,7 +4,7 @@ import * as THREE from "three"
 import { Object3D } from "three"
 
 import { Canvas } from "@react-three/fiber"
-import { useRef, memo } from "react"
+import { useRef, memo, useEffect } from "react"
 import { useSceneContext } from "store/SceneContext"
 import LoadAssetsContextProvider from "store/LoadAssetsContext"
 import { OrbitControls, Stats } from "@react-three/drei"
@@ -22,11 +22,21 @@ import Decor from "./Decor"
 import UserInterface from './UserInterface/UserInterface'
 
 import { useUiStore } from 'store/uiStore'
+import { useHTMLEvents } from "store/htmlEvents"
+import { shallow } from 'zustand/shallow'
 
 const Scene = memo(function Scene() {
     const store = useSceneContext()
     const worldRef = useRef<Object3D | null>(null)
     const eventsNode = useUiStore(state => state.eventsNode)
+    // START: HTML Events Manager
+    const [listen, stopListen, _handlers] = useHTMLEvents(state => [state.listen, state.stopListen, state._handlers], shallow)
+    useEffect(() => {
+        const node = eventsNode.current
+        listen(node)
+        return () => stopListen(node)
+    }, [])
+    // END: HTML Events Manager
     return (
         <div ref={eventsNode} id="scene" className={styles.scene}>
             <Canvas

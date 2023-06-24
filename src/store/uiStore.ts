@@ -1,3 +1,4 @@
+import * as THREE from 'three'
 import { RefObject, createRef } from "react";
 import { create } from "zustand";
 
@@ -7,6 +8,11 @@ export interface UiStoreInterface {
 
     // Set cursor state
     setCursor: (property: 'pointer' | 'grabbing' | 'default') => void
+
+    // User Interface 3d Object
+    userInterface: RefObject<THREE.Group | null>
+    // Plane which we raycasts, based on which all mouse events in ui
+    intersectionPlane: RefObject<THREE.Mesh | null>
 }
 
 export const useUiStore = create<UiStoreInterface>((set, get) => ({
@@ -19,5 +25,7 @@ export const useUiStore = create<UiStoreInterface>((set, get) => ({
             return
         }
         eventsNode.style.cursor = property
-    }
+    },
+    userInterface: createRef(),
+    intersectionPlane: createRef()
 }))
