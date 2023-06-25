@@ -13,10 +13,11 @@ interface Props {
     item: { qty: number; itemHash: string; itemAttributes: any; slot: number }
     onClick?: (e: ThreeEvent<PointerEvent>) => void
     onPointerEnter?: (e: ThreeEvent<PointerEvent>) => void
+    onPointerMove?: (e: ThreeEvent<PointerEvent>) => void
     onPointerLeave?: (e: ThreeEvent<PointerEvent>) => void
 }
 
-const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter, onPointerLeave }: Props) {
+const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter, onPointerMove, onPointerLeave }: Props) {
     console.log('[CPU CHECK]: Rerender <Backpack Item>')
     // For test
     // FIXME: Rerenders lots of time, cuz app.tsx (eventCloud) has rerendering hole
@@ -35,22 +36,21 @@ const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter,
     const itemPlaneHeight = useMemo(() => cellSize * item.itemAttributes.itemHeight, [item])
 
     const itemScale = useMemo(() => {
-        return cellSize * .4  * item.itemAttributes.itemWidth
+        return cellSize * .4  * Math.max(item.itemAttributes.itemWidth, item.itemAttributes.itemHeight)
     }, [cellSize, item])
 
     const itemPlanePosition = useMemo(() => {
         if (!slots.current) { return new THREE.Vector3(0, 0, 0) }
-        const slot = slots.current[item.slot]
-        if (!slot) { return new THREE.Vector3(0, 0, 0) }
-        const slotCell = slot.parent
+        const slotCell = slots.current[item.slot]
+        if (!slotCell) { return new THREE.Vector3(0, 0, 0) }
         const slotRow = slotCell.parent
         const slotColumn = slotRow.parent
         const slotWrapper = slotColumn.parent
 
         // Calc position based on all parents
-        let x = slot.position.x + slotCell.position.x + slotRow.position.x + slotColumn.position.x + slotWrapper.position.x
-        let y = slot.position.y + slotCell.position.y + slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
-        let z = slot.position.z + slotCell.position.z + slotRow.position.z + slotColumn.position.z + slotWrapper.position.z
+        let x = slotCell.position.x + slotRow.position.x + slotColumn.position.x + slotWrapper.position.x
+        let y = slotCell.position.y + slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
+        let z = slotCell.position.z + slotRow.position.z + slotColumn.position.z + slotWrapper.position.z
 
         // Take into the account size of the element
         x += (item.itemAttributes.itemWidth - 1) * uiUnits(cellSize) / 2
@@ -76,6 +76,7 @@ const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter,
                 args={[uiUnits(itemPlaneWidth), uiUnits(itemPlaneHeight)]} 
                 visible={false} 
                 onClick={onClick}
+                onPointerMove={onPointerMove}
                 onPointerEnter={onPointerEnter}
                 onPointerLeave={onPointerLeave}
             />

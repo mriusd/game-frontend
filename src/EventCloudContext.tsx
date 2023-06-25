@@ -43,6 +43,14 @@ export const EventCloudProvider = ({ children }) => {
 
   const [town, setTown] = useState("lorencia")
 
+  // Just for test
+  const init = useEventStore(state => state.init);
+  useEffect(() => {
+    init(sendJsonMessage)
+  }, [])
+  // 
+
+
   // WebSocket
   const socketUrl = process.env.REACT_APP_WS_URL; // ws://149.100.159.50:8080/ws
   const socketOptions = {
@@ -136,14 +144,13 @@ export const EventCloudProvider = ({ children }) => {
       });
   }
 
-  function updateItemBackpackPosition(itemHash, coords) {
+  function updateItemBackpackPosition(itemHash: string, coords: any) {
     var response = sendJsonMessage({
         type: "update_backpack_item_position",
         data: {
             itemHash: itemHash,
             position: coords
         }
-
       });
   }
 
@@ -154,7 +161,6 @@ export const EventCloudProvider = ({ children }) => {
           itemHash: itemHash,
           position: coords
       }
-
     });
   }
 

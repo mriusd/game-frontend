@@ -11,6 +11,7 @@ import { useEventStore } from 'store/EventStore'
 import { ThreeEvent, useFrame } from '@react-three/fiber'
 import { useUiStore } from 'store/uiStore'
 import { getCoordInUISpace } from 'Scene/utils/getCoordInUiSpace'
+import { useFighterStore } from 'store/fighterStore'
 
 const colors = {
     COMMON_DARK: '#131313',
@@ -29,10 +30,18 @@ const colors = {
 const Backpack = memo(function Backpack() {
     console.log('[CPU CHECK]: Rerender <Backpack>')
     const backpack = useEventStore(state => state.backpack)
-    const [backpackWidth, backpackHeight, isOpened, slots] = useBackpackStore(state => 
-        [state.width, state.height, state.isOpened, state.slots], 
+    const [backpackWidth, backpackHeight, isOpened, slots, cellSize] = useBackpackStore(state => 
+        [state.width, state.height, state.isOpened, state.slots, state.cellSize], 
         shallow
-    )    
+    )
+    // TODO: change location for handler
+    const [updateBackpackItemPosition, dropBackpackItem] = useEventStore(state => 
+        [state.updateItemBackpackPosition, state.dropBackpackItem], 
+        shallow
+    )
+
+    const fighterCurrentMatrixCoordinate = useFighterStore(state => state.currentMatrixCoordinate)
+    
     // Transform items to Array for rendering
     const items = useMemo(() => {
         if (!backpack) { return }
@@ -64,7 +73,12 @@ const Backpack = memo(function Backpack() {
     }
 
     // Hover Effects
-    const onPointerEnter = (e: ThreeEvent<PointerEvent>) => {
+
+    // Events
+    const onPointerMove = (e: ThreeEvent<PointerEvent>) => {
+        if (!isOpened) { return }
+        if (!e.object) { return } // in case if removed
+        if (isItemHovered.current) { return }
         if (isItemPinned.current || pinnedItemEvent.current) { return }
         isItemHovered.current = true
         hoveredItemModel.current = getSlotModel(e)
@@ -74,12 +88,9 @@ const Backpack = memo(function Backpack() {
         // @ts-expect-error
         hoveredItemEvent.current.object.parent.material.opacity = .2
     }
-    function getSlotModel(e: ThreeEvent<PointerEvent>) {
-        const name = 'slot-model'
-        const model = e.object.parent.children.find(object => object.name === name)
-        return model || null
-    }
     const onPointerLeave = (e: ThreeEvent<PointerEvent>) => {
+        if (!isOpened) { return }
+        if (!e.object) { return } // in case if removed
         if (isItemPinned.current || pinnedItemEvent.current) { return }
         isItemHovered.current = false
         hoveredItemModel.current && (hoveredItemModel.current.rotation.y = 0)
@@ -93,22 +104,75 @@ const Backpack = memo(function Backpack() {
         }
     }
     const onClick = (e: ThreeEvent<PointerEvent>) => {
+        if (!isOpened) { return }
+        if (!e.object) { return } // in case if removed
         // If we Pinning already, we have to prevent click on another Item, otherwise -- error
         if (isItemPinned.current && e.object !== pinnedItemEvent.current.object) { return }
         // 
-        isItemPinned.current = !isItemPinned.current
-        if (isItemPinned.current) {
-            pinnedItemEvent.current = e
-            // @ts-expect-error
-            hoveredItemEvent.current.object.parent.material.opacity = 0 // TODO: sometimes get error over here
-            // Display previous cell
-            setPlaceholderCells(pinnedItemEvent.current, true)
-        } else {
-            setPlaceholderCells(pinnedItemEvent.current, false)
-            // @ts-expect-error
-            hoveredItemEvent.current.object.parent.material.opacity = .2
-            pinnedItemEvent.current = null
-            clearPointerCells()
+        
+        onPointerMove(e)
+        setTimeout(() => {
+            isItemPinned.current = !isItemPinned.current
+            if (isItemPinned.current) {
+                pinnedItemEvent.current = e
+                // @ts-expect-error
+                hoveredItemEvent.current.object.parent.material.opacity = 0 // TODO: sometimes get error over here
+                // Display previous cell
+                setPlaceholderCells(pinnedItemEvent.current, true)
+            } else {
+                setPlaceholderCells(pinnedItemEvent.current, false)
+                // @ts-expect-error
+                hoveredItemEvent.current.object.parent.material.opacity = .2
+                placeItemToCell(pinnedItemEvent.current)
+                pinnedItemEvent.current = null
+                clearPointerCells()
+                onPointerLeave(e)
+            }
+        }, 0)
+    }
+    // 
+
+    function getSlotModel(e: ThreeEvent<PointerEvent>) {
+        const name = 'slot-model'
+        const model = e.object.parent.children.find(object => object.name === name)
+        return model || null
+    }
+    function placeItemToCell(pinnedItemEvent: ThreeEvent<PointerEvent>) {
+        const itemHash = pinnedItemEvent.object.parent.userData.item.itemHash
+        const item = pinnedItemEvent.object.parent
+
+        if (!cellToInsert.current) {
+            console.log(pointerCell.current)
+            // Drop if nothing hovered
+            if (!pointerCell.current) {
+                item.visible = false
+                dropBackpackItem(itemHash, fighterCurrentMatrixCoordinate)
+                return
+            }
+
+            // Move to last position
+            item.position.copy(item.userData.currentPosition)
+        }
+        if (cellToInsert.current) {
+            const slot = cellToInsert.current.userData.slot
+
+            // TODO: Twice the same code, the same thing did in BackpackItem
+            // TODO: Put to utils?
+            const slotCell = cellToInsert.current
+            const slotRow = slotCell.parent
+            const slotColumn = slotRow.parent
+            const slotWrapper = slotColumn.parent
+            // Calc position based on all parents
+            let x = slotCell.position.x + slotRow.position.x + slotColumn.position.x + slotWrapper.position.x
+            let y = slotCell.position.y + slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
+            let z = slotCell.position.z + slotRow.position.z + slotColumn.position.z + slotWrapper.position.z
+            // Take into the account size of the element
+            x += (item.userData.item.itemAttributes.itemWidth - 1) * uiUnits(cellSize) / 2
+            y -= (item.userData.item.itemAttributes.itemHeight - 1) * uiUnits(cellSize) / 2
+            item.position.set(x, y, z)
+
+            // TODO: Change <z> to <y> coordinate
+            updateBackpackItemPosition(itemHash, { x: slot.x, z: slot.y })
         }
     }
     function setPlaceholderCells(pinnedItemEvent: ThreeEvent<PointerEvent>, show: boolean) {
@@ -189,41 +253,48 @@ const Backpack = memo(function Backpack() {
                 cell.material.color = new THREE.Color(cell.userData.colors.insert_disallowed)
             })
         }
+    }
 
-        function getPointerCells(projectedPointer: {x:number;y:number}) {
-            const _pointerCell = Object.values(slots.current).find(slotCell => {
-                const slotRow = slotCell.parent
-                const slotColumn = slotRow.parent
-                const slotWrapper = slotColumn.parent
-                const x = slotRow.position.x + slotColumn.position.x + slotWrapper.position.x
-                const y = slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
-                return Math.abs(x - projectedPointer.x) < uiUnits(0.5) && Math.abs(y - projectedPointer.y) < uiUnits(0.5)
-            })
+    function getPointerCells(projectedPointer: {x:number;y:number}) {
+        const itemWidth = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemWidth
+        const itemHeight = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemHeight
+
+        // Find Cell under Pointer
+        const _pointerCell = Object.values(slots.current).find(slotCell => {
+            const slotRow = slotCell.parent
+            const slotColumn = slotRow.parent
+            const slotWrapper = slotColumn.parent
+            const x = slotRow.position.x + slotColumn.position.x + slotWrapper.position.x
+            const y = slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
+
+            // Multiply by itemWidth & itemHeight to always position model in the center of highligh square, no matter 1x1 or 2x2 or event 1x3
+            return Math.abs(x - projectedPointer.x) < uiUnits(.5 * itemWidth) && Math.abs(y - projectedPointer.y) < uiUnits(.5 * itemHeight)
+        })
+
+        pointerCell.current = _pointerCell || null
+        if (!_pointerCell) return []
     
-            if (!_pointerCell) return []
-            pointerCell.current = _pointerCell
-        
-    
-            const cells = []
-            const { x, y } = _pointerCell.userData.slot
-            const itemWidth = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemWidth
-            const itemHeight = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemHeight
-            for (let i = 0; i < itemHeight; i++) {
-                for (let j = 0; j < itemWidth; j++) {
-                    const cell = slots.current[`${x+i},${y+j}`]
-                    if (cell) {
-                        cells.push(cell)
-                    }
+
+        // Calc all cells belongs to the Pointer, depending on Item size (like 1x1, 2x2)
+        const cells = []
+        const { x, y } = _pointerCell.userData.slot
+        for (let i = 0; i < itemWidth; i++) {
+            for (let j = 0; j < itemHeight; j++) {
+                const cell = slots.current[`${x+i},${y+j}`]
+                if (cell) {
+                    cells.push(cell)
                 }
             }
-    
-            return cells
         }
 
-        function isOccupied(cell: THREE.Mesh) {
-            const { x, y } = cell.userData.slot
-            return backpack.grid[y][x]
-        }
+        return cells
+    }
+
+    function isOccupied(cell: THREE.Mesh) {
+        const { x, y } = cell.userData.slot
+        // Allow paste to the same cell, or a little touching the same cell 
+        if (placeholderCells.current.find(_ => _.userData.slot.x === x && _.userData.slot.y === y)) return false
+        return backpack.grid[y][x]
     }
 
     function clearPointerCells() {
@@ -252,7 +323,7 @@ const Backpack = memo(function Backpack() {
                                 <Plane 
                                     name='slot-cell' 
                                     ref={(r) => setRef(r, j, i)} 
-                                    args={[uiUnits(1), uiUnits(1), 1]}
+                                    args={[uiUnits(cellSize), uiUnits(cellSize), 1]}
                                     userData={{
                                         slot: { x: j, y: i }, 
                                         colors: {
@@ -286,7 +357,7 @@ const Backpack = memo(function Backpack() {
                 {items?.length && items.map(item => 
                     <BackpackItem 
                         onClick={onClick}
-                        onPointerEnter={onPointerEnter}
+                        onPointerMove={onPointerMove}
                         onPointerLeave={onPointerLeave}
                         key={item.itemHash} 
                         item={item} 

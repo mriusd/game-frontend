@@ -15,13 +15,13 @@ export interface BackpackStoreInterface {
     close: () => void
     toggle: () => void
 
-    // Slots plane, used for coordinates as a placeholder; hover/focus events...
+    // Slots plane, stores Backpack data in <userData>, used by backpack drag system
     slots: RefObject<{[key: number]: THREE.Mesh}>
 }
 
 export const useBackpackStore = create<BackpackStoreInterface>((set, get) => ({
-    width: 8,
-    height: 8,
+    width: 0,
+    height: 0,
     cellSize: 1,
     isOpened: false,
     open: () => set({ isOpened: true }),
