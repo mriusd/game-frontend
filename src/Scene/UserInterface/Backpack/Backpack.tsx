@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Flex, Box } from '@react-three/flex'
 import { Plane } from '@react-three/drei'
 import { uiUnits } from 'Scene/utils/uiUnits'
@@ -12,6 +12,8 @@ import { ThreeEvent, useFrame } from '@react-three/fiber'
 import { useUiStore } from 'store/uiStore'
 import { getCoordInUISpace } from 'Scene/utils/getCoordInUiSpace'
 import { useFighterStore } from 'store/fighterStore'
+import { Text } from '@react-three/drei'
+import EquipmentItem from './EquipmentItem'
 
 const colors = {
     COMMON_DARK: '#131313',
@@ -28,10 +30,10 @@ const colors = {
 }
 
 const Backpack = memo(function Backpack() {
-    console.log('[CPU CHECK]: Rerender <Backpack>')
-    const backpack = useEventStore(state => state.backpack)
-    const [backpackWidth, backpackHeight, isOpened, slots, cellSize] = useBackpackStore(state => 
-        [state.width, state.height, state.isOpened, state.slots, state.cellSize], 
+    // console.log('[CPU CHECK]: Rerender <Backpack>')
+    const [backpack, equipmentSlots, equipment] = useEventStore(state => [state.backpack, state.equipmentSlots, state.equipment], shallow)
+    const [backpackWidth, backpackHeight, isOpened, slotsRef, equipmentSlotsRef, cellSize] = useBackpackStore(state => 
+        [state.width, state.height, state.isOpened, state.slots, state.equipmentSlots, state.cellSize], 
         shallow
     )
     // TODO: change location for handler
@@ -40,12 +42,17 @@ const Backpack = memo(function Backpack() {
         shallow
     )
 
+    // TODO: Causes lots of backpack rerenders
     const fighterCurrentMatrixCoordinate = useFighterStore(state => state.currentMatrixCoordinate)
     
     // Transform items to Array for rendering
     const items = useMemo(() => {
         if (!backpack) { return }
         return Object.keys(backpack.items).map(slot => ({ ...backpack.items[slot], slot }))
+    }, [backpack])
+    const equipmentItems = useMemo(() => {
+        if (!backpack) { return }
+        return Object.keys(equipment).map(slot => ({ ...equipment[slot], slot }))
     }, [backpack])
 
     const setCursor = useUiStore(state => state.setCursor)
@@ -65,11 +72,18 @@ const Backpack = memo(function Backpack() {
     const cellToInsert = useRef<THREE.Mesh | null>(null)
 
     const setRef = (ref: any, x: number, y: number) => {
-        if (!slots.current) {
+        if (!slotsRef.current) {
             // @ts-expect-error
-            slots.current = {}
+            slotsRef.current = {}
         }
-        return slots.current[x+','+y] = ref
+        return slotsRef.current[x+','+y] = ref
+    }
+    const setEquipmentRef = (ref: any, xy: number) => {
+        if (!equipmentSlotsRef.current) {
+            // @ts-expect-error
+            equipmentSlotsRef.current = {}
+        }
+        return equipmentSlotsRef.current[xy] = ref
     }
 
     // Hover Effects
@@ -183,7 +197,7 @@ const Backpack = memo(function Backpack() {
         const cells = []
         for (let i = 0; i < itemHeight; i++) {
             for (let j = 0; j < itemWidth; j++) {
-                const cell = slots.current[`${cellCoordinate[0]+j},${cellCoordinate[1]+i}`]
+                const cell = slotsRef.current[`${cellCoordinate[0]+j},${cellCoordinate[1]+i}`]
                 if (!cell) { return console.error('[Backpack]: Cell not found') }
 
                 if (show) {
@@ -260,7 +274,7 @@ const Backpack = memo(function Backpack() {
         const itemHeight = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemHeight
 
         // Find Cell under Pointer
-        const _pointerCell = Object.values(slots.current).find(slotCell => {
+        const _pointerCell = Object.values(slotsRef.current).find(slotCell => {
             const slotRow = slotCell.parent
             const slotColumn = slotRow.parent
             const slotWrapper = slotColumn.parent
@@ -280,7 +294,7 @@ const Backpack = memo(function Backpack() {
         const { x, y } = _pointerCell.userData.slot
         for (let i = 0; i < itemWidth; i++) {
             for (let j = 0; j < itemHeight; j++) {
-                const cell = slots.current[`${x+i},${y+j}`]
+                const cell = slotsRef.current[`${x+i},${y+j}`]
                 if (cell) {
                     cells.push(cell)
                 }
@@ -315,12 +329,13 @@ const Backpack = memo(function Backpack() {
             </Plane>
 
             {/* Backpack Slots */}
-            <Flex name='backpack' position={[uiUnits(1), uiUnits(4), uiUnits(1)]} flexDir="column" >
+            {/* Layer (9), layer of intersaction (z = 1) */}
+            <Flex name='backpack' position={[uiUnits(3), uiUnits(4), uiUnits(1)]} flexDir="column" >
                 { [...new Array(backpackWidth)].map((_, i) => (
                     <Box name='column' key={i} flexDir="row">
                         { [...new Array(backpackHeight)].map((_, j) => (
                             <Box name='row' key={'_'+j}>
-                                <Plane 
+                                <Plane
                                     name='slot-cell' 
                                     ref={(r) => setRef(r, j, i)} 
                                     args={[uiUnits(cellSize), uiUnits(cellSize), 1]}
@@ -343,20 +358,50 @@ const Backpack = memo(function Backpack() {
                 )) }
             </Flex>
 
-            {/* Fighter Slots */}
-            <Plane
-                name='backpack-equiped-items'
-                position={[uiUnits(-5), uiUnits(0), uiUnits(1)]} 
-                args={[uiUnits(4), uiUnits(8)]} 
-            >
-                <meshBasicMaterial color={'black'}/>
-            </Plane>
+            {/* Equipment Slots */}
+            <Flex name='equipment' scaleFactor={1000} flexDir="row" flexWrap="wrap" maxWidth={uiUnits(9.5)} position={[uiUnits(-10.75), uiUnits(4.7), uiUnits(1)]}>
+                { equipmentSlots && [...Object.values(equipmentSlots)].sort((a,b) => b.height - a.height).map((_, i) => (
+                    <Box name='row' key={i} margin={uiUnits(.25)} centerAnchor>
+                        <Plane
+                            name='slot-equipment'
+                            ref={(r) => setEquipmentRef(r, _.slot)}
+                            userData={{
+                                slot: _.slot,
+                                colors: {
+                                    common: i % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT
+                                },
+                                type: _.type,
+                                itemWidth: _.width,
+                                itemHeight: _.height
+                            }}
+                            args={[uiUnits(cellSize * _.width), uiUnits(cellSize * _.height), 1]}
+                        >
+                            <meshBasicMaterial color={i % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT} />
+                            <Text fontSize={uiUnits(.1 * _.height)}>{ _.type.toUpperCase() }</Text>
+                        </Plane>
+                    </Box>
+                )) }
+            </Flex>
+
                 
             {/* Backpack Items */}
             <group name='backpack-items'>
                 {items?.length && items.map(item => 
                     <BackpackItem 
                         onClick={onClick}
+                        onPointerMove={onPointerMove}
+                        onPointerLeave={onPointerLeave}
+                        key={item.itemHash} 
+                        item={item} 
+                    />) 
+                }
+            </group>
+
+            {/* Equipment Items */}
+            <group name='equipment-items'>
+                {equipmentItems?.length && equipmentItems.map(item => 
+                    <EquipmentItem
+                        // onClick={onClick}
                         onPointerMove={onPointerMove}
                         onPointerLeave={onPointerLeave}
                         key={item.itemHash} 

@@ -4,7 +4,7 @@ import { getMeshDimensions } from 'Scene/utils/getMeshDimensions';
 import { RefObject, createRef } from 'react';
 
 export interface BackpackStoreInterface {
-    // Backpack settings
+    // Backpack slots
     width: number
     height: number
     cellSize: number
@@ -17,6 +17,7 @@ export interface BackpackStoreInterface {
 
     // Slots plane, stores Backpack data in <userData>, used by backpack drag system
     slots: RefObject<{[key: number]: THREE.Mesh}>
+    equipmentSlots: RefObject<{[key: number]: THREE.Mesh}>
 }
 
 export const useBackpackStore = create<BackpackStoreInterface>((set, get) => ({
@@ -27,5 +28,6 @@ export const useBackpackStore = create<BackpackStoreInterface>((set, get) => ({
     open: () => set({ isOpened: true }),
     close: () => set({ isOpened: false }),
     toggle: () => set(state => ({ isOpened: !state.isOpened })),
-    slots: createRef()
+    slots: createRef(),
+    equipmentSlots: createRef()
 }))

@@ -239,11 +239,13 @@ export const EventCloudProvider = ({ children }) => {
 
 
   const updateBackpack = useEventStore(state => state.updateBackpack);
+  const updateEquipment = useEventStore(state => state.updateEquipment);
 
   function handleUpdateBackpack (newBackpack, newEquipment) {
     console.log("[handleUpdateBackpack] ", newBackpack, newEquipment)
     setBackpack(newBackpack);
     updateBackpack(newBackpack);
+    updateEquipment(newEquipment)
     setEquipment(newEquipment);
   }
 
@@ -285,6 +287,7 @@ export const EventCloudProvider = ({ children }) => {
     setDroppedItems(droppedItems);
     setBackpack(backpack);
     updateBackpack(backpack);
+    updateEquipment(equipment)
 
 
 
