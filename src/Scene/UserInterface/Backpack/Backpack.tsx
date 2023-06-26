@@ -51,9 +51,10 @@ const Backpack = memo(function Backpack() {
         return Object.keys(backpack.items).map(slot => ({ ...backpack.items[slot], slot }))
     }, [backpack])
     const equipmentItems = useMemo(() => {
-        if (!backpack) { return }
+        if (!equipment) { return }
+        console.log('Equipment Items: ', equipment)
         return Object.keys(equipment).map(slot => ({ ...equipment[slot], slot }))
-    }, [backpack])
+    }, [equipment])
 
     const setCursor = useUiStore(state => state.setCursor)
 

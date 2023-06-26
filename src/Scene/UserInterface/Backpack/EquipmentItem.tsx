@@ -35,15 +35,15 @@ const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter
         if (!slots.current) { return }
         if (!slots.current[item.slot]) { return null }
         return slots.current[item.slot].userData
-    }, [item])
+    }, [item, slots.current])
 
     // Positioning
-    const itemPlaneWidth = useMemo(() => cellSize * (slotUserData?.itemWidth || 0), [item])
-    const itemPlaneHeight = useMemo(() => cellSize * (slotUserData?.itemHeight || 0), [item])
+    const itemPlaneWidth = useMemo(() => cellSize * (slotUserData?.itemWidth || 0), [slotUserData])
+    const itemPlaneHeight = useMemo(() => cellSize * (slotUserData?.itemHeight || 0), [slotUserData])
 
     const itemScale = useMemo(() => {
         return cellSize * .4 * (slotUserData?.itemHeight || 0)
-    }, [cellSize, item])
+    }, [cellSize, slotUserData])
 
     const itemPlanePosition = useMemo(() => {
         if (!slots.current) { return new THREE.Vector3(0, 0, 0) }
