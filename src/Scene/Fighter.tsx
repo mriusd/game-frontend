@@ -129,6 +129,9 @@ const Fighter = memo(function Fighter() {
         setTargetMatrixCoordinate(saveFocusedMatrixCoordinate)
     }, [saveFocusedMatrixCoordinate, isMoving])
         // Set target position to move on Object click
+
+    const attackTimeout = useRef<NodeJS.Timeout | null>(null)
+    const speed = 500 //ms
     useEffect(() => {
         console.log(target, itemTarget)
         // For attack target
@@ -137,6 +140,13 @@ const Fighter = memo(function Fighter() {
             const objectCoordinate = target.target.coordinates
             const targetCoordinate = getTargetSquareWithAttackDistance(occupiedCoords, currentMatrixCoordinate, objectCoordinate, attackDistance)
             setSaveFocusedMatrixCoordinate(targetCoordinate)
+            if (actions) {
+                actions['atack']?.setDuration(speed / 1000).play()
+                clearTimeout(attackTimeout.current)
+                attackTimeout.current = setTimeout(() => {
+                    actions['atack']?.stop()
+                }, speed)
+            }
             submitMalee(calcDirection(currentMatrixCoordinate, objectCoordinate))
             setTarget(null, null)
             return
@@ -210,12 +220,12 @@ const Fighter = memo(function Fighter() {
         // console.log('[Fighter]: Toggle isMoving animation', mixer, actions)
         console.log(actions)
         if (isStaying) {
-            actions['run-loop']?.fadeOut(.1).stop()
-            actions['standing-loop']?.play()
+            actions['run']?.fadeOut(.1).stop()
+            // actions['t-pose']?.play()
 
         } else {
-            actions['standing-loop']?.fadeOut(.1).stop()
-            actions['run-loop']?.setDuration(60 / fighter.movementSpeed * 4).play()
+            // actions['t-pose']?.fadeOut(.1).stop()
+            actions['run']?.setDuration(60 / fighter.movementSpeed * 4).play()
         }
     }, [ isStaying ])
 
@@ -231,7 +241,7 @@ const Fighter = memo(function Fighter() {
                 ref={animationTarget}
                 object={gltf.current.fighter.scene}
                 position={[currentWorldCoordinate.x, 0, currentWorldCoordinate.z]}
-                scale={1}
+                scale={.3}
                 rotation={[0, direction, 0]}
                 castShadow 
             />

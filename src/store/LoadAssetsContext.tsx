@@ -17,7 +17,7 @@ const LoadAssetsContextProvider = ({ children }) => {
     const gltf = useRef<{[key: string]: GLTF}>({})
 
     // @ts-expect-error
-    gltf.current.fighter = useGLTF('models/character/character.gltf')
+    gltf.current.fighter = useGLTF('models/pixel_character/character.gltf')
     // @ts-expect-error
     gltf.current.npc = useGLTF('models/npc_test/scene.gltf')
     // @ts-expect-error
