@@ -24,6 +24,8 @@ const LoadAssetsContextProvider = ({ children }) => {
     gltf.current.tree = useGLTF('models/decor/tree/scene.gltf')
     // @ts-expect-error
     gltf.current.sword = useGLTF('models/max_sword/file.gltf')
+    // @ts-expect-error
+    gltf.current.head = useGLTF('models/head/head.gltf')
 
     const value: ILoadAssetsContext = {
         gltf
@@ -42,4 +44,5 @@ useGLTF.preload('models/character/character.gltf')
 useGLTF.preload('models/npc_test/scene.gltf')
 useGLTF.preload('models/decor/tree/tree.gltf')
 useGLTF.preload('models/max_sword/file.gltf')
+useGLTF.preload('models/head/head.gltf')
 

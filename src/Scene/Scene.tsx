@@ -1,4 +1,4 @@
-// import styles from './Scene.module.scss'
+import styles from './Scene.module.scss'
 
 import * as THREE from "three"
 import { Object3D } from "three"
@@ -38,13 +38,7 @@ const Scene = memo(function Scene() {
     // }, [])
     // // END: HTML Events Manager
     return (
-        <div ref={eventsNode} id="scene" style={{
-            position: 'absolute',
-            top: 0, left: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: 0
-        }}>
+        <div ref={eventsNode} id="scene" className={styles.scene}>
             <Canvas
                 shadows
                 camera={{
@@ -70,16 +64,7 @@ const Scene = memo(function Scene() {
                 </LoadAssetsContextProvider>
                 <Stats/>
             </Canvas>
-            <div style={{
-                    position: 'absolute',
-                    top: '30px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    fontSize: '20px',
-                    color: 'white',
-                    userSelect: 'none',
-                    pointerEvents: 'none',
-            }}>
+            <div className={styles.coordinates}>
                 <div>World size [{store.worldSize.current}x{store.worldSize.current}]</div>
                 <div>Server coordinate [ X: {store.currentMatrixCoordinate?.x} Z: {store.currentMatrixCoordinate?.z} ]</div>
                 <div>World coordinate [ X: {store.currentWorldCoordinate?.x.toFixed(0)} Z: {store.currentWorldCoordinate?.z.toFixed(0)} ]</div>

@@ -27,7 +27,7 @@ const SlotModel = memo(forwardRef(function SlotModel({ gltf, ...props }: Props, 
         if (isMounted.current) { return }
         isMounted.current = true
         model.traverse((object) => {
-            object.renderOrder = 999
+            // object.renderOrder = 999
             if (object.isObject3D) {
                 // @ts-expect-error
                 if (object.material) {

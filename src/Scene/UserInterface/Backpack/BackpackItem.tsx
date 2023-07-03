@@ -8,6 +8,7 @@ import { ThreeEvent } from '@react-three/fiber';
 import SlotModel from 'Scene/components/SlotModel'
 import { memo } from 'react';
 import { useLoadAssets } from 'store/LoadAssetsContext';
+import ItemDescription from './ItemDescription';
 
 interface Props {
     item: { qty: number; itemHash: string; itemAttributes: any; slot: number }
@@ -67,6 +68,7 @@ const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter,
             userData={{ 
                 currentPosition: itemPlanePosition, 
                 item: item,
+                type: 'backpack'
             }}
             args={[uiUnits(itemPlaneWidth), uiUnits(itemPlaneHeight)]}
         >
@@ -79,7 +81,9 @@ const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter,
                 onPointerMove={onPointerMove}
                 onPointerEnter={onPointerEnter}
                 onPointerLeave={onPointerLeave}
-            />
+            >
+            </Plane>
+            <ItemDescription item={item} type="backpack" />
             <SlotModel position={[0, 0, 0]} ref={itemRef} scale={[uiUnits(itemScale), uiUnits(itemScale), uiUnits(itemScale)]} gltf={gltf.current.sword} />
         </Plane>
 

@@ -15,6 +15,8 @@ import { useFighterStore } from 'store/fighterStore'
 import { Text } from '@react-three/drei'
 import EquipmentItem from './EquipmentItem'
 
+type CellType = 'equipment' | 'backpack'
+
 const colors = {
     COMMON_DARK: '#131313',
     COMMON_LIGHT: '#202020',
@@ -52,7 +54,7 @@ const Backpack = memo(function Backpack() {
     }, [backpack])
     const equipmentItems = useMemo(() => {
         if (!equipment) { return }
-        console.log('Equipment Items: ', equipment)
+        // console.log('Equipment Items: ', equipment)
         return Object.keys(equipment).map(slot => ({ ...equipment[slot], slot }))
     }, [equipment])
 
@@ -102,6 +104,9 @@ const Backpack = memo(function Backpack() {
         hoveredItemEvent.current = e
         // @ts-expect-error
         hoveredItemEvent.current.object.parent.material.opacity = .2
+        // Toggle Item Description
+        const itemDescription = hoveredItemEvent.current.object.parent.children.find(_ => _.name === 'item-description')
+        itemDescription && ( itemDescription.visible = true )
     }
     const onPointerLeave = (e: ThreeEvent<PointerEvent>) => {
         if (!isOpened) { return }
@@ -115,6 +120,9 @@ const Backpack = memo(function Backpack() {
         if (hoveredItemEvent.current) {
             // @ts-expect-error
             hoveredItemEvent.current.object.parent.material.opacity = .1
+            // Toggle Item Description
+            const itemDescription = hoveredItemEvent.current.object.parent.children.find(_ => _.name === 'item-description')
+            itemDescription && ( itemDescription.visible = false )
             hoveredItemEvent.current = null
         }
     }
@@ -157,7 +165,6 @@ const Backpack = memo(function Backpack() {
         const item = pinnedItemEvent.object.parent
 
         if (!cellToInsert.current) {
-            console.log(pointerCell.current)
             // Drop if nothing hovered
             if (!pointerCell.current) {
                 item.visible = false
@@ -194,23 +201,31 @@ const Backpack = memo(function Backpack() {
         const cellCoordinate = pinnedItemEvent.object.parent.userData.item.slot.split(',').map((_:string)=>Number(_))
         const itemWidth = pinnedItemEvent.object.parent.userData.item.itemAttributes.itemWidth
         const itemHeight = pinnedItemEvent.object.parent.userData.item.itemAttributes.itemHeight
-
+        const cellType: CellType = pinnedItemEvent.object.parent.userData.type
         const cells = []
-        for (let i = 0; i < itemHeight; i++) {
-            for (let j = 0; j < itemWidth; j++) {
-                const cell = slotsRef.current[`${cellCoordinate[0]+j},${cellCoordinate[1]+i}`]
-                if (!cell) { return console.error('[Backpack]: Cell not found') }
 
-                if (show) {
-                    cell.material.color = new THREE.Color(cell.userData.colors.last_placeholder)
+        // Placeholder for pinned Equipment Item
+        if (cellType === 'equipment') {
+            const xy = pinnedItemEvent.object.parent.userData.item.slot
+            const cell = equipmentSlotsRef.current[xy]
+            if (!cell) { return console.warn('[Backpack: setPlaceholderCells]: Cell not found') }
+            cells.push(cell)
+        // Placeholder for pinned Backpack Item 
+        } else {
+            for (let i = 0; i < itemHeight; i++) {
+                for (let j = 0; j < itemWidth; j++) {
+                    const cell = slotsRef.current[`${cellCoordinate[0]+j},${cellCoordinate[1]+i}`]
+                    if (!cell) { return console.warn('[Backpack: setPlaceholderCells]: Cell not found') }
                     cells.push(cell)
-                } else {
-                    cell.material.color = new THREE.Color(cell.userData.colors.common)
                 }
             }
         }
 
-        placeholderCells.current = cells
+        cells.forEach(cell => {
+            cell.material.color = show ? new THREE.Color(cell.userData.colors.last_placeholder) : new THREE.Color(cell.userData.colors.common)
+        })
+
+        placeholderCells.current = show ? cells : []
     }
 
     useFrame(({ raycaster }) => {
@@ -231,6 +246,9 @@ const Backpack = memo(function Backpack() {
     function highlightPointerCell(projectedPointer: {x:number;y:number}) {        
         lastPointerCells.current = currentPointerCells.current
         currentPointerCells.current = getPointerCells(projectedPointer)
+        const isHoveredEquipmentSlot = currentPointerCells.current.length 
+            ? currentPointerCells.current[0].userData.type === 'equipment'
+            : false
 
         lastPointerCells.current.forEach(cell => {
             // If placeholder cell we dont touch it
@@ -244,12 +262,32 @@ const Backpack = memo(function Backpack() {
         // Check if we can insert
         let availableCells = 0
         currentPointerCells.current.forEach(cell => {
-            if (currentPointerCells.current.length < itemWidth * itemHeight) {
+            if (currentPointerCells.current.length < itemWidth * itemHeight && !isHoveredEquipmentSlot) {
                 return
             }
-            availableCells += isOccupied(cell) ? 0 : 1
+            availableCells += isOccupied(cell, isHoveredEquipmentSlot) ? 0 : 1
         })
 
+        // Logic for Equipment Slot
+        if (isHoveredEquipmentSlot) {
+            // TODO: detect if slote enabled
+            if (true) {
+
+                // If placeholder cell we dont touch it
+                if (placeholderCells.current.find(_ => _ === currentPointerCells.current[0])) { return }
+                console.log(currentPointerCells.current[0])
+                // @ts-expect-error
+                currentPointerCells.current[0].material.color = new THREE.Color(currentPointerCells.current[0].userData.colors.insert_allowed)
+            } else {
+                // If placeholder cell we dont touch it
+                if (placeholderCells.current.find(_ => _ === currentPointerCells.current[0])) { return }
+                // @ts-expect-error
+                currentPointerCells.current[0].material.color = new THREE.Color(currentPointerCells.current[0].userData.colors.insert_disallowed)
+            }
+            return
+        }
+
+        // Logic for Backpack Slot
         // Then set insert availability based on <availableCells>
         if (availableCells === itemWidth * itemHeight) {
             cellToInsert.current = pointerCell.current
@@ -274,30 +312,49 @@ const Backpack = memo(function Backpack() {
         const itemWidth = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemWidth
         const itemHeight = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemHeight
 
-        // Find Cell under Pointer
-        const _pointerCell = Object.values(slotsRef.current).find(slotCell => {
+        // Find Cell under Pointer (for Backpack Item)
+        const _backpackPointerCell = Object.values(slotsRef.current).find(slotCell => {
             const slotRow = slotCell.parent
             const slotColumn = slotRow.parent
             const slotWrapper = slotColumn.parent
             const x = slotRow.position.x + slotColumn.position.x + slotWrapper.position.x
             const y = slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
 
-            // Multiply by itemWidth & itemHeight to always position model in the center of highligh square, no matter 1x1 or 2x2 or event 1x3
+            // Multiply by itemWidth & itemHeight to always position model in the center of highlighted square, no matter 1x1 or 2x2 or even 1x3
             return Math.abs(x - projectedPointer.x) < uiUnits(.5 * itemWidth) && Math.abs(y - projectedPointer.y) < uiUnits(.5 * itemHeight)
         })
+        const _equipmentPointerCell = Object.values(equipmentSlotsRef.current).find(slotCell => {
+            const slotRow = slotCell.parent
+            const slotColumn = slotRow.parent
+            const slotWrapper = slotColumn.parent
+            const x = slotRow.position.x + slotColumn.position.x + slotWrapper.position.x
+            const y = slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
 
-        pointerCell.current = _pointerCell || null
-        if (!_pointerCell) return []
+            // Multiply by itemWidth & itemHeight to always position model in the center of highlighted square, no matter 1x1 or 2x2 or even 1x3
+            return Math.abs(x - projectedPointer.x) < uiUnits(1) && Math.abs(y - projectedPointer.y) < uiUnits(1)
+        })
+
+        // Could be only one typ at the same time
+        const isHoveredEquipmentSlot = !!_equipmentPointerCell
+        // console.log(isHoveredEquipmentSlot, _equipmentPointerCell, _backpackPointerCell)
+        pointerCell.current = _backpackPointerCell || _equipmentPointerCell || null
+        if (!pointerCell.current) return []
     
 
-        // Calc all cells belongs to the Pointer, depending on Item size (like 1x1, 2x2)
+        // Calc all cells belongs to the Pointer, depending on Item size (like 1x1, 2x2) and Hovered cell type
         const cells = []
-        const { x, y } = _pointerCell.userData.slot
-        for (let i = 0; i < itemWidth; i++) {
-            for (let j = 0; j < itemHeight; j++) {
-                const cell = slotsRef.current[`${x+i},${y+j}`]
-                if (cell) {
-                    cells.push(cell)
+
+        // Depending on hovered cell type
+        if (isHoveredEquipmentSlot) {
+            cells.push(pointerCell.current)
+        } else {
+            const { x, y } = pointerCell.current.userData.slot
+            for (let i = 0; i < itemWidth; i++) {
+                for (let j = 0; j < itemHeight; j++) {
+                    const cell = slotsRef.current[`${x+i},${y+j}`]
+                    if (cell) {
+                        cells.push(cell)
+                    }
                 }
             }
         }
@@ -305,7 +362,11 @@ const Backpack = memo(function Backpack() {
         return cells
     }
 
-    function isOccupied(cell: THREE.Mesh) {
+    function isOccupied(cell: THREE.Mesh, isEquipmentSlot: boolean) {
+        if (isEquipmentSlot) {
+            // TODO: temporary
+            return false
+        }
         const { x, y } = cell.userData.slot
         // Allow paste to the same cell, or a little touching the same cell 
         if (placeholderCells.current.find(_ => _.userData.slot.x === x && _.userData.slot.y === y)) return false
@@ -341,6 +402,7 @@ const Backpack = memo(function Backpack() {
                                     ref={(r) => setRef(r, j, i)} 
                                     args={[uiUnits(cellSize), uiUnits(cellSize), 1]}
                                     userData={{
+                                        type: 'backpack',
                                         slot: { x: j, y: i }, 
                                         colors: {
                                             common: (i + j) % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT,
@@ -348,7 +410,6 @@ const Backpack = memo(function Backpack() {
                                             insert_disallowed: (i + j) % 2 === 0 ? colors.INSERT_DISALLOWED_DARK : colors.INSERT_DISALLOWED_LIGHT,
                                             last_placeholder: (i + j) % 2 === 0 ? colors.LAST_PLACEHOLDER_DARK : colors.LAST_PLACEHOLDER_LIGHT,
                                         },
-                                        type: 'backpack'
                                     }}
                                 >
                                     <meshBasicMaterial color={(i + j) % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT} />
@@ -367,11 +428,15 @@ const Backpack = memo(function Backpack() {
                             name='slot-equipment'
                             ref={(r) => setEquipmentRef(r, _.slot)}
                             userData={{
+                                type: 'equipment',
                                 slot: _.slot,
                                 colors: {
-                                    common: i % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT
+                                    common: i % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT,
+                                    insert_allowed: i % 2 === 0 ? colors.INSERT_ALLOWED_DARK : colors.INSERT_ALLOWED_LIGHT,
+                                    insert_disallowed: i % 2 === 0 ? colors.INSERT_DISALLOWED_DARK : colors.INSERT_DISALLOWED_LIGHT,
+                                    last_placeholder: i % 2 === 0 ? colors.LAST_PLACEHOLDER_DARK : colors.LAST_PLACEHOLDER_LIGHT,
                                 },
-                                type: _.type,
+                                allowedItemType: _.type,
                                 itemWidth: _.width,
                                 itemHeight: _.height
                             }}
@@ -402,7 +467,7 @@ const Backpack = memo(function Backpack() {
             <group name='equipment-items'>
                 {equipmentItems?.length && equipmentItems.map(item => 
                     <EquipmentItem
-                        // onClick={onClick}
+                        onClick={onClick}
                         onPointerMove={onPointerMove}
                         onPointerLeave={onPointerLeave}
                         key={item.itemHash} 
