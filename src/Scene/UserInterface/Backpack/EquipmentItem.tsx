@@ -5,9 +5,8 @@ import { useBackpackStore } from "store/backpackStore";
 import { shallow } from 'zustand/shallow'
 import { uiUnits } from 'Scene/utils/uiUnits';
 import { ThreeEvent } from '@react-three/fiber';
-import SlotModel from 'Scene/components/SlotModel'
+import SlotModel from 'Scene/UserInterface/Backpack/SlotModel'
 import { memo } from 'react';
-import { useLoadAssets } from 'store/LoadAssetsContext';
 import ItemDescription from './ItemDescription';
 
 interface Props {
@@ -20,9 +19,6 @@ interface Props {
 
 const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter, onPointerMove, onPointerLeave }: Props) {
     // console.log('[CPU CHECK]: Rerender <Backpack Item>')
-    // For test
-    // FIXME: Rerenders lots of time, cuz app.tsx (eventCloud) has rerendering hole
-    const { gltf } = useLoadAssets()
 
     const itemPlaneRef = useRef<THREE.Mesh | null>(null)
     const itemRef = useRef<THREE.Mesh | null>(null)
@@ -88,7 +84,7 @@ const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter
                 onPointerLeave={onPointerLeave}
             />
             <ItemDescription item={item} type="equipment" />
-            <SlotModel position={[0, 0, 0]} ref={itemRef} scale={[uiUnits(itemScale), uiUnits(itemScale), uiUnits(itemScale)]} gltf={gltf.current.sword} />
+            <SlotModel position={[0, 0, 0]} ref={itemRef} scale={[uiUnits(itemScale), uiUnits(itemScale), uiUnits(itemScale)]} item={item} />
         </Plane>
 
     )

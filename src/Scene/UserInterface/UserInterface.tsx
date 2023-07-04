@@ -1,5 +1,4 @@
 import { ScreenSpace } from "@react-three/drei"
-import { useEffect, useRef } from "react"
 import { Plane } from "@react-three/drei"
 import { memo } from "react"
 
@@ -14,7 +13,7 @@ import UiLayer from "./UiLayer"
 import { shallow } from "zustand/shallow"
 
 const UserInterface = memo(function UserInterface() {
-    const [eventsNode, userInterface, intersectionPlane] = useUiStore(state => [state.eventsNode ,state.userInterface, state.intersectionPlane], shallow)
+    const [userInterface, intersectionPlane] = useUiStore(state => [state.userInterface, state.intersectionPlane], shallow)
     return (
         <ScreenSpace ref={userInterface} name="user-interface" depth={depth}>
             <UiLayer z={-10}>

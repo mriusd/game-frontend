@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { create } from "zustand";
 import { getMeshDimensions } from 'Scene/utils/getMeshDimensions';
 import { RefObject, createRef } from 'react';
+import { useEventStore } from './EventStore';
 
 export interface BackpackStoreInterface {
     // Backpack slots
@@ -29,5 +30,5 @@ export const useBackpackStore = create<BackpackStoreInterface>((set, get) => ({
     close: () => set({ isOpened: false }),
     toggle: () => set(state => ({ isOpened: !state.isOpened })),
     slots: createRef(),
-    equipmentSlots: createRef()
+    equipmentSlots: createRef(),
 }))

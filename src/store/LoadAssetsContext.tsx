@@ -5,6 +5,21 @@ import { GLTF } from "three/examples/jsm/loaders/GLTFLoader"
 
 const LoadAssetsContext = createContext({})
 
+// tbm = Test Backpack Models :)
+export const tbm = {
+    ice_sword: 'ice_sword',
+    magic_box: 'magic_box',
+
+    // dragon
+    dragon_boots: 'dragon_boots',
+    dragon_chest: 'dragon_chest',
+    dragon_gloves: 'dragon_gloves',
+    dragon_helmet: 'dragon_helmet',
+    dragon_sholders: 'dragon_sholders',
+    dragon_trousers: 'dragon_trousers',
+    // next one
+}
+
 export const useLoadAssets = (): ILoadAssetsContext => {
     const context = useContext(LoadAssetsContext)
     if (!context) {
@@ -26,6 +41,23 @@ const LoadAssetsContextProvider = ({ children }) => {
     gltf.current.sword = useGLTF('models/max_sword/file.gltf')
     // @ts-expect-error
     gltf.current.head = useGLTF('models/head/head.gltf')
+
+    // @ts-expect-error
+    gltf.current[tbm.ice_sword] = useGLTF('models/max_sword/file.gltf')
+    // @ts-expect-error
+    gltf.current[tbm.magic_box] = useGLTF(`models/${tbm[tbm.magic_box]}/${tbm[tbm.magic_box]}.gltf`)
+    // @ts-expect-error
+    gltf.current[tbm.dragon_boots] = useGLTF(`models/${tbm[tbm.dragon_boots]}/${tbm[tbm.dragon_boots]}.gltf`)
+    // @ts-expect-error
+    gltf.current[tbm.dragon_chest] = useGLTF(`models/${tbm[tbm.dragon_chest]}/${tbm[tbm.dragon_chest]}.gltf`)
+    // @ts-expect-error
+    gltf.current[tbm.dragon_gloves] = useGLTF(`models/${tbm[tbm.dragon_gloves]}/${tbm[tbm.dragon_gloves]}.gltf`)
+    // @ts-expect-error
+    gltf.current[tbm.dragon_helmet] = useGLTF(`models/${tbm[tbm.dragon_helmet]}/${tbm[tbm.dragon_helmet]}.gltf`)
+    // @ts-expect-error
+    gltf.current[tbm.dragon_sholders] = useGLTF(`models/${tbm[tbm.dragon_sholders]}/${tbm[tbm.dragon_sholders]}.gltf`)
+    // @ts-expect-error
+    gltf.current[tbm.dragon_trousers] = useGLTF(`models/${tbm[tbm.dragon_trousers]}/${tbm[tbm.dragon_trousers]}.gltf`)
 
     const value: ILoadAssetsContext = {
         gltf

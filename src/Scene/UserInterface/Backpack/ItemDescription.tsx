@@ -12,9 +12,9 @@ interface Props {
 }
 const ItemDescription = ({ item, type }: Props) => {
 
-    const billboardMaterial = useMemo(() => createBillboardMaterial(new THREE.MeshBasicMaterial()), [])
+    const billboardMaterial = useMemo(() => createBillboardMaterial(new THREE.MeshBasicMaterial({ transparent: true, depthTest: false })), [])
     // TODO: Should i change this, instead using depthTest & renderOrder do smth different?
-    const bgMaterial = useMemo(() => createBillboardMaterial(new THREE.MeshBasicMaterial({ color: 'black', transparent: true, depthTest: false })), [])
+    const bgMaterial = useMemo(() => createBillboardMaterial(new THREE.MeshBasicMaterial({ color: 'black', opacity: .9, transparent: true, depthTest: false })), [])
     const text = useMemo(() => generateItemName(item.itemAttributes, item.qty), [item])
     const bannerWidth = useMemo(() => Math.max(2.5, text.length * 0.15), [text]) 
     const offsetY = useMemo(() => {

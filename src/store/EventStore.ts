@@ -8,7 +8,7 @@ import { Coordinate } from "interfaces/coordinate.interface";
 import type { JsonValue } from "react-use-websocket/dist/lib/types";
 
 // For TEST, Then has to get from server
-import { equipment } from "interfaces/equipment.interface";
+import { equipment as equipmentSlots } from "interfaces/equipment.interface";
 import type { Equipment } from "interfaces/equipment.interface";
 
 // -------------------
@@ -24,8 +24,13 @@ export interface EventStoreInterface {
     equipmentSlots: Record<number, Equipment> | null
     updateEquipment: (equipment: BackpackSlot) => void
     updateBackpack: (backpack: Backpack) => void
-    updateItemBackpackPosition: (itemHash: string, coords: { x: number; z: number }) => void
-    dropBackpackItem: (itemHash: string, coords: { x: number; z: number }) => void
+
+    // User Events
+    updateItemBackpackPosition: (itemHash: string, position: { x: number; z: number }) => void
+    dropBackpackItem: (itemHash: string, position: { x: number; z: number }) => void
+    unequipBackpackItem: (itemHash: string, position: { x: number; z: number }) => void
+    equipBackpackItem: (itemHash: string, slot: number) => void
+
 }
 
 export const useEventStore = create<EventStoreInterface>((set, get) => ({
@@ -38,7 +43,7 @@ export const useEventStore = create<EventStoreInterface>((set, get) => ({
     // Backpack
     backpack: null,
     equipment: null,
-    equipmentSlots: equipment,
+    equipmentSlots: equipmentSlots,
     updateEquipment: (equipment) => {
         set(() => ({ equipment: equipment }))
     },
@@ -47,26 +52,33 @@ export const useEventStore = create<EventStoreInterface>((set, get) => ({
         // Sets the size of backpack based on Server Side
         useBackpackStore.setState(() => ({ width: backpack.grid[0].length, height: backpack.grid.length }))
     },
-    updateItemBackpackPosition(itemHash, coords) {
+
+    // TODO: customise locally
+    updateItemBackpackPosition(itemHash, position) {
+        // set(state => {
+        //     const backpack = get().backpack.items.forEach()
+        // })
         get().sendJsonMessage({
             type: "update_backpack_item_position",
-            data: {
-                itemHash: itemHash,
-                position: coords
-            }
+            data: { itemHash, position }
         });
     },
-    dropBackpackItem(itemHash, coords) {
+    dropBackpackItem(itemHash, position) {
         get().sendJsonMessage({
-          type: "drop_backpack_item",
-          data: {
-              itemHash: itemHash,
-              position: coords
-          }
+            type: "drop_backpack_item",
+            data: { itemHash, position }
         });
-      }
+    },
+    equipBackpackItem(itemHash, slot) {
+        get().sendJsonMessage({
+            type: "equip_backpack_item",
+            data: { itemHash, slot }
+        });
+    },
+    unequipBackpackItem(itemHash, position) {
+        get().sendJsonMessage({
+            type: "unequip_backpack_item",
+            data: { itemHash, position }
+        });
+    }
 }))
-
-
-// equipBackpackItem,
-// unequipBackpackItem,

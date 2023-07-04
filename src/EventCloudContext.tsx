@@ -245,6 +245,8 @@ export const EventCloudProvider = ({ children }) => {
     console.log("[handleUpdateBackpack] ", newBackpack, newEquipment)
     setBackpack(newBackpack);
     updateBackpack(newBackpack);
+    console.log('newEquipment', newEquipment)
+    console.log('backpack', backpack)
     updateEquipment(newEquipment)
     setEquipment(newEquipment);
   }
