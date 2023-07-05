@@ -3,7 +3,6 @@ import { Plane } from "@react-three/drei"
 import { useMemo, useRef } from "react"
 import { useBackpackStore } from "store/backpackStore";
 import { shallow } from 'zustand/shallow'
-import { uiUnits } from 'Scene/utils/uiUnits';
 import { ThreeEvent } from '@react-three/fiber';
 import SlotModel from 'Scene/UserInterface/Backpack/SlotModel'
 import { memo } from 'react';
@@ -15,9 +14,10 @@ interface Props {
     onPointerEnter?: (e: ThreeEvent<PointerEvent>) => void
     onPointerMove?: (e: ThreeEvent<PointerEvent>) => void
     onPointerLeave?: (e: ThreeEvent<PointerEvent>) => void
+    mounted: boolean
 }
 
-const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter, onPointerMove, onPointerLeave }: Props) {
+const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter, onPointerMove, onPointerLeave, mounted }: Props) {
     // console.log('[CPU CHECK]: Rerender <Backpack Item>')
 
     const itemPlaneRef = useRef<THREE.Mesh | null>(null)
@@ -29,12 +29,12 @@ const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter,
     )
 
     // Positioning
-    const itemPlaneWidth = useMemo(() => cellSize * item.itemAttributes.itemWidth, [item])
-    const itemPlaneHeight = useMemo(() => cellSize * item.itemAttributes.itemHeight, [item])
+    const itemPlaneWidth = useMemo(() => cellSize * item.itemAttributes.itemWidth, [item, mounted])
+    const itemPlaneHeight = useMemo(() => cellSize * item.itemAttributes.itemHeight, [item, mounted])
 
     const itemScale = useMemo(() => {
         return cellSize * .8 * Math.max(item.itemAttributes.itemWidth, item.itemAttributes.itemHeight)
-    }, [cellSize, item])
+    }, [cellSize, item, mounted])
 
     const itemPlanePosition = useMemo(() => {
         if (!slots.current) { return new THREE.Vector3(0, 0, 0) }
@@ -50,11 +50,15 @@ const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter,
         let z = slotCell.position.z + slotRow.position.z + slotColumn.position.z + slotWrapper.position.z
 
         // Take into the account size of the element
-        x += (item.itemAttributes.itemWidth - 1) * uiUnits(cellSize) / 2
-        y -= (item.itemAttributes.itemHeight - 1) * uiUnits(cellSize) / 2
+        x += (item.itemAttributes.itemWidth - 1) * cellSize / 2
+        y -= (item.itemAttributes.itemHeight - 1) * cellSize / 2
 
         return new THREE.Vector3(x, y, z)
-    }, [ item, slots.current ])
+    }, [ item, slots.current, mounted ])
+
+    if (!mounted) {
+        return <></>
+    }
 
     return (
         <Plane 
@@ -66,12 +70,12 @@ const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter,
                 item: item,
                 type: 'backpack'
             }}
-            args={[uiUnits(itemPlaneWidth), uiUnits(itemPlaneHeight)]}
+            args={[itemPlaneWidth, itemPlaneHeight]}
         >
             <meshBasicMaterial color={'#FFC700'} transparent={true} opacity={.1} />
             <Plane 
                 name='backpack-item-events' 
-                args={[uiUnits(itemPlaneWidth), uiUnits(itemPlaneHeight)]} 
+                args={[itemPlaneWidth, itemPlaneHeight]} 
                 visible={false} 
                 onClick={onClick}
                 onPointerMove={onPointerMove}
@@ -80,7 +84,7 @@ const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter,
             >
             </Plane>
             <ItemDescription item={item} type="backpack" />
-            <SlotModel position={[0, 0, 0]} ref={itemRef} scale={[uiUnits(itemScale), uiUnits(itemScale), uiUnits(itemScale)]} item={item} />
+            <SlotModel position={[0, 0, 100]} ref={itemRef} scale={[itemScale, itemScale, itemScale]} item={item} />
         </Plane>
 
     )

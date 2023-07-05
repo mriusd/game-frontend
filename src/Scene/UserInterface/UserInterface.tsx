@@ -1,5 +1,5 @@
 import { ScreenSpace } from "@react-three/drei"
-import { Plane } from "@react-three/drei"
+import { Plane, Hud } from "@react-three/drei"
 import { memo } from "react"
 
 import { useUiStore } from "store/uiStore"
@@ -7,28 +7,23 @@ import { useUiStore } from "store/uiStore"
 import Backpack from "./Backpack/Backpack"
 import BottomMenu from "./BottomMenu"
 
-import { depth, uiUnits } from "Scene/utils/uiUnits"
-
-import UiLayer from "./UiLayer"
 import { shallow } from "zustand/shallow"
+
+import { OrthographicCamera } from "@react-three/drei"
 
 const UserInterface = memo(function UserInterface() {
     const [userInterface, intersectionPlane] = useUiStore(state => [state.userInterface, state.intersectionPlane], shallow)
     return (
-        <ScreenSpace ref={userInterface} name="user-interface" depth={depth}>
-            <UiLayer z={-10}>
+        <Hud>
+            <OrthographicCamera makeDefault position={[0, 0, 10]} />
+            <ambientLight color={0xFFFFFF} intensity={.5} />
+            <directionalLight color={0xFFFFFF} position={[-5, 0, 10]} />
+            <group position={[0, 0, -1000]} ref={userInterface} name="user-interface">
                 <Backpack/>
-
-                <UiLayer z={10}>
-                    <BottomMenu/>
-                </UiLayer>
-
-                {/* Layer -10 + 1 (<layer "9">) is used for intersection */}
-                <UiLayer z={1}>
-                    <Plane ref={intersectionPlane} name='intersection-plane' visible={false} args={[uiUnits(40), uiUnits(40), 1]}></Plane>
-                </UiLayer>
-            </UiLayer>
-        </ScreenSpace>
+                <BottomMenu/>
+                <Plane ref={intersectionPlane} name='intersection-plane' visible={false} args={[4000, 4000, 1]}></Plane>
+            </group>
+        </Hud>
     )
 })
 

@@ -24,7 +24,7 @@ export interface BackpackStoreInterface {
 export const useBackpackStore = create<BackpackStoreInterface>((set, get) => ({
     width: 0,
     height: 0,
-    cellSize: 1,
+    cellSize: 48,
     isOpened: false,
     open: () => set({ isOpened: true }),
     close: () => set({ isOpened: false }),

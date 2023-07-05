@@ -1,10 +1,9 @@
 import { Plane, Text } from "@react-three/drei"
-import { uiUnits } from "Scene/utils/uiUnits"
 import { setCursorPointer } from "Scene/utils/setCursorPointer"
 import { useSceneContext } from "store/SceneContext"
 
 
-const Button = ({ children, name, fontSize = uiUnits(.15), color = 'black', onClick, args = [uiUnits(1), uiUnits(.3)], ...props }) => {
+const Button = ({ children, name, fontSize = 16, color = 'black', onClick, args = [100, 30], ...props }) => {
     const { html, setHoveredItems } = useSceneContext()
     
     const handlePointerEnter = () => {

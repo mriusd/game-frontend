@@ -21,7 +21,7 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"Plane.005"
+			"name":"dragon_trousers"
 		}
 	],
 	"animations":[
@@ -49,7 +49,7 @@
 					}
 				}
 			],
-			"name":"Plane.005",
+			"name":"dragon_trousers",
 			"samplers":[
 				{
 					"input":12,
@@ -86,20 +86,6 @@
 		},
 		{
 			"doubleSided":true,
-			"name":"Material.001",
-			"pbrMetallicRoughness":{
-				"baseColorFactor":[
-					0.8000000715255737,
-					0.3587631285190582,
-					0.10768890380859375,
-					1
-				],
-				"metallicFactor":0.9589040875434875,
-				"roughnessFactor":0.5
-			}
-		},
-		{
-			"doubleSided":true,
 			"name":"Material.002",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
@@ -111,11 +97,25 @@
 				"metallicFactor":0,
 				"roughnessFactor":0.5376712083816528
 			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Material.001",
+			"pbrMetallicRoughness":{
+				"baseColorFactor":[
+					0.8000000715255737,
+					0.3587631285190582,
+					0.10768890380859375,
+					1
+				],
+				"metallicFactor":0.9589040875434875,
+				"roughnessFactor":0.5
+			}
 		}
 	],
 	"meshes":[
 		{
-			"name":"Plane.007",
+			"name":"Cube.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -185,14 +185,14 @@
 			"componentType":5126,
 			"count":688,
 			"max":[
-				0.39164355397224426,
-				0.42403101921081543,
-				0.07077677547931671
+				0.44363686442375183,
+				0.4651411175727844,
+				0.2712765634059906
 			],
 			"min":[
-				-0.39166179299354553,
-				-0.47962796688079834,
-				-0.3875916600227356
+				-0.44641706347465515,
+				-0.561667799949646,
+				-0.2495579570531845
 			],
 			"type":"VEC3"
 		},
@@ -213,16 +213,46 @@
 		},
 		{
 			"componentType":5126,
-			"count":600,
+			"count":1210,
 			"max":[
-				0.3861130177974701,
-				0.44621559977531433,
-				0.06632226705551147
+				0.4427861273288727,
+				0.5293175578117371,
+				0.2712765634059906
 			],
 			"min":[
-				-0.38613128662109375,
-				-0.3083578646183014,
-				-0.34634119272232056
+				-0.4455663561820984,
+				-0.4497559666633606,
+				-0.20268592238426208
+			],
+			"type":"VEC3"
+		},
+		{
+			"componentType":5126,
+			"count":1210,
+			"type":"VEC2"
+		},
+		{
+			"componentType":5126,
+			"count":1210,
+			"type":"VEC3"
+		},
+		{
+			"componentType":5123,
+			"count":1848,
+			"type":"SCALAR"
+		},
+		{
+			"componentType":5126,
+			"count":600,
+			"max":[
+				0.43735265731811523,
+				0.4903489351272583,
+				0.2662149667739868
+			],
+			"min":[
+				-0.4401327967643738,
+				-0.3670571446418762,
+				-0.20268592238426208
 			],
 			"type":"VEC3"
 		},
@@ -239,36 +269,6 @@
 		{
 			"componentType":5123,
 			"count":912,
-			"type":"SCALAR"
-		},
-		{
-			"componentType":5126,
-			"count":1218,
-			"max":[
-				0.3908948302268982,
-				0.4805103838443756,
-				0.07077677547931671
-			],
-			"min":[
-				-0.39091312885284424,
-				-0.3811382055282593,
-				-0.34634119272232056
-			],
-			"type":"VEC3"
-		},
-		{
-			"componentType":5126,
-			"count":1218,
-			"type":"VEC2"
-		},
-		{
-			"componentType":5126,
-			"count":1218,
-			"type":"VEC3"
-		},
-		{
-			"componentType":5123,
-			"count":1860,
 			"type":"SCALAR"
 		},
 		{
@@ -305,43 +305,43 @@
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":4950,
+			"byteLength":4946,
 			"byteOffset":0
 		},
 		{
 			"buffer":0,
-			"byteLength":3850,
-			"byteOffset":4952
+			"byteLength":7975,
+			"byteOffset":4948
 		},
 		{
 			"buffer":0,
-			"byteLength":8029,
-			"byteOffset":8804
+			"byteLength":3850,
+			"byteOffset":12924
 		},
 		{
 			"buffer":0,
 			"byteLength":80,
-			"byteOffset":16836
+			"byteOffset":16776
 		},
 		{
 			"buffer":0,
 			"byteLength":240,
-			"byteOffset":16916
+			"byteOffset":16856
 		},
 		{
 			"buffer":0,
 			"byteLength":320,
-			"byteOffset":17156
+			"byteOffset":17096
 		},
 		{
 			"buffer":0,
 			"byteLength":240,
-			"byteOffset":17476
+			"byteOffset":17416
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":17716,
+			"byteLength":17656,
 			"uri":"dragon_trousers.bin"
 		}
 	]

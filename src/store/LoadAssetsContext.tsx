@@ -9,6 +9,7 @@ const LoadAssetsContext = createContext({})
 export const tbm = {
     ice_sword: 'ice_sword',
     magic_box: 'magic_box',
+    sword: 'sword',
 
     // dragon
     dragon_boots: 'dragon_boots',
@@ -37,8 +38,8 @@ const LoadAssetsContextProvider = ({ children }) => {
     gltf.current.npc = useGLTF('models/npc_test/scene.gltf')
     // @ts-expect-error
     gltf.current.tree = useGLTF('models/decor/tree/scene.gltf')
-    // @ts-expect-error
-    gltf.current.sword = useGLTF('models/max_sword/file.gltf')
+    // // @ts-expect-error
+    // gltf.current.sword = useGLTF('models/max_sword/file.gltf')
     // @ts-expect-error
     gltf.current.head = useGLTF('models/head/head.gltf')
 
@@ -58,6 +59,8 @@ const LoadAssetsContextProvider = ({ children }) => {
     gltf.current[tbm.dragon_sholders] = useGLTF(`models/${tbm[tbm.dragon_sholders]}/${tbm[tbm.dragon_sholders]}.gltf`)
     // @ts-expect-error
     gltf.current[tbm.dragon_trousers] = useGLTF(`models/${tbm[tbm.dragon_trousers]}/${tbm[tbm.dragon_trousers]}.gltf`)
+    // @ts-expect-error
+    gltf.current[tbm.sword] = useGLTF(`models/${tbm[tbm.sword]}/${tbm[tbm.sword]}.gltf`)
 
     const value: ILoadAssetsContext = {
         gltf

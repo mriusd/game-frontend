@@ -6,7 +6,7 @@ export const getItemModelName = (name: string) => {
         return tbm.dragon_boots
     }
     if (name.toLowerCase().includes('sword')) {
-        return tbm.ice_sword
+        return tbm.sword
     }
     if (name.toLowerCase().includes('pants')) {
         return tbm.dragon_trousers

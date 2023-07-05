@@ -1,8 +1,7 @@
 import * as THREE from 'three'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Flex, Box } from '@react-three/flex'
 import { Plane } from '@react-three/drei'
-import { uiUnits } from 'Scene/utils/uiUnits'
 import { memo } from 'react'
 import BackpackItem from './BackpackItem'
 import { useBackpackStore } from 'store/backpackStore'
@@ -32,6 +31,11 @@ const colors = {
 }
 
 const Backpack = memo(function Backpack() {
+    // used on backpack mount to get 100% chance calc items position correctly based on backpack slots position
+    // Additionally rerender items after mount
+    const [mounted, mount] = useState<boolean>(false)
+    useEffect(() => mount(true), [])
+
     // console.log('[CPU CHECK]: Rerender <Backpack>')
     const [backpack, equipmentSlots, equipment] = useEventStore(state => [state.backpack, state.equipmentSlots, state.equipment], shallow)
     const [backpackWidth, backpackHeight, isOpened, slotsRef, equipmentSlotsRef, cellSize] = useBackpackStore(state => 
@@ -43,6 +47,7 @@ const Backpack = memo(function Backpack() {
         [state.updateItemBackpackPosition, state.dropBackpackItem, state.unequipBackpackItem, state.equipBackpackItem], 
         shallow
     )
+
 
     // TODO: Causes lots of backpack rerenders
     const fighterCurrentMatrixCoordinate = useFighterStore(state => state.currentMatrixCoordinate)
@@ -192,8 +197,8 @@ const Backpack = memo(function Backpack() {
             let y = slotCell.position.y + slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
             let z = slotCell.position.z + slotRow.position.z + slotColumn.position.z + slotWrapper.position.z
             // Take into the account size of the element
-            x += (item.userData.item.itemAttributes.itemWidth - 1) * uiUnits(cellSize) / 2
-            y -= (item.userData.item.itemAttributes.itemHeight - 1) * uiUnits(cellSize) / 2
+            x += (item.userData.item.itemAttributes.itemWidth - 1) * cellSize / 2
+            y -= (item.userData.item.itemAttributes.itemHeight - 1) * cellSize / 2
             item.position.set(x, y, z)
 
             // TODO?: Change <z> to <y> coordinate
@@ -348,7 +353,7 @@ const Backpack = memo(function Backpack() {
             const y = slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
 
             // Multiply by itemWidth & itemHeight to always position model in the center of highlighted square, no matter 1x1 or 2x2 or even 1x3
-            return Math.abs(x - projectedPointer.x) < uiUnits(.5 * itemWidth) && Math.abs(y - projectedPointer.y) < uiUnits(.5 * itemHeight)
+            return Math.abs(x - projectedPointer.x) < .5 * itemWidth * cellSize && Math.abs(y - projectedPointer.y) < .5 * itemHeight * cellSize
         })
         const _equipmentPointerCell = Object.values(equipmentSlotsRef.current).find(slotCell => {
             const slotRow = slotCell.parent
@@ -358,7 +363,8 @@ const Backpack = memo(function Backpack() {
             const y = slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
 
             // Multiply by itemWidth & itemHeight to always position model in the center of highlighted square, no matter 1x1 or 2x2 or even 1x3
-            return Math.abs(x - projectedPointer.x) < uiUnits(1) && Math.abs(y - projectedPointer.y) < uiUnits(1)
+            // TODO: Change "100" to cell size
+            return Math.abs(x - projectedPointer.x) < 100 && Math.abs(y - projectedPointer.y) < 100
         })
 
         // Could be only one typ at the same time
@@ -413,13 +419,12 @@ const Backpack = memo(function Backpack() {
 
     return (
         <group visible={isOpened}>
-            <Plane name='background-plane' position={[0,0,0]} args={[uiUnits(40), uiUnits(40), 1]}>
-                <meshBasicMaterial color={'black'} transparent={true} opacity={.8} />
-            </Plane>
+            {/* <Plane name='background-plane' position={[0,0,-10]} args={[1920, 1080, 1]}>
+                <meshBasicMaterial color={'black'} transparent={true} opacity={.3} />
+            </Plane> */}
 
             {/* Backpack Slots */}
-            {/* Layer (9), layer of intersaction (z = 1) */}
-            <Flex name='backpack' position={[uiUnits(3), uiUnits(4), uiUnits(1)]} flexDir="column" >
+            <Flex name='backpack' position={[224, -20, 0]} flexDir="column" >
                 { [...new Array(backpackWidth)].map((_, i) => (
                     <Box name='column' key={i} flexDir="row">
                         { [...new Array(backpackHeight)].map((_, j) => (
@@ -427,7 +432,7 @@ const Backpack = memo(function Backpack() {
                                 <Plane
                                     name='slot-cell' 
                                     ref={(r) => setRef(r, j, i)} 
-                                    args={[uiUnits(cellSize), uiUnits(cellSize), 1]}
+                                    args={[cellSize, cellSize, 1]}
                                     userData={{
                                         type: 'backpack',
                                         slot: { x: j, y: i }, 
@@ -448,9 +453,9 @@ const Backpack = memo(function Backpack() {
             </Flex>
 
             {/* Equipment Slots */}
-            <Flex name='equipment' scaleFactor={1000} flexDir="row" flexWrap="wrap" maxWidth={uiUnits(9.5)} position={[uiUnits(-10.75), uiUnits(4.7), uiUnits(1)]}>
+            <Flex name='equipment' flexDir="row" flexWrap="wrap" maxWidth={450} position={[192, 400, 0]}>
                 { equipmentSlots && [...Object.values(equipmentSlots)].sort((a,b) => b.height - a.height).map((_, i) => (
-                    <Box name='row' key={i} margin={uiUnits(.25)} centerAnchor>
+                    <Box name='row' key={i} margin={8} centerAnchor>
                         <Plane
                             name='slot-equipment'
                             ref={(r) => setEquipmentRef(r, _.slot)}
@@ -467,13 +472,13 @@ const Backpack = memo(function Backpack() {
                                 itemWidth: _.width,
                                 itemHeight: _.height
                             }}
-                            args={[uiUnits(cellSize * _.width), uiUnits(cellSize * _.height), 1]}
+                            args={[cellSize * _.width, cellSize * _.height, 1]}
                         >
                             <meshBasicMaterial color={i % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT} />
                             <Text 
                                 // TODO: mb temporary 
                                 visible={ !equipmentItems.find(__ => +__.slot === +_.slot)  } 
-                                fontSize={uiUnits(.1 * _.height / 1.2)}
+                                fontSize={4 * _.height}
                             >{ _.type.toUpperCase() }</Text>
                         </Plane>
                     </Box>
@@ -490,6 +495,7 @@ const Backpack = memo(function Backpack() {
                         onPointerLeave={onPointerLeave}
                         key={item.itemHash} 
                         item={item} 
+                        mounted={mounted}
                     />) 
                 }
             </group>
@@ -503,6 +509,7 @@ const Backpack = memo(function Backpack() {
                         onPointerLeave={onPointerLeave}
                         key={item.itemHash} 
                         item={item} 
+                        mounted={mounted}
                     />) 
                 }
             </group>

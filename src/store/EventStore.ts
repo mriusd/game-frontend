@@ -44,6 +44,7 @@ export const useEventStore = create<EventStoreInterface>((set, get) => ({
     backpack: null,
     equipment: null,
     equipmentSlots: equipmentSlots,
+
     updateEquipment: (equipment) => {
         set(() => ({ equipment: equipment }))
     },

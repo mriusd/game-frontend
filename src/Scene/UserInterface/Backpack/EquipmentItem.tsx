@@ -3,7 +3,6 @@ import { Plane } from "@react-three/drei"
 import { useMemo, useRef } from "react"
 import { useBackpackStore } from "store/backpackStore";
 import { shallow } from 'zustand/shallow'
-import { uiUnits } from 'Scene/utils/uiUnits';
 import { ThreeEvent } from '@react-three/fiber';
 import SlotModel from 'Scene/UserInterface/Backpack/SlotModel'
 import { memo } from 'react';
@@ -15,9 +14,10 @@ interface Props {
     onPointerEnter?: (e: ThreeEvent<PointerEvent>) => void
     onPointerMove?: (e: ThreeEvent<PointerEvent>) => void
     onPointerLeave?: (e: ThreeEvent<PointerEvent>) => void
+    mounted: boolean
 }
 
-const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter, onPointerMove, onPointerLeave }: Props) {
+const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter, onPointerMove, onPointerLeave, mounted }: Props) {
     // console.log('[CPU CHECK]: Rerender <Backpack Item>')
 
     const itemPlaneRef = useRef<THREE.Mesh | null>(null)
@@ -39,7 +39,7 @@ const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter
     const itemPlaneHeight = useMemo(() => cellSize * (slotUserData?.itemHeight || 0), [slotUserData])
 
     const itemScale = useMemo(() => {
-        return cellSize * .4 * (slotUserData?.itemHeight || 0)
+        return cellSize * .9 * (slotUserData?.itemHeight || 0)
     }, [cellSize, slotUserData])
 
     const itemPlanePosition = useMemo(() => {
@@ -55,9 +55,9 @@ const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter
         let z = slotCell.position.z + slotRow.position.z + slotWrapper.position.z
 
         return new THREE.Vector3(x, y, z)
-    }, [ item, slots.current ])
+    }, [ item, slots.current, mounted ])
 
-    if (!slotUserData) {
+    if (!slotUserData || !mounted) {
         return <></>
     }
 
@@ -71,12 +71,12 @@ const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter
                 item: item,
                 type: 'equipment'
             }}
-            args={[uiUnits(itemPlaneWidth), uiUnits(itemPlaneHeight)]}
+            args={[itemPlaneWidth, itemPlaneHeight]}
         >
             <meshBasicMaterial color={'#FFC700'} transparent={true} opacity={.1} />
             <Plane 
                 name='equipment-item-events' 
-                args={[uiUnits(itemPlaneWidth), uiUnits(itemPlaneHeight)]} 
+                args={[itemPlaneWidth, itemPlaneHeight]} 
                 visible={false} 
                 onClick={onClick}
                 onPointerMove={onPointerMove}
@@ -84,7 +84,7 @@ const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter
                 onPointerLeave={onPointerLeave}
             />
             <ItemDescription item={item} type="equipment" />
-            <SlotModel position={[0, 0, 0]} ref={itemRef} scale={[uiUnits(itemScale), uiUnits(itemScale), uiUnits(itemScale)]} item={item} />
+            <SlotModel position={[0, 0, 100]} ref={itemRef} scale={[itemScale, itemScale, itemScale]} item={item} />
         </Plane>
 
     )
