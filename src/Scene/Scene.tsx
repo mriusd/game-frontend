@@ -25,6 +25,10 @@ import { useUiStore } from 'store/uiStore'
 import { useHTMLEvents } from "store/htmlEvents"
 import { shallow } from 'zustand/shallow'
 
+import { Leva } from 'leva'
+import { useBackpackStore } from 'store/backpackStore'
+
+
 const Scene = memo(function Scene() {
     const store = useSceneContext()
     const worldRef = useRef<Object3D | null>(null)
@@ -37,6 +41,9 @@ const Scene = memo(function Scene() {
     //     return () => stopListen(node)
     // }, [])
     // // END: HTML Events Manager
+
+    const isBackpackOpened = useBackpackStore(state => state.isOpened)
+
     return (
         <div ref={eventsNode} id="scene" className={styles.scene}>
             <Canvas
@@ -62,13 +69,18 @@ const Scene = memo(function Scene() {
                     <FloatingDamage />
                     <UserInterface />
                 </LoadAssetsContextProvider>
-                <Stats/>
+                <Stats className='stats'/>
             </Canvas>
             <div className={styles.coordinates}>
                 <div>World size [{store.worldSize.current}x{store.worldSize.current}]</div>
                 <div>Server coordinate [ X: {store.currentMatrixCoordinate?.x} Z: {store.currentMatrixCoordinate?.z} ]</div>
                 <div>World coordinate [ X: {store.currentWorldCoordinate?.x.toFixed(0)} Z: {store.currentWorldCoordinate?.z.toFixed(0)} ]</div>
             </div>
+            <Leva
+                hidden={!isBackpackOpened}
+                flat
+            />
+
         </div>
     )
 })

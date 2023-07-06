@@ -181,16 +181,6 @@ const Backpack = memo(function Backpack() {
     }
     // 
 
-    function setObjectRenderLayer(pinnedItemEvent: ThreeEvent<PointerEvent>, mode: 'highest' | 'default') {
-        const object = pinnedItemEvent.object.parent
-        const delta = 100
-        if (!object) { return }
-        if (mode === 'highest') {
-            object.position.z += delta
-        } else {
-            object.position.z -= delta
-        }
-    }
     function getSlotModel(e: ThreeEvent<PointerEvent>) {
         const name = 'slot-model'
         const model = e.object.parent.children.find(object => object.name === name)
