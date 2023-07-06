@@ -166,11 +166,13 @@ const Backpack = memo(function Backpack() {
                 hoveredItemEvent.current.object.parent.material.opacity = 0 // TODO: sometimes get error over here
                 // Display previous cell
                 setPlaceholderCells(pinnedItemEvent.current, true)
+                // setObjectRenderLayer(pinnedItemEvent.current, 'highest')
             } else {
                 setPlaceholderCells(pinnedItemEvent.current, false)
                 // @ts-expect-error
                 hoveredItemEvent.current.object.parent.material.opacity = .2
                 placeItemToCell(pinnedItemEvent.current)
+                // setObjectRenderLayer(pinnedItemEvent.current, 'default')
                 pinnedItemEvent.current = null
                 clearPointerCells()
                 onPointerLeave(e)
@@ -179,6 +181,16 @@ const Backpack = memo(function Backpack() {
     }
     // 
 
+    function setObjectRenderLayer(pinnedItemEvent: ThreeEvent<PointerEvent>, mode: 'highest' | 'default') {
+        const object = pinnedItemEvent.object.parent
+        const delta = 100
+        if (!object) { return }
+        if (mode === 'highest') {
+            object.position.z += delta
+        } else {
+            object.position.z -= delta
+        }
+    }
     function getSlotModel(e: ThreeEvent<PointerEvent>) {
         const name = 'slot-model'
         const model = e.object.parent.children.find(object => object.name === name)
@@ -201,26 +213,9 @@ const Backpack = memo(function Backpack() {
             return
         }
 
+        // If click on Backpack cell
         if (cellToInsert.current.type === 'backpack') {
             const slot = cellToInsert.current.ref.userData.slot
-            // // TODO: Twice the same code, the same thing did in BackpackItem
-            // // TODO: Put to utils?
-            // const slotCell = cellToInsert.current.ref
-            // const slotRow = slotCell.parent
-            // const slotColumn = slotRow.parent
-            // const slotWrapper = slotColumn.parent
-            // // Calc position based on all parents
-            // let x = slotCell.position.x + slotRow.position.x + slotColumn.position.x + slotWrapper.position.x
-            // let y = slotCell.position.y + slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
-            // let z = slotCell.position.z + slotRow.position.z + slotColumn.position.z + slotWrapper.position.z
-            // // Take into the account size of the element
-            // x += (item.userData.item.itemAttributes.itemWidth - 1) * cellSize / 2
-            // y -= (item.userData.item.itemAttributes.itemHeight - 1) * cellSize / 2
-            // item.position.set(x, y, z)
-
-            // // TODO?: Change <z> to <y> coordinate
-            // // If equiped, use unequiped otherwise just change the position
-            // console.log(pinnedItemEvent.object.parent.userData.type)
             const isBackpackItem = pinnedItemEvent.object.parent.userData.type === 'backpack'
             if (isBackpackItem) {
                 updateBackpackItemPosition(itemHash, { x: slot.x, z: slot.y })
@@ -228,19 +223,9 @@ const Backpack = memo(function Backpack() {
                 unequipBackpackItem(itemHash, { x: slot.x, z: slot.y })
             }
         } 
+        // If click on Equipment cell
         else if (cellToInsert.current.type === 'equipment') {
             const slot = cellToInsert.current.ref.userData.slot
-
-            // const slotCell = cellToInsert.current.ref
-            // const slotRow = slotCell.parent
-            // const slotWrapper = slotRow.parent
-    
-            // // Calc position based on all parents
-            // let x = slotCell.position.x + slotRow.position.x + slotWrapper.position.x
-            // let y = slotCell.position.y + slotRow.position.y + slotWrapper.position.y
-            // let z = slotCell.position.z + slotRow.position.z + slotWrapper.position.z
-            // item.position.set(x, y, z)
-
             equipBackpackItem(itemHash, slot)
         }
     }
@@ -287,6 +272,7 @@ const Backpack = memo(function Backpack() {
             if (!projectedPointer || !backpackRef.current) { return }
             // <substract Backpack position>: Take backpack Items offset into the account
             projectedPointer.sub(backpackRef.current.position)
+            projectedPointer.z += 100 // Make it Higher than other Inventory Objects
             pinnedItemEvent.current.object.parent.position.copy(projectedPointer)
             // Detect collisions
             highlightPointerCell(projectedPointer)
