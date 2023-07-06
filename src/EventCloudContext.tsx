@@ -12,6 +12,8 @@ import type { MapObject } from 'interfaces/mapObject.interface';
 // @ts-expect-error
 import { common } from 'ethereumjs-util';  
 
+import { useEventStore } from 'store/EventStore';
+
 
 
 
@@ -40,6 +42,14 @@ export const EventCloudProvider = ({ children }) => {
   const [selectedSkill, setSelectedSkill] = useState(4);
 
   const [town, setTown] = useState("lorencia")
+
+  // Just for test
+  const init = useEventStore(state => state.init);
+  useEffect(() => {
+    init(sendJsonMessage)
+  }, [])
+  // 
+
 
   // WebSocket
   const socketUrl = process.env.REACT_APP_WS_URL; // ws://149.100.159.50:8080/ws
@@ -134,14 +144,13 @@ export const EventCloudProvider = ({ children }) => {
       });
   }
 
-  function updateItemBackpackPosition(itemHash, coords) {
+  function updateItemBackpackPosition(itemHash: string, coords: any) {
     var response = sendJsonMessage({
         type: "update_backpack_item_position",
         data: {
             itemHash: itemHash,
             position: coords
         }
-
       });
   }
 
@@ -152,7 +161,6 @@ export const EventCloudProvider = ({ children }) => {
           itemHash: itemHash,
           position: coords
       }
-
     });
   }
 
@@ -230,11 +238,17 @@ export const EventCloudProvider = ({ children }) => {
   }
 
 
+  const updateBackpack = useEventStore(state => state.updateBackpack);
+  const updateEquipment = useEventStore(state => state.updateEquipment);
+
   function handleUpdateBackpack (newBackpack, newEquipment) {
     console.log("[handleUpdateBackpack] ", newBackpack, newEquipment)
     setBackpack(newBackpack);
+    updateBackpack(newBackpack);
+    console.log('newEquipment', newEquipment)
+    console.log('backpack', backpack)
+    updateEquipment(newEquipment)
     setEquipment(newEquipment);
-
   }
 
   function handlePing(fighter, mapObjects) {
@@ -274,6 +288,8 @@ export const EventCloudProvider = ({ children }) => {
     setNpcList(npcs);    
     setDroppedItems(droppedItems);
     setBackpack(backpack);
+    updateBackpack(backpack);
+    updateEquipment(equipment)
 
 
 

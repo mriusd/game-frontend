@@ -10,6 +10,8 @@ import { Group, Mesh } from "three"
 import type { SceneData, ObjectData } from "interfaces/sceneData.interface"
 import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
 
+// TODO: Change SceneContext to seperate stores
+import { useFighterStore } from "./fighterStore"
 
 export const SceneContext = createContext({})
 
@@ -38,9 +40,15 @@ const SceneContextProvider = ({ children }: Props) => {
         mapObjects,
     } = useEventCloud()
 
+    const test_setCurrentMatrixCoordinate = useFighterStore(state => state.setCurrentMatrixCoordinate)
+
     const [isMoving, setIsMoving] = useState<boolean>(false)
     const [html, setHTML] = useState<HTMLElement | null>(null)
-    const [currentMatrixCoordinate, setCurrentMatrixCoordinate] = useState<Coordinate | null>(null)
+    const [currentMatrixCoordinate, _setCurrentMatrixCoordinate] = useState<Coordinate | null>(null)
+    const setCurrentMatrixCoordinate = (coordinate: Coordinate | null) => {
+        _setCurrentMatrixCoordinate(coordinate)
+        test_setCurrentMatrixCoordinate(coordinate)
+    }
     const [currentWorldCoordinate, setCurrentWorldCoordinate] = useState<Coordinate | null>(null)
     const [nextMatrixCoordinate, setNextMatrixCoordinate] = useState<Coordinate | null>(null)
     const [nextWorldCoordinate, setNextWorldCoordinate] = useState<Coordinate | null>(null)
@@ -175,7 +183,7 @@ const SceneContextProvider = ({ children }: Props) => {
     }, [droppedItems]);
 
     useEffect(() => {
-        const html = document.querySelector(".scene")
+        const html = document.getElementById("scene")
         if (!html) { console.error('[SceneContext]: Html Element not found') }
         setHTML(html as HTMLElement)
     }, [])

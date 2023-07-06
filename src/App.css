@@ -10,6 +10,20 @@ body,
 }
 /*  */
 
+/* Leva Panel */
+.leva-c-kWgxhW {
+  position: absolute !important;
+  left: 32px !important;
+  top: 32px !important;
+}
+/* Stats */
+.stats {
+  top: auto !important;
+  bottom: 0 !important;
+}
+
+
+
 .App {
   text-align: center;
 }
@@ -102,7 +116,8 @@ body,
   margin-top: 16px;
 }
 
-.scene {
+.Game {
+  position: relative;
   width: 100vw;
   height: 90vh;
 }
