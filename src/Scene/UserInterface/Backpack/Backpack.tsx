@@ -1,18 +1,19 @@
 import * as THREE from 'three'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Flex, Box } from '@react-three/flex'
-import { Plane } from '@react-three/drei'
+import { Center, Plane } from '@react-three/drei'
 import { memo } from 'react'
 import BackpackItem from './BackpackItem'
 import { useBackpackStore } from 'store/backpackStore'
 import { shallow } from 'zustand/shallow'
 import { useEventStore } from 'store/EventStore'
-import { ThreeEvent, useFrame } from '@react-three/fiber'
+import { ThreeEvent, useFrame, useThree } from '@react-three/fiber'
 import { useUiStore } from 'store/uiStore'
 import { getCoordInUISpace } from 'Scene/utils/getCoordInUiSpace'
 import { useFighterStore } from 'store/fighterStore'
 import { Text } from '@react-three/drei'
 import EquipmentItem from './EquipmentItem'
+import { getMeshDimensions } from 'Scene/utils/getMeshDimensions'
 
 type CellType = 'equipment' | 'backpack'
 
@@ -31,10 +32,12 @@ const colors = {
 }
 
 const Backpack = memo(function Backpack() {
-    // used on backpack mount to get 100% chance calc items position correctly based on backpack slots position
+    // TODO: Should be fixed in future?
     // Additionally rerender items after mount
+    // used on backpack items to get 100% chance calc items position correctly based on backpack slots position
     const [mounted, mount] = useState<boolean>(false)
     useEffect(() => mount(true), [])
+    // 
 
     // console.log('[CPU CHECK]: Rerender <Backpack>')
     const [backpack, equipmentSlots, equipment] = useEventStore(state => [state.backpack, state.equipmentSlots, state.equipment], shallow)
@@ -48,6 +51,20 @@ const Backpack = memo(function Backpack() {
         shallow
     )
 
+    // Getting Non-reactive Scene data
+    const get = useThree(state => state.get)
+    // Used for boundingBox
+    const backpackRef = useRef<THREE.Group | null>(null)
+    const backpackSlotsContainerRef = useRef<THREE.Group | null>(null)
+    // Triggers before paint, draw backpack on the right
+    // TODO: Should i move it to useFrame or to ResizeHandler?
+    const marginRight = 64
+    React.useLayoutEffect(() => {
+        if (!backpackRef.current || !backpackSlotsContainerRef.current) { return }
+        const canvasWidth = get().size.width
+        const backpackWidth = getMeshDimensions(backpackSlotsContainerRef.current).width
+        backpackRef.current.position.x = canvasWidth / 2 - backpackWidth - marginRight
+    })
 
     // TODO: Causes lots of backpack rerenders
     const fighterCurrentMatrixCoordinate = useFighterStore(state => state.currentMatrixCoordinate)
@@ -186,24 +203,24 @@ const Backpack = memo(function Backpack() {
 
         if (cellToInsert.current.type === 'backpack') {
             const slot = cellToInsert.current.ref.userData.slot
-            // TODO: Twice the same code, the same thing did in BackpackItem
-            // TODO: Put to utils?
-            const slotCell = cellToInsert.current.ref
-            const slotRow = slotCell.parent
-            const slotColumn = slotRow.parent
-            const slotWrapper = slotColumn.parent
-            // Calc position based on all parents
-            let x = slotCell.position.x + slotRow.position.x + slotColumn.position.x + slotWrapper.position.x
-            let y = slotCell.position.y + slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
-            let z = slotCell.position.z + slotRow.position.z + slotColumn.position.z + slotWrapper.position.z
-            // Take into the account size of the element
-            x += (item.userData.item.itemAttributes.itemWidth - 1) * cellSize / 2
-            y -= (item.userData.item.itemAttributes.itemHeight - 1) * cellSize / 2
-            item.position.set(x, y, z)
+            // // TODO: Twice the same code, the same thing did in BackpackItem
+            // // TODO: Put to utils?
+            // const slotCell = cellToInsert.current.ref
+            // const slotRow = slotCell.parent
+            // const slotColumn = slotRow.parent
+            // const slotWrapper = slotColumn.parent
+            // // Calc position based on all parents
+            // let x = slotCell.position.x + slotRow.position.x + slotColumn.position.x + slotWrapper.position.x
+            // let y = slotCell.position.y + slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
+            // let z = slotCell.position.z + slotRow.position.z + slotColumn.position.z + slotWrapper.position.z
+            // // Take into the account size of the element
+            // x += (item.userData.item.itemAttributes.itemWidth - 1) * cellSize / 2
+            // y -= (item.userData.item.itemAttributes.itemHeight - 1) * cellSize / 2
+            // item.position.set(x, y, z)
 
-            // TODO?: Change <z> to <y> coordinate
-            // If equiped, use unequiped otherwise just change the position
-            console.log(pinnedItemEvent.object.parent.userData.type)
+            // // TODO?: Change <z> to <y> coordinate
+            // // If equiped, use unequiped otherwise just change the position
+            // console.log(pinnedItemEvent.object.parent.userData.type)
             const isBackpackItem = pinnedItemEvent.object.parent.userData.type === 'backpack'
             if (isBackpackItem) {
                 updateBackpackItemPosition(itemHash, { x: slot.x, z: slot.y })
@@ -214,15 +231,15 @@ const Backpack = memo(function Backpack() {
         else if (cellToInsert.current.type === 'equipment') {
             const slot = cellToInsert.current.ref.userData.slot
 
-            const slotCell = cellToInsert.current.ref
-            const slotRow = slotCell.parent
-            const slotWrapper = slotRow.parent
+            // const slotCell = cellToInsert.current.ref
+            // const slotRow = slotCell.parent
+            // const slotWrapper = slotRow.parent
     
-            // Calc position based on all parents
-            let x = slotCell.position.x + slotRow.position.x + slotWrapper.position.x
-            let y = slotCell.position.y + slotRow.position.y + slotWrapper.position.y
-            let z = slotCell.position.z + slotRow.position.z + slotWrapper.position.z
-            item.position.set(x, y, z)
+            // // Calc position based on all parents
+            // let x = slotCell.position.x + slotRow.position.x + slotWrapper.position.x
+            // let y = slotCell.position.y + slotRow.position.y + slotWrapper.position.y
+            // let z = slotCell.position.z + slotRow.position.z + slotWrapper.position.z
+            // item.position.set(x, y, z)
 
             equipBackpackItem(itemHash, slot)
         }
@@ -252,7 +269,11 @@ const Backpack = memo(function Backpack() {
         }
 
         cells.forEach(cell => {
-            cell.material.color = show ? new THREE.Color(cell.userData.colors.last_placeholder) : new THREE.Color(cell.userData.colors.common)
+            if (show) {
+                cell.material.color.set(cell.userData.colors.last_placeholder)
+            } else {
+                cell.material.color.set(cell.userData.colors.common)
+            }
         })
 
         placeholderCells.current = show ? cells : []
@@ -263,7 +284,9 @@ const Backpack = memo(function Backpack() {
         // Pin item
         if (pinnedItemEvent.current && isItemPinned.current) {
             const projectedPointer = getCoordInUISpace(raycaster)
-            if (!projectedPointer) { return }
+            if (!projectedPointer || !backpackRef.current) { return }
+            // <substract Backpack position>: Take backpack Items offset into the account
+            projectedPointer.sub(backpackRef.current.position)
             pinnedItemEvent.current.object.parent.position.copy(projectedPointer)
             // Detect collisions
             highlightPointerCell(projectedPointer)
@@ -284,7 +307,7 @@ const Backpack = memo(function Backpack() {
             // If placeholder cell we dont touch it
             if (placeholderCells.current.find(_ => _ === cell)) { return }
             // @ts-expect-error
-            cell.material.color = new THREE.Color(cell.userData.colors.common)
+            cell.material.color.set(cell.userData.colors.common)
         })
 
         const itemWidth = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemWidth
@@ -308,13 +331,13 @@ const Backpack = memo(function Backpack() {
                 // If placeholder cell we dont touch it
                 if (placeholderCells.current.find(_ => _ === currentPointerCells.current[0])) { return }
                 // @ts-expect-error
-                currentPointerCells.current[0].material.color = new THREE.Color(currentPointerCells.current[0].userData.colors.insert_allowed)
+                currentPointerCells.current[0].material.color.set(currentPointerCells.current[0].userData.colors.insert_allowed)
             } else {
                 cellToInsert.current = null
                 // If placeholder cell we dont touch it
                 if (placeholderCells.current.find(_ => _ === currentPointerCells.current[0])) { return }
                 // @ts-expect-error
-                currentPointerCells.current[0].material.color = new THREE.Color(currentPointerCells.current[0].userData.colors.insert_disallowed)
+                currentPointerCells.current[0].material.color.set(currentPointerCells.current[0].userData.colors.insert_disallowed)
             }
             return
         }
@@ -327,7 +350,7 @@ const Backpack = memo(function Backpack() {
                 // If placeholder cell we dont touch it
                 if (placeholderCells.current.find(_ => _ === cell)) { return }
                 // @ts-expect-error
-                cell.material.color = new THREE.Color(cell.userData.colors.insert_allowed)
+                cell.material.color.set(cell.userData.colors.insert_allowed)
             })
         } else {
             cellToInsert.current = null
@@ -335,7 +358,7 @@ const Backpack = memo(function Backpack() {
                 // If placeholder cell we dont touch it
                 if (placeholderCells.current.find(_ => _ === cell)) { return }
                 // @ts-expect-error
-                cell.material.color = new THREE.Color(cell.userData.colors.insert_disallowed)
+                cell.material.color.set(cell.userData.colors.insert_disallowed)
             })
         }
     }
@@ -349,6 +372,7 @@ const Backpack = memo(function Backpack() {
             const slotRow = slotCell.parent
             const slotColumn = slotRow.parent
             const slotWrapper = slotColumn.parent
+
             const x = slotRow.position.x + slotColumn.position.x + slotWrapper.position.x
             const y = slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
 
@@ -359,12 +383,13 @@ const Backpack = memo(function Backpack() {
             const slotRow = slotCell.parent
             const slotColumn = slotRow.parent
             const slotWrapper = slotColumn.parent
+
             const x = slotRow.position.x + slotColumn.position.x + slotWrapper.position.x
             const y = slotRow.position.y + slotColumn.position.y + slotWrapper.position.y
 
             // Multiply by itemWidth & itemHeight to always position model in the center of highlighted square, no matter 1x1 or 2x2 or even 1x3
             // TODO: Change "100" to cell size
-            return Math.abs(x - projectedPointer.x) < 100 && Math.abs(y - projectedPointer.y) < 100
+            return Math.abs(x - projectedPointer.x) < .5 * slotCell.userData.itemWidth * cellSize && Math.abs(y - projectedPointer.y) < .5 * slotCell.userData.itemHeight * cellSize
         })
 
         // Could be only one typ at the same time
@@ -396,6 +421,9 @@ const Backpack = memo(function Backpack() {
     }
 
     function isOccupied(cell: THREE.Mesh, isEquipmentSlot: boolean) {
+        // TODO: Think about this way to handle slot type
+        // It works perfect and with current solution
+        // But i guess there is another more ease to understand way
         if (isEquipmentSlot) {
             // TODO: temporary
             return false
@@ -409,7 +437,7 @@ const Backpack = memo(function Backpack() {
     function clearPointerCells() {
         currentPointerCells.current.forEach(cell => {
             // @ts-expect-error
-            cell.material.color = new THREE.Color(cell.userData.colors.common)
+            cell.material.color.set(cell.userData.colors.common)
         })
     }
 
@@ -423,96 +451,109 @@ const Backpack = memo(function Backpack() {
                 <meshBasicMaterial color={'black'} transparent={true} opacity={.3} />
             </Plane> */}
 
-            {/* Backpack Slots */}
-            <Flex name='backpack' position={[224, -20, 0]} flexDir="column" >
-                { [...new Array(backpackWidth)].map((_, i) => (
-                    <Box name='column' key={i} flexDir="row">
-                        { [...new Array(backpackHeight)].map((_, j) => (
-                            <Box name='row' key={'_'+j}>
+            <group ref={backpackRef} /*position={Position is changing based on viewport size}*/>
+
+                <group 
+                    name='backpack-slots-container' 
+                    // Used for backpack boundingBox calculation
+                    ref={backpackSlotsContainerRef}
+                >
+
+                    {/* Backpack Slots */}
+                    <Flex name='backpack' position={[32, -50, 0]} flexDir="column" >
+                        { [...new Array(backpackWidth)].map((_, i) => (
+                            <Box name='column' key={i} flexDir="row">
+                                { [...new Array(backpackHeight)].map((_, j) => (
+                                    <Box name='row' key={'_'+j}>
+                                        <Plane
+                                            name='slot-cell' 
+                                            ref={(r) => setRef(r, j, i)} 
+                                            args={[cellSize, cellSize, 1]}
+                                            userData={{
+                                                type: 'backpack',
+                                                slot: { x: j, y: i }, 
+                                                colors: {
+                                                    common: (i + j) % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT,
+                                                    insert_allowed: (i + j) % 2 === 0 ? colors.INSERT_ALLOWED_DARK : colors.INSERT_ALLOWED_LIGHT,
+                                                    insert_disallowed: (i + j) % 2 === 0 ? colors.INSERT_DISALLOWED_DARK : colors.INSERT_DISALLOWED_LIGHT,
+                                                    last_placeholder: (i + j) % 2 === 0 ? colors.LAST_PLACEHOLDER_DARK : colors.LAST_PLACEHOLDER_LIGHT,
+                                                },
+                                            }}
+                                        >
+                                            <meshBasicMaterial color={(i + j) % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT} />
+                                        </Plane>
+                                    </Box>
+                                ))}
+                            </Box>
+                        )) }
+                    </Flex>
+
+                    {/* Equipment Slots */}
+                    <Flex name='equipment' position={[0, 400, 0]} maxWidth={450} flexDir="row" flexWrap="wrap">
+                        { equipmentSlots && [...Object.values(equipmentSlots)].sort((a,b) => b.height - a.height).map((_, i) => (
+                            <Box name='row' key={i} margin={8} centerAnchor>
                                 <Plane
-                                    name='slot-cell' 
-                                    ref={(r) => setRef(r, j, i)} 
-                                    args={[cellSize, cellSize, 1]}
+                                    name='slot-equipment'
+                                    ref={(r) => setEquipmentRef(r, _.slot)}
                                     userData={{
-                                        type: 'backpack',
-                                        slot: { x: j, y: i }, 
+                                        type: 'equipment',
+                                        slot: _.slot,
                                         colors: {
-                                            common: (i + j) % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT,
-                                            insert_allowed: (i + j) % 2 === 0 ? colors.INSERT_ALLOWED_DARK : colors.INSERT_ALLOWED_LIGHT,
-                                            insert_disallowed: (i + j) % 2 === 0 ? colors.INSERT_DISALLOWED_DARK : colors.INSERT_DISALLOWED_LIGHT,
-                                            last_placeholder: (i + j) % 2 === 0 ? colors.LAST_PLACEHOLDER_DARK : colors.LAST_PLACEHOLDER_LIGHT,
+                                            common: i % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT,
+                                            insert_allowed: i % 2 === 0 ? colors.INSERT_ALLOWED_DARK : colors.INSERT_ALLOWED_LIGHT,
+                                            insert_disallowed: i % 2 === 0 ? colors.INSERT_DISALLOWED_DARK : colors.INSERT_DISALLOWED_LIGHT,
+                                            last_placeholder: i % 2 === 0 ? colors.LAST_PLACEHOLDER_DARK : colors.LAST_PLACEHOLDER_LIGHT,
                                         },
+                                        allowedItemType: _.type,
+                                        itemWidth: _.width,
+                                        itemHeight: _.height
                                     }}
+                                    args={[cellSize * _.width, cellSize * _.height, 1]}
                                 >
-                                    <meshBasicMaterial color={(i + j) % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT} />
+                                    <meshBasicMaterial color={i % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT} />
+                                    <Text 
+                                        // TODO: mb temporary 
+                                        visible={ !equipmentItems.find(__ => +__.slot === +_.slot)  } 
+                                        fontSize={4 * _.height}
+                                    >{ _.type.toUpperCase() }</Text>
                                 </Plane>
                             </Box>
-                        ))}
-                    </Box>
-                )) }
-            </Flex>
+                        )) }
+                    </Flex>
+                </group>
 
-            {/* Equipment Slots */}
-            <Flex name='equipment' flexDir="row" flexWrap="wrap" maxWidth={450} position={[192, 400, 0]}>
-                { equipmentSlots && [...Object.values(equipmentSlots)].sort((a,b) => b.height - a.height).map((_, i) => (
-                    <Box name='row' key={i} margin={8} centerAnchor>
-                        <Plane
-                            name='slot-equipment'
-                            ref={(r) => setEquipmentRef(r, _.slot)}
-                            userData={{
-                                type: 'equipment',
-                                slot: _.slot,
-                                colors: {
-                                    common: i % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT,
-                                    insert_allowed: i % 2 === 0 ? colors.INSERT_ALLOWED_DARK : colors.INSERT_ALLOWED_LIGHT,
-                                    insert_disallowed: i % 2 === 0 ? colors.INSERT_DISALLOWED_DARK : colors.INSERT_DISALLOWED_LIGHT,
-                                    last_placeholder: i % 2 === 0 ? colors.LAST_PLACEHOLDER_DARK : colors.LAST_PLACEHOLDER_LIGHT,
-                                },
-                                allowedItemType: _.type,
-                                itemWidth: _.width,
-                                itemHeight: _.height
-                            }}
-                            args={[cellSize * _.width, cellSize * _.height, 1]}
-                        >
-                            <meshBasicMaterial color={i % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT} />
-                            <Text 
-                                // TODO: mb temporary 
-                                visible={ !equipmentItems.find(__ => +__.slot === +_.slot)  } 
-                                fontSize={4 * _.height}
-                            >{ _.type.toUpperCase() }</Text>
-                        </Plane>
-                    </Box>
-                )) }
-            </Flex>
 
-                
-            {/* Backpack Items */}
-            <group name='backpack-items'>
-                {items?.length && items.map(item => 
-                    <BackpackItem 
-                        onClick={onClick}
-                        onPointerMove={onPointerMove}
-                        onPointerLeave={onPointerLeave}
-                        key={item.itemHash} 
-                        item={item} 
-                        mounted={mounted}
-                    />) 
-                }
+
+                {/* Backpack Items */}
+                <group name='backpack-items'>
+                    {items?.length && items.map(item => 
+                        <BackpackItem 
+                            onClick={onClick}
+                            onPointerMove={onPointerMove}
+                            onPointerLeave={onPointerLeave}
+                            key={item.itemHash} 
+                            item={item} 
+                            mounted={mounted}
+                        />) 
+                    }
+                </group>
+
+                {/* Equipment Items */}
+                <group name='equipment-items'>
+                    {equipmentItems?.length && equipmentItems.map(item => 
+                        <EquipmentItem
+                            onClick={onClick}
+                            onPointerMove={onPointerMove}
+                            onPointerLeave={onPointerLeave}
+                            key={item.itemHash} 
+                            item={item} 
+                            mounted={mounted}
+                        />) 
+                    }
+                </group>
+            
             </group>
 
-            {/* Equipment Items */}
-            <group name='equipment-items'>
-                {equipmentItems?.length && equipmentItems.map(item => 
-                    <EquipmentItem
-                        onClick={onClick}
-                        onPointerMove={onPointerMove}
-                        onPointerLeave={onPointerLeave}
-                        key={item.itemHash} 
-                        item={item} 
-                        mounted={mounted}
-                    />) 
-                }
-            </group>
         </group>
     )
 })

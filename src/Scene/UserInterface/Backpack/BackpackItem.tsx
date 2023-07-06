@@ -43,6 +43,7 @@ const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter,
         const slotRow = slotCell.parent
         const slotColumn = slotRow.parent
         const slotWrapper = slotColumn.parent
+        
 
         // Calc position based on all parents
         let x = slotCell.position.x + slotRow.position.x + slotColumn.position.x + slotWrapper.position.x

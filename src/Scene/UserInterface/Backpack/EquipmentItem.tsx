@@ -48,11 +48,13 @@ const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter
         if (!slotCell) { return new THREE.Vector3(0, 0, 0) }
         const slotRow = slotCell.parent
         const slotWrapper = slotRow.parent
+        
 
         // Calc position based on all parents
         let x = slotCell.position.x + slotRow.position.x + slotWrapper.position.x
         let y = slotCell.position.y + slotRow.position.y + slotWrapper.position.y
         let z = slotCell.position.z + slotRow.position.z + slotWrapper.position.z
+        
 
         return new THREE.Vector3(x, y, z)
     }, [ item, slots.current, mounted ])
