@@ -13,35 +13,24 @@ import { CAMERA_POSITION } from "./config"
 
 import Light from "./Light"
 import Chunks from "./Chunks"
-import Fighter from "./Fighter"
+import Fighter from "./Fighter/Fighter"
 import Npc from "./Npc"
 import Controller from "./Controller"
 import DroppedItem from "./DroppedItem"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"
 import Decor from "./Decor"
 import UserInterface from './UserInterface/UserInterface'
+import GLTFLoader from './GLTFLoader/GLTFLoader'
 
 import { useUiStore } from 'store/uiStore'
-import { useHTMLEvents } from "store/htmlEvents"
-import { shallow } from 'zustand/shallow'
 
 import { Leva } from 'leva'
 import { useBackpackStore } from 'store/backpackStore'
-
 
 const Scene = memo(function Scene() {
     const store = useSceneContext()
     const worldRef = useRef<Object3D | null>(null)
     const eventsNode = useUiStore(state => state.eventsNode)
-    // // START: HTML Events Manager
-    // const [listen, stopListen, _handlers] = useHTMLEvents(state => [state.listen, state.stopListen, state._handlers], shallow)
-    // useEffect(() => {
-    //     const node = eventsNode.current
-    //     listen(node)
-    //     return () => stopListen(node)
-    // }, [])
-    // // END: HTML Events Manager
-
     const isBackpackOpened = useBackpackStore(state => state.isOpened)
 
     return (
@@ -55,6 +44,7 @@ const Scene = memo(function Scene() {
                     fov: 45,
                 }}
             >
+                <GLTFLoader/>
                 <LoadAssetsContextProvider>
                     <color attach="background" args={[0x000000]} />
                     {/* <fog attach="fog" color={0x000000} near={20} far={60} /> */}
