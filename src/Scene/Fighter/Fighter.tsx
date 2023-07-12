@@ -14,7 +14,6 @@ import { isOccupiedCoordinate } from "../utils/isOccupiedCoordinate"
 import { getMoveDuration } from "../utils/getMoveDuration"
 import { useEventCloud } from "EventCloudContext"
 import { calcDirection } from "../utils/calcDirection"
-import { useControls } from "leva"
 import FighterModel from "./FighterModel"
 import { useGLTFLoaderStore } from "Scene/GLTFLoader/GLTFLoaderStore"
 
@@ -22,12 +21,6 @@ const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
     const camera = useThree(state => state.camera)
     const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.fighter, [])
-
-
-    const test = useControls('Fighter', {
-        turnOn: { value: false }
-    })
-
 
     useEffect(() => {
         console.log('fighter 3d object', gltf)
@@ -40,42 +33,6 @@ const Fighter = memo(function Fighter() {
             }
         }) 
     }, [gltf])
-
-    // const newChestArray = useRef<any>([])
-    // const isChanged = useRef(false)
-    // useEffect(() => {
-    //     if (test.turnOn) {
-    //         if (isChanged.current) { return }
-    //         isChanged.current = true
-
-    //         const newChest = gltf.current.test.scene.getObjectByName("chest")
-    //         const armature = gltf.current.fighter.scene.getObjectByName("Armature")
-
-    //         if (!armature) { return }
-
-    //         if (!newChestArray.current.length) {
-    //             newChest.children.forEach((item: THREE.SkinnedMesh) => {
-    //                 // Attach the bib to the character's skeleton
-    //                 // @ts-expect-error
-    //                 item.bind(gltf.current.fighter.scene.getObjectByName("standard").skeleton, item.matrixWorld)
-    //                 newChestArray.current.push(item)
-    //             })
-    //         }
-    //         newChestArray.current.forEach((item: THREE.SkinnedMesh) => {
-    //             armature.add(item)
-    //         })
-
-    //     } else {
-    //         if (!isChanged.current) { return }
-
-    //         isChanged.current = false
-    //         const armature = gltf.current.fighter.scene.getObjectByName("Armature")
-            
-    //         newChestArray.current.forEach((item: THREE.SkinnedMesh) => {
-    //             armature.remove(item)
-    //         })
-    //     }
-    // }, [test])
 
     const { submitMalee } = useEventCloud()
     const { 
@@ -93,10 +50,7 @@ const Fighter = memo(function Fighter() {
         setNextWorldCoordinate,
 
         controller: {
-            direction,
             focusedMatrixCoordinate,
-            focusedWorldCoordinate,
-            pointerWorldCoordinate
         },
 
         occupiedCoords

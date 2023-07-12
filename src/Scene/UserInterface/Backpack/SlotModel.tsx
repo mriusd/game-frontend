@@ -9,8 +9,10 @@ import { getItemModelName } from 'Scene/utils/getItemModelName'
 import { useTexture } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useControls } from 'leva'
+import { isExcellent } from 'Scene/utils/isExcellent'
 
 import { shader_level } from 'Scene/shaders/shader_level'
+import { generateItemName } from 'helpers/generateItemName'
 
 interface Props { position?: number[], rotation?: number[], scale?: number[], onPointerEnter?: (e?: any) => void, onPointerLeave?: (e?: any) => void, item: BackpackSlot }
 const SlotModel = memo(forwardRef(function SlotModel({ item, ...props }: Props, ref: any) {
@@ -35,9 +37,9 @@ const SlotModel = memo(forwardRef(function SlotModel({ item, ...props }: Props, 
     }, [item, map])
 
     // For Dev
-    const devState = useControls(`${item.itemAttributes.name}`, {
+    const devState = useControls(generateItemName(item.itemAttributes, item.qty), {
         level: { min: 0, max: 15,  value: +item.itemAttributes.itemLevel },
-        isExcellent: false
+        isExcellent: isExcellent(item)
     })
     // 
 

@@ -49,8 +49,27 @@ export const models: ModelLoadItem[] = [
         name: 'sword',
         url: 'models/sword/sword.gltf'
     },
+
+
+    // Equipment On Fighter
     {
-        name: 'dragon_chest_figher',
-        url: 'models/dragon_chest_fight/dragon_chest.gltf'
+        name: 'fighter_dragon_gloves',
+        url: 'models/figher_dragon_gloves/fighter_dragon_gloves.gltf'
+    },
+    {
+        name: 'fighter_dragon_helmet',
+        url: 'models/fighter_dragon_helmet/fighter_dragon_helmet.gltf'
+    },
+    {
+        name: 'fighter_dragon_chest',
+        url: 'models/fighter_dragon_chest/fighter_dragon_chest.gltf'
+    },
+    {
+        name: 'fighter_dragon_trousers',
+        url: 'models/fighter_dragon_trousers/fighter_dragon_trousers.gltf'
+    },
+    {
+        name: 'fighter_dragon_boots',
+        url: 'models/fighter_dragon_boot/fighter_dragon_boot.gltf'
     },
 ]
