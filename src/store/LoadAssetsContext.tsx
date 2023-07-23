@@ -33,7 +33,7 @@ const LoadAssetsContextProvider = ({ children }) => {
     const gltf = useRef<{[key: string]: GLTF}>({})
 
     // @ts-expect-error
-    gltf.current.fighter = useGLTF('models/pixel_character/character.gltf')
+    gltf.current.fighter = useGLTF('models/bolvanus/bolvanus.gltf')
     // @ts-expect-error
     gltf.current.npc = useGLTF('models/npc_test/scene.gltf')
     // @ts-expect-error
@@ -61,6 +61,13 @@ const LoadAssetsContextProvider = ({ children }) => {
     gltf.current[tbm.dragon_trousers] = useGLTF(`models/${tbm[tbm.dragon_trousers]}/${tbm[tbm.dragon_trousers]}.gltf`)
     // @ts-expect-error
     gltf.current[tbm.sword] = useGLTF(`models/${tbm[tbm.sword]}/${tbm[tbm.sword]}.gltf`)
+
+    // @ts-expect-error
+    gltf.current.dragon_chest_figher = useGLTF(`models/dragon_chest_fight/dragon_chest.gltf`)
+    // @ts-expect-error
+    gltf.current.test = useGLTF(`models/test/dragon_armor.gltf`)
+    // @ts-expect-error
+    gltf.current.bolvanus = useGLTF(`models/bolvanus/bolvanus.gltf`)
 
     const value: ILoadAssetsContext = {
         gltf

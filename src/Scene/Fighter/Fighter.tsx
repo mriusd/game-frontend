@@ -1,36 +1,38 @@
 import * as THREE from "three"
-import { useEffect, useState, useRef, memo } from "react"
+import { useEffect, useState, useRef, memo, useMemo } from "react"
 import { useThree } from "@react-three/fiber"
 import { useAnimations } from "@react-three/drei"
-import { CAMERA_POSITION } from "./config"
-import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
-import { getNearestEmptySquareToTarget, getTargetSquareWithAttackDistance } from "./utils/getNextPosition"
-import { inWorld } from "./utils/inWorld"
-import { euclideanDistance } from "./utils/euclideanDistance"
-import Tween from "./utils/tween/tween"
-import { useSceneContext } from '../store/SceneContext'
+import { CAMERA_POSITION } from "../config"
+import { matrixCoordToWorld } from "../utils/matrixCoordToWorld"
+import { getNearestEmptySquareToTarget, getTargetSquareWithAttackDistance } from "../utils/getNextPosition"
+import { inWorld } from "../utils/inWorld"
+import { euclideanDistance } from "../utils/euclideanDistance"
+import Tween from "../utils/tween/tween"
+import { useSceneContext } from '../../store/SceneContext'
 import type { Coordinate } from "interfaces/coordinate.interface"
-import { useLoadAssets } from "store/LoadAssetsContext"
-import { isOccupiedCoordinate } from "./utils/isOccupiedCoordinate"
-import { getMoveDuration } from "./utils/getMoveDuration"
-import Name from "./components/Name"
+import { isOccupiedCoordinate } from "../utils/isOccupiedCoordinate"
+import { getMoveDuration } from "../utils/getMoveDuration"
 import { useEventCloud } from "EventCloudContext"
-import { calcDirection } from "./utils/calcDirection"
+import { calcDirection } from "../utils/calcDirection"
+import FighterModel from "./FighterModel"
+import { useGLTFLoaderStore } from "Scene/GLTFLoader/GLTFLoaderStore"
 
 const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
     const camera = useThree(state => state.camera)
-    const { gltf } = useLoadAssets()
+    const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.fighter, [])
+
     useEffect(() => {
-        if (!gltf.current.fighter) { return }
-        gltf.current.fighter.scene.traverse((child) => {
+        console.log('fighter 3d object', gltf)
+        if (!gltf) { return }
+        gltf.scene.traverse((child) => {
             // @ts-expect-error
             if (child.isMesh) {
                 child.castShadow = true
                 child.receiveShadow = true
             }
         }) 
-    }, [gltf.current.fighter])
+    }, [gltf])
 
     const { submitMalee } = useEventCloud()
     const { 
@@ -48,10 +50,7 @@ const Fighter = memo(function Fighter() {
         setNextWorldCoordinate,
 
         controller: {
-            direction,
             focusedMatrixCoordinate,
-            focusedWorldCoordinate,
-            pointerWorldCoordinate
         },
 
         occupiedCoords
@@ -68,7 +67,7 @@ const Fighter = memo(function Fighter() {
     const ENTER_TO_ISSTAYING_DELAY = 50 //ms
 
     const animationTarget = useRef()
-    const { mixer, actions } = useAnimations(gltf.current.fighter.animations, animationTarget)
+    const { mixer, actions } = useAnimations(gltf.animations, animationTarget)
 
     // const [attacks, _setAttacks] = useState([])
     // const setAttacks = (attack: ) => {
@@ -217,8 +216,8 @@ const Fighter = memo(function Fighter() {
 
     // Toggle movement animation
     useEffect(() => {
-        // console.log('[Fighter]: Toggle isMoving animation', mixer, actions)
-        console.log(actions)
+        console.log('[Fighter]: Toggle isMoving animation', mixer, actions)
+        // console.log(actions)
         if (isStaying) {
             actions['run']?.fadeOut(.1).stop()
             // actions['t-pose']?.play()
@@ -234,19 +233,7 @@ const Fighter = memo(function Fighter() {
         return <></>
     }
 
-    return (
-        <group>
-            <Name value="MyName()_()" target={animationTarget} offset={.4} />
-            <primitive 
-                ref={animationTarget}
-                object={gltf.current.fighter.scene}
-                position={[currentWorldCoordinate.x, 0, currentWorldCoordinate.z]}
-                scale={.3}
-                rotation={[0, direction, 0]}
-                castShadow 
-            />
-        </group>
-    )
+    return <FighterModel ref={animationTarget} model={gltf.scene} />
 })
 
 export default Fighter

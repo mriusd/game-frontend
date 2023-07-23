@@ -17,7 +17,9 @@ const UserInterface = memo(function UserInterface() {
         <Hud>
             <OrthographicCamera makeDefault position={[0, 0, 10]} />
             <ambientLight color={0xFFFFFF} intensity={.5} />
-            <directionalLight color={0xFFFFFF} position={[-5, 0, 10]} />
+            <directionalLight color={0xFFFFFF} position={[-5, 0, 10]} intensity={.5} />
+            <directionalLight color={0xFFFFFF} position={[5, 0, 10]} intensity={.5} />
+
             <group position={[0, 0, -1000]} ref={userInterface} name="user-interface">
                 <Backpack/>
                 <BottomMenu/>
