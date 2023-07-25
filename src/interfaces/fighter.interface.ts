@@ -44,5 +44,5 @@ export interface Fighter {
     direction: Direction;
 
     skills: Record<number, Skill>;
-    equipment: Record<number, BackpackSlot | null>;;
+    equipment: Record<number, BackpackSlot | null>;
 }
