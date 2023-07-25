@@ -26,7 +26,6 @@ export const useSceneContext = (): ISceneContext => {
 interface Props { children: ReactNode | ReactNode[] }
 const SceneContextProvider = ({ children }: Props) => {
     const {
-        PlayerID,
         addDamageEvent,
         fighter,
         npcList,
