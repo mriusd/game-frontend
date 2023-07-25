@@ -1,26 +1,44 @@
 import type { ModelLoadItem } from "interfaces/gltfloader.interface"
 
 export const models: ModelLoadItem[] = [
+    // Fighter
     {
-        name: 'fighter',
-        url: 'models/bolvanus/bolvanus.gltf'
+        name: 'stock',
+        url: 'models/stock/stock.gltf'
     },
+
+
+    // Npc
     {
         name: 'npc',
         url: 'models/npc_test/scene.gltf'
     },
+
+
+    // Tree
     {
         name: 'tree',
         url: 'models/decor/tree/scene.gltf'
     },
-    {
-        name: 'ice_sword',
-        url: 'models/max_sword/file.gltf'
-    },
+
+    // Magic Box
     {
         name: 'magic_box',
         url: 'models/magic_box/magic_box.gltf'
     },
+
+    // Swords
+    {
+        name: 'sword',
+        url: 'models/sword/sword.gltf'
+    },
+    {
+        name: 'crystal_sword',
+        url: 'models/crystal_sword/crystal sword.gltf'
+    },
+
+
+    // Dragon Set (For Inventory)
     {
         name: 'dragon_boots',
         url: 'models/dragon_boots/dragon_boots.gltf'
@@ -38,20 +56,35 @@ export const models: ModelLoadItem[] = [
         url: 'models/dragon_helmet/dragon_helmet.gltf'
     },
     {
-        name: 'dragon_sholders',
-        url: 'models/dragon_sholders/dragon_sholders.gltf'
-    },
-    {
         name: 'dragon_trousers',
         url: 'models/dragon_trousers/dragon_trousers.gltf'
     },
+
+
+    // Legendary Set (For Inventory)
     {
-        name: 'sword',
-        url: 'models/sword/sword.gltf'
+        name: 'legendary_boots',
+        url: 'models/legendary_boots/legendary_boots.gltf'
+    },
+        {
+        name: 'legendary_chest',
+        url: 'models/legendary_chest/legendary_chest.gltf'
+    },
+    {
+        name: 'legendary_gloves',
+        url: 'models/legendary_gloves/legendary_gloves.gltf'
+    },
+    {
+        name: 'legendary_helmet',
+        url: 'models/legendary_helmet/legendary_helmet.gltf'
+    },
+    {
+        name: 'legendary_trousers',
+        url: 'models/legendary_trousers/legendary_trousers.gltf'
     },
 
 
-    // Equipment On Fighter
+    // Dragon Set (Equipment On Fighter)
     {
         name: 'fighter_dragon_gloves',
         url: 'models/figher_dragon_gloves/fighter_dragon_gloves.gltf'

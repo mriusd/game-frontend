@@ -16,23 +16,12 @@ import { useEventCloud } from "EventCloudContext"
 import { calcDirection } from "../utils/calcDirection"
 import FighterModel from "./FighterModel"
 import { useGLTFLoaderStore } from "Scene/GLTFLoader/GLTFLoaderStore"
+import { getAttackAction, getRunAction, getStandAction } from "./utils/getAction"
 
 const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
     const camera = useThree(state => state.camera)
-    const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.fighter, [])
-
-    useEffect(() => {
-        console.log('fighter 3d object', gltf)
-        if (!gltf) { return }
-        gltf.scene.traverse((child) => {
-            // @ts-expect-error
-            if (child.isMesh) {
-                child.castShadow = true
-                child.receiveShadow = true
-            }
-        }) 
-    }, [gltf])
+    const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.stock, [])
 
     const { submitMalee } = useEventCloud()
     const { 
@@ -51,6 +40,7 @@ const Fighter = memo(function Fighter() {
 
         controller: {
             focusedMatrixCoordinate,
+            direction,
         },
 
         occupiedCoords
@@ -132,20 +122,26 @@ const Fighter = memo(function Fighter() {
     const attackTimeout = useRef<NodeJS.Timeout | null>(null)
     const speed = 500 //ms
     useEffect(() => {
-        console.log(target, itemTarget)
+        console.log('target!', target, itemTarget)
         // For attack target
         if (target && target?.skill) {
+            console.log('FIGHTER EQUUUUU', fighter.equipment)
+
             const attackDistance = target.skill.activeDistance
             const objectCoordinate = target.target.coordinates
             const targetCoordinate = getTargetSquareWithAttackDistance(occupiedCoords, currentMatrixCoordinate, objectCoordinate, attackDistance)
             setSaveFocusedMatrixCoordinate(targetCoordinate)
+            
             if (actions) {
-                actions['atack']?.setDuration(speed / 1000).play()
+                const attackAction = getAttackAction(actions, fighter, target.skill)
+                // const action
+                attackAction?.setDuration(speed / 1000).play()
                 clearTimeout(attackTimeout.current)
                 attackTimeout.current = setTimeout(() => {
-                    actions['atack']?.stop()
+                    attackAction?.stop()
                 }, speed)
             }
+            
             submitMalee(calcDirection(currentMatrixCoordinate, objectCoordinate))
             setTarget(null, null)
             return
@@ -216,24 +212,49 @@ const Fighter = memo(function Fighter() {
 
     // Toggle movement animation
     useEffect(() => {
+        if (!actions || !fighter) { return }
         console.log('[Fighter]: Toggle isMoving animation', mixer, actions)
         // console.log(actions)
-        if (isStaying) {
-            actions['run']?.fadeOut(.1).stop()
-            // actions['t-pose']?.play()
+        const { action: runAction, lastAction: lastRunAction } = getRunAction(actions, fighter)
+        const { action: standAction, lastAction: lastStandAction } = getStandAction(actions, fighter)
+        
+        // TODO: do this another way
+        // change after ill rewrite fighter
+        // Reset old animations
+        lastRunAction?.stop()
+        lastStandAction?.stop()
 
+        if (isStaying) {
+            runAction?.fadeOut(.1).stop()
+            standAction?.play()
         } else {
-            // actions['t-pose']?.fadeOut(.1).stop()
-            actions['run']?.setDuration(60 / fighter.movementSpeed * 4).play()
+            standAction?.fadeOut(.1).stop()
+            runAction?.setDuration(60 / fighter.movementSpeed * 4).play()
         }
     }, [ isStaying ])
+
+
+    // Change Pose if Fighter Equipment Changes
+    // TODO: Change this to a correct implementation
+    useEffect(() => {
+        if (!actions) { return  }
+        const { action: standAction, lastAction: lastStandAction } = getStandAction(actions, fighter)
+        lastStandAction?.stop()
+        standAction?.play()
+    }, [fighter])
 
 
     if (!currentWorldCoordinate) {
         return <></>
     }
 
-    return <FighterModel ref={animationTarget} model={gltf.scene} />
+    return <FighterModel 
+                ref={animationTarget} 
+                model={gltf.scene} 
+                fighter={fighter} 
+                position={[currentWorldCoordinate.x, 0, currentWorldCoordinate.z]}
+                rotation={[0, direction, 0]}
+            />
 })
 
 export default Fighter

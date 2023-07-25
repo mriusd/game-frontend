@@ -280,6 +280,7 @@ export const EventCloudProvider = ({ children }) => {
     setFighter(fighter);
     setMapObjects(mapObjects);
     setNpcList(npcs);
+    setPlayerList(players);
 
     //console.log("Ping fighter: ", fighter, mapObjects);
   }

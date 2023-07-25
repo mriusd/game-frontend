@@ -1,23 +1,25 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useMemo, useRef } from "react"
 import Name from "Scene/components/Name"
 import { useSceneContext } from "store/SceneContext"
-import { useEventStore } from "store/EventStore"
-import { shader_level } from "Scene/shaders/shader_level"
 import { BackpackSlot } from "interfaces/backpack.interface"
 import { getShaderedEquipment } from "./utils/getShaderedEquipment"
 import { useFrame } from "@react-three/fiber"
+import { Fighter } from "interfaces/fighter.interface"
+import { SkeletonUtils } from "three-stdlib"
 
-interface Props { model: THREE.Group | THREE.Mesh }
-const FighterModel = React.memo(React.forwardRef(function FighterModel({ model }: Props, ref) {
+interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, position: number[], rotation: number[] }
+const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: baseModel, fighter, position, rotation }: Props, ref) {
+    // Clone model for Reuse
+    const model = useMemo(() => SkeletonUtils.clone(baseModel), [baseModel])
+
+
     // Equipment we take on Fighter
-    const equipment = useEventStore(state => state.equipment)
+    // const equipment = useEventStore(state => state.equipment)
+    const equipment = useMemo(() => fighter.equipment, [fighter])
+
     const modelRef = useRef()
     // Forward ref
     React.useImperativeHandle(ref, () => modelRef.current)
-
-
-    // TODO: Should be fixed, to prevent rerenders
-    const { currentWorldCoordinate, controller: { direction } } = useSceneContext()
 
 
     // Space in Fighter model where we insert all Equipment
@@ -36,6 +38,18 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model }
 
     const uniforms = useRef({ uTime: { value: 0 } })
 
+    // Enable shadows
+    useEffect(() => {
+        if (!model) { return }
+        model.traverse((child) => {
+            // @ts-expect-error
+            if (child.isMesh) {
+                child.castShadow = true
+                child.receiveShadow = true
+            }
+        }) 
+    }, [model])
+
     // Find Armature & Skeleton
     useEffect(() => {
         // @ts-expect-error
@@ -53,18 +67,18 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model }
             lastEquipment.current = Object.values(equipment)
         }
 
-        console.log('Armature', fighterArmature.current)
+        // console.log('Armature', fighterArmature.current)
         // Finding items to be removed
         equipmentToTakeOF.current = lastEquipment.current.filter(
             (oldItem) => !Object.values(equipment).find(_ => _.itemHash === oldItem.itemHash)
         )
-        console.log('equipmentToTakeOF', equipmentToTakeOF.current)
+        // console.log('equipmentToTakeOF', equipmentToTakeOF.current)
 
         // Finding items to be added
         equipmentToTakeON.current = Object.values(equipment).filter(
             (newItem) => !lastEquipment.current.find(_ => _.itemHash === newItem.itemHash)
         )
-        console.log('equipmentToTakeON', equipmentToTakeON.current)
+        // console.log('equipmentToTakeON', equipmentToTakeON.current)
 
         if (!fighterArmature.current || !fighterSkeleton.current) { return }
         takeOfLastEquipment()
@@ -84,10 +98,10 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model }
             equipedMeshes.current.splice(meshIndex, 1)
         })
         function removeFromScene(model: { itemHash: string, objects: {name: string}[] }) {
-            console.log('removeFromScene', model)
+            // console.log('removeFromScene', model)
             model.objects.forEach(_ => {
                 const object = fighterArmature.current.getObjectByName(_.name)
-                console.log('Object to remove', object)
+                // console.log('Object to remove', object)
                 // @ts-expect-error
                 if (object.isSkinnedMesh) {
                     fighterArmature.current.remove(object)
@@ -101,7 +115,7 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model }
             const model = getShaderedEquipment(item, uniforms)
             if (!model) { return console.warn('[FighterModel<takeOn>]: Equipment Model not Found') }
             const modelArmature = model.getObjectByName('Armature')
-            console.log('modelArmature', modelArmature)
+            // console.log('modelArmature', modelArmature)
             if (!modelArmature) { return }
             
             // Set itemHash to remove via it then
@@ -147,16 +161,16 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model }
     useFrame(({ clock }) => {
         uniforms.current.uTime.value = clock.getElapsedTime()
     })
-    
+
     return (
         <group name="fighter-model">
-            <Name value="Berlin" target={modelRef} offset={.4} />
+            <Name value={fighter.name || 'Player_'+fighter.id} target={modelRef} offset={.4} />
             <primitive 
                 ref={modelRef}
                 object={model}
-                position={[currentWorldCoordinate.x, 0, currentWorldCoordinate.z]}
                 scale={.3}
-                rotation={[0, direction, 0]}
+                position={position}
+                rotation={rotation}
                 castShadow 
             />
         </group>

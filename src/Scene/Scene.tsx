@@ -21,6 +21,7 @@ import FloatingDamage from "./FloatingDamage/FloatingDamage"
 import Decor from "./Decor"
 import UserInterface from './UserInterface/UserInterface'
 import GLTFLoader from './GLTFLoader/GLTFLoader'
+import OtherFighter from './Fighter/OtherFighter'
 
 import { useUiStore } from 'store/uiStore'
 
@@ -53,6 +54,8 @@ const Scene = memo(function Scene() {
                     {store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />)}
                     {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
                     {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)}
+                    {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)}
+
                     <Fighter />
                     <Chunks ref={worldRef} />
                     <Controller world={worldRef} />

@@ -1,11 +1,10 @@
 import * as THREE from 'three'
 // @ts-expect-error 
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js'
-import { useMemo, memo, useEffect, useRef } from "react"
+import { useMemo, memo, useRef } from "react"
 import { forwardRef } from 'react'
 import type { BackpackSlot } from 'interfaces/backpack.interface'
-import { useLoadAssets } from 'store/LoadAssetsContext'
-import { getItemModelName } from 'Scene/utils/getItemModelName'
+import { getBackpackModel } from './utils/getBackpackModel'
 import { useTexture } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useControls } from 'leva'
@@ -16,8 +15,6 @@ import { generateItemName } from 'helpers/generateItemName'
 
 interface Props { position?: number[], rotation?: number[], scale?: number[], onPointerEnter?: (e?: any) => void, onPointerLeave?: (e?: any) => void, item: BackpackSlot }
 const SlotModel = memo(forwardRef(function SlotModel({ item, ...props }: Props, ref: any) {
-    // FIXME: Rerenders lots of time, cuz app.tsx (eventCloud) has rerendering hole
-    const { gltf } = useLoadAssets()
     const { map } = useTexture({ map: 'assets/notexture.png' })
 
     const shader = useRef<THREE.Shader | null>(null)
@@ -25,15 +22,16 @@ const SlotModel = memo(forwardRef(function SlotModel({ item, ...props }: Props, 
 
     // Find needed 3D Model
     const model = useMemo<THREE.Mesh>(() => {
-        const name = getItemModelName(item.itemAttributes.name)
-        if (name === 'none') {
+        const newModel = getBackpackModel(item.itemAttributes.name)
+
+        if (!newModel) {
             return new THREE.Mesh(
                 new THREE.BoxGeometry(+item.itemAttributes.itemWidth / 4, +item.itemAttributes.itemHeight / 4, +item.itemAttributes.itemWidth / 4),
                 new THREE.MeshStandardMaterial({ color: 'pink', map })
             )
         }
 
-        return SkeletonUtils.clone(gltf.current[name].scene)
+        return SkeletonUtils.clone(newModel.scene)
     }, [item, map])
 
     // For Dev
