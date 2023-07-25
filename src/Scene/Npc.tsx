@@ -146,8 +146,8 @@ const Npc = memo(function Npc({ npc }: Props) {
                 onPointerDown={handleLeftClick}
                 ref={animationTarget}
                 object={model}
-                position={[currentWorldPosition.x, .4, currentWorldPosition.z]}
                 scale={.006}
+                position={[currentWorldPosition.x, .4, currentWorldPosition.z]}
                 rotation={[0, direction, 0]}
             >
             </primitive>

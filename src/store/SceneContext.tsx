@@ -37,6 +37,7 @@ const SceneContextProvider = ({ children }: Props) => {
         setTarget: setEventTarget,
         refreshFighterItems,
         mapObjects,
+        playerList
     } = useEventCloud()
 
     const test_setCurrentMatrixCoordinate = useFighterStore(state => state.setCurrentMatrixCoordinate)
@@ -110,7 +111,16 @@ const SceneContextProvider = ({ children }: Props) => {
     const chunkSize = useRef<number>(60)
     const chunksPerAxis = useRef<number>(worldSize.current / chunkSize.current)
 
+    // Update PlayerList but remove Yourself
     const NpcList = useRef<Fighter[]>([])
+    const PlayerList = useRef<Fighter[]>([])
+    useEffect(() => {
+        const id = fighter.id
+        const playerIndex = playerList.findIndex(item => item.id === id)
+        const newState = [...playerList]
+
+        PlayerList.current = [...newState.slice(0, playerIndex), ...newState.slice(playerIndex + 1)]
+    }, [playerList])
 
     // Store npc refs, to have acces there position, boinding box etc
     const sceneData = useRef<SceneData>({})
@@ -222,7 +232,9 @@ const SceneContextProvider = ({ children }: Props) => {
         VisibleDecor,
 
         target, setTarget,
-        itemTarget, setItemTarget
+        itemTarget, setItemTarget,
+
+        PlayerList
     }
 
     return (
