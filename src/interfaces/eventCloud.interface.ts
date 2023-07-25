@@ -4,9 +4,9 @@ import { BackpackSlot } from './backpack.interface';
 import type { ItemDroppedEvent } from "./item.interface"; 
 import type { Direction } from "./direction.interface"; 
 import type { MapObject } from "./mapObject.interface"; 
+import type { FighterAttributes } from "./fighterAttributes.interface"; 
 
 export interface EventCloud {
-    PlayerID: any 
     events: any 
     addDamageEvent: any 
     setEvents: any
@@ -33,5 +33,12 @@ export interface EventCloud {
     equipBackpackItem: any
     unequipBackpackItem: any
     sendCommand: (text: string) => void
-    mapObjects: MapObject[]
+    mapObjects: MapObject[],
+    userFighters: FighterAttributes[],
+    fetchUserFighters: (ownerAddress: string) => void,
+    createFighter: (ownerAddress: string, fighterClass: number, name: string) => void,
+    sendAuth: any,
+    account: string,
+    setAccount: any,
+    playerList: Fighter[] 
 }

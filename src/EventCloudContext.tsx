@@ -24,18 +24,21 @@ export const useEventCloud = (): EventCloud => {
 };
 
 export const EventCloudProvider = ({ children }) => {
-  const PlayerID = 1;
   const UserAddress = process.env.REACT_APP_USER_WALLET;
 
   const [events, setEvents] = useState([]);
   const [latestDamageEvent, setLatestDamageEvent] = useState(null);
 
+
+  const [account, setAccount]           = useState<string>('');
   const [fighter, setFighter]           = useState<Fighter | null>(null);
   const [droppedItems, setDroppedItems] = useState<Record<common.Hash, ItemDroppedEvent>>({});
   const [npcList, setNpcList]           = useState<Fighter[]>([]);
+  const [playerList, setPlayerList]     = useState<Fighter[]>([]);
   const [equipment, setEquipment]       = useState<Record<number, BackpackSlot | null>>(null);
   const [backpack, setBackpack]         = useState<Backpack | null>(null);
   const [mapObjects, setMapObjects]     = useState<MapObject[]>([]);
+  const [userFighters, setUserFighters] = useState<FighterAttributes[]>([]);
  
   const [money, setMoney] = useState(0);
   const [target, setTarget] = useState(0);
@@ -57,7 +60,7 @@ export const EventCloudProvider = ({ children }) => {
     onOpen: (event) => { 
       //@console.log('WebSocket connected!:', event); 
       // @ts-expect-error
-      sendAuth(); 
+      //sendAuth(); 
     },
     onError: (event) => {
       console.error('WebSocket error:', event)
@@ -75,8 +78,8 @@ export const EventCloudProvider = ({ children }) => {
       type: "auth",
       data: {
         // @ts-expect-error
-          playerID: parseInt(PlayerID),
-          userAddress: UserAddress,
+          playerID: target,
+          userAddress: account,
           locationHash: "lorencia_0_0"
       }
     });
@@ -100,7 +103,7 @@ export const EventCloudProvider = ({ children }) => {
       type: "submit_attack",
       data: {
           opponentID: target.toString(),
-          playerID: PlayerID.toString(),
+          playerID: fighter.tokenId.toString(),
           skill: selectedSkill,
           direction: direction
       }
@@ -114,7 +117,7 @@ export const EventCloudProvider = ({ children }) => {
       type: "submit_attack",
       data: {
           opponentID: target.toString(),
-          playerID: PlayerID.toString(),
+          playerID: fighter.tokenId.toString(),
           skill: 0,
           direction: direction
       }
@@ -138,7 +141,7 @@ export const EventCloudProvider = ({ children }) => {
     var response = sendJsonMessage({
         type: "get_fighter_items",
         data: {
-            fighterId: parseInt(PlayerID),
+            fighterId: parseInt(fighter.tokenId),
         }
 
       });
@@ -193,6 +196,20 @@ export const EventCloudProvider = ({ children }) => {
   }
   
 
+  function fetchUserFighters(ownerAddress: string) {
+    var response = sendJsonMessage({
+      type: "get_user_fighters",
+      data: { ownerAddress }
+    });
+  }
+
+  function createFighter(ownerAddress: string, fighterClass: number, name: string) {
+    var response = sendJsonMessage({
+      type: "create_fighter",
+      data: { ownerAddress, fighterClass, name }
+    });
+  }
+
   
 
 
@@ -210,9 +227,9 @@ export const EventCloudProvider = ({ children }) => {
           handleDroppedItems(msg.droppedItems);
         break;
 
-        case "spawn_npc":
-          handleUpdateNpc(msg.npc);
-        break;
+        // case "spawn_npc":
+        //   handleUpdateNpc(msg.npc);
+        // break;
 
         case "fighter_items":
           handleFighterItems(msg.items, msg.attributes, msg.equipment, msg.stats, msg.npcs, msg.fighter, msg.money, msg.droppedItems, msg.backpack);
@@ -220,19 +237,23 @@ export const EventCloudProvider = ({ children }) => {
 
         case "damage_dealt":
           //console.log("[damage_dealt]  msg=", msg);
-          handleDamage(msg.damage, msg.opponent, msg.player, msg.opponentHealth, msg.lastDmgTimestamp, msg.fighter, msg.type)
+          handleDamage(msg.damage, msg.opponent, msg.player, msg.opponentHealth, msg.lastDmgTimestamp, msg.playerFighter, msg.opponentFighter, msg.type, msg.skill)
         break;
 
         case "ping":
-          handlePing(msg.fighter, msg.mapObjects);
+          handlePing(msg.fighter, msg.mapObjects, msg.npcs, msg.players);
         break;
 
-        case "update_npc":
-          handleUpdateNpc(msg.npc);
-        break;
+        // case "update_npc":
+        //   handleUpdateNpc(msg.npc);
+        // break;
 
         case "backpack_update":
           handleUpdateBackpack(msg.backpack, msg.equipment);
+        break;
+
+        case "user_fighters":
+          handleUserFighters(msg.fighters);
         break;
       }
   }
@@ -240,6 +261,10 @@ export const EventCloudProvider = ({ children }) => {
 
   const updateBackpack = useEventStore(state => state.updateBackpack);
   const updateEquipment = useEventStore(state => state.updateEquipment);
+
+  function handleUserFighters (fighters) {
+    setUserFighters(fighters)
+  }
 
   function handleUpdateBackpack (newBackpack, newEquipment) {
     console.log("[handleUpdateBackpack] ", newBackpack, newEquipment)
@@ -251,25 +276,23 @@ export const EventCloudProvider = ({ children }) => {
     setEquipment(newEquipment);
   }
 
-  function handlePing(fighter, mapObjects) {
+  function handlePing(fighter, mapObjects, npcs, players) {
     setFighter(fighter);
     setMapObjects(mapObjects);
+    setNpcList(npcs);
+
     //console.log("Ping fighter: ", fighter, mapObjects);
   }
 
-  function handleDamage(damage, opponent, player, opponentHealth, lastDmgTimestamp, opponentFighterObj, dmgType) {
+  function handleDamage(damage, opponent, player, opponentHealth, lastDmgTimestamp, playerFighter, opponentFighter, dmgType, skill) {
     // console.log("[handleDamage]  damage=", damage ," dmgType=", dmgType);
 
-    if (player == PlayerID) {
-      handleUpdateNpc(opponentFighterObj);
-      
-      // Use addDamageEvent from EventCloudContext
-      console.log('Calling addDamageEvent', { npcId: opponent, damage: damage, dmgType: dmgType }, dmgType);
-      addDamageEvent({ npcId: opponent, damage, dmgType });
+    //handleUpdateNpc(opponentFighterObj);
+    
+    // Use addDamageEvent from EventCloudContext
+    console.log('Calling addDamageEvent', { npcId: opponent, damage: damage, dmgType: dmgType }, dmgType);
+    addDamageEvent({ npcId: opponent, damage, dmgType, skill, playerFighter, opponentFighter });
 
-    } else {
-      setFighter(opponentFighterObj);
-    }
   }
 
   function handleFighterItems(items, attributes, equipment, stats, npcs, fighter, money, droppedItems, backpack) {
@@ -285,7 +308,7 @@ export const EventCloudProvider = ({ children }) => {
     
 
     setEquipment(equipment);
-    setNpcList(npcs);    
+    //setNpcList(npcs);    
     setDroppedItems(droppedItems);
     setBackpack(backpack);
     updateBackpack(backpack);
@@ -307,22 +330,22 @@ export const EventCloudProvider = ({ children }) => {
     
   }
 
-  function handleUpdateNpc(npc) {
-    setNpcList((prevNpcList) => {
-      const index = prevNpcList.findIndex((item) => item.id === npc.id);
-      if (index !== -1) {
-        // Replace the NPC with the same ID in the list
-        return [
-          ...prevNpcList.slice(0, index),
-          npc,
-          ...prevNpcList.slice(index + 1),
-        ];
-      } else {
-        // If the NPC is not found in the list, add it to the list
-        return [...prevNpcList, npc];
-      }
-    });
-  }
+  // function handleUpdateNpc(npc) {
+  //   setNpcList((prevNpcList) => {
+  //     const index = prevNpcList.findIndex((item) => item.id === npc.id);
+  //     if (index !== -1) {
+  //       // Replace the NPC with the same ID in the list
+  //       return [
+  //         ...prevNpcList.slice(0, index),
+  //         npc,
+  //         ...prevNpcList.slice(index + 1),
+  //       ];
+  //     } else {
+  //       // If the NPC is not found in the list, add it to the list
+  //       return [...prevNpcList, npc];
+  //     }
+  //   });
+  // }
 
   function handleDroppedItems(droppedItems) {
     //@console.log("[handleDroppedItems] items=", droppedItems)
@@ -330,11 +353,7 @@ export const EventCloudProvider = ({ children }) => {
   }
 
   function handleItemPickedEvent(item, fighter, qty) {
-    if (item.tokenId == 1 && fighter.tokenId == PlayerID) {
-      setMoney(money + parseInt(qty));
-    } else {
-      refreshFighterItems();
-    }
+    refreshFighterItems();
   }
 
 
@@ -418,7 +437,6 @@ export const EventCloudProvider = ({ children }) => {
   return (
     <EventCloudContext.Provider value={
       { 
-        PlayerID, 
         events, 
         addDamageEvent, 
         setEvents, 
@@ -445,7 +463,14 @@ export const EventCloudProvider = ({ children }) => {
         equipBackpackItem,
         unequipBackpackItem,
         sendCommand,
-        mapObjects
+        mapObjects,
+        userFighters,
+        fetchUserFighters,
+        createFighter,
+        sendAuth,
+        account,
+        setAccount,
+        playerList
       }}>
       {children}
     </EventCloudContext.Provider>

@@ -3,6 +3,7 @@ import type { Coordinate } from "./coordinate.interface";
 import type { Damage } from "./damage.interface";
 import type { Direction } from "./direction.interface";
 import type { Skill } from "./skill.interface";
+import type { BackpackSlot } from "./backpack.interface";
 
 export interface Fighter {
     id: string;
@@ -43,4 +44,5 @@ export interface Fighter {
     direction: Direction;
 
     skills: Record<number, Skill>;
+    equipment: Record<number, BackpackSlot | null>;
 }
