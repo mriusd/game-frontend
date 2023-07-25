@@ -37,10 +37,12 @@ const Npc = memo(function Npc({ npc }: Props) {
         })
     }, [model]) 
 
+    const isTurned = useRef(false)
     const animationTarget = useRef()
     const { mixer, actions } = useAnimations(gltf.current.npc.animations, animationTarget)
     useEffect(() => {
-        if (!mixer) { return }
+        if (!mixer || isTurned.current) { return }
+        isTurned.current = true
         setTimeout(() => {
             actions?.jump?.setDuration(1).play()
         }, Math.random() * 1000)
