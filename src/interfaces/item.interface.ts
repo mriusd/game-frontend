@@ -16,47 +16,19 @@ export interface ItemAttributes {
 	itemHeight: BigNumber;
 	acceptableSlot1: BigNumber;
 	acceptableSlot2: BigNumber;
-	physicalDamage: BigNumber;
-	magicDamage: BigNumber;
-	defense: BigNumber;
+
+	baseMinPhysicalDamage: BigNumber;
+	baseMaxPhysicalDamage: BigNumber;
+	baseMinMagicDamage: BigNumber;
+	baseMaxMagicDamage: BigNumber;
+	baseDefense: BigNumber;
 	attackSpeed: BigNumber;
-	defenseSuccessRate: BigNumber;
 	additionalDamage: BigNumber;
 	additionalDefense: BigNumber;
-	increasedExperienceGain: BigNumber;
-	damageIncrease: BigNumber;
-	defenseSuccessRateIncrease: BigNumber;
-	lifeAfterMonsterIncrease: BigNumber;
-	manaAfterMonsterIncrease: BigNumber;
-	goldAfterMonsterIncrease: BigNumber;
-	doubleDamageProbabilityIncrease: BigNumber;
-	excellentDamageProbabilityIncrease: BigNumber;
-	ignoreOpponentsDefenseRateIncrease: BigNumber;
-	reflectDamage: BigNumber;
-	maxLifeIncrease: BigNumber;
-	maxManaIncrease: BigNumber;
-	excellentDamageRateIncrease: BigNumber;
-	doubleDamageRateIncrease: BigNumber;
-	ignoreOpponentsDefenseSuccessRateIncrease: BigNumber;
-	attackDamageIncrease: BigNumber;
-	isAncient: BigNumber;
-	reflectDamageRateIncrease: BigNumber;
-	decreaseDamageRateIncrease: BigNumber;
-	hpRecoveryRateIncrease: BigNumber;
-	mpRecoveryRateIncrease: BigNumber;
-	defenceIncreasePerLevel: BigNumber;
-	damageIncreasePerLevel: BigNumber;
-	increaseDefenseRate: BigNumber;
-	strengthReqIncreasePerLevel: BigNumber;
-	agilityReqIncreasePerLevel: BigNumber;
-	energyReqIncreasePerLevel: BigNumber;
-	vitalityReqIncreasePerLevel: BigNumber;
-	attackSpeedIncrease: BigNumber;
 
 	fighterId: BigNumber;
 	lastUpdBlock: BigNumber;
 	itemRarityLevel: BigNumber;
-
 	itemAttributesId: BigNumber;
 
 	luck: boolean;
@@ -65,10 +37,38 @@ export interface ItemAttributes {
 	isWeapon: boolean;
 	isArmour: boolean;
 	isJewel: boolean;
+	isWings: boolean;
 	isMisc: boolean;
-	isConsumable: boolean;
 	inShop: boolean;
+
+	// Excellent
+	// Wings
+	increaseAttackSpeedPoints: BigNumber;
+	reflectDamagePercent: BigNumber;
+	restoreHPChance: BigNumber;
+	restoreMPChance: BigNumber;
+	doubleDamageChance: BigNumber;
+	ignoreOpponentDefenseChance: BigNumber;
+
+	// Weapons
+	lifeAfterMonsterIncrease: BigNumber;
+	manaAfterMonsterIncrease: BigNumber;
+	excellentDamageProbabilityIncrease: BigNumber;
+	attackSpeedIncrease: BigNumber;
+	attackLvl20: BigNumber;
+	attackIncreasePercent: BigNumber;
+
+	// Armours
+	defenseSuccessRateIncrease: BigNumber;
+	goldAfterMonsterIncrease: BigNumber;
+	reflectDamage: BigNumber;
+	maxLifeIncrease: BigNumber;
+	maxManaIncrease: BigNumber;
+	hpRecoveryRateIncrease: BigNumber;
+	mpRecoveryRateIncrease: BigNumber;
+	decreaseDamageRateIncrease: BigNumber;
 }
+
 
 export interface ItemDroppedEvent {
 	itemHash: string;
