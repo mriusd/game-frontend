@@ -12,6 +12,7 @@ export const getShaderedEquipment = (item: BackpackSlot, uniforms: any) => {
     // TODO: Think about another way store models, im not sure that clonning is a good idea for cpu
     const model: THREE.Group | THREE.SkinnedMesh = gltf.scene.clone()
     const levelShader = shader_level()
+    console.log(model, item.itemAttributes.name)
 
     model.traverse((object: any) => {
         if (object.isMesh) {

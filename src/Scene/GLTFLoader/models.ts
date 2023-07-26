@@ -34,7 +34,11 @@ export const models: ModelLoadItem[] = [
     },
     {
         name: 'crystal_sword',
-        url: 'models/crystal_sword/crystal sword.gltf'
+        url: 'models/crystal_sword/crystal_sword.gltf'
+    },
+    {
+        name: 'fighter_crystal_sword',
+        url: 'models/fighter_crystal_sword/project_an.gltf'
     },
 
 
@@ -104,5 +108,26 @@ export const models: ModelLoadItem[] = [
     {
         name: 'fighter_dragon_boots',
         url: 'models/fighter_dragon_boot/fighter_dragon_boot.gltf'
+    },
+    // Legendary Set (Equipment On Fighter)
+    {
+        name: 'fighter_legendary_gloves',
+        url: 'models/fighter_legendary_gloves/legendary_gloves.gltf'
+    },
+    {
+        name: 'fighter_legendary_helmet',
+        url: 'models/fighter_legendary_helmet/legendary_helmet.gltf'
+    },
+    {
+        name: 'fighter_legendary_chest',
+        url: 'models/fighter_legendary_chest/legendary_chest.gltf'
+    },
+    {
+        name: 'fighter_legendary_trousers',
+        url: 'models/fighter_legendary_trousers/legendary_trousers.gltf'
+    },
+    {
+        name: 'fighter_legendary_boots',
+        url: 'models/fighter_legendary_boots/legendary_boots.gltf'
     },
 ]
