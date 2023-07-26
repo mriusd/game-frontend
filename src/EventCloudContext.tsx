@@ -210,6 +210,13 @@ export const EventCloudProvider = ({ children }) => {
     });
   }
 
+  function updateFighterDirection(direction: Direction) {
+    var response = sendJsonMessage({
+      type: "update_fighter_direction",
+      data: { direction }
+    });
+  }
+
   
 
 
@@ -471,7 +478,8 @@ export const EventCloudProvider = ({ children }) => {
         sendAuth,
         account,
         setAccount,
-        playerList
+        playerList,
+        updateFighterDirection
       }}>
       {children}
     </EventCloudContext.Provider>

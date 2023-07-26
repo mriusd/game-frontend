@@ -40,5 +40,6 @@ export interface EventCloud {
     sendAuth: any,
     account: string,
     setAccount: any,
-    playerList: Fighter[] 
+    playerList: Fighter[],
+    updateFighterDirection: (direction: Direction) => void
 }
