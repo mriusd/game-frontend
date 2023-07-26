@@ -120,7 +120,7 @@ const Fighter = memo(function Fighter() {
         // Set target position to move on Object click
 
     const attackTimeout = useRef<NodeJS.Timeout | null>(null)
-    const speed = 500 //ms
+    const speed = 300
     useEffect(() => {
         console.log('target!', target, itemTarget)
         // For attack target

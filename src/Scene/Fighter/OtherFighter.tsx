@@ -9,7 +9,8 @@ import { useSceneContext } from "store/SceneContext"
 import { matrixCoordToWorld } from "Scene/utils/matrixCoordToWorld"
 import Tween from "Scene/utils/tween/tween"
 import { getMoveDuration } from "Scene/utils/getMoveDuration"
-import { getRunAction, getStandAction } from "./utils/getAction"
+import { getRunAction, getStandAction, getAttackAction } from "./utils/getAction"
+import { useEventCloud } from "EventCloudContext"
 
 interface Props { fighter: Fighter }
 const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
@@ -21,6 +22,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
 
     // Just for test
     // TODO: must be removed
+    const { events } = useEventCloud()
     const { worldSize } = useSceneContext()
     const [spawned, setSpawned] = useState<boolean>(false)
     const [currentMatrixPosition, setCurrentMatrixPosition] = useState<Coordinate | null>(null)
@@ -43,6 +45,28 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
             setDirection(Math.atan2(fighter.direction.dx, fighter.direction.dz))
         }
     }, [fighter])
+
+
+    // TODO: This works wrong but just for test
+    const attackTimeout = useRef<NodeJS.Timeout | null>(null)
+    const speed = 300
+    useEffect(() => {
+        events.forEach(damageEvent => {
+            if (damageEvent.playerFighter.id === fighter.id) {
+                if (actions) {
+                    const attackAction = getAttackAction(actions, fighter, damageEvent.skill)
+                    // const action
+                    attackAction?.setDuration(speed / 1000).play()
+                    clearTimeout(attackTimeout.current)
+                    attackTimeout.current = setTimeout(() => {
+                        attackAction?.stop()
+                    }, speed)
+                }
+            }
+        })
+        console.log('Fighter events', events)
+    }, [events])
+    // 
 
     // Move npc
     useEffect(() => {
