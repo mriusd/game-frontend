@@ -6,6 +6,7 @@ import type { Skill } from "./skill.interface"
 import type { ItemDroppedEvent } from "./item.interface"
 import type { Group, Mesh } from "three"
 import type { ObjectData } from "./sceneData.interface"
+import type { Direction } from "./direction.interface"
 
 export interface ISceneContext {
     html: HTMLElement | null
@@ -45,5 +46,6 @@ export interface ISceneContext {
     target: { target: Fighter, skill: Skill } | null, setTarget: (target: Fighter | null, skill: Skill | null) => void,
     itemTarget: ItemDroppedEvent, setItemTarget: (item: ItemDroppedEvent) => void
 
-    PlayerList: RefObject<Fighter[]>
+    PlayerList: RefObject<Fighter[]>,
+    updateFighterDirection: (direction: Direction) => void
 }

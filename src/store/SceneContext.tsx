@@ -37,7 +37,8 @@ const SceneContextProvider = ({ children }: Props) => {
         setTarget: setEventTarget,
         refreshFighterItems,
         mapObjects,
-        playerList
+        playerList,
+        updateFighterDirection
     } = useEventCloud()
 
     const test_setCurrentMatrixCoordinate = useFighterStore(state => state.setCurrentMatrixCoordinate)
@@ -234,7 +235,8 @@ const SceneContextProvider = ({ children }: Props) => {
         target, setTarget,
         itemTarget, setItemTarget,
 
-        PlayerList
+        PlayerList,
+        updateFighterDirection
     }
 
     return (
