@@ -1,7 +1,7 @@
 import { Fighter } from "interfaces/fighter.interface"
 import FighterModel from "./FighterModel"
 import { useGLTFLoaderStore } from "Scene/GLTFLoader/GLTFLoaderStore"
-import { useMemo, useRef, useState, useEffect } from "react"
+import { useMemo, useRef, useState, useEffect, memo } from "react"
 import HealthBar from "Scene/components/HealthBar"
 import { Box, useAnimations } from "@react-three/drei"
 import type { Coordinate } from "interfaces/coordinate.interface"
@@ -9,9 +9,10 @@ import { useSceneContext } from "store/SceneContext"
 import { matrixCoordToWorld } from "Scene/utils/matrixCoordToWorld"
 import Tween from "Scene/utils/tween/tween"
 import { getMoveDuration } from "Scene/utils/getMoveDuration"
+import { getRunAction, getStandAction } from "./utils/getAction"
 
 interface Props { fighter: Fighter }
-const OtherFighter = ({ fighter }: Props) => {
+const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
 
     const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.stock, [])
 
@@ -28,6 +29,9 @@ const OtherFighter = ({ fighter }: Props) => {
     const [currentWorldPosition, setCurrentWorldPosition] = useState<Coordinate | null>(null)
     const [direction, setDirection] = useState<number>(0)
     // 
+    const ENTER_TO_ISSTAYING_DELAY = 100 //ms
+    const isMoving = useRef<boolean>(false)
+    const isStaying = useRef<boolean>(true)
 
     // Fill changed npc properties
     useEffect(() => {
@@ -44,6 +48,7 @@ const OtherFighter = ({ fighter }: Props) => {
     useEffect(() => {
         if (!targetMatrixPosition) { return }
         if (!worldSize.current) { return }
+        if (isMoving.current) { return }
 
         const _targetWorldPosition = matrixCoordToWorld(worldSize.current, { ...targetMatrixPosition })
         setTargetWorldPosition(_targetWorldPosition)
@@ -58,6 +63,7 @@ const OtherFighter = ({ fighter }: Props) => {
         if (!currentWorldPosition || !_targetWorldPosition) { return }
         if (currentWorldPosition.x !== _targetWorldPosition.x
             || currentWorldPosition.z !== _targetWorldPosition.z) {
+            isMoving.current = true
             Tween.to(currentWorldPosition, _targetWorldPosition,
                 {
                     duration: getMoveDuration(fighter.movementSpeed, currentMatrixPosition, targetMatrixPosition),
@@ -68,11 +74,54 @@ const OtherFighter = ({ fighter }: Props) => {
                     onComplete() {
                         setCurrentMatrixPosition(targetMatrixPosition)
                         setCurrentWorldPosition(_targetWorldPosition)
+                        isMoving.current = false
                     },
                 }
             )
         }
     }, [targetMatrixPosition, currentMatrixPosition])
+
+    
+    // Add delay to prevent freeze on "checkpoint" when synchronising with server
+    // On delayed mooving "true" we render fighter in the same position as server
+    // Otherwise we render if fighter < 2 cells away from server
+    const timeout = useRef<any>(0)
+    useEffect(() => {
+        console.log(`Player ${fighter.id},`, `isMoving ${isMoving.current},`, `isStaying ${isStaying.current}`)
+        clearTimeout(timeout.current)
+
+        if (isMoving.current) {
+            isStaying.current = false
+            return
+        }
+
+        timeout.current = setTimeout(() => {
+            isStaying.current = true
+        }, ENTER_TO_ISSTAYING_DELAY) // 200ms delay
+    }, [ isMoving.current ])
+
+    // Toggle movement animation
+    useEffect(() => {
+        if (!actions || !fighter) { return }
+        // console.log('[Fighter]: Toggle isMoving animation', mixer, actions)
+        // console.log(actions)
+        const { action: runAction, lastAction: lastRunAction } = getRunAction(actions, fighter)
+        const { action: standAction, lastAction: lastStandAction } = getStandAction(actions, fighter)
+        
+        // TODO: do this another way
+        // change after ill rewrite fighter
+        // Reset old animations
+        lastRunAction?.stop()
+        lastStandAction?.stop()
+
+        if (isStaying.current) {
+            runAction?.fadeOut(.1).stop()
+            standAction?.play()
+        } else {
+            standAction?.fadeOut(.1).stop()
+            runAction?.setDuration(60 / fighter.movementSpeed * 4).play()
+        }
+    }, [ isStaying.current, actions, fighter ])
 
     if (!spawned) {
         return <></>
@@ -85,11 +134,11 @@ const OtherFighter = ({ fighter }: Props) => {
                 ref={animationTarget}
                 model={gltf.scene}
                 fighter={fighter}
-                position={[currentWorldPosition.x, .4, currentWorldPosition.z]}
+                position={[currentWorldPosition.x, 0, currentWorldPosition.z]}
                 rotation={[0, direction, 0]}
             />
         </group>
     )
-}
+})
 
 export default OtherFighter

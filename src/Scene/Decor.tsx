@@ -52,7 +52,7 @@ const Npc = memo(function Npc({ objectData }: Props) {
                 gltf={model}
                 position={[worldCoordinate.x, 0, worldCoordinate.z]}
                 rotation={[objectData.rotation.x, objectData.rotation.y, objectData.rotation.z]}
-                scale={[objectData.scale.x, objectData.scale.y, objectData.scale.z]}
+                scale={[objectData.scale.x-0.5, objectData.scale.y-0.5, objectData.scale.z-0.5]}
             />
         </group>
     )

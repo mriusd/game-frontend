@@ -7,7 +7,7 @@ import { useFrame } from "@react-three/fiber"
 import { Fighter } from "interfaces/fighter.interface"
 import { SkeletonUtils } from "three-stdlib"
 
-interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, position: number[], rotation: number[] }
+interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, position: number[], rotation?: number[] }
 const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: baseModel, fighter, position, rotation }: Props, ref) {
     // Clone model for Reuse
     const model = useMemo(() => SkeletonUtils.clone(baseModel), [baseModel])
