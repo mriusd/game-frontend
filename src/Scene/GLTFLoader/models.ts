@@ -41,6 +41,12 @@ export const models: ModelLoadItem[] = [
         url: 'models/fighter_crystal_sword/project_an.gltf'
     },
 
+    // Wings
+    {
+        name: 'fighter_simple_wings',
+        url: 'models/fighter/simple_wings/fighter_simple_wings.gltf'
+    },
+
 
     // Dragon Set (For Inventory)
     {

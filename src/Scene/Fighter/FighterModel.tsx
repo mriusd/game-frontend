@@ -114,9 +114,12 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
         equipmentToTakeON.current.forEach(item => {
             const model = getShaderedEquipment(item, uniforms)
             if (!model) { return console.warn('[FighterModel<takeOn>]: Equipment Model not Found') }
+            if (item.itemAttributes.name.includes('boots')) {
+                console.log(model)
+            }
             const modelArmature = model.getObjectByName('Armature')
             // console.log('modelArmature', modelArmature)
-            if (!modelArmature) { return }
+            if (!modelArmature) { return console.warn('[FighterModel<takeOn>]: Model Armature not found, mb it is renamed') }
             
             // Set itemHash to remove via it then
             modelArmature.userData.itemHash = item.itemHash
@@ -149,6 +152,8 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
 
                     fighterArmature.current.add(object)
                     equiped.objects.push({ name: object.name })
+                } else {
+                    console.warn('[FighterModel<takeOn>]: No SkinnedMesh Found')
                 }
             })
 
