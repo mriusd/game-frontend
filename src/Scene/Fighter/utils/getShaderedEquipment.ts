@@ -3,6 +3,8 @@ import { getEquipmentModel } from "./getEquipmentModel"
 import { shader_level } from "Scene/shaders/shader_level"
 import { isExcellent } from "Scene/utils/isExcellent"
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader"
+import { SkeletonUtils } from "three-stdlib"
+import * as THREE from 'three'
 
 
 // TODO: Think about this
@@ -10,13 +12,15 @@ export const getShaderedEquipment = (item: BackpackSlot, uniforms: any) => {
     const gltf: GLTF = getEquipmentModel(item.itemAttributes.name)
     if (!gltf) { return null }
     // TODO: Think about another way store models, im not sure that clonning is a good idea for cpu
-    const model: THREE.Group | THREE.SkinnedMesh = gltf.scene.clone()
+    // @ts-expect-error
+    const model: THREE.Group | THREE.SkinnedMesh = SkeletonUtils.clone(gltf.scene)
     const levelShader = shader_level()
     console.log(model, item.itemAttributes.name)
 
     model.traverse((object: any) => {
         if (object.isMesh) {
             const material = object.material.clone()
+            // material.side = THREE.DoubleSide
             material.onBeforeCompile = (_shader: THREE.Shader) => {
                 // Uniforms
                 _shader.uniforms = { ..._shader.uniforms, ...levelShader.uniforms, ...uniforms.current  }

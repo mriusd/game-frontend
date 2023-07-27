@@ -721,7 +721,7 @@
 		},
 		{
 			"mesh":0,
-			"name":"legendary_chest",
+			"name":"legendary_chest.001",
 			"skin":0
 		},
 		{
@@ -3138,7 +3138,7 @@
 	"materials":[
 		{
 			"doubleSided":true,
-			"name":"Material.006",
+			"name":"Material.016",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
 					0.027484893798828125,
@@ -3152,7 +3152,7 @@
 		},
 		{
 			"doubleSided":true,
-			"name":"Material.007",
+			"name":"Material.017",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
 					0.7138261795043945,
@@ -3166,7 +3166,7 @@
 		},
 		{
 			"doubleSided":true,
-			"name":"Material.008",
+			"name":"Material.018",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
 					0.008023194968700409,
@@ -3181,7 +3181,7 @@
 	],
 	"meshes":[
 		{
-			"name":"Cube.004",
+			"name":"Cube.016",
 			"primitives":[
 				{
 					"attributes":{

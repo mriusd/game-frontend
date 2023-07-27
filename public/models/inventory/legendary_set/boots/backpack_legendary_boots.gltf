@@ -21,7 +21,7 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"legendary_helmet"
+			"name":"legendary_boots"
 		}
 	],
 	"animations":[
@@ -49,22 +49,22 @@
 					}
 				}
 			],
-			"name":"legendary_helmet",
+			"name":"legendary_boots",
 			"samplers":[
 				{
-					"input":16,
+					"input":8,
 					"interpolation":"LINEAR",
-					"output":17
+					"output":9
 				},
 				{
-					"input":16,
+					"input":8,
 					"interpolation":"LINEAR",
-					"output":18
+					"output":10
 				},
 				{
-					"input":16,
+					"input":8,
 					"interpolation":"LINEAR",
-					"output":19
+					"output":11
 				}
 			]
 		}
@@ -86,20 +86,6 @@
 		},
 		{
 			"doubleSided":true,
-			"name":"Material.002",
-			"pbrMetallicRoughness":{
-				"baseColorFactor":[
-					0.027484893798828125,
-					0.014006990939378738,
-					0.04338299483060837,
-					1
-				],
-				"metallicFactor":0,
-				"roughnessFactor":0.8356164693832397
-			}
-		},
-		{
-			"doubleSided":true,
 			"name":"Material.001",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
@@ -111,25 +97,11 @@
 				"metallicFactor":0.6849315166473389,
 				"roughnessFactor":0.215753436088562
 			}
-		},
-		{
-			"doubleSided":true,
-			"name":"Material.004",
-			"pbrMetallicRoughness":{
-				"baseColorFactor":[
-					0.7991030812263489,
-					0.22789083421230316,
-					0.04661102965474129,
-					1
-				],
-				"metallicFactor":0,
-				"roughnessFactor":0.5
-			}
 		}
 	],
 	"meshes":[
 		{
-			"name":"Cube.012",
+			"name":"Cube.010",
 			"primitives":[
 				{
 					"attributes":{
@@ -170,46 +142,6 @@
 					"indices":7,
 					"material":1,
 					"mode":4
-				},
-				{
-					"attributes":{
-						"POSITION":8,
-						"TEXCOORD_0":9,
-						"NORMAL":10
-					},
-					"extensions":{
-						"KHR_draco_mesh_compression":{
-							"bufferView":2,
-							"attributes":{
-								"POSITION":0,
-								"TEXCOORD_0":1,
-								"NORMAL":2
-							}
-						}
-					},
-					"indices":11,
-					"material":2,
-					"mode":4
-				},
-				{
-					"attributes":{
-						"POSITION":12,
-						"TEXCOORD_0":13,
-						"NORMAL":14
-					},
-					"extensions":{
-						"KHR_draco_mesh_compression":{
-							"bufferView":3,
-							"attributes":{
-								"POSITION":0,
-								"TEXCOORD_0":1,
-								"NORMAL":2
-							}
-						}
-					},
-					"indices":15,
-					"material":3,
-					"mode":4
 				}
 			]
 		}
@@ -217,126 +149,66 @@
 	"accessors":[
 		{
 			"componentType":5126,
-			"count":480,
+			"count":320,
 			"max":[
-				0.2598743438720703,
-				0.26741519570350647,
-				0.37008342146873474
+				0.3649320602416992,
+				0.34976688027381897,
+				0.226634219288826
 			],
 			"min":[
-				-0.2598700523376465,
-				-0.3921828866004944,
-				-0.3920460641384125
+				-0.4138069152832031,
+				-0.23566563427448273,
+				-0.1503656506538391
 			],
 			"type":"VEC3"
 		},
 		{
 			"componentType":5126,
-			"count":480,
+			"count":320,
 			"type":"VEC2"
 		},
 		{
 			"componentType":5126,
-			"count":480,
+			"count":320,
 			"type":"VEC3"
 		},
 		{
 			"componentType":5123,
-			"count":720,
+			"count":528,
 			"type":"SCALAR"
 		},
 		{
 			"componentType":5126,
-			"count":394,
+			"count":564,
 			"max":[
-				0.13177824020385742,
-				0.3055301010608673,
-				0.3346131443977356
+				0.3663330078125,
+				0.38401737809181213,
+				0.226634219288826
 			],
 			"min":[
-				-0.1317739486694336,
-				-0.3306015729904175,
-				-0.387386292219162
+				-0.4138069152832031,
+				-0.23566563427448273,
+				-0.12707513570785522
 			],
 			"type":"VEC3"
 		},
 		{
 			"componentType":5126,
-			"count":394,
+			"count":564,
 			"type":"VEC2"
 		},
 		{
 			"componentType":5126,
-			"count":394,
+			"count":564,
 			"type":"VEC3"
 		},
 		{
 			"componentType":5123,
-			"count":594,
+			"count":912,
 			"type":"SCALAR"
 		},
 		{
-			"componentType":5126,
-			"count":160,
-			"max":[
-				0.24246883392333984,
-				0.047119200229644775,
-				0.37008342146873474
-			],
-			"min":[
-				-0.24246454238891602,
-				-0.3921828866004944,
-				-0.3920460641384125
-			],
-			"type":"VEC3"
-		},
-		{
-			"componentType":5126,
-			"count":160,
-			"type":"VEC2"
-		},
-		{
-			"componentType":5126,
-			"count":160,
-			"type":"VEC3"
-		},
-		{
-			"componentType":5123,
-			"count":240,
-			"type":"SCALAR"
-		},
-		{
-			"componentType":5126,
-			"count":240,
-			"max":[
-				0.3146958351135254,
-				0.4342893958091736,
-				0.24234527349472046
-			],
-			"min":[
-				-0.31469154357910156,
-				0.07285085320472717,
-				0.09949556738138199
-			],
-			"type":"VEC3"
-		},
-		{
-			"componentType":5126,
-			"count":240,
-			"type":"VEC2"
-		},
-		{
-			"componentType":5126,
-			"count":240,
-			"type":"VEC3"
-		},
-		{
-			"componentType":5123,
-			"count":432,
-			"type":"SCALAR"
-		},
-		{
-			"bufferView":4,
+			"bufferView":2,
 			"componentType":5126,
 			"count":20,
 			"max":[
@@ -348,19 +220,19 @@
 			"type":"SCALAR"
 		},
 		{
-			"bufferView":5,
+			"bufferView":3,
 			"componentType":5126,
 			"count":20,
 			"type":"VEC3"
 		},
 		{
-			"bufferView":6,
+			"bufferView":4,
 			"componentType":5126,
 			"count":20,
 			"type":"VEC4"
 		},
 		{
-			"bufferView":7,
+			"bufferView":5,
 			"componentType":5126,
 			"count":20,
 			"type":"VEC3"
@@ -369,49 +241,39 @@
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":3747,
+			"byteLength":2259,
 			"byteOffset":0
 		},
 		{
 			"buffer":0,
-			"byteLength":3221,
-			"byteOffset":3748
-		},
-		{
-			"buffer":0,
-			"byteLength":1457,
-			"byteOffset":6972
-		},
-		{
-			"buffer":0,
-			"byteLength":2046,
-			"byteOffset":8432
+			"byteLength":3621,
+			"byteOffset":2260
 		},
 		{
 			"buffer":0,
 			"byteLength":80,
-			"byteOffset":10480
+			"byteOffset":5884
 		},
 		{
 			"buffer":0,
 			"byteLength":240,
-			"byteOffset":10560
+			"byteOffset":5964
 		},
 		{
 			"buffer":0,
 			"byteLength":320,
-			"byteOffset":10800
+			"byteOffset":6204
 		},
 		{
 			"buffer":0,
 			"byteLength":240,
-			"byteOffset":11120
+			"byteOffset":6524
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":11360,
-			"uri":"legendary_helmet.bin"
+			"byteLength":6764,
+			"uri":"backpack_legendary_boots.bin"
 		}
 	]
 }

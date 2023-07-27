@@ -11,6 +11,7 @@ import { Coordinate } from "interfaces/coordinate.interface"
 import { Box } from "@react-three/drei"
 import { isOccupiedCoordinate } from "./utils/isOccupiedCoordinate"
 import { useBackpackStore } from "store/backpackStore"
+import { angleToVector } from "./utils/angleToVector"
 
 const ANGLE_STEP = Math.PI / 4 // 8 directions
 const ANGLE_RANGE = Math.PI / 8 // Set a range of angles to rotate towards
@@ -174,16 +175,9 @@ const Controller = memo(function Controller({ world }: Props) {
             return
         }
         saveDirection.value = clamp(targetAngle, minAngle.value, maxAngle.value)
-        // TODO: Just for test this way
         setDirection(saveDirection.value)
-        const coord = worldCoordToMatrix(worldSize.current, { x: worldCoordinate.x - saveCurrentWorldCoordinate.value.x, z: worldCoordinate.z - saveCurrentWorldCoordinate.value.z })
-        const direction = {
-            dx: coord.x,
-            dz: coord.z
-        }
-        updateFighterDirection(direction)
-        // console.log('UPDATE FIGHTER DIRECTION', direction)
-        // 
+        const { x, z } = angleToVector(saveDirection.value)
+        updateFighterDirection({ dx: x, dz: z })
     }
 
     function mouseUp() {

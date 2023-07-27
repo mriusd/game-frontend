@@ -68,23 +68,23 @@ export const models: ModelLoadItem[] = [
     // Legendary Set (For Inventory)
     {
         name: 'legendary_boots',
-        url: 'models/legendary_boots/legendary_boots.gltf'
+        url: 'models/inventory/legendary_set/boots/backpack_legendary_boots.gltf'
     },
         {
-        name: 'legendary_chest',
-        url: 'models/legendary_chest/legendary_chest.gltf'
+        name: 'legendary_armour',
+        url: 'models/inventory/legendary_set/armour/backpack_legendary_armour.gltf'
     },
     {
         name: 'legendary_gloves',
-        url: 'models/legendary_gloves/legendary_gloves.gltf'
+        url: 'models/inventory/legendary_set/gloves/backpack_legendary_gloves.gltf'
     },
     {
         name: 'legendary_helmet',
-        url: 'models/legendary_helmet/legendary_helmet.gltf'
+        url: 'models/inventory/legendary_set/helmet/backpack_legendary_helmet.gltf'
     },
     {
         name: 'legendary_trousers',
-        url: 'models/legendary_trousers/legendary_trousers.gltf'
+        url: 'models/inventory/legendary_set/pants/backpack_legendary_pants.gltf'
     },
 
 

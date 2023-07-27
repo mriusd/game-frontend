@@ -21,7 +21,7 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"legendary_gloves"
+			"name":"legendary_chest"
 		}
 	],
 	"animations":[
@@ -49,7 +49,7 @@
 					}
 				}
 			],
-			"name":"legendary_gloves",
+			"name":"legendary_chest",
 			"samplers":[
 				{
 					"input":12,
@@ -72,16 +72,16 @@
 	"materials":[
 		{
 			"doubleSided":true,
-			"name":"Material",
+			"name":"Material.002",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
-					0.008023194968700409,
-					0.012983039021492004,
-					0.08228270709514618,
+					0.027484893798828125,
+					0.014006990939378738,
+					0.04338299483060837,
 					1
 				],
 				"metallicFactor":0,
-				"roughnessFactor":0.7431507110595703
+				"roughnessFactor":0.8356164693832397
 			}
 		},
 		{
@@ -100,22 +100,22 @@
 		},
 		{
 			"doubleSided":true,
-			"name":"Material.003",
+			"name":"Material",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
-					0.21223078668117523,
-					0.05286065861582756,
-					0.03433981165289879,
+					0.008023194968700409,
+					0.012983039021492004,
+					0.08228270709514618,
 					1
 				],
 				"metallicFactor":0,
-				"roughnessFactor":0.33561643958091736
+				"roughnessFactor":0.7431507110595703
 			}
 		}
 	],
 	"meshes":[
 		{
-			"name":"Cube.008",
+			"name":"Cube.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -183,92 +183,92 @@
 	"accessors":[
 		{
 			"componentType":5126,
-			"count":592,
+			"count":536,
 			"max":[
-				0.25729745626449585,
-				0.2254752516746521,
-				0.06146398186683655
+				0.6569623947143555,
+				0.528437077999115,
+				0.24315527081489563
 			],
 			"min":[
-				-0.2628440856933594,
-				-0.3317549526691437,
-				-0.08760026097297668
+				-0.6569585800170898,
+				-0.6226754784584045,
+				-0.16210314631462097
 			],
 			"type":"VEC3"
 		},
 		{
 			"componentType":5126,
-			"count":592,
+			"count":536,
 			"type":"VEC2"
 		},
 		{
 			"componentType":5126,
-			"count":592,
+			"count":536,
 			"type":"VEC3"
 		},
 		{
 			"componentType":5123,
-			"count":888,
+			"count":804,
 			"type":"SCALAR"
 		},
 		{
 			"componentType":5126,
-			"count":480,
+			"count":610,
 			"max":[
-				0.25729745626449585,
-				0.2254752516746521,
-				0.06146398186683655
+				0.6793217658996582,
+				0.38672423362731934,
+				0.2875424921512604
 			],
 			"min":[
-				-0.2628440856933594,
-				-0.1196947693824768,
-				-0.08767984807491302
+				-0.6793184280395508,
+				-0.5214545726776123,
+				-0.23898684978485107
 			],
 			"type":"VEC3"
 		},
 		{
 			"componentType":5126,
-			"count":480,
+			"count":610,
 			"type":"VEC2"
 		},
 		{
 			"componentType":5126,
-			"count":480,
+			"count":610,
 			"type":"VEC3"
 		},
 		{
 			"componentType":5123,
-			"count":720,
+			"count":936,
 			"type":"SCALAR"
 		},
 		{
 			"componentType":5126,
-			"count":524,
+			"count":746,
 			"max":[
-				0.27923935651779175,
-				0.31568408012390137,
-				0.11350616812705994
+				0.6634225845336914,
+				0.4244247376918793,
+				0.2790836989879608
 			],
 			"min":[
-				-0.2885988652706146,
-				-0.08004602044820786,
-				-0.0755537897348404
+				-0.6634187698364258,
+				-0.5390352010726929,
+				-0.24672219157218933
 			],
 			"type":"VEC3"
 		},
 		{
 			"componentType":5126,
-			"count":524,
+			"count":746,
 			"type":"VEC2"
 		},
 		{
 			"componentType":5126,
-			"count":524,
+			"count":746,
 			"type":"VEC3"
 		},
 		{
 			"componentType":5123,
-			"count":792,
+			"count":1134,
 			"type":"SCALAR"
 		},
 		{
@@ -305,44 +305,44 @@
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":3663,
+			"byteLength":3650,
 			"byteOffset":0
 		},
 		{
 			"buffer":0,
-			"byteLength":2879,
-			"byteOffset":3664
+			"byteLength":3826,
+			"byteOffset":3652
 		},
 		{
 			"buffer":0,
-			"byteLength":3647,
-			"byteOffset":6544
+			"byteLength":5012,
+			"byteOffset":7480
 		},
 		{
 			"buffer":0,
 			"byteLength":80,
-			"byteOffset":10192
+			"byteOffset":12492
 		},
 		{
 			"buffer":0,
 			"byteLength":240,
-			"byteOffset":10272
+			"byteOffset":12572
 		},
 		{
 			"buffer":0,
 			"byteLength":320,
-			"byteOffset":10512
+			"byteOffset":12812
 		},
 		{
 			"buffer":0,
 			"byteLength":240,
-			"byteOffset":10832
+			"byteOffset":13132
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":11072,
-			"uri":"legendary_gloves.bin"
+			"byteLength":13372,
+			"uri":"backpack_legendary_armour.bin"
 		}
 	]
 }
