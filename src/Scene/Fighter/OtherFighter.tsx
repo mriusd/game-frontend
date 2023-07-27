@@ -32,7 +32,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
     const [currentWorldPosition, setCurrentWorldPosition] = useState<Coordinate | null>(null)
     const [direction, setDirection] = useState<number>(0)
     // 
-    const ENTER_TO_ISSTAYING_DELAY = 100 //ms
+    const ENTER_TO_ISSTAYING_DELAY = 10 //ms
     const isMoving = useRef<boolean>(false)
     const isStaying = useRef<boolean>(true)
 
@@ -67,7 +67,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
                 removeEvent(currentEvent)
             }
         })
-        console.log('Fighter events', events)
+        // console.log('Fighter events', events)
     }, [events])
     // 
 
@@ -114,7 +114,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
     // Otherwise we render if fighter < 2 cells away from server
     const timeout = useRef<any>(0)
     useEffect(() => {
-        console.log(`Player ${fighter.id},`, `isMoving ${isMoving.current},`, `isStaying ${isStaying.current}`)
+        // console.log(`Player ${fighter.id},`, `isMoving ${isMoving.current},`, `isStaying ${isStaying.current}`)
         clearTimeout(timeout.current)
 
         if (isMoving.current) {
@@ -124,7 +124,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
 
         timeout.current = setTimeout(() => {
             isStaying.current = true
-        }, ENTER_TO_ISSTAYING_DELAY) // 200ms delay
+        }, ENTER_TO_ISSTAYING_DELAY) // delay
     }, [ isMoving.current ])
 
     // Toggle movement animation
@@ -146,7 +146,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
             standAction?.play()
         } else {
             standAction?.fadeOut(.1).stop()
-            runAction?.setDuration(60 / fighter.movementSpeed * 4).play()
+            runAction?.setDuration(60 / fighter.movementSpeed * 3).play()
         }
     }, [ isStaying.current, actions, fighter ])
 

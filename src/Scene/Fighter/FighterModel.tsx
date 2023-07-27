@@ -7,8 +7,8 @@ import { useFrame } from "@react-three/fiber"
 import { Fighter } from "interfaces/fighter.interface"
 import { SkeletonUtils } from "three-stdlib"
 
-interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, position: number[], rotation?: number[] }
-const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: baseModel, fighter, position, rotation }: Props, ref) {
+interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, position: number[], rotation?: number[], children?: any }
+const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: baseModel, fighter, position, rotation, children }: Props, ref) {
     // Clone model for Reuse
     const model = useMemo(() => SkeletonUtils.clone(baseModel), [baseModel])
 
@@ -165,14 +165,20 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
     return (
         <group name="fighter-model">
             <Name value={fighter.name || 'Player_'+fighter.id} target={modelRef} offset={.4} />
-            <primitive 
+            <group
                 ref={modelRef}
-                object={model}
-                scale={.3}
+                // @ts-expect-error
                 position={position}
+                // @ts-expect-error
                 rotation={rotation}
-                castShadow 
-            />
+            >
+                <primitive 
+                    object={model}
+                    scale={.3}
+                    castShadow 
+                />
+                { children }
+            </group>
         </group>
     )
 }))
