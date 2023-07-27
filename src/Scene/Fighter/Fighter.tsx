@@ -139,8 +139,12 @@ const Fighter = memo(function Fighter() {
             
             if (actions) {
                 const attackAction = getAttackAction(actions, fighter, target.skill)
-                // const action
-                renderEffect.current = true
+                // TODO: Just for test
+                const isEmptyHand = !Object.keys(fighter.equipment).find(slotKey => (+slotKey === 6 || +slotKey === 7))
+                if (!isEmptyHand) {
+                    renderEffect.current = true
+                }
+                // 
                 attackAction?.setDuration(speed / 1000).play()
                 clearTimeout(attackTimeout.current)
                 attackTimeout.current = setTimeout(() => {

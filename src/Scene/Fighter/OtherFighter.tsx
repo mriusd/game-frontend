@@ -11,7 +11,7 @@ import Tween from "Scene/utils/tween/tween"
 import { getMoveDuration } from "Scene/utils/getMoveDuration"
 import { getRunAction, getStandAction, getAttackAction } from "./utils/getAction"
 import { useEventCloud } from "EventCloudContext"
-import { angleToVector } from "Scene/utils/angleToVector"
+import TwistingSlash from "./Skills/TwistingSlash/TwistingSlash"
 
 interface Props { fighter: Fighter }
 const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
@@ -48,6 +48,9 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
     }, [fighter])
 
 
+    // TODO: Fix, just for test
+    const renderEffect = useRef(false)
+    // 
     // TODO: This works wrong but just for test
     const attackTimeout = useRef<NodeJS.Timeout | null>(null)
     const speed = 300
@@ -57,7 +60,12 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
             if (currentEvent.type === 'skill' && currentEvent?.fighter?.id === fighter.id) {
                 if (actions) {
                     const attackAction = getAttackAction(actions, fighter, currentEvent.skill)
-                    // const action
+                    // TODO: Just for test
+                    const isEmptyHand = !Object.keys(fighter.equipment).find(slotKey => (+slotKey === 6 || +slotKey === 7))
+                    if (!isEmptyHand) {
+                        renderEffect.current = true
+                    }
+                    // 
                     attackAction?.setDuration(speed / 1000).play()
                     clearTimeout(attackTimeout.current)
                     attackTimeout.current = setTimeout(() => {
@@ -163,7 +171,9 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
                 fighter={fighter}
                 position={[currentWorldPosition.x, 0, currentWorldPosition.z]}
                 rotation={[0, direction, 0]}
-            />
+            >
+                <TwistingSlash renderEffect={renderEffect} onEffectComplete={() => renderEffect.current = false}/>
+            </FighterModel>
         </group>
     )
 })
