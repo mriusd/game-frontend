@@ -16,7 +16,7 @@ export const getBackpackModel = (name: string): GLTF => {
     // Legendary Set
     if (is('legendary')) {
         if (is('helm')) return models['legendary_helmet']
-        if (is('armour')) return models['legendary_chest']
+        if (is('armour')) return models['legendary_armour']
         if (is('gloves')) return models['legendary_gloves']
         if (is('pants')) return models['legendary_trousers']
         if (is('boots')) return models['legendary_boots']

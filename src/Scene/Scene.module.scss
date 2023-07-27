@@ -16,3 +16,16 @@
     user-select: none;
     pointer-events: none;
 }
+
+.players {
+    position: absolute;
+    top: 32px; left: 32px;
+    display: flex;
+    flex-direction: column;
+
+    p {
+        margin: 0;
+        padding: 0;
+        color: rgb(0, 56, 0);
+    }
+}

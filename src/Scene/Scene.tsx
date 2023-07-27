@@ -64,6 +64,14 @@ const Scene = memo(function Scene() {
                 </LoadAssetsContextProvider>
                 <Stats className='stats'/>
             </Canvas>
+            {
+                store.PlayerList.current.length && (
+                    <div className={styles.players}>
+                        <p>Close Players({store.PlayerList.current.length}):</p>
+                        { store.PlayerList.current.map(_ => (<p key={_.id}>{ `Player_${_.id}, matrixCoord: (${_.coordinates.x}, ${_.coordinates.z})` }<span></span></p>)) }
+                    </div>
+                )
+            }
             <div className={styles.coordinates}>
                 <div>World size [{store.worldSize.current}x{store.worldSize.current}]</div>
                 <div>Server coordinate [ X: {store.currentMatrixCoordinate?.x} Z: {store.currentMatrixCoordinate?.z} ]</div>

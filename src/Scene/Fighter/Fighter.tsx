@@ -17,6 +17,8 @@ import { calcDirection } from "../utils/calcDirection"
 import FighterModel from "./FighterModel"
 import { useGLTFLoaderStore } from "Scene/GLTFLoader/GLTFLoaderStore"
 import { getAttackAction, getRunAction, getStandAction } from "./utils/getAction"
+// TODO: Temporary, create Skills Manager and swap shader materials instead
+import TwistingSlash from "./Skills/TwistingSlash/TwistingSlash"
 
 const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
@@ -119,6 +121,9 @@ const Fighter = memo(function Fighter() {
     }, [saveFocusedMatrixCoordinate, isMoving])
         // Set target position to move on Object click
 
+    // TODO: Fix, just for test
+    const renderEffect = useRef(false)
+    // 
     const attackTimeout = useRef<NodeJS.Timeout | null>(null)
     const speed = 300
     useEffect(() => {
@@ -134,7 +139,12 @@ const Fighter = memo(function Fighter() {
             
             if (actions) {
                 const attackAction = getAttackAction(actions, fighter, target.skill)
-                // const action
+                // TODO: Just for test
+                const isEmptyHand = !Object.keys(fighter.equipment).find(slotKey => (+slotKey === 6 || +slotKey === 7))
+                if (!isEmptyHand) {
+                    renderEffect.current = true
+                }
+                // 
                 attackAction?.setDuration(speed / 1000).play()
                 clearTimeout(attackTimeout.current)
                 attackTimeout.current = setTimeout(() => {
@@ -229,7 +239,7 @@ const Fighter = memo(function Fighter() {
             standAction?.play()
         } else {
             standAction?.fadeOut(.1).stop()
-            runAction?.setDuration(60 / fighter.movementSpeed * 4).play()
+            runAction?.setDuration(60 / fighter.movementSpeed * 3).play()
         }
     }, [ isStaying ])
 
@@ -254,7 +264,10 @@ const Fighter = memo(function Fighter() {
                 fighter={fighter} 
                 position={[currentWorldCoordinate.x, 0, currentWorldCoordinate.z]}
                 rotation={[0, direction, 0]}
-            />
+            >
+                {/* TODO: Temporary, create Skills Manager and swap shader materials instead */}
+                <TwistingSlash renderEffect={renderEffect} onEffectComplete={() => renderEffect.current = false}/>
+            </FighterModel>
 })
 
 export default Fighter

@@ -11,6 +11,7 @@ import Tween from "Scene/utils/tween/tween"
 import { getMoveDuration } from "Scene/utils/getMoveDuration"
 import { getRunAction, getStandAction, getAttackAction } from "./utils/getAction"
 import { useEventCloud } from "EventCloudContext"
+import TwistingSlash from "./Skills/TwistingSlash/TwistingSlash"
 
 interface Props { fighter: Fighter }
 const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
@@ -22,7 +23,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
 
     // Just for test
     // TODO: must be removed
-    const { events } = useEventCloud()
+    const { events, removeEvent } = useEventCloud()
     const { worldSize } = useSceneContext()
     const [spawned, setSpawned] = useState<boolean>(false)
     const [currentMatrixPosition, setCurrentMatrixPosition] = useState<Coordinate | null>(null)
@@ -31,7 +32,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
     const [currentWorldPosition, setCurrentWorldPosition] = useState<Coordinate | null>(null)
     const [direction, setDirection] = useState<number>(0)
     // 
-    const ENTER_TO_ISSTAYING_DELAY = 100 //ms
+    const ENTER_TO_ISSTAYING_DELAY = 10 //ms
     const isMoving = useRef<boolean>(false)
     const isStaying = useRef<boolean>(true)
 
@@ -47,24 +48,34 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
     }, [fighter])
 
 
+    // TODO: Fix, just for test
+    const renderEffect = useRef(false)
+    // 
     // TODO: This works wrong but just for test
     const attackTimeout = useRef<NodeJS.Timeout | null>(null)
     const speed = 300
     useEffect(() => {
-        events.forEach(damageEvent => {
-            if (damageEvent.playerFighter.id === fighter.id) {
+        if (!fighter) { return }
+        events.forEach(currentEvent => {
+            if (currentEvent.type === 'skill' && currentEvent?.fighter?.id === fighter.id) {
                 if (actions) {
-                    const attackAction = getAttackAction(actions, fighter, damageEvent.skill)
-                    // const action
+                    const attackAction = getAttackAction(actions, fighter, currentEvent.skill)
+                    // TODO: Just for test
+                    const isEmptyHand = !Object.keys(fighter.equipment).find(slotKey => (+slotKey === 6 || +slotKey === 7))
+                    if (!isEmptyHand) {
+                        renderEffect.current = true
+                    }
+                    // 
                     attackAction?.setDuration(speed / 1000).play()
                     clearTimeout(attackTimeout.current)
                     attackTimeout.current = setTimeout(() => {
                         attackAction?.stop()
                     }, speed)
                 }
+                removeEvent(currentEvent)
             }
         })
-        console.log('Fighter events', events)
+        // console.log('Fighter events', events)
     }, [events])
     // 
 
@@ -111,7 +122,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
     // Otherwise we render if fighter < 2 cells away from server
     const timeout = useRef<any>(0)
     useEffect(() => {
-        console.log(`Player ${fighter.id},`, `isMoving ${isMoving.current},`, `isStaying ${isStaying.current}`)
+        // console.log(`Player ${fighter.id},`, `isMoving ${isMoving.current},`, `isStaying ${isStaying.current}`)
         clearTimeout(timeout.current)
 
         if (isMoving.current) {
@@ -121,7 +132,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
 
         timeout.current = setTimeout(() => {
             isStaying.current = true
-        }, ENTER_TO_ISSTAYING_DELAY) // 200ms delay
+        }, ENTER_TO_ISSTAYING_DELAY) // delay
     }, [ isMoving.current ])
 
     // Toggle movement animation
@@ -143,7 +154,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
             standAction?.play()
         } else {
             standAction?.fadeOut(.1).stop()
-            runAction?.setDuration(60 / fighter.movementSpeed * 4).play()
+            runAction?.setDuration(60 / fighter.movementSpeed * 3).play()
         }
     }, [ isStaying.current, actions, fighter ])
 
@@ -160,7 +171,9 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
                 fighter={fighter}
                 position={[currentWorldPosition.x, 0, currentWorldPosition.z]}
                 rotation={[0, direction, 0]}
-            />
+            >
+                <TwistingSlash renderEffect={renderEffect} onEffectComplete={() => renderEffect.current = false}/>
+            </FighterModel>
         </group>
     )
 })
