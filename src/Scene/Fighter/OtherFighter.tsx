@@ -23,7 +23,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
 
     // Just for test
     // TODO: must be removed
-    const { events } = useEventCloud()
+    const { events, removeEvent } = useEventCloud()
     const { worldSize } = useSceneContext()
     const [spawned, setSpawned] = useState<boolean>(false)
     const [currentMatrixPosition, setCurrentMatrixPosition] = useState<Coordinate | null>(null)
@@ -52,10 +52,11 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
     const attackTimeout = useRef<NodeJS.Timeout | null>(null)
     const speed = 300
     useEffect(() => {
-        events.forEach(damageEvent => {
-            if (damageEvent.playerFighter.id === fighter.id) {
+        if (!fighter) { return }
+        events.forEach(currentEvent => {
+            if (currentEvent.type === 'skill' && currentEvent?.fighter?.id === fighter.id) {
                 if (actions) {
-                    const attackAction = getAttackAction(actions, fighter, damageEvent.skill)
+                    const attackAction = getAttackAction(actions, fighter, currentEvent.skill)
                     // const action
                     attackAction?.setDuration(speed / 1000).play()
                     clearTimeout(attackTimeout.current)
@@ -63,6 +64,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
                         attackAction?.stop()
                     }, speed)
                 }
+                removeEvent(currentEvent)
             }
         })
         console.log('Fighter events', events)
