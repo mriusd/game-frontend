@@ -19,6 +19,7 @@ import { useGLTFLoaderStore } from "Scene/GLTFLoader/GLTFLoaderStore"
 import { getAttackAction, getRunAction, getStandAction } from "./utils/getAction"
 // TODO: Temporary, create Skills Manager and swap shader materials instead
 import TwistingSlash from "./Skills/TwistingSlash/TwistingSlash"
+import { useControls } from "leva"
 
 const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
@@ -180,6 +181,9 @@ const Fighter = memo(function Fighter() {
         }, ENTER_TO_ISSTAYING_DELAY) // 200ms delay
     }, [ isMoving ])
 
+    const dev = useControls('Fighter Dev Settings', {
+        xSpeed: { min: 1, max: 10, value: 1 }
+    })
     // Fighter movement
     useEffect(() => {
         if (isMoving) { return }
@@ -204,7 +208,7 @@ const Fighter = memo(function Fighter() {
 
         Tween.to(currentWorldCoordinate, nextWorldPosition,
             {
-                duration: getMoveDuration(fighter.movementSpeed, currentMatrixCoordinate, nextMatrixPosition), 
+                duration: getMoveDuration(fighter.movementSpeed * dev.xSpeed, currentMatrixCoordinate, nextMatrixPosition), 
                 onChange(state) {
                     // console.log(state.value)
                     setCurrentWorldCoordinate(state.value)
