@@ -274,7 +274,7 @@ export const EventCloudProvider = ({ children }) => {
   const updateEquipment = useEventStore(state => state.updateEquipment);
 
   function handleFireSkill(fighter, skill) {
-    addSkillEvent({fightet, skill})
+    addSkillEvent({fighter, skill})
   }
 
   const addSkillEvent = (skillEvent) => {
