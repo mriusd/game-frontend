@@ -11,6 +11,7 @@ import Tween from "Scene/utils/tween/tween"
 import { getMoveDuration } from "Scene/utils/getMoveDuration"
 import { getRunAction, getStandAction, getAttackAction } from "./utils/getAction"
 import { useEventCloud } from "EventCloudContext"
+import { angleToVector } from "Scene/utils/angleToVector"
 
 interface Props { fighter: Fighter }
 const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
