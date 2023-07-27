@@ -262,12 +262,25 @@ export const EventCloudProvider = ({ children }) => {
         case "user_fighters":
           handleUserFighters(msg.fighters);
         break;
+
+      case "fire_skill":
+          handleFireSkill(msg.fighter, msg.skill);
+        break;
       }
   }
 
 
   const updateBackpack = useEventStore(state => state.updateBackpack);
   const updateEquipment = useEventStore(state => state.updateEquipment);
+
+  function handleFireSkill(fighter, skill) {
+    addSkillEvent({fighter, skill})
+  }
+
+  const addSkillEvent = (skillEvent) => {
+    setEvents((prevEvents) => [...prevEvents, { type: 'skill', ...skillEvent }]);
+    setLatestDamageEvent({ type: 'skill', ...skillEvent });
+  };
 
   function handleUserFighters (fighters) {
     setUserFighters(fighters)
