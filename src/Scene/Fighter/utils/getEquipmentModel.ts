@@ -10,18 +10,18 @@ export const getEquipmentModel = (name: string): GLTF => {
     // Dragon Set
     if (is('dragon')) {
         if (is('helm')) return models['fighter_dragon_helmet']
-        if (is('armour')) return models['fighter_dragon_chest']
+        if (is('armour')) return models['fighter_dragon_armour']
         if (is('gloves')) return models['fighter_dragon_gloves']
-        if (is('pants')) return models['fighter_dragon_trousers']
+        if (is('pants')) return models['fighter_dragon_pants']
         if (is('boots')) return models['fighter_dragon_boots']
     }
 
     // Legendary Set
     if (is('legendary')) {
         if (is('helm')) return models['fighter_legendary_helmet']
-        if (is('armour')) return models['fighter_legendary_chest']
+        if (is('armour')) return models['fighter_legendary_armour']
         if (is('gloves')) return models['fighter_legendary_gloves']
-        if (is('pants')) return models['fighter_legendary_trousers']
+        if (is('pants')) return models['fighter_legendary_pants']
         if (is('boots')) return models['fighter_legendary_boots']
     }
 

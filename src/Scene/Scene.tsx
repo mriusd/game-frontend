@@ -28,6 +28,14 @@ import { useUiStore } from 'store/uiStore'
 import { Leva } from 'leva'
 import { useBackpackStore } from 'store/backpackStore'
 
+// Postprocessing
+import { EffectComposer, DepthOfField, Bloom, Noise, Vignette } from '@react-three/postprocessing'
+import { BlurPass, Resizer, KernelSize, Resolution } from 'postprocessing'
+import { ToneMapping } from '@react-three/postprocessing'
+import { BlendFunction } from 'postprocessing'
+import { SelectiveBloom } from '@react-three/postprocessing'
+
+
 const Scene = memo(function Scene() {
     const store = useSceneContext()
     const worldRef = useRef<Object3D | null>(null)
@@ -63,6 +71,18 @@ const Scene = memo(function Scene() {
                     <UserInterface />
                 </LoadAssetsContextProvider>
                 <Stats className='stats'/>
+                {/* <EffectComposer> */}
+                    {/* <Bloom kernelSize={KernelSize.LARGE} luminanceThreshold={0} luminanceSmoothing={0.9} height={300} /> */}
+                    {/* <SelectiveBloom
+                        // lights={[lightRef1, lightRef2]} // ⚠️ REQUIRED! all relevant lights
+                        selection={[worldRef]} // selection of objects that will have bloom effect
+                        selectionLayer={10} // selection layer
+                        intensity={1.0} // The bloom intensity.
+                        kernelSize={KernelSize.LARGE} // blur kernel size
+                        luminanceThreshold={0.9} // luminance threshold. Raise this value to mask out darker elements in the scene.
+                        luminanceSmoothing={0.025} // smoothness of the luminance threshold. Range is [0, 1]
+                    /> */}
+                {/* </EffectComposer> */}
             </Canvas>
             {
                 store.PlayerList.current.length && (

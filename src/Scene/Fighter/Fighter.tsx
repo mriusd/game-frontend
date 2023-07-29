@@ -24,7 +24,7 @@ import { useControls } from "leva"
 const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
     const camera = useThree(state => state.camera)
-    const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.stock, [])
+    const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.fighter_man, [])
 
     const { submitMalee } = useEventCloud()
     const { 
@@ -126,7 +126,7 @@ const Fighter = memo(function Fighter() {
     const renderEffect = useRef(false)
     // 
     const attackTimeout = useRef<NodeJS.Timeout | null>(null)
-    const speed = 300
+    const speed = 1000
     useEffect(() => {
         console.log('target!', target, itemTarget)
         // For attack target

@@ -31,6 +31,7 @@ const colors = {
     LAST_PLACEHOLDER_LIGHT: '#393400', 
 }
 
+
 const Backpack = memo(function Backpack() {
     // TODO: Should be fixed in future?
     // Additionally rerender items after mount
@@ -126,6 +127,8 @@ const Backpack = memo(function Backpack() {
         hoveredItemEvent.current = e
         // @ts-expect-error
         hoveredItemEvent.current.object.parent.material.opacity = .2
+        hoveredItemModel.current.userData.positionZ = hoveredItemModel.current.position.z
+        hoveredItemModel.current.position.z = 300
         // Toggle Item Description
         const itemDescription = hoveredItemEvent.current.object.parent.children.find(_ => _.name === 'item-description')
         itemDescription && ( itemDescription.visible = true )
@@ -135,6 +138,7 @@ const Backpack = memo(function Backpack() {
         if (!e.object) { return } // in case if removed
         if (isItemPinned.current || pinnedItemEvent.current) { return }
         isItemHovered.current = false
+        hoveredItemModel.current?.userData?.positionZ && (hoveredItemModel.current.position.z = hoveredItemModel.current.userData.positionZ)
         hoveredItemModel.current && (hoveredItemModel.current.rotation.y = 0)
         hoveredItemModel.current = null
         setCursor('default')

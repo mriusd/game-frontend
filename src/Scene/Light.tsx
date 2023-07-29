@@ -29,7 +29,7 @@ const Light = memo(function Light() {
 
     return (
         <>
-            <ambientLight color={0xFFFFFF} intensity={1} />
+            <ambientLight color={0xFFFFFF} intensity={.5} />
             <directionalLight 
                 ref={shadowlightRef}
                 color={0xFFFFFF} 

@@ -6,7 +6,7 @@ export const getAttackAction = (actions: {[key: string]: THREE.AnimationAction},
     const isUseSkill = skill.skillId > 0
     const isEmptyHand = !Object.keys(fighter.equipment).find(slotKey => (+slotKey === 6 || +slotKey === 7))
     if (!isUseSkill) {
-        if (isEmptyHand) return actions['punch']
+        if (isEmptyHand) return actions['attack']
         return actions['sword_attack']
     }
     return null

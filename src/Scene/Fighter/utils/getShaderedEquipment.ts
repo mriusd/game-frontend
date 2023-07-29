@@ -53,5 +53,5 @@ export const getShaderedEquipment = (item: BackpackSlot, uniforms: any) => {
             object.material = material
         }
     })
-    return model
+    return { model, animations: gltf.animations }
 }

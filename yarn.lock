@@ -2761,15 +2761,15 @@
     "@react-pdf/yoga" "^2.0.4"
     react-merge-refs "^1.1.0"
 
-"@react-three/postprocessing@^2.8.0":
-  version "2.10.0"
-  resolved "https://registry.npmjs.org/@react-three/postprocessing/-/postprocessing-2.10.0.tgz"
-  integrity sha512-39jzEJ4DkMoJPWiO6TeT0dmmToNKVMxDd0BbdbAxJrRgCcAEVjE/7zOSkKPiLZYqjIsmXB5izgTohTXw3vbANw==
+"@react-three/postprocessing@^2.15.0":
+  version "2.15.0"
+  resolved "https://registry.yarnpkg.com/@react-three/postprocessing/-/postprocessing-2.15.0.tgz#9bea5aec5492d04e6d27fbdeaa6a2ce8cea0e10e"
+  integrity sha512-kldXieRcn8tB3bIVwRAFa1ojG11tkuMLAFYOra32E7y9n1nhVU4FKx+GxmblHSiRWpvGnEje/kYxDKTPjKj4eA==
   dependencies:
-    maath "^0.5.3"
-    postprocessing "^6.30.2"
-    screen-space-reflections "2.5.0"
-    three-stdlib "^2.21.10"
+    maath "^0.6.0"
+    n8ao "^1.6.6"
+    postprocessing "^6.32.1"
+    three-stdlib "^2.23.4"
 
 "@react-three/rapier@^0.15.0":
   version "0.15.1"
@@ -4759,12 +4759,7 @@ big.js@^5.2.2:
   resolved "https://registry.npmjs.org/big.js/-/big.js-5.2.2.tgz"
   integrity sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==
 
-bignumber.js@^9.0.0:
-  version "9.1.1"
-  resolved "https://registry.npmjs.org/bignumber.js/-/bignumber.js-9.1.1.tgz"
-  integrity sha512-pHm4LsMJ6lzgNGVfZHjMoO8sdoRhOzOH4MLmY65Jg70bpxCKu5iOHNJyfF6OyvYw7t8Fpf35RuzUyqnQsj8Vig==
-
-bignumber.js@^9.1.1:
+bignumber.js@^9.0.0, bignumber.js@^9.1.1:
   version "9.1.1"
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.1.1.tgz#c4df7dc496bd849d4c9464344c1aa74228b4dac6"
   integrity sha512-pHm4LsMJ6lzgNGVfZHjMoO8sdoRhOzOH4MLmY65Jg70bpxCKu5iOHNJyfF6OyvYw7t8Fpf35RuzUyqnQsj8Vig==
@@ -9829,10 +9824,15 @@ lz-string@^1.4.4:
   resolved "https://registry.npmjs.org/lz-string/-/lz-string-1.5.0.tgz"
   integrity sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==
 
-maath@^0.5.2, maath@^0.5.3:
+maath@^0.5.2:
   version "0.5.3"
   resolved "https://registry.npmjs.org/maath/-/maath-0.5.3.tgz"
   integrity sha512-ut63A4zTd9abtpi+sOHW1fPWPtAFrjK0E17eAthx1k93W/T2cWLKV5oaswyotJVDvvW1EXSdokAqhK5KOu0Qdw==
+
+maath@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/maath/-/maath-0.6.0.tgz#7841d0fb95bbb37d19b08b7c5458ef70190950d2"
+  integrity sha512-dSb2xQuP7vDnaYqfoKzlApeRcR2xtN8/f7WV/TMAkBC8552TwTLtOO0JTcSygkYMjNDPoo6V01jTw/aPi4JrMw==
 
 magic-string@^0.25.0, magic-string@^0.25.7:
   version "0.25.9"
@@ -10638,6 +10638,11 @@ mute-stream@0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
   integrity sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
+
+n8ao@^1.6.6:
+  version "1.6.8"
+  resolved "https://registry.yarnpkg.com/n8ao/-/n8ao-1.6.8.tgz#93195eb7c29de962c24ddbbed7d04b72f7ee0d1c"
+  integrity sha512-3xaBaoMIplgPdBK+9mZefa8stWEoA2673h2734wYMxm/hUkMLENMhzymDe+WZueFQq93ly4xpl5s1NJrQBzFOQ==
 
 nano-json-stream-parser@^0.1.2:
   version "0.1.2"
@@ -11887,10 +11892,10 @@ postcss@^8.4.23:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-postprocessing@^6.30.2:
-  version "6.30.2"
-  resolved "https://registry.npmjs.org/postprocessing/-/postprocessing-6.30.2.tgz"
-  integrity sha512-Vt77s5DkHyUOV4bmk10J46DHJLglBfIo9ARPI0o62UIAx9omANfuPJTKiLVoYlC1ApkV9y3ldBDipF3IldB7YA==
+postprocessing@^6.32.1:
+  version "6.32.2"
+  resolved "https://registry.yarnpkg.com/postprocessing/-/postprocessing-6.32.2.tgz#4b6fe0c821e448986c566379df6c3ecd163995a7"
+  integrity sha512-BpjIHeElXRmkcqO6p8Pi6W1uDcivQa2FVQ/Swnoo32Cg5bq/bb0mh9hXSHeCkIBD0W4D2KU8Fg7jBICztcN9iQ==
 
 potpack@^1.0.1:
   version "1.0.2"
@@ -12868,11 +12873,6 @@ schema-utils@^4.0.0:
     ajv-formats "^2.1.1"
     ajv-keywords "^5.0.0"
 
-screen-space-reflections@2.5.0:
-  version "2.5.0"
-  resolved "https://registry.npmjs.org/screen-space-reflections/-/screen-space-reflections-2.5.0.tgz"
-  integrity sha512-fWSDMhJS0xwD3LTxRRch7Lb9NzxsR66sCmtDmAA7i+OGnghUrBBsrha85ng7StnCBaLq/BKmZ97dLxWd1XgWdQ==
-
 scrypt-js@^3.0.0, scrypt-js@^3.0.1:
   version "3.0.1"
   resolved "https://registry.npmjs.org/scrypt-js/-/scrypt-js-3.0.1.tgz"
@@ -13747,7 +13747,7 @@ three-stdlib@2.21.6:
     potpack "^1.0.1"
     zstddec "^0.0.2"
 
-three-stdlib@^2.21.10, three-stdlib@^2.21.8:
+three-stdlib@^2.21.8:
   version "2.21.10"
   resolved "https://registry.npmjs.org/three-stdlib/-/three-stdlib-2.21.10.tgz"
   integrity sha512-YGkR3stmgmXSHL27+1A5dWAKKB+e63PLVkRWV/LLZ7f5+ExsqjLPm4YfBmJgkoSLgILYpQs6O7baY9gnIZlmNA==
@@ -13764,7 +13764,7 @@ three-stdlib@^2.21.10, three-stdlib@^2.21.8:
     potpack "^1.0.1"
     zstddec "^0.0.2"
 
-three-stdlib@^2.23.13:
+three-stdlib@^2.23.13, three-stdlib@^2.23.4:
   version "2.23.13"
   resolved "https://registry.yarnpkg.com/three-stdlib/-/three-stdlib-2.23.13.tgz#2647b9b6b93e9a257efb6d14c1b9af7a0f938439"
   integrity sha512-WU4XHs4E6szAyoREzTs5bUAc1WFadiz5jRjNlA7aIIqf+raT4jfA320P0XmlyZz/wJwmpZnOuki4kAFsmadkTQ==

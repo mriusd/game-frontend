@@ -7,7 +7,7 @@
     "@react-three/drei": "^9.66.0",
     "@react-three/fiber": "^8.12.2",
     "@react-three/flex": "^1.0.1",
-    "@react-three/postprocessing": "^2.8.0",
+    "@react-three/postprocessing": "^2.15.0",
     "@react-three/rapier": "^0.15.0",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
