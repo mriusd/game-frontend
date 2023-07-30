@@ -13,11 +13,13 @@ import type { Mesh } from 'three'
 import type { Fighter } from 'interfaces/fighter.interface'
 import Name from './components/Name'
 import { setCursorPointer } from './utils/setCursorPointer'
+import { useEventCloud } from 'EventCloudContext'
+import { useGLTFLoaderStore } from './GLTFLoader/GLTFLoaderStore'
 
 interface Props { npc: Fighter }
 const Npc = memo(function Npc({ npc }: Props) {
+    const { events, removeEvent } = useEventCloud()
     const { worldSize, html, setTarget, fighter, setHoveredItems, setSceneObject, getSceneObject } = useSceneContext()
-    const { gltf } = useLoadAssets()
     const [spawned, setSpawned] = useState<boolean>(false)
     const [currentMatrixPosition, setCurrentMatrixPosition] = useState<Coordinate | null>(null)
     const [targetMatrixPosition, setTargetMatrixPosition] = useState<Coordinate | null>(null)
@@ -26,7 +28,8 @@ const Npc = memo(function Npc({ npc }: Props) {
     const [direction, setDirection] = useState<number>(0)
     const nameColor = useRef<0xFFFFFF | 0xFF3300>(0xFFFFFF)
 
-    const model = useMemo(() => SkeletonUtils.clone(gltf.current.npc.scene), [gltf.current])
+    const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.npc, [])
+    const model = useMemo(() => SkeletonUtils.clone(gltf.scene), [gltf])
     useEffect(() => {
         if (!model) { return }
         model.traverse((child: Mesh) => {
@@ -39,7 +42,7 @@ const Npc = memo(function Npc({ npc }: Props) {
 
     const isTurned = useRef(false)
     const animationTarget = useRef()
-    const { mixer, actions } = useAnimations(gltf.current.npc.animations, animationTarget)
+    const { mixer, actions } = useAnimations(gltf.animations, animationTarget)
     useEffect(() => {
         if (!mixer || isTurned.current) { return }
         isTurned.current = true
@@ -53,7 +56,7 @@ const Npc = memo(function Npc({ npc }: Props) {
         // console.log(`[NPC]: npc with id '${npc?.id}' updated`, npc)
         if (!npc?.isNpc) { return }
         if (npc?.isDead) {
-            console.log(`[NPC]: npc with id '${npc?.id}' is dead`)
+            // console.log(`[NPC]: npc with id '${npc?.id}' is dead`)
             setSpawned(false)
             setTargetMatrixPosition(null)
             setCurrentMatrixPosition(null)
@@ -133,6 +136,38 @@ const Npc = memo(function Npc({ npc }: Props) {
     //     console.log('Right CLick', event)
     //     setTarget(npc, fighter.skills[1])
     // }
+
+    // TODO: This works wrong but just for test
+    const attackTimeout = useRef<NodeJS.Timeout | null>(null)
+    const speed = 1000
+    useEffect(() => {
+        // console.log('events', events)
+        const skillEvents = events.filter((event: any) => event.type === 'skill')
+        // console.log('skillEvents', skillEvents)
+        skillEvents.forEach((skillEvent: any)  => {
+            if (skillEvent.fighter?.id === npc.id) {
+                // if (actions) {
+                //     const attackAction = getAttackAction(actions, fighter, skillEvent.skill)
+                //     // TODO: Just for test
+                //     const isEmptyHand = !Object.keys(fighter.equipment).find(slotKey => (+slotKey === 6 || +slotKey === 7))
+                //     if (!isEmptyHand) {
+                //         renderEffect.current = true
+                //     }
+                //     // 
+                //     attackAction?.setDuration(speed / 1000).play()
+                //     clearTimeout(attackTimeout.current)
+                //     attackTimeout.current = setTimeout(() => {
+                //         attackAction?.stop()
+                //     }, speed)
+                // }
+                removeEvent(skillEvent)
+            } else {
+                // TODO: change this on npc attack skill
+                // removeEvent(skillEvent)
+            }
+        })
+    }, [events])
+    // 
 
     if (!spawned) {
         return <></>

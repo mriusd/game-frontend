@@ -53,13 +53,14 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
     // 
     // TODO: This works wrong but just for test
     const attackTimeout = useRef<NodeJS.Timeout | null>(null)
-    const speed = 1000
+    const speed = 500
     useEffect(() => {
-        if (!fighter) { return }
-        events.forEach(currentEvent => {
-            if (currentEvent.type === 'skill' && currentEvent?.fighter?.id === fighter.id) {
+        const skillEvents = events.filter((event: any) => event.type === 'skill')
+        // console.log('skillEvents', skillEvents)
+        skillEvents.forEach((skillEvent: any)  => {
+            if (skillEvent.fighter?.id === fighter.id) {
                 if (actions) {
-                    const attackAction = getAttackAction(actions, fighter, currentEvent.skill)
+                    const attackAction = getAttackAction(actions, fighter, skillEvent.skill)
                     // TODO: Just for test
                     const isEmptyHand = !Object.keys(fighter.equipment).find(slotKey => (+slotKey === 6 || +slotKey === 7))
                     if (!isEmptyHand) {
@@ -72,7 +73,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
                         attackAction?.stop()
                     }, speed)
                 }
-                removeEvent(currentEvent)
+                removeEvent(skillEvent)
             }
         })
         // console.log('Fighter events', events)

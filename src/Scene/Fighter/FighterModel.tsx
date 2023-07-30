@@ -22,6 +22,9 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
     // Forward ref
     React.useImperativeHandle(ref, () => modelRef.current)
 
+    // TODO: Fix this, dont use sceneContext
+    const { setSceneObject } = useSceneContext()
+
 
     // Space in Fighter model where we insert all Equipment
     const fighterArmature = useRef<THREE.Group | null>(null)
@@ -231,6 +234,17 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
         uniforms.current.uTime.value = clock.getElapsedTime()
         mixer.update( delta )
     })
+
+
+    // Save ref to object to store & rm on unmount
+    useEffect(() => {
+        if (modelRef.current) {
+            setSceneObject(fighter.id, modelRef.current, 'add')
+        }
+        return () => {
+            setSceneObject(fighter.id, modelRef.current, 'remove')
+        }
+    }, [modelRef.current, fighter])
 
     return (
         <group name="fighter-model">

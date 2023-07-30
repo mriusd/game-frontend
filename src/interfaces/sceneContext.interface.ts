@@ -46,6 +46,7 @@ export interface ISceneContext {
     target: { target: Fighter, skill: Skill } | null, setTarget: (target: Fighter | null, skill: Skill | null) => void,
     itemTarget: ItemDroppedEvent, setItemTarget: (item: ItemDroppedEvent) => void
 
+    allPlayerList: Fighter[],
     PlayerList: RefObject<Fighter[]>,
     updateFighterDirection: (direction: Direction) => void
 }

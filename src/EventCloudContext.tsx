@@ -311,7 +311,7 @@ export const EventCloudProvider = ({ children }) => {
     //handleUpdateNpc(opponentFighterObj);
     
     // Use addDamageEvent from EventCloudContext
-    console.log('Calling addDamageEvent', { npcId: opponent, damage: damage, dmgType: dmgType }, dmgType);
+    // console.log('Calling addDamageEvent', { npcId: opponent, damage: damage, dmgType: dmgType }, dmgType);
     addDamageEvent({ npcId: opponent, damage, dmgType, skill, playerFighter, opponentFighter });
 
   }

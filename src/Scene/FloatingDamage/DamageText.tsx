@@ -21,7 +21,7 @@ const DamageText = ({ color, value, target, onComplete }: Props) => {
         const to = { opacity: 0, offsetY: 1.3 }
 
         textRef.current!.position.set(x, height+from.offsetY, z)
-                console.log(textRef.current.material)
+        // console.log(textRef.current.material)
 
         Tween.to(from, to, {
             duration: 700,

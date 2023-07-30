@@ -235,6 +235,7 @@ const SceneContextProvider = ({ children }: Props) => {
         target, setTarget,
         itemTarget, setItemTarget,
 
+        allPlayerList: playerList,
         PlayerList,
         updateFighterDirection
     }

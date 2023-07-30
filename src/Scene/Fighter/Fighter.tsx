@@ -41,6 +41,8 @@ const Fighter = memo(function Fighter() {
         setNextMatrixCoordinate,
         setNextWorldCoordinate,
 
+        setSceneObject,
+
         controller: {
             focusedMatrixCoordinate,
             direction,
@@ -126,7 +128,7 @@ const Fighter = memo(function Fighter() {
     const renderEffect = useRef(false)
     // 
     const attackTimeout = useRef<NodeJS.Timeout | null>(null)
-    const speed = 1000
+    const speed = 500
     useEffect(() => {
         console.log('target!', target, itemTarget)
         // For attack target
@@ -143,7 +145,10 @@ const Fighter = memo(function Fighter() {
                 // TODO: Just for test
                 const isEmptyHand = !Object.keys(fighter.equipment).find(slotKey => (+slotKey === 6 || +slotKey === 7))
                 if (!isEmptyHand) {
-                    renderEffect.current = true
+                    // TODO: Hook animation on server event
+                    setTimeout(() => {
+                        renderEffect.current = true
+                    }, 300)
                 }
                 // 
                 attackAction?.setDuration(speed / 1000).play()
@@ -256,7 +261,6 @@ const Fighter = memo(function Fighter() {
         lastStandAction?.stop()
         standAction?.play()
     }, [fighter])
-
 
     if (!currentWorldCoordinate) {
         return <></>
