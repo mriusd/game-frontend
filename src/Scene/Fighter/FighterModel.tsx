@@ -12,7 +12,10 @@ import { getEquipmentBodyType, bodyType } from "./utils/getEquipmentBodyType"
 interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, position: number[], rotation?: number[], children?: any }
 const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: baseModel, fighter, position, rotation, children }: Props, ref) {
     // Clone model for Reuse
-    const model = useMemo(() => SkeletonUtils.clone(baseModel), [baseModel])
+    const model = useMemo(() => {
+        if (!baseModel) { return undefined }
+        return SkeletonUtils.clone(baseModel)
+    }, [baseModel])
 
     // Equipment we take on Fighter
     // const equipment = useEventStore(state => state.equipment)

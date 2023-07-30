@@ -24,7 +24,9 @@ import { useControls } from "leva"
 const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
     const camera = useThree(state => state.camera)
-    const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.fighter_man, [])
+    // const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.fighter_man, [])
+    const models = useGLTFLoaderStore(state => state.models)
+    const gltf = useMemo(() => models.current.fighter_man, [models.current])
 
     const { submitMalee } = useEventCloud()
     const { 

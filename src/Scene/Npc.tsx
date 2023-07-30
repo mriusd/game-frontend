@@ -5,7 +5,6 @@ import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
 import Tween from "./utils/tween/tween"
 import { Coordinate } from "interfaces/coordinate.interface"
 import { useSceneContext } from "store/SceneContext"
-import { useLoadAssets } from "store/LoadAssetsContext"
 import { useAnimations } from "@react-three/drei"
 import { getMoveDuration } from './utils/getMoveDuration'
 import HealthBar from './components/HealthBar'
@@ -28,8 +27,12 @@ const Npc = memo(function Npc({ npc }: Props) {
     const [direction, setDirection] = useState<number>(0)
     const nameColor = useRef<0xFFFFFF | 0xFF3300>(0xFFFFFF)
 
-    const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.npc, [])
-    const model = useMemo(() => SkeletonUtils.clone(gltf.scene), [gltf])
+    // const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.npc, [])
+    const gltf = useGLTFLoaderStore(state => state.models.current.npc)
+    const model = useMemo(() => {
+        if (!gltf?.scene) return undefined
+        return SkeletonUtils.clone(gltf.scene) 
+    }, [gltf])
     useEffect(() => {
         if (!model) { return }
         model.traverse((child: Mesh) => {

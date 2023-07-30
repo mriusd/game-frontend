@@ -4,10 +4,9 @@ import * as THREE from "three"
 import { Object3D } from "three"
 
 import { Canvas } from "@react-three/fiber"
-import { useRef, memo, useEffect } from "react"
+import { useRef, memo, Suspense } from "react"
 import { useSceneContext } from "store/SceneContext"
-import LoadAssetsContextProvider from "store/LoadAssetsContext"
-import { OrbitControls, Stats } from "@react-three/drei"
+import { Loader, Stats } from "@react-three/drei"
 
 import { CAMERA_POSITION } from "./config"
 
@@ -41,7 +40,7 @@ const Scene = memo(function Scene() {
     const worldRef = useRef<Object3D | null>(null)
     const eventsNode = useUiStore(state => state.eventsNode)
     const isBackpackOpened = useBackpackStore(state => state.isOpened)
-
+    
     return (
         <div ref={eventsNode} id="scene" className={styles.scene}>
             <Canvas
@@ -53,24 +52,23 @@ const Scene = memo(function Scene() {
                     fov: 45,
                 }}
             >
-                <GLTFLoader/>
-                <LoadAssetsContextProvider>
-                    <color attach="background" args={[0x000000]} />
-                    {/* <fog attach="fog" color={0x000000} near={20} far={60} /> */}
-                    {/* <OrbitControls/> */}
-                    <Light />
-                    {store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />)}
-                    {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
-                    {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)}
-                    {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)}
-
-                    <Fighter />
-                    <Chunks ref={worldRef} />
-                    <Controller world={worldRef} />
-                    <FloatingDamage />
-                    <UserInterface />
-                </LoadAssetsContextProvider>
+                <color attach="background" args={[0x000000]} />
                 <Stats className='stats'/>
+
+                <Suspense fallback={null}>
+                    <GLTFLoader>
+                        {store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />)}
+                        {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
+                        {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)}
+                        {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)}
+                        <Fighter />
+                        <Chunks ref={worldRef} />
+                        <Controller world={worldRef} />
+                        <FloatingDamage />
+                        <UserInterface />
+                        <Light />
+                    </GLTFLoader>
+                </Suspense>
                 {/* <EffectComposer> */}
                     {/* <Bloom kernelSize={KernelSize.LARGE} luminanceThreshold={0} luminanceSmoothing={0.9} height={300} /> */}
                     {/* <SelectiveBloom
@@ -84,6 +82,7 @@ const Scene = memo(function Scene() {
                     /> */}
                 {/* </EffectComposer> */}
             </Canvas>
+            <Loader/>
             {
                 store.PlayerList.current.length && (
                     <div className={styles.players}>
