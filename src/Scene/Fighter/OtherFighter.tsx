@@ -16,7 +16,7 @@ import TwistingSlash from "./Skills/TwistingSlash/TwistingSlash"
 interface Props { fighter: Fighter }
 const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
 
-    const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.stock, [])
+    const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.fighter_man, [])
 
     const animationTarget = useRef()
     const { mixer, actions } = useAnimations(gltf.animations, animationTarget)
@@ -53,7 +53,7 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
     // 
     // TODO: This works wrong but just for test
     const attackTimeout = useRef<NodeJS.Timeout | null>(null)
-    const speed = 300
+    const speed = 1000
     useEffect(() => {
         if (!fighter) { return }
         events.forEach(currentEvent => {

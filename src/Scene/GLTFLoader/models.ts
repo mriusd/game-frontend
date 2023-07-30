@@ -3,8 +3,8 @@ import type { ModelLoadItem } from "interfaces/gltfloader.interface"
 export const models: ModelLoadItem[] = [
     // Fighter
     {
-        name: 'stock',
-        url: 'models/stock/stock.gltf'
+        name: 'fighter_man',
+        url: 'models/fighter/man/man.gltf'
     },
 
 
@@ -38,13 +38,19 @@ export const models: ModelLoadItem[] = [
     },
     {
         name: 'fighter_crystal_sword',
-        url: 'models/fighter_crystal_sword/project_an.gltf'
+        url: 'models/fighter/crystal_sword/crystal_sword.gltf'
     },
 
-    // Wings
+    // Wings (For Fighter)
     {
         name: 'fighter_simple_wings',
-        url: 'models/fighter/simple_wings/fighter_simple_wings.gltf'
+        url: 'models/fighter/simple_wings/wings.gltf'
+    },
+
+    // Wings (For Inventory)
+    {
+        name: 'inventory_simple_wings',
+        url: 'models/inventory/simple_wings/simple_wings.gltf'
     },
 
 
@@ -97,43 +103,43 @@ export const models: ModelLoadItem[] = [
     // Dragon Set (Equipment On Fighter)
     {
         name: 'fighter_dragon_gloves',
-        url: 'models/figher_dragon_gloves/fighter_dragon_gloves.gltf'
+        url: 'models/fighter/dragon_set/gloves/gloves.gltf'
     },
     {
         name: 'fighter_dragon_helmet',
-        url: 'models/fighter_dragon_helmet/fighter_dragon_helmet.gltf'
+        url: 'models/fighter/dragon_set/helmet/helmet.gltf'
     },
     {
-        name: 'fighter_dragon_chest',
-        url: 'models/fighter_dragon_chest/fighter_dragon_chest.gltf'
+        name: 'fighter_dragon_armour',
+        url: 'models/fighter/dragon_set/armour/armour.gltf'
     },
     {
-        name: 'fighter_dragon_trousers',
-        url: 'models/fighter_dragon_trousers/fighter_dragon_trousers.gltf'
+        name: 'fighter_dragon_pants',
+        url: 'models/fighter/dragon_set/pants/pants.gltf'
     },
     {
         name: 'fighter_dragon_boots',
-        url: 'models/fighter_dragon_boot/fighter_dragon_boot.gltf'
+        url: 'models/fighter/dragon_set/boots/boots.gltf'
     },
     // Legendary Set (Equipment On Fighter)
     {
         name: 'fighter_legendary_gloves',
-        url: 'models/fighter_legendary_gloves/legendary_gloves.gltf'
+        url: 'models/fighter/legendary_set/gloves/gloves.gltf'
     },
     {
         name: 'fighter_legendary_helmet',
-        url: 'models/fighter_legendary_helmet/legendary_helmet.gltf'
+        url: 'models/fighter/legendary_set/helmet/helmet.gltf'
     },
     {
-        name: 'fighter_legendary_chest',
-        url: 'models/fighter_legendary_chest/legendary_chest.gltf'
+        name: 'fighter_legendary_armour',
+        url: 'models/fighter/legendary_set/armour/armour.gltf'
     },
     {
-        name: 'fighter_legendary_trousers',
-        url: 'models/fighter_legendary_trousers/legendary_trousers.gltf'
+        name: 'fighter_legendary_pants',
+        url: 'models/fighter/legendary_set/pants/pants.gltf'
     },
     {
         name: 'fighter_legendary_boots',
-        url: 'models/fighter_legendary_boots/legendary_boots.gltf'
+        url: 'models/fighter/legendary_set/boots/boots.gltf'
     },
 ]
