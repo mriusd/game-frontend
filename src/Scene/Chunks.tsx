@@ -47,16 +47,25 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
 
             // Set new texture to chunk
             // TODO: Remove Clamp, FIXME: fix error index chunk calculation
-            const textureX = Math.round(z / (worldSize.current + chunkSize.current))
-            const textureZ = Math.round(x / (worldSize.current + chunkSize.current))
-            console.log(textureX, textureZ)
-            console.log(planeTextureUrlBuffer.current)
-            planeTextureUrlBuffer.current[i] = `worlds/test_ground/map/${textureX}_${textureZ}.png`
+
+            // CALC THIS CORRECTLY
+            // const textureX = Math.round(z / worldSize.current + chunkSize.current)
+            // const textureZ = Math.round(x / worldSize.current + chunkSize.current)
+            // // 
+            // console.log(textureX, textureZ)
+            // console.log(planeTextureUrlBuffer.current)
+            // planeTextureUrlBuffer.current[i] = `worlds/test_ground/map/${textureX}_${textureZ}.png`
             // if (textureX < 0 || textureZ < 0 || textureX > chunksPerAxis.current || textureZ > chunksPerAxis.current) {
             //     planeTextureUrlBuffer.current[i] = ''
             // }
             // Set the plane position based on the current chunk index and offsets
-            plane.position.set(x, 0, z);
+            const textureX = xIndex
+            const textureZ = zIndex
+            console.log(textureX, textureZ)
+            if (textureX >= 0 && textureZ >= 0 && textureX < chunksPerAxis.current && textureZ < chunksPerAxis.current) {
+                planeTextureUrlBuffer.current[i] = `worlds/test_ground/map/${textureX}_${textureZ}.png`
+            }
+            plane.position.set(x, 0, z)
         }
     }
     function getChunkIndices(position: Coordinate) {

@@ -21,21 +21,14 @@ const Button = ({ children, name, fontSize = 16, color = 'black', onClick, args 
     }
     
     return (
-        <group {...props} name={"button_"+name}>
-            <Plane 
-                // @ts-expect-error
-                args={args} 
-                onClick={onClick}
-                onPointerEnter={handlePointerEnter}
-                onPointerLeave={handlePointerLeave}
-            >
-            </Plane>
-            <Text
-                fontSize={fontSize}
-                color={color}
-            >
-                { children }
-            </Text>
+        <group 
+            {...props} 
+            name={"button_"+name}
+            onClick={onClick}
+            onPointerEnter={handlePointerEnter}
+            onPointerLeave={handlePointerLeave}
+        >
+            { children }
         </group>
     )
 }
