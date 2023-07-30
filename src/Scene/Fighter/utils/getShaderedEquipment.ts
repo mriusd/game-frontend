@@ -20,7 +20,10 @@ export const getShaderedEquipment = (item: BackpackSlot, uniforms: any) => {
     model.traverse((object: any) => {
         if (object.isMesh) {
             const material = object.material.clone()
-            // material.side = THREE.DoubleSide
+
+            object.castShadow = true
+            object.revieveShadow = true
+
             material.onBeforeCompile = (_shader: THREE.Shader) => {
                 // Uniforms
                 _shader.uniforms = { ..._shader.uniforms, ...levelShader.uniforms, ...uniforms.current  }

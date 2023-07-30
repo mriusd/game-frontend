@@ -6,6 +6,7 @@ import { memo } from "react"
 import { Coordinate } from "interfaces/coordinate.interface"
 // import { makeNoise2D } from "open-simplex-noise"
 import { useTexture } from "@react-three/drei"
+import { clamp } from "three/src/math/MathUtils"
 
 const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
     const { chunkSize, chunksPerAxis, worldSize, currentWorldCoordinate } = useSceneContext()
@@ -46,12 +47,14 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
 
             // Set new texture to chunk
             // TODO: Remove Clamp, FIXME: fix error index chunk calculation
-            const textureZ = Math.max(0, Math.min(5, (x + worldSize.current / 2) / chunksPerAxis.current / 10))
-            const textureX = Math.max(0, Math.min(5, (z + worldSize.current / 2) / chunksPerAxis.current / 10))
-            planeTextureUrlBuffer.current[i] = `worlds/lorencia_ground/${textureX}_${textureZ}.png`
-            if (textureX < 0 || textureZ < 0 || textureX > chunksPerAxis.current || textureZ > chunksPerAxis.current) {
-                planeTextureUrlBuffer.current[i] = ''
-            }
+            const textureX = Math.round(z / (worldSize.current + chunkSize.current))
+            const textureZ = Math.round(x / (worldSize.current + chunkSize.current))
+            console.log(textureX, textureZ)
+            console.log(planeTextureUrlBuffer.current)
+            planeTextureUrlBuffer.current[i] = `worlds/test_ground/map/${textureX}_${textureZ}.png`
+            // if (textureX < 0 || textureZ < 0 || textureX > chunksPerAxis.current || textureZ > chunksPerAxis.current) {
+            //     planeTextureUrlBuffer.current[i] = ''
+            // }
             // Set the plane position based on the current chunk index and offsets
             plane.position.set(x, 0, z);
         }

@@ -51,6 +51,9 @@ const FloatingDamage = memo(function FloatingDamage() {
                 const fighter = allPlayerList.find(player => player?.id === String(damageEvent.npcId))
                 const object = npc || fighter
 
+                // TODO: rm bc it kill cpu, should remake damage indicators
+                if (fighter) { return removeEvent(damageEvent) }
+
                 if (!object) { return removeEvent(damageEvent) }
                 // console.log(`[FloatingDamage]: ID ${damageEvent.npcId} received ${damageEvent.damage} damage.`)
 

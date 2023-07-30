@@ -38,7 +38,7 @@ const Npc = memo(function Npc({ npc }: Props) {
         model.traverse((child: Mesh) => {
             if (child.isMesh) {
                 child.castShadow = true
-                child.receiveShadow = true
+                // child.receiveShadow = true
             } 
         })
     }, [model]) 

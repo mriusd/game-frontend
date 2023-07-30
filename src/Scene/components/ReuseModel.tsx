@@ -1,6 +1,6 @@
 // @ts-expect-error 
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js'
-import { useMemo, memo } from "react"
+import { useMemo, memo, useEffect } from "react"
 // import { useSceneContext } from "store/SceneContext"
 // import { useAnimations } from '@react-three/drei'
 import { forwardRef } from 'react'
@@ -20,6 +20,17 @@ const ReuseModel = memo(forwardRef(function ReuseModel({ gltf, ...props }: Props
     //         actions?.jump?.setDuration(1).play()
     //     }, Math.random() * 1000)
     // }, [ mixer, actions, model ])
+
+    // Enable shadows
+    useEffect(() => {
+        if (!model) { return }
+        model.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true
+                child.receiveShadow = true
+            }
+        })
+    }, [model])
 
     return (
         <primitive

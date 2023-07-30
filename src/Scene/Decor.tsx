@@ -27,7 +27,6 @@ const Npc = memo(function Npc({ objectData }: Props) {
     // const model = useMemo(() => useGLTFLoaderStore.getState().models.current.tree, [])
     const model = useGLTFLoaderStore(state => state.models.current.tree)
 
-
     const worldCoordinate = useMemo(() => matrixCoordToWorld(worldSize.current, objectData.location), [objectData])
     const modelRef = useRef<THREE.Mesh | null>(null)
 
