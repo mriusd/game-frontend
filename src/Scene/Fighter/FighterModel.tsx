@@ -155,7 +155,7 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
             // console.log('modelArmature', modelArmature)
             if (!modelArmature) { return console.warn('[FighterModel<takeOn>]: Model Armature not found, mb it is renamed') }
             
-            console.log('fighterArmature', fighterArmature)
+            // console.log('fighterArmature', fighterArmature)
             // Store Mixer to Animate equipment
             const animation = animations.find(_ => _.name === 'fly')
             if (animation) {

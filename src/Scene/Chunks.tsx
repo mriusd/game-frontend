@@ -20,7 +20,7 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
 
     const planeBufferSize = useRef([...new Array(4)])
     const planeBuffer = useRef<{ [key: number]: THREE.Mesh | null }>({})
-    const planeTextureUrlBuffer = useRef<{ [key: number]: string }>({})
+    const planeTextureUrlBuffer = useRef<{ [key: number]: {} }>({})
     const gridHelper = useRef<THREE.GridHelper | null>(null)
 
     useEffect(() => {
@@ -42,28 +42,23 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
 
             const x = (xIndex * chunkSize.current) + xOffset;
             const z = (zIndex * chunkSize.current) + yOffset;
-            if (plane.position.x === x && plane.position.z === z) { return }
+            if (plane.position.x === x && plane.position.z === z && planeTextureUrlBuffer.current[i]) { return }
             console.log('[Chunks]: chunks recalculated')
 
             // Set new texture to chunk
             // TODO: Remove Clamp, FIXME: fix error index chunk calculation
 
             // CALC THIS CORRECTLY
-            // const textureX = Math.round(z / worldSize.current + chunkSize.current)
-            // const textureZ = Math.round(x / worldSize.current + chunkSize.current)
-            // // 
-            // console.log(textureX, textureZ)
-            // console.log(planeTextureUrlBuffer.current)
-            // planeTextureUrlBuffer.current[i] = `worlds/test_ground/map/${textureX}_${textureZ}.png`
-            // if (textureX < 0 || textureZ < 0 || textureX > chunksPerAxis.current || textureZ > chunksPerAxis.current) {
-            //     planeTextureUrlBuffer.current[i] = ''
-            // }
+            const textureX = zIndex + 1 + yOffset/10
+            const textureZ = xIndex + 1 + xOffset/10
+            
             // Set the plane position based on the current chunk index and offsets
-            const textureX = xIndex
-            const textureZ = zIndex
             console.log(textureX, textureZ)
-            if (textureX >= 0 && textureZ >= 0 && textureX < chunksPerAxis.current && textureZ < chunksPerAxis.current) {
-                planeTextureUrlBuffer.current[i] = `worlds/test_ground/map/${textureX}_${textureZ}.png`
+            if (textureX >= 0 && textureZ >= 0 && textureX < chunksPerAxis.current+1 && textureZ < chunksPerAxis.current+1) {
+                planeTextureUrlBuffer.current[i] =  { 
+                    map: `worlds/test_ground/map/${textureX}_${textureZ}.png`,
+                    normalMap: `worlds/test_ground/normal_map/${textureX}_${textureZ}.png`,
+                }
             }
             plane.position.set(x, 0, z)
         }
@@ -103,7 +98,7 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
                         index={i}
                         // @ts-expect-error
                         ref={(ref) => planeBuffer.current[i] = ref}
-                        textureUrl={planeTextureUrlBuffer.current[i] || ''}
+                        textureUrls={planeTextureUrlBuffer.current[i] || ''}
                         geometry={geometry}
                     />
                 ))}
@@ -113,8 +108,8 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
     )
 }))
 
-interface SwapChunkProps { geometry: THREE.PlaneGeometry, textureUrl: string, index: number }
-const SwapChunk = forwardRef(({ geometry, textureUrl, index }: SwapChunkProps, ref: any) => {
+interface SwapChunkProps { geometry: THREE.PlaneGeometry, textureUrls: {}, index: number }
+const SwapChunk = forwardRef(({ geometry, textureUrls, index }: SwapChunkProps, ref: any) => {
     const isHovered = useRef(false)
 
     return (
@@ -128,16 +123,16 @@ const SwapChunk = forwardRef(({ geometry, textureUrl, index }: SwapChunkProps, r
             onPointerLeave={() => isHovered.current = false}
         >
             { 
-                isHovered.current && textureUrl ? <ChunkMaterial textureUrl={textureUrl} /> :
-                textureUrl ? <ChunkMaterial textureUrl={textureUrl} /> : <meshStandardMaterial color={0x000000}/>
+                isHovered.current && textureUrls ? <ChunkMaterial textureUrls={textureUrls} /> :
+                textureUrls ? <ChunkMaterial textureUrls={textureUrls} /> : <meshStandardMaterial color={0x000000}/>
             }
         </mesh>
     )
 })
 
-interface ChunkMaterialProps { textureUrl: string, opacity?: number, transparent?: boolean }
-const ChunkMaterial = ({ textureUrl, ...props }: ChunkMaterialProps) => {
-    const textures = useTexture({ map: textureUrl })
+interface ChunkMaterialProps { textureUrls: {}, opacity?: number, transparent?: boolean }
+const ChunkMaterial = ({ textureUrls, ...props }: ChunkMaterialProps) => {
+    const textures = useTexture({ ...textureUrls })
     return <meshStandardMaterial {...textures} {...props} />
 }
 
