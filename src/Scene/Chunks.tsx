@@ -27,7 +27,7 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
         if (!currentWorldCoordinate) { return }
         updatePlanePositions(currentWorldCoordinate)
         // Show grid for testing in chunk   
-        updateGridHelperPosition(currentWorldCoordinate)
+        // updateGridHelperPosition(currentWorldCoordinate)
     }, [currentWorldCoordinate, planeBuffer.current])
 
     function updatePlanePositions(characterPosition: Coordinate) {
@@ -49,15 +49,17 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
             // TODO: Remove Clamp, FIXME: fix error index chunk calculation
 
             // CALC THIS CORRECTLY
-            const textureX = zIndex + 1 + yOffset/10
-            const textureZ = xIndex + 1 + xOffset/10
+            const textureX = zIndex + 1 + yOffset/chunkSize.current
+            const textureZ = xIndex + 1 + xOffset/chunkSize.current
             
             // Set the plane position based on the current chunk index and offsets
             console.log(textureX, textureZ)
             if (textureX >= 0 && textureZ >= 0 && textureX < chunksPerAxis.current+1 && textureZ < chunksPerAxis.current+1) {
                 planeTextureUrlBuffer.current[i] =  { 
-                    map: `worlds/test_ground/map/${textureX}_${textureZ}.png`,
-                    normalMap: `worlds/test_ground/normal_map/${textureX}_${textureZ}.png`,
+                    map: `worlds/alex_ground/map/${textureX}_${textureZ}.png`,
+                    normalMap: `worlds/alex_ground/normalMap/${textureX}_${textureZ}.png`,
+                    roughnessMap: `worlds/alex_ground/roughnessMap/${textureX}_${textureZ}.png`,
+                    metalnessMap: `worlds/alex_ground/metalnessMap/${textureX}_${textureZ}.png`,
                 }
             }
             plane.position.set(x, 0, z)
@@ -103,7 +105,7 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
                     />
                 ))}
             </group>
-            <gridHelper ref={gridHelper} args={[sizeX, sizeY, 0x4B4B4B, 0x4B4B4B]} rotation={[0, 0, 0]} />
+            {/* <gridHelper ref={gridHelper} args={[sizeX, sizeY, 0x4B4B4B, 0x4B4B4B]} rotation={[0, 0, 0]} /> */}
         </>
     )
 }))

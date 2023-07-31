@@ -108,8 +108,8 @@ const SceneContextProvider = ({ children }: Props) => {
         })
     }
 
-    const worldSize = useRef<number>(20)
-    const chunkSize = useRef<number>(10)
+    const worldSize = useRef<number>(120)
+    const chunkSize = useRef<number>(60)
     const chunksPerAxis = useRef<number>(worldSize.current / chunkSize.current)
 
     // Update PlayerList but remove Yourself
