@@ -32,7 +32,7 @@ const Light = memo(function Light() {
             {/* <ambientLight color={0xFFFFFF} intensity={.1} /> */}
             <mesh ref={targetObject} position={[currentWorldCoordinate?.x, 0, currentWorldCoordinate?.z]}></mesh>
             <directionalLight 
-                intensity={1}
+                intensity={.5}
                 color={0xFFFADE} 
                 ref={shadowlightRef}
                 position={shadowlightPosition} 

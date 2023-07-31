@@ -53,7 +53,7 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
             const textureZ = xIndex + 1 + xOffset/chunkSize.current
             
             // Set the plane position based on the current chunk index and offsets
-            console.log(textureX, textureZ)
+            // console.log(textureX, textureZ)
             if (textureX >= 0 && textureZ >= 0 && textureX < chunksPerAxis.current+1 && textureZ < chunksPerAxis.current+1) {
                 planeTextureUrlBuffer.current[i] =  { 
                     map: `worlds/alex_ground/map/${textureX}_${textureZ}.png`,
@@ -62,6 +62,7 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
                     metalnessMap: `worlds/alex_ground/metalnessMap/${textureX}_${textureZ}.png`,
                 }
             }
+
             plane.position.set(x, 0, z)
         }
     }
@@ -112,7 +113,6 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
 
 interface SwapChunkProps { geometry: THREE.PlaneGeometry, textureUrls: {}, index: number }
 const SwapChunk = forwardRef(({ geometry, textureUrls, index }: SwapChunkProps, ref: any) => {
-    const isHovered = useRef(false)
 
     return (
         <mesh
@@ -121,11 +121,8 @@ const SwapChunk = forwardRef(({ geometry, textureUrls, index }: SwapChunkProps, 
             receiveShadow
             rotation={[Math.PI / -2, 0, 0]}
             geometry={geometry}
-            onPointerMove={() => isHovered.current = true}
-            onPointerLeave={() => isHovered.current = false}
         >
             { 
-                isHovered.current && textureUrls ? <ChunkMaterial textureUrls={textureUrls} /> :
                 textureUrls ? <ChunkMaterial textureUrls={textureUrls} /> : <meshStandardMaterial color={0x000000}/>
             }
         </mesh>

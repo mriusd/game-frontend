@@ -53,6 +53,7 @@ const Scene = memo(function Scene() {
                 }}
             >
                 <color attach="background" args={[0x000000]} />
+                <fog attach="fog" args={['black', 5, 40]}></fog>
                 <Stats className='stats'/>
                 {/* <Environment preset='forest' /> */}
 
@@ -84,8 +85,8 @@ const Scene = memo(function Scene() {
             }
             <div className={styles.coordinates}>
                 <div>World size [{store.worldSize.current}x{store.worldSize.current}]</div>
-                <div>Server coordinate [ X: {store.currentMatrixCoordinate?.x} Z: {store.currentMatrixCoordinate?.z} ]</div>
-                <div>World coordinate [ X: {store.currentWorldCoordinate?.x.toFixed(0)} Z: {store.currentWorldCoordinate?.z.toFixed(0)} ]</div>
+                {/* <div>Server coordinate [ X: {store.currentMatrixCoordinate?.x} Z: {store.currentMatrixCoordinate?.z} ]</div> */}
+                <div>Coordinate [ X: {store.currentWorldCoordinate?.x.toFixed(0)} Z: {store.currentWorldCoordinate?.z.toFixed(0)} ]</div>
             </div>
             <Leva
                 hidden={!isBackpackOpened}
