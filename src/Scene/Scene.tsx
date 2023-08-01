@@ -53,7 +53,7 @@ const Scene = memo(function Scene() {
                 }}
             >
                 <color attach="background" args={[0x000000]} />
-                <fog attach="fog" args={['black', 5, 40]}></fog>
+                <fog attach="fog" args={['black', 5, 25]}></fog>
                 <Stats className='stats'/>
                 {/* <Environment preset='forest' /> */}
 
