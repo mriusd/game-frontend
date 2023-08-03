@@ -41,5 +41,6 @@ export interface EventCloud {
     account: string,
     setAccount: any,
     playerList: Fighter[],
-    updateFighterDirection: (direction: Direction) => void
+    updateFighterDirection: (direction: Direction) => void,
+    chatLog: any
 }
