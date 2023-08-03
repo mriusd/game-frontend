@@ -268,7 +268,7 @@ export const EventCloudProvider = ({ children }) => {
         break;
 
       case "chat_message":
-          handleChatMessage(msg.msg, msg.msgType);
+          handleChatMessage(msg.author, msg.msg, msg.msgType);
         break;
       }
   }
@@ -278,9 +278,9 @@ export const EventCloudProvider = ({ children }) => {
   const updateEquipment = useEventStore(state => state.updateEquipment);
 
 
-  function handleChatMessage(msg, msgType) {
+  function handleChatMessage(author, msg, msgType) {
     setChatLog(prevChatLog => {
-      const newChatLog = [...prevChatLog, {msg, msgType}];
+      const newChatLog = [...prevChatLog, {author, msg, msgType}];
 
       // If the log has more than 100 messages, remove the oldest
       if (newChatLog.length > 100) {
