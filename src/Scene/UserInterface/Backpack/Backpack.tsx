@@ -37,7 +37,7 @@ const Backpack = memo(function Backpack() {
     // Additionally rerender items after mount
     // used on backpack items to get 100% chance calc items position correctly based on backpack slots position
     const [mounted, mount] = useState<boolean>(false)
-    useEffect(() => mount(true), [])
+    useEffect(() => { setTimeout(() => mount(true), 1000) }, [])
     // 
 
     // console.log('[CPU CHECK]: Rerender <Backpack>')

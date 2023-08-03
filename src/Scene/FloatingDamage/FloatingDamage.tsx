@@ -18,7 +18,7 @@ interface TriggerDamage {
 
 const FloatingDamage = memo(function FloatingDamage() {
     const { events, removeEvent } = useEventCloud()
-    const { NpcList, getSceneObject } = useSceneContext()
+    const { NpcList, getSceneObject, allPlayerList } = useSceneContext()
 
     const triggerDamage = useRef<TriggerDamage[]>([])
     const removeTriggerDamage = (label: string) => {
@@ -42,17 +42,23 @@ const FloatingDamage = memo(function FloatingDamage() {
 
     // Generate damage indicators
     useEffect(() => {
-        console.log('events', events)
+        // console.log('events', events)
         const damageEvents = events.filter((event: any) => event.type === 'damage')
-        console.log('damageEvents', damageEvents)
+        // console.log('damageEvents', damageEvents)
         if (damageEvents.length > 0) {
             damageEvents.forEach((damageEvent: Damage) => {
                 const npc = NpcList.current.find(npc => npc?.id === String(damageEvent.npcId))
-                if (!npc) { return }
+                const fighter = allPlayerList.find(player => player?.id === String(damageEvent.npcId))
+                const object = npc || fighter
+
+                // TODO: rm bc it kill cpu, should remake damage indicators
+                if (fighter) { return removeEvent(damageEvent) }
+
+                if (!object) { return removeEvent(damageEvent) }
                 // console.log(`[FloatingDamage]: ID ${damageEvent.npcId} received ${damageEvent.damage} damage.`)
 
-                const target = getSceneObject(npc.id)
-                if (!target) { return }
+                const target = getSceneObject(object.id)
+                if (!target) { return removeEvent(damageEvent) }
 
                 triggerDamage.current.push(createDamage(damageEvent, target))
 

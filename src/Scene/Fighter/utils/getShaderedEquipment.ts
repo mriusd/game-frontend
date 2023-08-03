@@ -15,12 +15,15 @@ export const getShaderedEquipment = (item: BackpackSlot, uniforms: any) => {
     // @ts-expect-error
     const model: THREE.Group | THREE.SkinnedMesh = SkeletonUtils.clone(gltf.scene)
     const levelShader = shader_level()
-    console.log(model, item.itemAttributes.name)
+    // console.log(model, item.itemAttributes.name)
 
     model.traverse((object: any) => {
         if (object.isMesh) {
             const material = object.material.clone()
-            // material.side = THREE.DoubleSide
+
+            object.castShadow = true
+            object.revieveShadow = true
+
             material.onBeforeCompile = (_shader: THREE.Shader) => {
                 // Uniforms
                 _shader.uniforms = { ..._shader.uniforms, ...levelShader.uniforms, ...uniforms.current  }

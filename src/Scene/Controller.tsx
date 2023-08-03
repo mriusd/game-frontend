@@ -52,10 +52,10 @@ const Controller = memo(function Controller({ world }: Props) {
 
     const [testWorldCoordinates, setTestWorldCoordinates] = useState<Coordinate>({ x: 0, z: 0 })
     const [testMatrixCoordinates, setTestMatrixCoordinates] = useState<Coordinate>({ x: 0, z: 0 })
-    const isOccupiedColorForTest = useMemo(() => {
+    const [occupiedColor, occupiedOpacity] = useMemo(() => {
         // console.log(occupiedCoords, testMatrixCoordinates)
         const colorOccupied = isOccupiedCoordinate(occupiedCoords, testMatrixCoordinates) ? 0xFF0000 : 0x00FF00
-        return hoveredItems.length ? 0x000000 : colorOccupied
+        return hoveredItems.length ? [0x000000, 0] : [colorOccupied, .5]
     }, [ testMatrixCoordinates, occupiedCoords, hoveredItems ])
 
     useFrame(() => {
@@ -187,7 +187,7 @@ const Controller = memo(function Controller({ world }: Props) {
     return (
         <group>
             <Box position={[testWorldCoordinates.x, 0, testWorldCoordinates.z]} args={[1, .01, 1]}>
-                <meshBasicMaterial color={isOccupiedColorForTest} opacity={.5} transparent={true} />
+                <meshBasicMaterial color={occupiedColor} opacity={occupiedOpacity} transparent={true} />
             </Box>
         </group>
     )

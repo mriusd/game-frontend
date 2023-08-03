@@ -5,7 +5,6 @@ import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
 import Tween from "./utils/tween/tween"
 import { Coordinate } from "interfaces/coordinate.interface"
 import { useSceneContext } from "store/SceneContext"
-import { useLoadAssets } from "store/LoadAssetsContext"
 import { useAnimations } from "@react-three/drei"
 import { getMoveDuration } from './utils/getMoveDuration'
 import HealthBar from './components/HealthBar'
@@ -14,6 +13,7 @@ import type { Fighter } from 'interfaces/fighter.interface'
 import Name from './components/Name'
 import { setCursorPointer } from './utils/setCursorPointer'
 import ReuseModel from './components/ReuseModel'
+import { useGLTFLoaderStore } from './GLTFLoader/GLTFLoaderStore'
 
 interface Props { 
     objectData: {
@@ -24,9 +24,9 @@ interface Props {
 }
 const Npc = memo(function Npc({ objectData }: Props) {
     const { worldSize, html, setTarget, fighter, setHoveredItems, setSceneObject, getSceneObject } = useSceneContext()
-    const { gltf } = useLoadAssets()
+    // const model = useMemo(() => useGLTFLoaderStore.getState().models.current.tree, [])
+    const model = useGLTFLoaderStore(state => state.models.current.tree)
 
-    const model = useMemo(() => gltf.current.tree, [objectData])
     const worldCoordinate = useMemo(() => matrixCoordToWorld(worldSize.current, objectData.location), [objectData])
     const modelRef = useRef<THREE.Mesh | null>(null)
 

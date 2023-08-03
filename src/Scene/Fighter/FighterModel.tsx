@@ -12,7 +12,10 @@ import { getEquipmentBodyType, bodyType } from "./utils/getEquipmentBodyType"
 interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, position: number[], rotation?: number[], children?: any }
 const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: baseModel, fighter, position, rotation, children }: Props, ref) {
     // Clone model for Reuse
-    const model = useMemo(() => SkeletonUtils.clone(baseModel), [baseModel])
+    const model = useMemo(() => {
+        if (!baseModel) { return undefined }
+        return SkeletonUtils.clone(baseModel)
+    }, [baseModel])
 
     // Equipment we take on Fighter
     // const equipment = useEventStore(state => state.equipment)
@@ -21,6 +24,9 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
     const modelRef = useRef()
     // Forward ref
     React.useImperativeHandle(ref, () => modelRef.current)
+
+    // TODO: Fix this, dont use sceneContext
+    const { setSceneObject } = useSceneContext()
 
 
     // Space in Fighter model where we insert all Equipment
@@ -149,7 +155,7 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
             // console.log('modelArmature', modelArmature)
             if (!modelArmature) { return console.warn('[FighterModel<takeOn>]: Model Armature not found, mb it is renamed') }
             
-            console.log('fighterArmature', fighterArmature)
+            // console.log('fighterArmature', fighterArmature)
             // Store Mixer to Animate equipment
             const animation = animations.find(_ => _.name === 'fly')
             if (animation) {
@@ -231,6 +237,17 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
         uniforms.current.uTime.value = clock.getElapsedTime()
         mixer.update( delta )
     })
+
+
+    // Save ref to object to store & rm on unmount
+    useEffect(() => {
+        if (modelRef.current) {
+            setSceneObject(fighter.id, modelRef.current, 'add')
+        }
+        return () => {
+            setSceneObject(fighter.id, modelRef.current, 'remove')
+        }
+    }, [modelRef.current, fighter])
 
     return (
         <group name="fighter-model">

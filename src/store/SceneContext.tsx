@@ -108,7 +108,7 @@ const SceneContextProvider = ({ children }: Props) => {
         })
     }
 
-    const worldSize = useRef<number>(360)
+    const worldSize = useRef<number>(120)
     const chunkSize = useRef<number>(60)
     const chunksPerAxis = useRef<number>(worldSize.current / chunkSize.current)
 
@@ -235,6 +235,7 @@ const SceneContextProvider = ({ children }: Props) => {
         target, setTarget,
         itemTarget, setItemTarget,
 
+        allPlayerList: playerList,
         PlayerList,
         updateFighterDirection
     }

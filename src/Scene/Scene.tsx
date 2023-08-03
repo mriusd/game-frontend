@@ -4,10 +4,9 @@ import * as THREE from "three"
 import { Object3D } from "three"
 
 import { Canvas } from "@react-three/fiber"
-import { useRef, memo, useEffect } from "react"
+import { useRef, memo, Suspense } from "react"
 import { useSceneContext } from "store/SceneContext"
-import LoadAssetsContextProvider from "store/LoadAssetsContext"
-import { OrbitControls, Stats } from "@react-three/drei"
+import { Loader, Stats } from "@react-three/drei"
 
 import { CAMERA_POSITION } from "./config"
 
@@ -28,20 +27,15 @@ import { useUiStore } from 'store/uiStore'
 import { Leva } from 'leva'
 import { useBackpackStore } from 'store/backpackStore'
 
-// Postprocessing
-import { EffectComposer, DepthOfField, Bloom, Noise, Vignette } from '@react-three/postprocessing'
-import { BlurPass, Resizer, KernelSize, Resolution } from 'postprocessing'
-import { ToneMapping } from '@react-three/postprocessing'
-import { BlendFunction } from 'postprocessing'
-import { SelectiveBloom } from '@react-three/postprocessing'
-
+import Postprocessing from './Postprocessing'
+import { Environment } from '@react-three/drei'
 
 const Scene = memo(function Scene() {
     const store = useSceneContext()
     const worldRef = useRef<Object3D | null>(null)
     const eventsNode = useUiStore(state => state.eventsNode)
     const isBackpackOpened = useBackpackStore(state => state.isOpened)
-
+    
     return (
         <div ref={eventsNode} id="scene" className={styles.scene}>
             <Canvas
@@ -52,38 +46,35 @@ const Scene = memo(function Scene() {
                     far: 60,
                     fov: 45,
                 }}
+                gl={{
+                    powerPreference: "high-performance",
+                    alpha: false,
+                    antialias: false,
+                }}
             >
-                <GLTFLoader/>
-                <LoadAssetsContextProvider>
-                    <color attach="background" args={[0x000000]} />
-                    {/* <fog attach="fog" color={0x000000} near={20} far={60} /> */}
-                    {/* <OrbitControls/> */}
-                    <Light />
-                    {store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />)}
-                    {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
-                    {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)}
-                    {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)}
-
-                    <Fighter />
-                    <Chunks ref={worldRef} />
-                    <Controller world={worldRef} />
-                    <FloatingDamage />
-                    <UserInterface />
-                </LoadAssetsContextProvider>
+                <color attach="background" args={[0x000000]} />
+                <fog attach="fog" args={['black', 5, 25]}></fog>
                 <Stats className='stats'/>
-                {/* <EffectComposer> */}
-                    {/* <Bloom kernelSize={KernelSize.LARGE} luminanceThreshold={0} luminanceSmoothing={0.9} height={300} /> */}
-                    {/* <SelectiveBloom
-                        // lights={[lightRef1, lightRef2]} // ⚠️ REQUIRED! all relevant lights
-                        selection={[worldRef]} // selection of objects that will have bloom effect
-                        selectionLayer={10} // selection layer
-                        intensity={1.0} // The bloom intensity.
-                        kernelSize={KernelSize.LARGE} // blur kernel size
-                        luminanceThreshold={0.9} // luminance threshold. Raise this value to mask out darker elements in the scene.
-                        luminanceSmoothing={0.025} // smoothness of the luminance threshold. Range is [0, 1]
-                    /> */}
-                {/* </EffectComposer> */}
+                {/* <Environment preset='forest' /> */}
+
+                <Suspense fallback={null}>
+                    <GLTFLoader>
+                        {store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />)}
+                        {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
+                        {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)}
+                        {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)}
+                        <Fighter />
+                        <Chunks ref={worldRef} />
+                        <Controller world={worldRef} />
+                        <FloatingDamage />
+                        <UserInterface />
+                        <Light />
+                    </GLTFLoader>
+                </Suspense>
+
+                {/* <Postprocessing/> */}
             </Canvas>
+            <Loader/>
             {
                 store.PlayerList.current.length && (
                     <div className={styles.players}>
@@ -94,14 +85,13 @@ const Scene = memo(function Scene() {
             }
             <div className={styles.coordinates}>
                 <div>World size [{store.worldSize.current}x{store.worldSize.current}]</div>
-                <div>Server coordinate [ X: {store.currentMatrixCoordinate?.x} Z: {store.currentMatrixCoordinate?.z} ]</div>
-                <div>World coordinate [ X: {store.currentWorldCoordinate?.x.toFixed(0)} Z: {store.currentWorldCoordinate?.z.toFixed(0)} ]</div>
+                {/* <div>Server coordinate [ X: {store.currentMatrixCoordinate?.x} Z: {store.currentMatrixCoordinate?.z} ]</div> */}
+                <div>Coordinate [ X: {store.currentWorldCoordinate?.x.toFixed(0)} Z: {store.currentWorldCoordinate?.z.toFixed(0)} ]</div>
             </div>
             <Leva
                 hidden={!isBackpackOpened}
                 flat
             />
-
         </div>
     )
 })

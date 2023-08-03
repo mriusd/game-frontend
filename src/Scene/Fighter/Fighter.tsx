@@ -24,7 +24,9 @@ import { useControls } from "leva"
 const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
     const camera = useThree(state => state.camera)
-    const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.fighter_man, [])
+    // const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.fighter_man, [])
+    const models = useGLTFLoaderStore(state => state.models)
+    const gltf = useMemo(() => models.current.fighter_man, [models.current])
 
     const { submitMalee } = useEventCloud()
     const { 
@@ -40,6 +42,8 @@ const Fighter = memo(function Fighter() {
         currentWorldCoordinate, setCurrentWorldCoordinate,
         setNextMatrixCoordinate,
         setNextWorldCoordinate,
+
+        setSceneObject,
 
         controller: {
             focusedMatrixCoordinate,
@@ -126,7 +130,7 @@ const Fighter = memo(function Fighter() {
     const renderEffect = useRef(false)
     // 
     const attackTimeout = useRef<NodeJS.Timeout | null>(null)
-    const speed = 1000
+    const speed = 500
     useEffect(() => {
         console.log('target!', target, itemTarget)
         // For attack target
@@ -143,7 +147,10 @@ const Fighter = memo(function Fighter() {
                 // TODO: Just for test
                 const isEmptyHand = !Object.keys(fighter.equipment).find(slotKey => (+slotKey === 6 || +slotKey === 7))
                 if (!isEmptyHand) {
-                    renderEffect.current = true
+                    // TODO: Hook animation on server event
+                    setTimeout(() => {
+                        renderEffect.current = true
+                    }, 300)
                 }
                 // 
                 attackAction?.setDuration(speed / 1000).play()
@@ -256,7 +263,6 @@ const Fighter = memo(function Fighter() {
         lastStandAction?.stop()
         standAction?.play()
     }, [fighter])
-
 
     if (!currentWorldCoordinate) {
         return <></>

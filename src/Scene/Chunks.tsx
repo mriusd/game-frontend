@@ -6,6 +6,7 @@ import { memo } from "react"
 import { Coordinate } from "interfaces/coordinate.interface"
 // import { makeNoise2D } from "open-simplex-noise"
 import { useTexture } from "@react-three/drei"
+import { clamp } from "three/src/math/MathUtils"
 
 const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
     const { chunkSize, chunksPerAxis, worldSize, currentWorldCoordinate } = useSceneContext()
@@ -19,14 +20,14 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
 
     const planeBufferSize = useRef([...new Array(4)])
     const planeBuffer = useRef<{ [key: number]: THREE.Mesh | null }>({})
-    const planeTextureUrlBuffer = useRef<{ [key: number]: string }>({})
+    const planeTextureUrlBuffer = useRef<{ [key: number]: {} }>({})
     const gridHelper = useRef<THREE.GridHelper | null>(null)
 
     useEffect(() => {
         if (!currentWorldCoordinate) { return }
         updatePlanePositions(currentWorldCoordinate)
         // Show grid for testing in chunk   
-        updateGridHelperPosition(currentWorldCoordinate)
+        // updateGridHelperPosition(currentWorldCoordinate)
     }, [currentWorldCoordinate, planeBuffer.current])
 
     function updatePlanePositions(characterPosition: Coordinate) {
@@ -41,19 +42,28 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
 
             const x = (xIndex * chunkSize.current) + xOffset;
             const z = (zIndex * chunkSize.current) + yOffset;
-            if (plane.position.x === x && plane.position.z === z) { return }
+            if (plane.position.x === x && plane.position.z === z && planeTextureUrlBuffer.current[i]) { return }
             console.log('[Chunks]: chunks recalculated')
 
             // Set new texture to chunk
             // TODO: Remove Clamp, FIXME: fix error index chunk calculation
-            const textureZ = Math.max(0, Math.min(5, (x + worldSize.current / 2) / chunksPerAxis.current / 10))
-            const textureX = Math.max(0, Math.min(5, (z + worldSize.current / 2) / chunksPerAxis.current / 10))
-            planeTextureUrlBuffer.current[i] = `worlds/lorencia_ground/${textureX}_${textureZ}.png`
-            if (textureX < 0 || textureZ < 0 || textureX > chunksPerAxis.current || textureZ > chunksPerAxis.current) {
-                planeTextureUrlBuffer.current[i] = ''
-            }
+
+            // CALC THIS CORRECTLY
+            const textureX = zIndex + 1 + yOffset/chunkSize.current
+            const textureZ = xIndex + 1 + xOffset/chunkSize.current
+            
             // Set the plane position based on the current chunk index and offsets
-            plane.position.set(x, 0, z);
+            // console.log(textureX, textureZ)
+            if (textureX >= 0 && textureZ >= 0 && textureX < chunksPerAxis.current+1 && textureZ < chunksPerAxis.current+1) {
+                planeTextureUrlBuffer.current[i] =  { 
+                    map: `worlds/alex_ground/map/${textureX}_${textureZ}.png`,
+                    normalMap: `worlds/alex_ground/normalMap/${textureX}_${textureZ}.png`,
+                    roughnessMap: `worlds/alex_ground/roughnessMap/${textureX}_${textureZ}.png`,
+                    metalnessMap: `worlds/alex_ground/metalnessMap/${textureX}_${textureZ}.png`,
+                }
+            }
+
+            plane.position.set(x, 0, z)
         }
     }
     function getChunkIndices(position: Coordinate) {
@@ -91,19 +101,18 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
                         index={i}
                         // @ts-expect-error
                         ref={(ref) => planeBuffer.current[i] = ref}
-                        textureUrl={planeTextureUrlBuffer.current[i] || ''}
+                        textureUrls={planeTextureUrlBuffer.current[i] || ''}
                         geometry={geometry}
                     />
                 ))}
             </group>
-            <gridHelper ref={gridHelper} args={[sizeX, sizeY, 0x4B4B4B, 0x4B4B4B]} rotation={[0, 0, 0]} />
+            {/* <gridHelper ref={gridHelper} args={[sizeX, sizeY, 0x4B4B4B, 0x4B4B4B]} rotation={[0, 0, 0]} /> */}
         </>
     )
 }))
 
-interface SwapChunkProps { geometry: THREE.PlaneGeometry, textureUrl: string, index: number }
-const SwapChunk = forwardRef(({ geometry, textureUrl, index }: SwapChunkProps, ref: any) => {
-    const isHovered = useRef(false)
+interface SwapChunkProps { geometry: THREE.PlaneGeometry, textureUrls: {}, index: number }
+const SwapChunk = forwardRef(({ geometry, textureUrls, index }: SwapChunkProps, ref: any) => {
 
     return (
         <mesh
@@ -112,20 +121,17 @@ const SwapChunk = forwardRef(({ geometry, textureUrl, index }: SwapChunkProps, r
             receiveShadow
             rotation={[Math.PI / -2, 0, 0]}
             geometry={geometry}
-            onPointerMove={() => isHovered.current = true}
-            onPointerLeave={() => isHovered.current = false}
         >
             { 
-                isHovered.current && textureUrl ? <ChunkMaterial textureUrl={textureUrl} /> :
-                textureUrl ? <ChunkMaterial textureUrl={textureUrl} /> : <meshStandardMaterial color={0x000000}/>
+                textureUrls ? <ChunkMaterial textureUrls={textureUrls} /> : <meshStandardMaterial color={0x000000}/>
             }
         </mesh>
     )
 })
 
-interface ChunkMaterialProps { textureUrl: string, opacity?: number, transparent?: boolean }
-const ChunkMaterial = ({ textureUrl, ...props }: ChunkMaterialProps) => {
-    const textures = useTexture({ map: textureUrl })
+interface ChunkMaterialProps { textureUrls: {}, opacity?: number, transparent?: boolean }
+const ChunkMaterial = ({ textureUrls, ...props }: ChunkMaterialProps) => {
+    const textures = useTexture({ ...textureUrls })
     return <meshStandardMaterial {...textures} {...props} />
 }
 
