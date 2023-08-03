@@ -39,6 +39,7 @@ export const EventCloudProvider = ({ children }) => {
   const [backpack, setBackpack]         = useState<Backpack | null>(null);
   const [mapObjects, setMapObjects]     = useState<MapObject[]>([]);
   const [userFighters, setUserFighters] = useState<FighterAttributes[]>([]);
+  const [chatLog, setChatLog]           = useState([]);
  
   const [money, setMoney] = useState(0);
   const [target, setTarget] = useState(0);
@@ -216,7 +217,6 @@ export const EventCloudProvider = ({ children }) => {
       data: { direction }
     });
   }
-
   
 
 
@@ -263,8 +263,12 @@ export const EventCloudProvider = ({ children }) => {
           handleUserFighters(msg.fighters);
         break;
 
-      case "fire_skill":
+        case "fire_skill":
           handleFireSkill(msg.fighter, msg.skill);
+        break;
+
+      case "chat_message":
+          handleChatMessage(msg.author, msg.msg, msg.msgType);
         break;
       }
   }
@@ -272,6 +276,20 @@ export const EventCloudProvider = ({ children }) => {
 
   const updateBackpack = useEventStore(state => state.updateBackpack);
   const updateEquipment = useEventStore(state => state.updateEquipment);
+
+
+  function handleChatMessage(author, msg, msgType) {
+    setChatLog(prevChatLog => {
+      const newChatLog = [...prevChatLog, {author, msg, msgType}];
+
+      // If the log has more than 100 messages, remove the oldest
+      if (newChatLog.length > 100) {
+        newChatLog.shift();
+      }
+
+      return newChatLog;
+    });
+  }
 
   function handleFireSkill(fighter, skill) {
     addSkillEvent({fighter, skill})
@@ -350,23 +368,6 @@ export const EventCloudProvider = ({ children }) => {
     setMoney(money);
     
   }
-
-  // function handleUpdateNpc(npc) {
-  //   setNpcList((prevNpcList) => {
-  //     const index = prevNpcList.findIndex((item) => item.id === npc.id);
-  //     if (index !== -1) {
-  //       // Replace the NPC with the same ID in the list
-  //       return [
-  //         ...prevNpcList.slice(0, index),
-  //         npc,
-  //         ...prevNpcList.slice(index + 1),
-  //       ];
-  //     } else {
-  //       // If the NPC is not found in the list, add it to the list
-  //       return [...prevNpcList, npc];
-  //     }
-  //   });
-  // }
 
   function handleDroppedItems(droppedItems) {
     //@console.log("[handleDroppedItems] items=", droppedItems)
@@ -492,7 +493,8 @@ export const EventCloudProvider = ({ children }) => {
         account,
         setAccount,
         playerList,
-        updateFighterDirection
+        updateFighterDirection,
+        chatLog
       }}>
       {children}
     </EventCloudContext.Provider>

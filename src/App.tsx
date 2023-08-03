@@ -34,6 +34,7 @@ import MetamaskDialog from './MetamaskDialog';
 // /slide <x: int> <z: int> - move char to coords
 // /spawn <npcName: string> - spawn an NPC (eg: spider, bull)
 // /make <itemName: string> [+<lvl>] [+<add points>] [l] [exc]  - make item (eg: /make brass armour +9 +8 l exc  | /make nodachi)
+// /makeset <setName: string> [+<lvl>] - make item (eg: /makeset legendary +15)
 //
 
 function App() {
