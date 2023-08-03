@@ -12,17 +12,18 @@ import { isExcellent } from 'Scene/utils/isExcellent'
 
 import { shader_level } from 'Scene/shaders/shader_level'
 import { generateItemName } from 'helpers/generateItemName'
+import { getShaderedBackpackModel } from './utils/getShaderedBackpackModel'
 
 interface Props { position?: number[], rotation?: number[], scale?: number[], onPointerEnter?: (e?: any) => void, onPointerLeave?: (e?: any) => void, item: BackpackSlot }
 const SlotModel = memo(forwardRef(function SlotModel({ item, ...props }: Props, ref: any) {
     const { map } = useTexture({ map: 'assets/notexture.png' })
 
-    const shader = useRef<THREE.Shader | null>(null)
-    const levelShader = useRef(shader_level())
+    const uniforms = useRef({ uTime: { value: 0 } })
 
-    // Find needed 3D Model
+
+    // @ts-expect-error
     const model = useMemo<THREE.Mesh>(() => {
-        const newModel = getBackpackModel(item.itemAttributes.name)
+        const newModel = getShaderedBackpackModel(item.itemAttributes, uniforms)
 
         if (!newModel) {
             return new THREE.Mesh(
@@ -30,65 +31,13 @@ const SlotModel = memo(forwardRef(function SlotModel({ item, ...props }: Props, 
                 new THREE.MeshStandardMaterial({ color: 'pink', map })
             )
         }
-
-        return SkeletonUtils.clone(newModel.scene)
+        return newModel
     }, [item, map])
-
-    // For Dev
-    const devState = useControls(generateItemName(item.itemAttributes, item.qty), {
-        level: { min: 0, max: 15,  value: +item.itemAttributes.itemLevel },
-        isExcellent: isExcellent(item)
-    })
-    // 
-
-    // Add shaders to the Model based on things level
-    const shaderModel = useMemo<THREE.Mesh>(() => {
-        if (!model) { return }
-        model.traverse((object: any) => {
-            if (object.isMesh) {
-                const material = object.material.clone()
-                // object.material.transparent = true
-                material.onBeforeCompile = (_shader: THREE.Shader) => {
-                    // Uniforms
-                    _shader.uniforms = { ..._shader.uniforms, ...levelShader.current.uniforms }
-                    _shader.uniforms['uLevel'] = { value: devState.level }
-                    _shader.uniforms['uIsExellent'] = { value: devState.isExcellent }
-
-                    // Injection
-                    _shader.vertexShader = _shader.vertexShader.replace('#include <common>', `
-                        #include <common>
-                        ${levelShader.current.injectVertexShader.header}
-                    `)
-                    _shader.vertexShader = _shader.vertexShader.replace('#include <fog_vertex>', `
-                        #include <fog_vertex>
-                        ${levelShader.current.injectVertexShader.footer}
-                    `)
-            
-                    _shader.fragmentShader = _shader.fragmentShader.replace('#include <common>', `
-                        #include <common>
-                        ${levelShader.current.injectFragmentShader.header}
-                    `)
-                    _shader.fragmentShader = _shader.fragmentShader.replace('#include <dithering_fragment>', `
-                        #include <dithering_fragment>
-                        ${levelShader.current.injectFragmentShader.footer}
-                    `)
-            
-                    // console.log(levelShader.current.injectFragmentShader.footer)
-                    // console.log(_shader.vertexShader)
-                    shader.current = _shader
-                }
-                object.material = material
-            }
-        })
-        return model
-    }, [model, devState])
 
 
     useFrame(({ clock }) => {
-        if (shaderModel) {
-            if (shader.current?.uniforms.uTime) {
-                shader.current.uniforms.uTime.value = clock.getElapsedTime()
-            }
+        if (model) {
+            uniforms.current.uTime.value = clock.getElapsedTime()
         }
     })
 
@@ -99,7 +48,7 @@ const SlotModel = memo(forwardRef(function SlotModel({ item, ...props }: Props, 
             onPointerLeave={props.onPointerLeave}
             ref={ref}
             name="slot-model"
-            object={shaderModel}
+            object={model}
             {...props}
         >
         </primitive>
