@@ -4,7 +4,7 @@ import * as THREE from "three"
 import { Object3D } from "three"
 
 import { Canvas } from "@react-three/fiber"
-import { useRef, memo, Suspense } from "react"
+import { useRef, memo, Suspense, useEffect } from "react"
 import { useSceneContext } from "store/SceneContext"
 import { Loader, Stats } from "@react-three/drei"
 
@@ -18,7 +18,7 @@ import Controller from "./Controller"
 import DroppedItem from "./DroppedItem"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"
 import Decor from "./Decor"
-import UserInterface from './UserInterface/UserInterface'
+import UserInterface3D from './UserInterface3D/UserInterface3D'
 import GLTFLoader from './GLTFLoader/GLTFLoader'
 import OtherFighter from './Fighter/OtherFighter'
 
@@ -30,14 +30,24 @@ import { useBackpackStore } from 'store/backpackStore'
 import Postprocessing from './Postprocessing'
 import { Environment } from '@react-three/drei'
 
+import { shallow } from 'zustand/shallow'
+import UserInterface2D from './UserInterface2D/UserInterface2D'
+import { useCommandLine } from './UserInterface2D/CommandLine/useCommandLine'
+
 const Scene = memo(function Scene() {
     const store = useSceneContext()
     const worldRef = useRef<Object3D | null>(null)
     const eventsNode = useUiStore(state => state.eventsNode)
     const isBackpackOpened = useBackpackStore(state => state.isOpened)
+
+    const [subscribe, unsubscribe] = useCommandLine(state => [state.subscribeCommandLine, state.unsubscribeCommandLine], shallow)
+    useEffect(() => {
+        if (eventsNode.current) { subscribe(eventsNode.current) }
+        return () => unsubscribe()
+    }, [eventsNode.current])
     
     return (
-        <div ref={eventsNode} id="scene" className={styles.scene}>
+        <div tabIndex={0} ref={eventsNode} id="scene" className={styles.scene}>
             <Canvas
                 shadows
                 camera={{
@@ -67,19 +77,20 @@ const Scene = memo(function Scene() {
                         <Chunks ref={worldRef} />
                         <Controller world={worldRef} />
                         <FloatingDamage />
-                        <UserInterface />
+                        <UserInterface3D />
                         <Light />
                     </GLTFLoader>
                 </Suspense>
 
                 {/* <Postprocessing/> */}
             </Canvas>
+            <UserInterface2D/>
             <Loader/>
             {
                 store.PlayerList.current.length && (
                     <div className={styles.players}>
                         <p>Close Players({store.PlayerList.current.length}):</p>
-                        { store.PlayerList.current.map(_ => (<p key={_.id}>{ `Player_${_.id}, matrixCoord: (${_.coordinates.x}, ${_.coordinates.z})` }<span></span></p>)) }
+                        { store.PlayerList.current.map(_ => (<p key={_.id}>{ `${Fighter.name}, Coordinate: (${_.coordinates.x}, ${_.coordinates.z})` }<span></span></p>)) }
                     </div>
                 )
             }

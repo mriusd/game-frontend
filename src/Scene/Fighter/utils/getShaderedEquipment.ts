@@ -28,7 +28,7 @@ export const getShaderedEquipment = (item: BackpackSlot, uniforms: any) => {
                 // Uniforms
                 _shader.uniforms = { ..._shader.uniforms, ...levelShader.uniforms, ...uniforms.current  }
                 _shader.uniforms['uLevel'] = { value: item.itemAttributes.itemLevel }
-                _shader.uniforms['uIsExellent'] = { value: isExcellent(item) }
+                _shader.uniforms['uIsExellent'] = { value: isExcellent(item.itemAttributes) }
 
                 // Injection
                 _shader.vertexShader = _shader.vertexShader.replace('#include <common>', `
