@@ -251,7 +251,7 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
 
     return (
         <group name="fighter-model">
-            <Name value={fighter.name || 'Player_'+fighter.id} target={modelRef} offset={.4} />
+            {/* <Name value={fighter.name || 'Player_'+fighter.id} target={modelRef} offset={.4} /> */}
             <group
                 ref={modelRef}
                 // @ts-expect-error

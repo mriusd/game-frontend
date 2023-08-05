@@ -11,7 +11,7 @@ const Minimap = ({ ...props }) => {
     const { worldSize, chunkSize, currentWorldCoordinate, NpcList } = useSceneContext()
 
     const textures = useTexture({ map: '/worlds/alex_ground/minimap/minimap.png' })
-    const planeSize = useMemo(() => new THREE.Vector2(200, 200), [])
+    const planeSize = useMemo(() => new THREE.Vector2(100, 100), [])
 
     const minimapMaterial = useMemo(() => minimap_material(), [])
     const material = useMemo(() => {
@@ -54,7 +54,7 @@ const Minimap = ({ ...props }) => {
         if (!minimapRef.current) { return }
         const { width, height } = get().size
         minimapRef.current.position.x = width / 2 - planeSize.x / 2 - marginRight
-        minimapRef.current.position.y = height / 2 - planeSize.y / 2 - marginTop
+        minimapRef.current.position.y = - height / 2 + planeSize.y / 2 + marginTop
     })
 
 

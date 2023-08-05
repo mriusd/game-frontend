@@ -10,7 +10,7 @@ import { matrixCoordToWorld } from "Scene/utils/matrixCoordToWorld"
 import Tween from "Scene/utils/tween/tween"
 import { getMoveDuration } from "Scene/utils/getMoveDuration"
 import { getRunAction, getStandAction, getAttackAction } from "./utils/getAction"
-import { useEventCloud } from "EventCloudContext"
+import { useEventCloud } from "store/EventCloudContext"
 import TwistingSlash from "./Skills/TwistingSlash/TwistingSlash"
 
 interface Props { fighter: Fighter }

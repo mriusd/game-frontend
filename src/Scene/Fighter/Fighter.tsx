@@ -12,7 +12,7 @@ import { useSceneContext } from '../../store/SceneContext'
 import type { Coordinate } from "interfaces/coordinate.interface"
 import { isOccupiedCoordinate } from "../utils/isOccupiedCoordinate"
 import { getMoveDuration } from "../utils/getMoveDuration"
-import { useEventCloud } from "EventCloudContext"
+import { useEventCloud } from "store/EventCloudContext"
 import { calcDirection } from "../utils/calcDirection"
 import FighterModel from "./FighterModel"
 import { useGLTFLoaderStore } from "Scene/GLTFLoader/GLTFLoaderStore"

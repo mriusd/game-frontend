@@ -12,7 +12,7 @@ import type { Mesh } from 'three'
 import type { Fighter } from 'interfaces/fighter.interface'
 import Name from './components/Name'
 import { setCursorPointer } from './utils/setCursorPointer'
-import { useEventCloud } from 'EventCloudContext'
+import { useEventCloud } from 'store/EventCloudContext'
 import { useGLTFLoaderStore } from './GLTFLoader/GLTFLoaderStore'
 
 interface Props { npc: Fighter }

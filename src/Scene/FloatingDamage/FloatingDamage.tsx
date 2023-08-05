@@ -1,4 +1,4 @@
-import { useEventCloud } from "EventCloudContext"
+import { useEventCloud } from "store/EventCloudContext"
 import { useEffect, useRef, memo } from "react"
 import type { Damage } from "interfaces/damage.interface"
 import DamageText from "./DamageText"

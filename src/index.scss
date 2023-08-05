@@ -1,0 +1,51 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+}
+
+html,
+body {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  overflow: hidden;
+  scroll-behavior: auto;
+  touch-action: pan-x;
+  -ms-scroll-chaining: none;
+  overscroll-behavior: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Leva Panel */
+.leva-c-kWgxhW {
+  position: absolute !important;
+  left: 32px !important;
+  top: 32px !important;
+}
+
+/* Stats */
+.stats {
+  top: auto !important;
+  bottom: 0 !important;
+}
+
+/* Game */
+.Game {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}

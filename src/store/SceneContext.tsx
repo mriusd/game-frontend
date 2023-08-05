@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState, useRef, useContext, ReactNode } from "react"
-import { useEventCloud } from "EventCloudContext"
+import { useEventCloud } from "store/EventCloudContext"
 import type { Fighter } from "interfaces/fighter.interface"
 import type { Coordinate } from "interfaces/coordinate.interface"
 import type { ISceneContext } from "interfaces/sceneContext.interface"

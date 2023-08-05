@@ -5,7 +5,7 @@ import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
 import { useSceneContext } from "store/SceneContext"
 import { Mesh } from "three"
 import { setCursorPointer } from "./utils/setCursorPointer"
-import { useEventCloud } from "EventCloudContext"
+import { useEventCloud } from "store/EventCloudContext"
 import { Plane, Text } from "@react-three/drei"
 import { createBillboardMaterial } from "./helpers/createBillboardMaterial"
 import { getMeshDimensions } from "./utils/getMeshDimensions"
@@ -45,7 +45,7 @@ const DroppedItem = memo(function DroppedItem({ item }: Props) {
 
         if (!newModel) {
             return new THREE.Mesh(
-                new THREE.BoxGeometry(+item.item.itemWidth / 4, +item.item.itemHeight / 4, +item.item.itemWidth / 4),
+                new THREE.BoxGeometry(+item.item.itemWidth / 4 || .5, +item.item.itemHeight / 4 || .5, +item.item.itemWidth / 4 || .5),
                 new THREE.MeshStandardMaterial({ color: 'pink', map })
             )
         }

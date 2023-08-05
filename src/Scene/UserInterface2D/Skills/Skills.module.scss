@@ -1,0 +1,23 @@
+.Skills {
+    position: absolute;
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    bottom: 32px;
+    left: 50%;
+    transform: translate(-50%);
+    pointer-events: all;
+
+    > button {
+        border: 1px solid rgba(255, 255, 255, .5);
+        background-color: black;
+        color: rgba(255, 255, 255, .5);
+        padding: 4px;
+        cursor: pointer;
+    }
+}
+
+.SkillSelected {
+    border-color: rgb(179, 85, 31) !important;
+    color: rgb(179, 85, 31) !important;
+}
