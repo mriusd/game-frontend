@@ -3,7 +3,7 @@
     bottom: 32px;
     left: 50%;
     transform: translate(-50%);
-    width: 80%;
+    width: 60%;
     min-width: 300px;
     height: 36px;
     background-color: black;
@@ -22,5 +22,21 @@
         font-size: 18px;
         margin: 0;
         color: #ff7b00;
+    }
+}
+
+.CommandsPlaceholder {
+    position: absolute;
+    width: 100%;
+    height: auto;
+    left: 0;
+    bottom: calc(100% + 120px);
+    color: white;
+    opacity: .5;
+    font-size: 12px;
+
+    pre {
+        margin: 0;
+        padding: 0;
     }
 }

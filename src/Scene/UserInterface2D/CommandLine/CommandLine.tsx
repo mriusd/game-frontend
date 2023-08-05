@@ -1,7 +1,8 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import styles from './CommandLine.module.scss'
 import { useCommandLine } from './useCommandLine'
-import { useEventCloud } from 'EventCloudContext'
+import { useEventCloud } from 'store/EventCloudContext'
+import CommandsPlaceholder from './CommandsPlaceholder'
 
 const CommandLine = () => {
     const { sendCommand } = useEventCloud()
@@ -85,12 +86,15 @@ const CommandLine = () => {
             ref={commandLineRef}
             className={styles.CommandLine}
         >
+            <CommandsPlaceholder/>
             <form onSubmit={handleSubmit}>
                 <input
                     ref={inputRef}
                     // @ts-expect-error
                     onKeyDown={handleKeyDown}
                     onChange={handleChange}
+                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+                    onMouseUp={(e) => { e.preventDefault(); e.stopPropagation() }}
                     onBlur={() => useCommandLine.getState().hide()}
                     type='text'
                     placeholder='Enter command here'

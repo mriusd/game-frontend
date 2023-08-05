@@ -45,7 +45,6 @@ const Light = memo(function Light() {
                 shadow-camera-right={20}
                 shadow-camera-top={20}
                 shadow-camera-bottom={-20}
-
             />
         </group>
     )

@@ -48,6 +48,7 @@ const Controller = memo(function Controller({ world }: Props) {
     const raycaster = useRef(new THREE.Raycaster())
     const pointer = useThree(state => state.pointer)
     const camera = useThree(state => state.camera)
+    const canvas = useThree(state => state.gl.domElement)
     const [isHolding, setIsHolding] = useState(false)
 
     const [testWorldCoordinates, setTestWorldCoordinates] = useState<Coordinate>({ x: 0, z: 0 })
@@ -124,7 +125,10 @@ const Controller = memo(function Controller({ world }: Props) {
     }, [nextWorldCoordinate])
 
     // Set world mouse position
-    function mouseDown() {
+    function mouseDown(e: MouseEvent) {
+        if (e.target !== canvas) {
+            return
+        }
         setIsHolding(true)
         if (!world.current) { return }
         if (!savePointerWorldCoordinate.value) { return }

@@ -46,5 +46,5 @@ export interface Fighter {
     skills: Record<number, Skill>;
     equipment: Record<number, BackpackSlot | null>;
 
-    lastChatMsg: string;
+    lastChatMessage: string;
 }
