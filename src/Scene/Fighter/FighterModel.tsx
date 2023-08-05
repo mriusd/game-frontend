@@ -1,13 +1,13 @@
 import * as THREE from 'three'
 import React, { useEffect, useMemo, useRef } from "react"
-import Name from "Scene/components/Name"
 import { useSceneContext } from "store/SceneContext"
 import { BackpackSlot } from "interfaces/backpack.interface"
 import { getShaderedEquipment } from "./utils/getShaderedEquipment"
 import { useFrame } from "@react-three/fiber"
 import { Fighter } from "interfaces/fighter.interface"
 import { SkeletonUtils } from "three-stdlib"
-import { getEquipmentBodyType, bodyType } from "./utils/getEquipmentBodyType"
+import { getEquipmentBodyType } from "./utils/getEquipmentBodyType"
+import LastMessage from './components/LastMessage'
 
 interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, position: number[], rotation?: number[], children?: any }
 const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: baseModel, fighter, position, rotation, children }: Props, ref) {
@@ -251,7 +251,6 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
 
     return (
         <group name="fighter-model">
-            {/* <Name value={fighter.name || 'Player_'+fighter.id} target={modelRef} offset={.4} /> */}
             <group
                 ref={modelRef}
                 // @ts-expect-error

@@ -56,6 +56,7 @@
     cursor: pointer;
     pointer-events: all;
     text-decoration: underline;
+    user-select: none;
 }
 
 .CloseButton {
@@ -64,4 +65,5 @@
     font-size: 32px;
     cursor: pointer;
     pointer-events: all;
+    user-select: none;
 }

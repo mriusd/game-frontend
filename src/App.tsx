@@ -30,22 +30,18 @@ import Auth from 'Auth/Auth';
 //
 
 function App() {
-  const { fighter } = useEventCloud();
-  
-  return (
-  <DndProvider backend={HTML5Backend}>
-      <Auth />
-      {fighter && (
-        <>
-        <SceneContextProvider>
-          <div className='Game'>
-            <Scene/>
-          </div>
-        </SceneContextProvider>
-        </>
-      )}
-  </DndProvider>
-);
+	const { fighter } = useEventCloud();
+
+	return (
+		<DndProvider backend={HTML5Backend}>
+			<Auth />
+			{fighter && (
+				<SceneContextProvider>
+					<Scene />
+				</SceneContextProvider>
+			)}
+		</DndProvider>
+	);
 
 }
 

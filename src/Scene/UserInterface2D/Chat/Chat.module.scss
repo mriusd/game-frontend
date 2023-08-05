@@ -9,20 +9,9 @@
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-end;
+    gap: 2px;
 }
 
 .message {
     font-size: 16px;
-}
-
-
-// Message Colors
-$messageColors: (
-    common: #FFFFFF,
-    error: #FF0000,
-);
-@each $name, $color in $messageColors {
-    .message_#{$name} {
-        color: $color;
-    }
 }

@@ -7,3 +7,32 @@
     pointer-events: none;
     user-select: none;
 }
+
+.coordinates {
+    position: absolute;
+    top: 32px;
+    left: 32px;
+    // transform: translateX(-50%);
+    font-size: 14px;
+    color: rgba(255, 255, 255, .5);
+    user-select: none;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.players {
+    position: absolute;
+    top: 140px; left: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 14px;
+    color: rgba(255, 255, 255, .5);
+
+    p {
+        margin: 0;
+        padding: 0;
+    }
+}

@@ -93,6 +93,8 @@ const CommandLine = () => {
                     // @ts-expect-error
                     onKeyDown={handleKeyDown}
                     onChange={handleChange}
+                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+                    onMouseUp={(e) => { e.preventDefault(); e.stopPropagation() }}
                     onBlur={() => useCommandLine.getState().hide()}
                     type='text'
                     placeholder='Enter command here'

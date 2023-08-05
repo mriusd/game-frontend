@@ -12,6 +12,8 @@ import { getMoveDuration } from "Scene/utils/getMoveDuration"
 import { getRunAction, getStandAction, getAttackAction } from "./utils/getAction"
 import { useEventCloud } from "store/EventCloudContext"
 import TwistingSlash from "./Skills/TwistingSlash/TwistingSlash"
+import Name from "Scene/components/Name"
+import LastMessage from "./components/LastMessage"
 
 interface Props { fighter: Fighter }
 const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
@@ -166,6 +168,8 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
     return (
         <group name="other-fighter">
             <HealthBar object={fighter} target={animationTarget} offset={.7} />
+            <Name value={fighter.name || 'Player_'+fighter.id} target={animationTarget} offset={.4} />
+            <LastMessage offset={.8} fighter={fighter} target={animationTarget} />
             <FighterModel
                 ref={animationTarget}
                 model={gltf.scene}

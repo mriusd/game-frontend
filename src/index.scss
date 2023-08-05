@@ -39,8 +39,10 @@ body {
 
 /* Stats */
 .stats {
-  top: auto !important;
-  bottom: 0 !important;
+  top: 80px !important;
+  left: 32px !important;
+  opacity: .3 !important;
+  z-index: 0 !important;
 }
 
 /* Game */

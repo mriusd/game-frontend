@@ -24,9 +24,6 @@ import OtherFighter from './Fighter/OtherFighter'
 
 import { useUiStore } from 'store/uiStore'
 
-import { Leva } from 'leva'
-import { useBackpackStore } from 'store/backpackStore'
-
 import Postprocessing from './Postprocessing'
 import { Environment } from '@react-three/drei'
 
@@ -38,16 +35,15 @@ const Scene = memo(function Scene() {
     const store = useSceneContext()
     const worldRef = useRef<Object3D | null>(null)
     const eventsNode = useUiStore(state => state.eventsNode)
-    const isBackpackOpened = useBackpackStore(state => state.isOpened)
 
     const [subscribe, unsubscribe] = useCommandLine(state => [state.subscribeCommandLine, state.unsubscribeCommandLine], shallow)
     useEffect(() => {
         if (eventsNode.current) { subscribe(eventsNode.current) }
         return () => unsubscribe()
     }, [eventsNode.current])
-    
+
     return (
-        <div tabIndex={0} ref={eventsNode} id="scene" className={styles.scene}>
+        <div id="scene" tabIndex={0} ref={eventsNode} className={styles.scene}>
             <Canvas
                 shadows
                 camera={{
@@ -64,7 +60,7 @@ const Scene = memo(function Scene() {
             >
                 <color attach="background" args={[0x000000]} />
                 <fog attach="fog" args={['black', 5, 25]}></fog>
-                <Stats className='stats'/>
+                <Stats className='stats' />
                 {/* <Environment preset='forest' /> */}
 
                 <Suspense fallback={null}>
@@ -81,28 +77,10 @@ const Scene = memo(function Scene() {
                         <Light />
                     </GLTFLoader>
                 </Suspense>
-
                 {/* <Postprocessing/> */}
             </Canvas>
             <UserInterface2D/>
             <Loader/>
-            {
-                store.PlayerList.current.length && (
-                    <div className={styles.players}>
-                        <p>Close Players({store.PlayerList.current.length}):</p>
-                        { store.PlayerList.current.map(_ => (<p key={_.id}>{ `${Fighter.name}, Coordinate: (${_.coordinates.x}, ${_.coordinates.z})` }<span></span></p>)) }
-                    </div>
-                )
-            }
-            <div className={styles.coordinates}>
-                <div>World size [{store.worldSize.current}x{store.worldSize.current}]</div>
-                {/* <div>Server coordinate [ X: {store.currentMatrixCoordinate?.x} Z: {store.currentMatrixCoordinate?.z} ]</div> */}
-                <div>Coordinate [ X: {store.currentWorldCoordinate?.x.toFixed(0)} Z: {store.currentWorldCoordinate?.z.toFixed(0)} ]</div>
-            </div>
-            <Leva
-                hidden={!isBackpackOpened}
-                flat
-            />
         </div>
     )
 })
