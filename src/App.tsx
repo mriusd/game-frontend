@@ -11,7 +11,6 @@ import DroppedItemsList from './DroppedItemsList';
 import NPC from './NPC';
 import Backpack from './Backpack';
 import ToggleSkillButton from './ToggleSkillButton';
-import CommandLine from './CommandLine';
 
 
 import Scene from './Scene/Scene';
@@ -63,10 +62,6 @@ function App() {
           </div>
         </SceneContextProvider>
         
-        <div>
-          <CommandLine />
-        </div>
-
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
 
           <div style={{ width: '30%', padding: '0 10px' }}>

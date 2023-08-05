@@ -32,8 +32,8 @@ const TwistingSlash = ({ renderEffect, onEffectComplete }) => {
     const aura = useControls('Aura', {
         duration: { min: 100, max: 5000, value: 700 },
         pointSize: { min: 0, max: 50, value: 8 },
-        density: { min: 100, max: 10000, value: 2000 },
-        speedMin: { min: 0., max: .9, value: .5 },
+        density: { min: 100, max: 10000, value: 5000 },
+        speedMin: { min: 0., max: .9, value: 0 },
         tubeRadius: { min: 0, max: 2, value: .5 },
         moveRadius: { min: 0, max: 4, value: 1.25 },
         alphaDifference: { min: 0, max: 1, value: .45 },

@@ -10,7 +10,7 @@ import { Plane, Text } from "@react-three/drei"
 import { createBillboardMaterial } from "./helpers/createBillboardMaterial"
 import { getMeshDimensions } from "./utils/getMeshDimensions"
 import type { ItemDroppedEvent } from "interfaces/item.interface"
-import { getShaderedBackpackModel } from "./UserInterface/Backpack/utils/getShaderedBackpackModel"
+import { getShaderedBackpackModel } from "./UserInterface3D/Backpack/utils/getShaderedBackpackModel"
 import { useFrame } from "@react-three/fiber"
 import { useTexture } from "@react-three/drei"
 

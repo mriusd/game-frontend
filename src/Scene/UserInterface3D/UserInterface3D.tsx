@@ -12,7 +12,7 @@ import { shallow } from "zustand/shallow"
 
 import { OrthographicCamera } from "@react-three/drei"
 
-const UserInterface = memo(function UserInterface() {
+const UserInterface3D = memo(function UserInterface() {
     const [userInterface, intersectionPlane] = useUiStore(state => [state.userInterface, state.intersectionPlane], shallow)
     return (
         <Hud>
@@ -31,4 +31,4 @@ const UserInterface = memo(function UserInterface() {
     )
 })
 
-export default UserInterface
+export default UserInterface3D

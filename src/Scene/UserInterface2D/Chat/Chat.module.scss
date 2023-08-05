@@ -1,0 +1,28 @@
+.chat {
+    position: absolute;
+    left: 0; bottom: 0;
+    width: 400px;
+    height: 23.6%;
+    overflow-y: auto;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+}
+
+.message {
+    font-size: 16px;
+}
+
+
+// Message Colors
+$messageColors: (
+    common: #FFFFFF,
+    error: #FF0000,
+);
+@each $name, $color in $messageColors {
+    .message_#{$name} {
+        color: $color;
+    }
+}
