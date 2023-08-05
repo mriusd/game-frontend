@@ -289,6 +289,8 @@ export const EventCloudProvider = ({ children }) => {
 
       return newChatLog;
     });
+
+    console.log("ChatLog", chatLog)
   }
 
   function handleFireSkill(fighter, skill) {
