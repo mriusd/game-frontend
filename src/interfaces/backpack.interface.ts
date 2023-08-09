@@ -1,7 +1,7 @@
-import { ItemAttributes } from './item.interface';
+import { TokenAttributes } from './item.interface';
 
 export interface BackpackSlot {
-  itemAttributes: ItemAttributes;
+  itemAttributes: TokenAttributes;
   qty: number;
   itemHash: string;
 }

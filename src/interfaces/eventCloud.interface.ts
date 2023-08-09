@@ -36,7 +36,7 @@ export interface EventCloud {
     mapObjects: MapObject[],
     userFighters: FighterAttributes[],
     fetchUserFighters: (ownerAddress: string) => void,
-    createFighter: (ownerAddress: string, fighterClass: number, name: string) => void,
+    createFighter: (ownerAddress: string, fighterClass: string, name: string) => void,
     sendAuth: any,
     account: string,
     setAccount: any,

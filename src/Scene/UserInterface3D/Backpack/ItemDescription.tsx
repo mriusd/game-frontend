@@ -18,7 +18,7 @@ const ItemDescription = ({ item, type }: Props) => {
     const bannerWidth = useMemo(() => Math.max(100, text.length * 12), [text]) 
     const offsetY = useMemo(() => {
         if (type === 'backpack') {
-            return (Number(item.itemAttributes.itemHeight) - .5 * (Number(item.itemAttributes.itemHeight) - 1)) * 48
+            return (Number(item.itemAttributes.itemParameters.itemHeight) - .5 * (Number(item.itemAttributes.itemParameters.itemHeight) - 1)) * 48
         }
         // Should store size of equipment slot in element
         return 80

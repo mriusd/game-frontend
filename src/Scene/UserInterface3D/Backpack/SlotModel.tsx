@@ -27,7 +27,7 @@ const SlotModel = memo(forwardRef(function SlotModel({ item, ...props }: Props, 
 
         if (!newModel) {
             return new THREE.Mesh(
-                new THREE.BoxGeometry(+item.itemAttributes.itemWidth / 4, +item.itemAttributes.itemHeight / 4, +item.itemAttributes.itemWidth / 4),
+                new THREE.BoxGeometry(+item.itemAttributes.itemParameters.itemWidth / 4, +item.itemAttributes.itemParameters.itemHeight / 4, +item.itemAttributes.itemParameters.itemWidth / 4),
                 new THREE.MeshStandardMaterial({ color: 'pink', map })
             )
         }

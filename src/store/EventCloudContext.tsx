@@ -204,7 +204,7 @@ export const EventCloudProvider = ({ children }) => {
     });
   }
 
-  function createFighter(ownerAddress: string, fighterClass: number, name: string) {
+  function createFighter(ownerAddress: string, fighterClass: string, name: string) {
     var response = sendJsonMessage({
       type: "create_fighter",
       data: { ownerAddress, fighterClass, name }
@@ -411,7 +411,7 @@ export const EventCloudProvider = ({ children }) => {
       itemName += " +"+item.additionalDefense;
     } 
 
-    if (item.itemAttributesId == 1) {
+    if (item.name == "Gold") {
       itemName = qty + ' ' + itemName;
     } 
 

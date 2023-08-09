@@ -1,6 +1,6 @@
-import type { ItemAttributes, ItemDroppedEvent } from "interfaces/item.interface";
+import type { TokenAttributes, ItemDroppedEvent } from "interfaces/item.interface";
 
-export const generateItemName = (item: ItemAttributes, qty: number) => {
+export const generateItemName = (item: TokenAttributes, qty: number) => {
     ////@console.log("[generateItemName] ", item.name);
     var itemName = item.name;
 

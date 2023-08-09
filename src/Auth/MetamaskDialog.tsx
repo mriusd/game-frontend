@@ -34,11 +34,11 @@ function MetamaskDialog() {
 	};
 
 	const createWarrior = () => {
-		createFighter(account, 1, fighterName)
+		createFighter(account, "Warrior", fighterName)
 	};
 
 	const createWizard = () => {
-		createFighter(account, 2, fighterName)
+		createFighter(account, "Wizard", fighterName)
 	};
 
 	if (!account) {
