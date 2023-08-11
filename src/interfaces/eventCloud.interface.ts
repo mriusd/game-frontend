@@ -1,6 +1,6 @@
 import type { Fighter } from "./fighter.interface";
 import type { Coordinate } from "./coordinate.interface";
-import { BackpackSlot } from './backpack.interface';
+import { InventorySlot } from './inventory.interface';
 import type { ItemDroppedEvent } from "./item.interface"; 
 import type { Direction } from "./direction.interface"; 
 import type { MapObject } from "./mapObject.interface"; 
@@ -15,7 +15,7 @@ export interface EventCloud {
     npcList: Fighter[] 
     droppedItems: any
     money: any 
-    equipment: Record<number, BackpackSlot> 
+    equipment: Record<number, InventorySlot> 
     moveFighter: (coordinate: Coordinate) => void 
     submitSkill: (direction: Direction) => void
     submitMalee: (direction: Direction) => void

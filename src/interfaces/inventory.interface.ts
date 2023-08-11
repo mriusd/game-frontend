@@ -1,12 +1,12 @@
 import { TokenAttributes } from './item.interface';
 
-export interface BackpackSlot {
+export interface InventorySlot {
   itemAttributes: TokenAttributes;
   qty: number;
   itemHash: string;
 }
 
-export interface Backpack {
+export interface Inventory {
   grid: boolean[][];
-  items: Map<string, BackpackSlot>;
+  items: Map<string, InventorySlot>;
 }

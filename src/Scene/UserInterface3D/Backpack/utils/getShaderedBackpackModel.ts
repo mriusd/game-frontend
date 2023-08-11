@@ -1,4 +1,4 @@
-import { BackpackSlot } from "interfaces/backpack.interface"
+import { InventorySlot } from "interfaces/inventory.interface"
 import { getBackpackModel } from "./getBackpackModel"
 import { shader_level } from "Scene/shaders/shader_level"
 import { isExcellent } from "Scene/utils/isExcellent"

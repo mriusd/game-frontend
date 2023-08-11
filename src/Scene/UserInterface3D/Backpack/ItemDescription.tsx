@@ -2,11 +2,11 @@ import * as THREE from 'three'
 import { Text } from "@react-three/drei"
 import { createBillboardMaterial } from "Scene/helpers/createBillboardMaterial"
 import { useMemo } from "react"
-import type { BackpackSlot } from 'interfaces/backpack.interface'
+import type { InventorySlot } from 'interfaces/inventory.interface'
 import { generateItemName } from 'helpers/generateItemName'
 
 interface Props {
-    item: BackpackSlot
+    item: InventorySlot
     type: 'equipment' | 'backpack'
 }
 const ItemDescription = ({ item, type }: Props) => {

@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js'
 import { useMemo, memo, useRef } from "react"
 import { forwardRef } from 'react'
-import type { BackpackSlot } from 'interfaces/backpack.interface'
+import type { InventorySlot } from 'interfaces/inventory.interface'
 import { getBackpackModel } from './utils/getBackpackModel'
 import { useTexture } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
@@ -14,7 +14,7 @@ import { shader_level } from 'Scene/shaders/shader_level'
 import { generateItemName } from 'helpers/generateItemName'
 import { getShaderedBackpackModel } from './utils/getShaderedBackpackModel'
 
-interface Props { position?: number[], rotation?: number[], scale?: number[], onPointerEnter?: (e?: any) => void, onPointerLeave?: (e?: any) => void, item: BackpackSlot }
+interface Props { position?: number[], rotation?: number[], scale?: number[], onPointerEnter?: (e?: any) => void, onPointerLeave?: (e?: any) => void, item: InventorySlot }
 const SlotModel = memo(forwardRef(function SlotModel({ item, ...props }: Props, ref: any) {
     const { map } = useTexture({ map: 'assets/notexture.png' })
 

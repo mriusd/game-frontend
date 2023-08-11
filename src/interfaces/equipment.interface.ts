@@ -1,4 +1,4 @@
-import { BackpackSlot } from './backpack.interface';
+import { InventorySlot } from './inventory.interface';
 
 export interface EquipmentSlots {
     [key: number]: string;
