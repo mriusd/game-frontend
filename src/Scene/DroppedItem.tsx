@@ -13,6 +13,8 @@ import type { ItemDroppedEvent } from "interfaces/item.interface"
 import { getShaderedBackpackModel } from "./UserInterface3D/Backpack/utils/getShaderedBackpackModel"
 import { useFrame } from "@react-three/fiber"
 import { useTexture } from "@react-three/drei"
+import { useSpring } from "react-spring"
+import { animated } from "@react-spring/three"
 
 interface Props { item: ItemDroppedEvent }
 const DroppedItem = memo(function DroppedItem({ item }: Props) {
@@ -59,8 +61,18 @@ const DroppedItem = memo(function DroppedItem({ item }: Props) {
         if (!model) { return new THREE.Vector3(0, 0, 0) }
         if (!currentWorldCoordinate) { return new THREE.Vector3(0, 0, 0) }
         const bb = getMeshDimensions(model)
-        return new THREE.Vector3(currentWorldCoordinate.x + offsetX, bb.depth / 2, currentWorldCoordinate.z + offsetZ)
+        const depth = isException() ? bb.height / 2 : bb.depth / 2
+        return new THREE.Vector3(currentWorldCoordinate.x + offsetX, depth, currentWorldCoordinate.z + offsetZ)
     }, [currentWorldCoordinate, model])
+    const rotation = useMemo(() => {
+        if (isException()) {
+            return [0, rotationZ, 0]
+        }
+        return [-Math.PI / 2, 0, rotationZ]
+    }, [])
+    function isException() {
+        return ( item.item.name.toLowerCase().includes('box') || item.item.name.toLowerCase().includes('gold') )
+    }
 
     useEffect(() => {
         setTimeout(() => {
@@ -118,6 +130,13 @@ const DroppedItem = memo(function DroppedItem({ item }: Props) {
         }
     })
 
+    const { posX, posY, posZ } = useSpring({
+        posX: position ? position.x : currentWorldCoordinate.x,
+        posY: position ? position.y : 2,
+        posZ: position ? position.z : currentWorldCoordinate.z,
+        // config: { tension: 200, friction: 50 },
+    })
+
     if (!currentWorldCoordinate) {
         return <></>
     }
@@ -150,13 +169,19 @@ const DroppedItem = memo(function DroppedItem({ item }: Props) {
                         { generatedName }
                     </Text>
                 </group>
-                <primitive 
-                    ref={itemRef}
-                    object={clonedModel}
-                    castShadow 
-                    position={position} 
-                    rotation={[Math.PI / -2, 0, rotationZ]}
-                />
+                <animated.group 
+                    position-x={posX}
+                    position-y={posY}
+                    position-z={posZ}
+                >
+                    <primitive
+                        ref={itemRef}
+                        object={clonedModel}
+                        castShadow 
+                        // position={position} 
+                        rotation={rotation}
+                    />
+                </animated.group>
         </group>
     )
 })

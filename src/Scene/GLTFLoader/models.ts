@@ -14,6 +14,11 @@ export const models: ModelLoadItem[] = [
         url: 'models/npc_test/scene.gltf'
     },
 
+    // Gold
+    {
+        name: 'gold',
+        url: 'models/gold/gold.gltf'
+    },
 
     // Tree
     {

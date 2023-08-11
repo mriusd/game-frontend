@@ -35,6 +35,8 @@ body {
   position: absolute !important;
   left: 32px !important;
   top: 32px !important;
+  z-index: 1000000;
+  pointer-events: all;
 }
 
 /* Stats */
