@@ -6,7 +6,7 @@ import type { EventCloud } from 'interfaces/eventCloud.interface';
 
 import type { Fighter } from 'interfaces/fighter.interface';
 import type { ItemAttributes, ItemDroppedEvent } from 'interfaces/item.interface'
-import type { Backpack, BackpackSlot } from 'interfaces/backpack.interface';
+import type { Backpack, InventorySlot } from 'interfaces/inventory.interface';
 import type { Equipment } from 'interfaces/equipment.interface';
 import type { MapObject } from 'interfaces/mapObject.interface';
 // @ts-expect-error
@@ -35,7 +35,7 @@ export const EventCloudProvider = ({ children }) => {
   const [droppedItems, setDroppedItems] = useState<Record<common.Hash, ItemDroppedEvent>>({});
   const [npcList, setNpcList]           = useState<Fighter[]>([]);
   const [playerList, setPlayerList]     = useState<Fighter[]>([]);
-  const [equipment, setEquipment]       = useState<Record<number, BackpackSlot | null>>(null);
+  const [equipment, setEquipment]       = useState<Record<number, InventorySlot | null>>(null);
   const [backpack, setBackpack]         = useState<Backpack | null>(null);
   const [mapObjects, setMapObjects]     = useState<MapObject[]>([]);
   const [userFighters, setUserFighters] = useState<FighterAttributes[]>([]);
