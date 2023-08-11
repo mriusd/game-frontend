@@ -1,4 +1,4 @@
-import type { BackpackSlot } from "interfaces/backpack.interface"
+import type { InventorySlot } from "interfaces/inventory.interface"
 import { getIs } from "Scene/utils/utils"
 
 export const bodyType = {
@@ -9,7 +9,7 @@ export const bodyType = {
     boots: 'boots'
 }
 
-export const getEquipmentBodyType = (item: BackpackSlot) => {
+export const getEquipmentBodyType = (item: InventorySlot) => {
     const is = getIs(item.itemAttributes.name)
     if (is('helm')) { return bodyType.helmet }
     if (is('armour')) { return bodyType.armour }

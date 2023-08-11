@@ -56,14 +56,14 @@ const Backpack = memo(function Backpack() {
     const get = useThree(state => state.get)
     // Used for boundingBox
     const backpackRef = useRef<THREE.Group | null>(null)
-    const backpackSlotsContainerRef = useRef<THREE.Group | null>(null)
+    const InventorySlotsContainerRef = useRef<THREE.Group | null>(null)
     // Triggers before paint, draw backpack on the right
     // TODO: Should i move it to useFrame or to ResizeHandler?
     const marginRight = 64
     React.useLayoutEffect(() => {
-        if (!backpackRef.current || !backpackSlotsContainerRef.current) { return }
+        if (!backpackRef.current || !InventorySlotsContainerRef.current) { return }
         const canvasWidth = get().size.width
-        const backpackWidth = getMeshDimensions(backpackSlotsContainerRef.current).width
+        const backpackWidth = getMeshDimensions(InventorySlotsContainerRef.current).width
         backpackRef.current.position.x = canvasWidth / 2 - backpackWidth - marginRight
     })
 
@@ -436,7 +436,7 @@ const Backpack = memo(function Backpack() {
                 <group 
                     name='backpack-slots-container' 
                     // Used for backpack boundingBox calculation
-                    ref={backpackSlotsContainerRef}
+                    ref={InventorySlotsContainerRef}
                 >
 
                     {/* Backpack Slots */}

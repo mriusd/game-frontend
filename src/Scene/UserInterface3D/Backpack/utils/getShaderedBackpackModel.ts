@@ -1,15 +1,15 @@
-import { BackpackSlot } from "interfaces/backpack.interface"
+import { InventorySlot } from "interfaces/inventory.interface"
 import { getBackpackModel } from "./getBackpackModel"
 import { shader_level } from "Scene/shaders/shader_level"
 import { isExcellent } from "Scene/utils/isExcellent"
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader"
 import { SkeletonUtils } from "three-stdlib"
 import * as THREE from 'three'
-import { ItemAttributes } from "interfaces/item.interface"
+import { TokenAttributes } from "interfaces/item.interface"
 
 
 // TODO: Think about this
-export const getShaderedBackpackModel = (itemAttributes: ItemAttributes, uniforms: any) => {
+export const getShaderedBackpackModel = (itemAttributes: TokenAttributes, uniforms: any) => {
     const gltf: GLTF = getBackpackModel(itemAttributes.name)
     if (!gltf) { return null }
     // TODO: Think about another way store models, im not sure that clonning is a good idea for cpu

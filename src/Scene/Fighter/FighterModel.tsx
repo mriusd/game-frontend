@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import React, { useEffect, useMemo, useRef } from "react"
 import { useSceneContext } from "store/SceneContext"
-import { BackpackSlot } from "interfaces/backpack.interface"
+import { InventorySlot } from "interfaces/inventory.interface"
 import { getShaderedEquipment } from "./utils/getShaderedEquipment"
 import { useFrame } from "@react-three/fiber"
 import { Fighter } from "interfaces/fighter.interface"
@@ -39,10 +39,10 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
     const equipedMeshes = useRef<Array<{ itemHash: string, objects: {name: string}[] }>>([])
 
     // Store last equipment state
-    const lastEquipment = useRef<BackpackSlot[]>([])
+    const lastEquipment = useRef<InventorySlot[]>([])
     // Depending on this states we take on or take of equipment
-    const equipmentToTakeOF = useRef<BackpackSlot[]>([])
-    const equipmentToTakeON = useRef<BackpackSlot[]>([])
+    const equipmentToTakeOF = useRef<InventorySlot[]>([])
+    const equipmentToTakeON = useRef<InventorySlot[]>([])
 
 
     const uniforms = useRef({ uTime: { value: 0 } })
@@ -137,7 +137,7 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
 
             })
         }
-        function showBodyPart(item: BackpackSlot) {
+        function showBodyPart(item: InventorySlot) {
             // Remove part of body
             const bodyPartName = getEquipmentBodyType(item)
             if (!bodyPartName) { return console.warn('[FighterModel<takeOf>]: Not body Type found, mb wrong server item name') }
@@ -222,7 +222,7 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
             equipedMeshes.current.push(equiped)
             // console.log(equipedMeshes.current)
         }
-        function hideBodyPart(item: BackpackSlot) {
+        function hideBodyPart(item: InventorySlot) {
             // Remove part of body
             const bodyPartName = getEquipmentBodyType(item)
             if (!bodyPartName) { return console.warn('[FighterModel<takeOn>]: Not body Type found, mb wrong server item name') }

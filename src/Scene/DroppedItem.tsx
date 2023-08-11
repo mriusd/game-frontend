@@ -47,7 +47,7 @@ const DroppedItem = memo(function DroppedItem({ item }: Props) {
 
         if (!newModel) {
             return new THREE.Mesh(
-                new THREE.BoxGeometry(+item.item.itemWidth / 4 || .5, +item.item.itemHeight / 4 || .5, +item.item.itemWidth / 4 || .5),
+                new THREE.BoxGeometry(+item.item.itemParameters.itemWidth / 4 || .5, +item.item.itemParameters.itemHeight / 4 || .5, +item.item.itemParameters.itemWidth / 4 || .5),
                 new THREE.MeshStandardMaterial({ color: 'pink', map })
             )
         }

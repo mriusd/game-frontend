@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Backpack, BackpackSlot } from "interfaces/backpack.interface";
+import type { Inventory, InventorySlot } from "interfaces/inventory.interface";
 import { useBackpackStore } from "./backpackStore";
 import { Coordinate } from "interfaces/coordinate.interface";
 
@@ -19,11 +19,11 @@ export interface EventStoreInterface {
     sendJsonMessage: (jsonMessage: JsonValue) => void | null
     init: (sendJsonMessage: (jsonMessage: JsonValue) => void) => void
 
-    backpack: Backpack | null
-    equipment: Record<number, BackpackSlot> | null
+    backpack: Inventory | null
+    equipment: Record<number, InventorySlot> | null
     equipmentSlots: Record<number, Equipment> | null
-    updateEquipment: (equipment: Record<number, BackpackSlot>) => void
-    updateBackpack: (backpack: Backpack) => void
+    updateEquipment: (equipment: Record<number, InventorySlot>) => void
+    updateBackpack: (backpack: Inventory) => void
 
     // User Events
     updateItemBackpackPosition: (itemHash: string, position: { x: number; z: number }) => void
