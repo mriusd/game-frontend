@@ -67,12 +67,12 @@ const Scene = memo(function Scene() {
                     <GLTFLoader>
                         {store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />)}
                         {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
-                        {/* {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)} */}
-                        {/* {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)} */}
+                        {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)}
+                        {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)}
                         <Fighter />
                         <Chunks ref={worldRef} />
                         <Controller world={worldRef} />
-                        {/* <FloatingDamage /> */}
+                        <FloatingDamage />
                         <UserInterface3D />
                         <Light />
                     </GLTFLoader>

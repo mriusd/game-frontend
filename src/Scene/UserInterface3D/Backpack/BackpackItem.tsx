@@ -33,7 +33,6 @@ const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter,
     const itemPlaneHeight = useMemo(() => cellSize * item.itemAttributes.itemParameters.itemHeight, [item, mounted])
 
     const itemScale = useMemo(() => {
-        console.log(item)
         return cellSize * .8 * Math.max(item.itemAttributes.itemParameters.itemWidth, item.itemAttributes.itemParameters.itemHeight)
     }, [cellSize, item, mounted])
 

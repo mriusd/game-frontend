@@ -372,7 +372,7 @@ export const EventCloudProvider = ({ children }) => {
   }
 
   function handleDroppedItems(droppedItems) {
-    console.log("[handleDroppedItems] items=", droppedItems)
+    // console.log("[handleDroppedItems] items=", droppedItems)
     setDroppedItems(droppedItems);
   }
 
