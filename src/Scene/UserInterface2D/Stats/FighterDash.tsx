@@ -14,7 +14,7 @@ const Fighter = () => {
 		}
 		return 'red'
 	}, [fighter])
-	const width = useMemo(() => fighter.currentHealth / fighter.maxHealth * 100, [])
+	const width = useMemo(() => fighter.currentHealth / fighter.maxHealth * 100 || 0, [])
 	const progressStyle = useMemo(() => ({ backgroundColor: color, width: width+'%' }), [color, width])
 	return (
 		<div className={styles.FighterDash}>
