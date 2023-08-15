@@ -225,8 +225,8 @@ const Backpack = memo(function Backpack() {
     }
     function setPlaceholderCells(pinnedItemEvent: ThreeEvent<PointerEvent>, show: boolean) {
         const cellCoordinate = pinnedItemEvent.object.parent.userData.item.slot.split(',').map((_:string)=>Number(_))
-        const itemWidth = pinnedItemEvent.object.parent.userData.item.itemAttributes.itemWidth
-        const itemHeight = pinnedItemEvent.object.parent.userData.item.itemAttributes.itemHeight
+        const itemWidth = pinnedItemEvent.object.parent.userData.item.itemAttributes.itemParameters.itemWidth
+        const itemHeight = pinnedItemEvent.object.parent.userData.item.itemAttributes.itemParameters.itemHeight
         const cellType: CellType = pinnedItemEvent.object.parent.userData.type
         const cells = []
 
@@ -290,8 +290,8 @@ const Backpack = memo(function Backpack() {
             cell.material.color.set(cell.userData.colors.common)
         })
 
-        const itemWidth = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemWidth
-        const itemHeight = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemHeight
+        const itemWidth = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemParameters.itemWidth
+        const itemHeight = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemParameters.itemHeight
         // Check if we can insert
         let availableCells = 0
         currentPointerCells.current.forEach(cell => {
@@ -305,7 +305,7 @@ const Backpack = memo(function Backpack() {
         if (isHoveredEquipmentSlot) {
             // TODO: detect if slote enabled
             const isAvailableCell = !equipmentItems.find(_ => Number(_.slot) === Number(currentPointerCells.current[0].userData.slot))
-            const isEnabledByType = +currentPointerCells.current[0].userData.slot === +pinnedItemEvent.current.object.parent.userData.item.itemAttributes.acceptableSlot1 || +currentPointerCells.current[0].userData.slot === +pinnedItemEvent.current.object.parent.userData.item.itemAttributes.acceptableSlot2
+            const isEnabledByType = +currentPointerCells.current[0].userData.slot === +pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemParameters.acceptableSlot1 || +currentPointerCells.current[0].userData.slot === +pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemParameters.acceptableSlot2
             if (isAvailableCell && isEnabledByType) {
                 cellToInsert.current = { ref: currentPointerCells.current[0], type: 'equipment' }
                 // If placeholder cell we dont touch it
@@ -344,8 +344,8 @@ const Backpack = memo(function Backpack() {
     }
 
     function getPointerCells(projectedPointer: {x:number;y:number}) {
-        const itemWidth = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemWidth
-        const itemHeight = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemHeight
+        const itemWidth = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemParameters.itemWidth
+        const itemHeight = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemParameters.itemHeight
 
         // Find Cell under Pointer (for Backpack Item)
         const _backpackPointerCell = Object.values(slotsRef.current).find(slotCell => {
@@ -427,9 +427,6 @@ const Backpack = memo(function Backpack() {
 
     return (
         <group visible={isOpened}>
-            {/* <Plane name='background-plane' position={[0,0,-10]} args={[1920, 1080, 1]}>
-                <meshBasicMaterial color={'black'} transparent={true} opacity={.3} />
-            </Plane> */}
 
             <group ref={backpackRef} /*position={Position is changing based on viewport size}*/>
 
@@ -506,7 +503,8 @@ const Backpack = memo(function Backpack() {
 
                 {/* Backpack Items */}
                 <group name='backpack-items'>
-                    {items?.length && items.map(item => 
+                    {items?.length 
+                    ? items.map(item => 
                         <BackpackItem 
                             onClick={onClick}
                             onPointerMove={onPointerMove}
@@ -515,12 +513,14 @@ const Backpack = memo(function Backpack() {
                             item={item} 
                             mounted={mounted}
                         />) 
+                    : <></>
                     }
                 </group>
 
                 {/* Equipment Items */}
                 <group name='equipment-items'>
-                    {equipmentItems?.length && equipmentItems.map(item => 
+                    {equipmentItems?.length 
+                    ? equipmentItems.map(item => 
                         <EquipmentItem
                             onClick={onClick}
                             onPointerMove={onPointerMove}
@@ -528,7 +528,8 @@ const Backpack = memo(function Backpack() {
                             key={item.itemHash} 
                             item={item} 
                             mounted={mounted}
-                        />) 
+                        />)
+                    : <></>
                     }
                 </group>
             

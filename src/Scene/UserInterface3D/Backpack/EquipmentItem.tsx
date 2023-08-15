@@ -85,10 +85,9 @@ const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter
                 onPointerEnter={onPointerEnter}
                 onPointerLeave={onPointerLeave}
             />
-            <ItemDescription item={item} type="equipment" />
+            {/* <ItemDescription item={item} type="equipment" /> */}
             <SlotModel position={[0, 0, 100]} ref={itemRef} scale={[itemScale, itemScale, itemScale]} item={item} />
         </Plane>
-
     )
 })
 

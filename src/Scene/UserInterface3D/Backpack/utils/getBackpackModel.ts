@@ -4,6 +4,11 @@ import { GLTF } from "three/examples/jsm/loaders/GLTFLoader"
 export const getBackpackModel = (name: string): GLTF => {
     const models = useGLTFLoaderStore.getState().models.current
 
+    // Gold
+    if (is('gold')) {
+        return models['gold']
+    }
+
     // Wings
     if (is('wings')) {
         return models['inventory_simple_wings']

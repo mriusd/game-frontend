@@ -29,11 +29,11 @@ const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter,
     )
 
     // Positioning
-    const itemPlaneWidth = useMemo(() => cellSize * item.itemAttributes.itemWidth, [item, mounted])
-    const itemPlaneHeight = useMemo(() => cellSize * item.itemAttributes.itemHeight, [item, mounted])
+    const itemPlaneWidth = useMemo(() => cellSize * item.itemAttributes.itemParameters.itemWidth, [item, mounted])
+    const itemPlaneHeight = useMemo(() => cellSize * item.itemAttributes.itemParameters.itemHeight, [item, mounted])
 
     const itemScale = useMemo(() => {
-        return cellSize * .8 * Math.max(item.itemAttributes.itemWidth, item.itemAttributes.itemHeight)
+        return cellSize * .8 * Math.max(item.itemAttributes.itemParameters.itemWidth, item.itemAttributes.itemParameters.itemHeight)
     }, [cellSize, item, mounted])
 
     const itemPlanePosition = useMemo(() => {
@@ -51,8 +51,8 @@ const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter,
         let z = slotCell.position.z + slotRow.position.z + slotColumn.position.z + slotWrapper.position.z
 
         // Take into the account size of the element
-        x += (item.itemAttributes.itemWidth - 1) * cellSize / 2
-        y -= (item.itemAttributes.itemHeight - 1) * cellSize / 2
+        x += (item.itemAttributes.itemParameters.itemWidth - 1) * cellSize / 2
+        y -= (item.itemAttributes.itemParameters.itemHeight - 1) * cellSize / 2
 
         return new THREE.Vector3(x, y, z)
     }, [ item, slots.current, mounted ])
@@ -87,7 +87,6 @@ const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter,
             <ItemDescription item={item} type="backpack" />
             <SlotModel position={[0, 0, 100]} ref={itemRef} scale={[itemScale, itemScale, itemScale]} item={item} />
         </Plane>
-
     )
 })
 
