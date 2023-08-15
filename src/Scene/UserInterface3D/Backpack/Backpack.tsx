@@ -427,9 +427,6 @@ const Backpack = memo(function Backpack() {
 
     return (
         <group visible={isOpened}>
-            {/* <Plane name='background-plane' position={[0,0,-10]} args={[1920, 1080, 1]}>
-                <meshBasicMaterial color={'black'} transparent={true} opacity={.3} />
-            </Plane> */}
 
             <group ref={backpackRef} /*position={Position is changing based on viewport size}*/>
 
@@ -506,7 +503,8 @@ const Backpack = memo(function Backpack() {
 
                 {/* Backpack Items */}
                 <group name='backpack-items'>
-                    {items?.length && items.map(item => 
+                    {items?.length 
+                    ? items.map(item => 
                         <BackpackItem 
                             onClick={onClick}
                             onPointerMove={onPointerMove}
@@ -515,12 +513,14 @@ const Backpack = memo(function Backpack() {
                             item={item} 
                             mounted={mounted}
                         />) 
+                    : <></>
                     }
                 </group>
 
                 {/* Equipment Items */}
                 <group name='equipment-items'>
-                    {equipmentItems?.length && equipmentItems.map(item => 
+                    {equipmentItems?.length 
+                    ? equipmentItems.map(item => 
                         <EquipmentItem
                             onClick={onClick}
                             onPointerMove={onPointerMove}
@@ -528,7 +528,8 @@ const Backpack = memo(function Backpack() {
                             key={item.itemHash} 
                             item={item} 
                             mounted={mounted}
-                        />) 
+                        />)
+                    : <></>
                     }
                 </group>
             

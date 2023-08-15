@@ -63,33 +63,34 @@ const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter
         return <></>
     }
 
-    return (
-        <Plane 
-            name='equipment-item'
-            ref={itemPlaneRef}
-            position={itemPlanePosition} 
-            userData={{ 
-                currentPosition: itemPlanePosition, 
-                item: item,
-                type: 'equipment'
-            }}
-            args={[itemPlaneWidth, itemPlaneHeight]}
-        >
-            <meshBasicMaterial color={'#FFC700'} transparent={true} opacity={.1} />
-            <Plane 
-                name='equipment-item-events' 
-                args={[itemPlaneWidth, itemPlaneHeight]} 
-                visible={false} 
-                onClick={onClick}
-                onPointerMove={onPointerMove}
-                onPointerEnter={onPointerEnter}
-                onPointerLeave={onPointerLeave}
-            />
-            <ItemDescription item={item} type="equipment" />
-            <SlotModel position={[0, 0, 100]} ref={itemRef} scale={[itemScale, itemScale, itemScale]} item={item} />
-        </Plane>
+    return <></>
 
-    )
+    // return (
+    //     <Plane 
+    //         name='equipment-item'
+    //         ref={itemPlaneRef}
+    //         position={itemPlanePosition} 
+    //         userData={{ 
+    //             currentPosition: itemPlanePosition, 
+    //             item: item,
+    //             type: 'equipment'
+    //         }}
+    //         args={[itemPlaneWidth, itemPlaneHeight]}
+    //     >
+    //         <meshBasicMaterial color={'#FFC700'} transparent={true} opacity={.1} />
+    //         <Plane 
+    //             name='equipment-item-events' 
+    //             args={[itemPlaneWidth, itemPlaneHeight]} 
+    //             visible={false} 
+    //             onClick={onClick}
+    //             onPointerMove={onPointerMove}
+    //             onPointerEnter={onPointerEnter}
+    //             onPointerLeave={onPointerLeave}
+    //         />
+    //         {/* <ItemDescription item={item} type="equipment" /> */}
+    //         <SlotModel position={[0, 0, 100]} ref={itemRef} scale={[itemScale, itemScale, itemScale]} item={item} />
+    //     </Plane>
+    // )
 })
 
 export default EquipmentItem
