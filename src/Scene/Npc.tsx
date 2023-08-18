@@ -28,8 +28,9 @@ const Npc = memo(function Npc({ npc }: Props) {
     const nameColor = useRef<0xFFFFFF | 0xFF3300>(0xFFFFFF)
 
     // const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.npc, [])
-    const gltf = useGLTFLoaderStore(state => state.models.current.npc)
+    const gltf = useGLTFLoaderStore(state => state.models.current.npc_bull)
     const model = useMemo(() => {
+        console.log('npc gltf', gltf)
         if (!gltf?.scene) return undefined
         return SkeletonUtils.clone(gltf.scene) 
     }, [gltf])
@@ -50,7 +51,7 @@ const Npc = memo(function Npc({ npc }: Props) {
         if (!mixer || isTurned.current) { return }
         isTurned.current = true
         setTimeout(() => {
-            actions?.jump?.setDuration(1).play()
+            actions?.stand?.setDuration(1).play()
         }, Math.random() * 1000)
     }, [ mixer, actions, model ])
 
@@ -186,8 +187,8 @@ const Npc = memo(function Npc({ npc }: Props) {
                 onPointerDown={handleLeftClick}
                 ref={animationTarget}
                 object={model}
-                scale={.006}
-                position={[currentWorldPosition.x, .4, currentWorldPosition.z]}
+                scale={.3}
+                position={[currentWorldPosition.x, 0, currentWorldPosition.z]}
                 rotation={[0, direction, 0]}
             >
             </primitive>
