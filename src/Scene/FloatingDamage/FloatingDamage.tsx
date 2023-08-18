@@ -6,6 +6,7 @@ import { useSceneContext } from "store/SceneContext"
 import type { ObjectData } from "interfaces/sceneData.interface"
 import { getDamageColor } from "Scene/utils/getDamageColor"
 import { getDamageValue } from "Scene/utils/getDamageValue"
+import { useNpc } from "Scene/Npc/useNpc"
 
 interface TriggerDamage {
     label: string
@@ -18,7 +19,9 @@ interface TriggerDamage {
 
 const FloatingDamage = memo(function FloatingDamage() {
     const { events, removeEvent } = useEventCloud()
-    const { NpcList, getSceneObject, allPlayerList } = useSceneContext()
+    const { getSceneObject, allPlayerList } = useSceneContext()
+
+    const npcList = useNpc(state => state.npcList)
 
     const triggerDamage = useRef<TriggerDamage[]>([])
     const removeTriggerDamage = (label: string) => {
@@ -47,7 +50,7 @@ const FloatingDamage = memo(function FloatingDamage() {
         // console.log('damageEvents', damageEvents)
         if (damageEvents.length > 0) {
             damageEvents.forEach((damageEvent: Damage) => {
-                const npc = NpcList.current.find(npc => npc?.id === String(damageEvent.npcId))
+                const npc = npcList.find(npc => npc?.id === String(damageEvent.npcId))
                 const fighter = allPlayerList.find(player => player?.id === String(damageEvent.npcId))
                 const object = npc || fighter
 

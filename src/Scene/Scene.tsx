@@ -13,7 +13,7 @@ import { CAMERA_POSITION } from "./config"
 import Light from "./Light"
 import Chunks from "./Chunks"
 import Fighter from "./Fighter/Fighter"
-import Npc from "./Npc"
+import Npc from "./Npc/Npc"
 import Controller from "./Controller"
 import DroppedItem from "./DroppedItem"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"
@@ -21,6 +21,7 @@ import Decor from "./Decor"
 import UserInterface3D from './UserInterface3D/UserInterface3D'
 import GLTFLoader from './GLTFLoader/GLTFLoader'
 import OtherFighter from './Fighter/OtherFighter'
+import NpcList from './Npc/NpcList'
 
 import { useUiStore } from 'store/uiStore'
 
@@ -41,6 +42,7 @@ const Scene = memo(function Scene() {
         if (eventsNode.current) { subscribe(eventsNode.current) }
         return () => unsubscribe()
     }, [eventsNode.current])
+    
 
     return (
         <div id="scene" tabIndex={0} ref={eventsNode} className={styles.scene}>
@@ -65,7 +67,7 @@ const Scene = memo(function Scene() {
 
                 <Suspense fallback={null}>
                     <GLTFLoader>
-                        {store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />)}
+                        <NpcList/>
                         {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
                         {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)}
                         {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)}

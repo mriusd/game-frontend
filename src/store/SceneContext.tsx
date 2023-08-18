@@ -3,7 +3,6 @@ import { useEventCloud } from "store/EventCloudContext"
 import type { Fighter } from "interfaces/fighter.interface"
 import type { Coordinate } from "interfaces/coordinate.interface"
 import type { ISceneContext } from "interfaces/sceneContext.interface"
-import type { OccupiedCoordinate } from "interfaces/occupied.interface"
 import type { ItemDroppedEvent } from "interfaces/item.interface"
 import type { Skill } from "interfaces/skill.interface"
 import { Group, Mesh } from "three"
@@ -26,16 +25,10 @@ export const useSceneContext = (): ISceneContext => {
 interface Props { children: ReactNode | ReactNode[] }
 const SceneContextProvider = ({ children }: Props) => {
     const {
-        addDamageEvent,
         fighter,
-        npcList,
         droppedItems,
-        money,
-        equipment,
         moveFighter,
-        target: eventTarget,
         setTarget: setEventTarget,
-        refreshFighterItems,
         mapObjects,
         playerList,
         updateFighterDirection
@@ -58,26 +51,6 @@ const SceneContextProvider = ({ children }: Props) => {
     const [focusedMatrixCoordinate, setFocusedMatrixCoordinate] = useState<Coordinate | null>(null)
     const [focusedWorldCoordinate, setFocusedWorldCoordinate] = useState<Coordinate | null>(null)
     const [pointerWorldCoordinate, setPointerWorldCoordinate] = useState<Coordinate | null>(null)
-
-    const [occupiedCoords, _setOccupedCoords] = useState<OccupiedCoordinate[]>([])
-    function setOccupedCoords(item: OccupiedCoordinate, action: 'add' | 'remove') {
-        if (!item.coordinates || !item.id) { return console.warn("[SceneContextProvider] setOccupedCoords: invalid item") }
-        _setOccupedCoords((state: OccupiedCoordinate[]) => {
-            const newState = [...state]
-            const itemIndex = newState.findIndex((occupiedCoord: OccupiedCoordinate) => occupiedCoord.id === item.id)
-            
-            if (action === 'remove') {
-                if (itemIndex === -1) { return newState }
-                return [...newState.slice(0, itemIndex), ...newState.slice(itemIndex + 1)]
-            }
-            
-            if (itemIndex === -1) {
-                newState.push(item)
-                return newState
-            }
-            return [...newState.slice(0, itemIndex), ...newState.slice(itemIndex + 1), item]
-        })
-    }
 
     const [ target, _setTarget ] = useState<{ target: Fighter, skill: Skill } | null>(null)
     const setTarget = (target: Fighter | null, skill: Skill | null) => {
@@ -159,33 +132,6 @@ const SceneContextProvider = ({ children }: Props) => {
         VisibleDecor.current = mapObjects
     }, [mapObjects])
 
-    // Detect npc updates and add them to NpcList
-    useEffect(() => {
-        if (!npcList?.length) { return }
-        // console.log("[SceneContextProvider] NPC list updated: ", npcList)
-        npcList.forEach((serverNpc: Fighter) => {
-            // const localeNpcIndex = NpcList.current.findIndex(localeNpc => localeNpc.id === serverNpc.id)
-            // if (localeNpcIndex !== -1) {
-            //     NpcList.current[localeNpcIndex] = { ...serverNpc }
-            //     return
-            // }
-            // NpcList.current.push(serverNpc)
-            if (serverNpc.isDead) {
-                setOccupedCoords({
-                    id: serverNpc.id,
-                    coordinates: serverNpc.coordinates
-                }, 'remove')
-                return
-            }
-            setOccupedCoords({
-                id: serverNpc.id,
-                coordinates: serverNpc.coordinates
-            }, 'add')
-        })
-
-        NpcList.current = [...npcList]
-    }, [npcList]);
-
     // Dropped Items
     useEffect(() => {
         console.log('Dropped Items updated,', Object.values(droppedItems))
@@ -205,7 +151,6 @@ const SceneContextProvider = ({ children }: Props) => {
         chunkSize,
         chunksPerAxis,
 
-        npcList,
         setSceneObject, getSceneObject,
         NpcList,
         fighter,
@@ -226,8 +171,6 @@ const SceneContextProvider = ({ children }: Props) => {
             focusedWorldCoordinate, setFocusedWorldCoordinate,
             pointerWorldCoordinate, setPointerWorldCoordinate
         },
-
-        occupiedCoords, setOccupedCoords,
 
         DroppedItems,
         VisibleDecor,

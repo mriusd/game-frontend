@@ -15,6 +15,8 @@ import { common } from 'ethereumjs-util';
 import { useEventStore } from 'store/EventStore';
 
 
+import { useNpc } from 'Scene/Npc/useNpc';
+
 
 
 const EventCloudContext = createContext({});
@@ -33,7 +35,6 @@ export const EventCloudProvider = ({ children }) => {
   const [account, setAccount]           = useState<string>('');
   const [fighter, setFighter]           = useState<Fighter | null>(null);
   const [droppedItems, setDroppedItems] = useState<Record<common.Hash, ItemDroppedEvent>>({});
-  const [npcList, setNpcList]           = useState<Fighter[]>([]);
   const [playerList, setPlayerList]     = useState<Fighter[]>([]);
   const [equipment, setEquipment]       = useState<Record<number, InventorySlot | null>>(null);
   const [backpack, setBackpack]         = useState<Backpack | null>(null);
@@ -46,6 +47,9 @@ export const EventCloudProvider = ({ children }) => {
   const [selectedSkill, setSelectedSkill] = useState(4);
 
   const [town, setTown] = useState("lorencia")
+
+
+  const setNpcList = useNpc(state => state.setNpcList)
 
   // Just for test
   const init = useEventStore(state => state.init);
@@ -466,7 +470,6 @@ export const EventCloudProvider = ({ children }) => {
         setEvents, 
         removeEvent, 
         fighter, 
-        npcList, 
         droppedItems, 
         money, 
         equipment, 

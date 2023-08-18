@@ -21,6 +21,8 @@ import { getAttackAction, getRunAction, getStandAction } from "./utils/getAction
 import TwistingSlash from "./Skills/TwistingSlash/TwistingSlash"
 import { useControls } from "leva"
 import LastMessage from "./components/LastMessage"
+import { useCore } from "store/useCore"
+import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
 
 const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
@@ -50,9 +52,11 @@ const Fighter = memo(function Fighter() {
             focusedMatrixCoordinate,
             direction,
         },
-
-        occupiedCoords
     } = useSceneContext()
+
+    const occupiedCoords = useCore(state => state.occupiedCoords)
+
+
     const [isSpawned, setIsSpawned] = useState<boolean>(false)
     const [serverMatrixCoordinate, setServerMatrixCoordinate] = useState<Coordinate | null>(null)
     const [targetMatrixCoordinate, setTargetMatrixCoordinate] = useState<Coordinate | null>(null)

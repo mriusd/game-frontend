@@ -8,7 +8,7 @@ import { useSceneContext } from 'store/SceneContext'
 import { matrixCoordToWorld } from 'Scene/utils/matrixCoordToWorld'
 
 const Minimap = ({ ...props }) => {
-    const { worldSize, chunkSize, currentWorldCoordinate, NpcList } = useSceneContext()
+    const { worldSize, chunkSize, currentWorldCoordinate } = useSceneContext()
 
     const textures = useTexture({ map: '/worlds/alex_ground/minimap/minimap.png' })
     const planeSize = useMemo(() => new THREE.Vector2(100, 100), [])

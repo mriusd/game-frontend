@@ -2,6 +2,6 @@ export const npc = [
     // Bull
     {
         name: 'npc_bull',
-        url: 'models/npc/bull/npc_bull.gltf'
+        url: 'models/npc/bull/bull.gltf'
     },
 ]

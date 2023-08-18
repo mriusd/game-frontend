@@ -13,6 +13,8 @@ import { isOccupiedCoordinate } from "./utils/isOccupiedCoordinate"
 import { useBackpackStore } from "store/backpackStore"
 import { angleToVector } from "./utils/angleToVector"
 
+import { useCore } from "store/useCore"
+
 const ANGLE_STEP = Math.PI / 4 // 8 directions
 const ANGLE_RANGE = Math.PI / 8 // Set a range of angles to rotate towards
 const MIN_ANGLE = Math.PI / 6 // Min angle on which detect rotation
@@ -43,8 +45,10 @@ const Controller = memo(function Controller({ world }: Props) {
             setPointerWorldCoordinate,
             pointerWorldCoordinate,
         },
-        occupiedCoords
     } = useSceneContext()
+
+    const occupiedCoords = useCore(state => state.occupiedCoords)
+
     const raycaster = useRef(new THREE.Raycaster())
     const pointer = useThree(state => state.pointer)
     const camera = useThree(state => state.camera)
