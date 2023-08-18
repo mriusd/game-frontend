@@ -130,11 +130,11 @@ const DroppedItem = memo(function DroppedItem({ item }: Props) {
         }
     })
 
+    // Drop animation
     const { posX, posY, posZ } = useSpring({
-        posX: position ? position.x : currentWorldCoordinate.x,
-        posY: position ? position.y : 2,
-        posZ: position ? position.z : currentWorldCoordinate.z,
-        // config: { tension: 200, friction: 50 },
+        posX: position.x ? position.x : matrixCoordToWorld(worldSize.current, item.coords).x,
+        posY: position.y ? position.y : 2.5,
+        posZ: position.z ? position.z : matrixCoordToWorld(worldSize.current, item.coords).z,
     })
 
     if (!currentWorldCoordinate) {
