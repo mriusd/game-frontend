@@ -12,6 +12,10 @@ export interface CoreInterface {
 
     matrixCoordToWorld: (coordinate: Coordinate) => Coordinate
     worldCoordToMatrix: (coordinate: Coordinate) => Coordinate
+
+    // For Develop
+    devMode: boolean
+    setDevMode: (value: boolean) => void
 }
 
 export const useCore = create<CoreInterface>((set, get) => ({
@@ -52,6 +56,9 @@ export const useCore = create<CoreInterface>((set, get) => ({
             x: Math.min(Math.max(Math.round(coordinate.x + sqsize), 0), worldSize-1),
             z: Math.min(Math.max(Math.round(coordinate.z + sqsize), 0), worldSize-1)
         }
-    }
+    },
+
+    devMode: true,
+    setDevMode: (value) => set({ devMode: value }),
     
 }))

@@ -6,7 +6,7 @@ import { Object3D } from "three"
 import { Canvas } from "@react-three/fiber"
 import { useRef, memo, Suspense, useEffect } from "react"
 import { useSceneContext } from "store/SceneContext"
-import { Loader, Stats } from "@react-three/drei"
+import { Loader, Stats, OrbitControls } from "@react-three/drei"
 
 import { CAMERA_POSITION } from "./config"
 
@@ -17,7 +17,8 @@ import Npc from "./Npc/Npc"
 import Controller from "./Controller"
 import DroppedItem from "./DroppedItem"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"
-import Decor from "./Decor"
+import Decor from "./Decor/Decor"
+import DecorTest from './Decor/DecorTest'
 import UserInterface3D from './UserInterface3D/UserInterface3D'
 import GLTFLoader from './GLTFLoader/GLTFLoader'
 import OtherFighter from './Fighter/OtherFighter'
@@ -32,10 +33,16 @@ import { shallow } from 'zustand/shallow'
 import UserInterface2D from './UserInterface2D/UserInterface2D'
 import { useCommandLine } from './UserInterface2D/CommandLine/useCommandLine'
 
+import { useCore } from 'store/useCore'
+
+import { AdaptiveDpr } from '@react-three/drei'
+import { useControls } from 'leva'
+
 const Scene = memo(function Scene() {
     const store = useSceneContext()
     const worldRef = useRef<Object3D | null>(null)
     const eventsNode = useUiStore(state => state.eventsNode)
+    const [devMode, setDevMode] = useCore(state => [state.devMode, state.setDevMode], shallow)
 
     const [subscribe, unsubscribe] = useCommandLine(state => [state.subscribeCommandLine, state.unsubscribeCommandLine], shallow)
     useEffect(() => {
@@ -51,7 +58,7 @@ const Scene = memo(function Scene() {
                 camera={{
                     position: new THREE.Vector3(...CAMERA_POSITION),
                     near: 0.1,
-                    far: 60,
+                    far: devMode ? 1000 : 60,
                     fov: 45,
                 }}
                 gl={{
@@ -61,25 +68,27 @@ const Scene = memo(function Scene() {
                 }}
             >
                 <color attach="background" args={[0x000000]} />
-                <fog attach="fog" args={['black', 5, 25]}></fog>
-                <Stats className='stats' />
-                {/* <Environment preset='forest' /> */}
+                { !devMode ? <fog attach="fog" args={['black', 5, 25]}></fog> : <></> }
+                { devMode ? <OrbitControls/> : <></> }
 
+                <Stats className='stats' />
                 <Suspense fallback={null}>
                     <GLTFLoader>
                         <NpcList/>
                         {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
-                        {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)}
+                        {/* {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)} */}
+                        <DecorTest/>
                         {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)}
                         <Fighter />
                         <Chunks ref={worldRef} />
-                        <Controller world={worldRef} />
+                        { !devMode ? <Controller world={worldRef} /> : <></> }
                         <FloatingDamage />
                         <UserInterface3D />
                         <Light />
                     </GLTFLoader>
                 </Suspense>
                 {/* <Postprocessing/> */}
+                {/* <AdaptiveDpr/> */}
             </Canvas>
             <UserInterface2D/>
             <Loader/>

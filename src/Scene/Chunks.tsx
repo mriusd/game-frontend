@@ -6,14 +6,20 @@ import { memo } from "react"
 import { Coordinate } from "interfaces/coordinate.interface"
 // import { makeNoise2D } from "open-simplex-noise"
 import { useTexture } from "@react-three/drei"
-import { clamp } from "three/src/math/MathUtils"
+
+import { useCore } from "store/useCore"
+import { shallow } from "zustand/shallow"
+
+import { Plane } from "@react-three/drei"
 
 const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
-    const { chunkSize, chunksPerAxis, worldSize, currentWorldCoordinate } = useSceneContext()
+    const { currentWorldCoordinate } = useSceneContext()
+
+    const [ worldSize, chunkSize, chunksPerAxis ] = useCore(state => [state.worldSize, state.chunkSize, state.chunksPerAxis], shallow)
 
     const segmentsSize = 1
-    const segmentsX = chunkSize.current
-    const segmentsY = chunkSize.current
+    const segmentsX = chunkSize
+    const segmentsY = chunkSize
     const sizeX = segmentsSize * segmentsX
     const sizeY = segmentsSize * segmentsY
     const geometry = useMemo(() => new THREE.PlaneGeometry(sizeX, sizeY, segmentsX, segmentsY), [])
@@ -23,11 +29,18 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
     const planeTextureUrlBuffer = useRef<{ [key: number]: {} }>({})
     const gridHelper = useRef<THREE.GridHelper | null>(null)
 
+
+    // For Dev
+    const devMode = useCore(state => state.devMode)
+    const mapPlaceholder = useTexture({ map: '/worlds/alex_ground/minimap/minimap.png' })
+
     useEffect(() => {
         if (!currentWorldCoordinate) { return }
         updatePlanePositions(currentWorldCoordinate)
         // Show grid for testing in chunk   
-        // updateGridHelperPosition(currentWorldCoordinate)
+        if (devMode) {
+            updateGridHelperPosition(currentWorldCoordinate)
+        }
     }, [currentWorldCoordinate, planeBuffer.current])
 
     function updatePlanePositions(characterPosition: Coordinate) {
@@ -37,11 +50,11 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
             const plane = planeBuffer.current[i]
 
             // Calculate the x and y offsets for each plane
-            const xOffset = (i % 2) * chunkSize.current
-            const yOffset = Math.floor(i / 2) * chunkSize.current
+            const xOffset = (i % 2) * chunkSize
+            const yOffset = Math.floor(i / 2) * chunkSize
 
-            const x = (xIndex * chunkSize.current) + xOffset;
-            const z = (zIndex * chunkSize.current) + yOffset;
+            const x = (xIndex * chunkSize) + xOffset;
+            const z = (zIndex * chunkSize) + yOffset;
             if (plane.position.x === x && plane.position.z === z && planeTextureUrlBuffer.current[i]) { return }
             console.log('[Chunks]: chunks recalculated')
 
@@ -49,12 +62,12 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
             // TODO: Remove Clamp, FIXME: fix error index chunk calculation
 
             // CALC THIS CORRECTLY
-            const textureX = zIndex + 1 + yOffset/chunkSize.current
-            const textureZ = xIndex + 1 + xOffset/chunkSize.current
+            const textureX = zIndex + 1 + yOffset/chunkSize
+            const textureZ = xIndex + 1 + xOffset/chunkSize
             
             // Set the plane position based on the current chunk index and offsets
             // console.log(textureX, textureZ)
-            if (textureX >= 0 && textureZ >= 0 && textureX < chunksPerAxis.current+1 && textureZ < chunksPerAxis.current+1) {
+            if (textureX >= 0 && textureZ >= 0 && textureX < chunksPerAxis+1 && textureZ < chunksPerAxis+1) {
                 planeTextureUrlBuffer.current[i] =  { 
                     map: `worlds/alex_ground/map/${textureX}_${textureZ}.png`,
                     normalMap: `worlds/alex_ground/normalMap/${textureX}_${textureZ}.png`,
@@ -67,14 +80,14 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
         }
     }
     function getChunkIndices(position: Coordinate) {
-        const xIndex = Math.floor(position.x / chunkSize.current)
-        const zIndex = Math.floor(position.z / chunkSize.current)
+        const xIndex = Math.floor(position.x / chunkSize)
+        const zIndex = Math.floor(position.z / chunkSize)
         return { xIndex, zIndex }
     }
     // Different cuz we put the plain with offset
     function getChunkIndicesForHelper(position: Coordinate) {
-        const xIndex = Math.floor((position.x + chunkSize.current / 2) / chunkSize.current)
-        const zIndex = Math.floor((position.z + chunkSize.current / 2) / chunkSize.current)
+        const xIndex = Math.floor((position.x + chunkSize / 2) / chunkSize)
+        const zIndex = Math.floor((position.z + chunkSize / 2) / chunkSize)
         return { xIndex, zIndex }
     }
     function updateGridHelperPosition(characterPosition: Coordinate) {
@@ -83,18 +96,18 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
 
         // Set the GridHelper position based on the current chunk index
         gridHelper.current.position.set(
-            xIndex * chunkSize.current,
+            xIndex * chunkSize,
             0.001,
-            zIndex * chunkSize.current
+            zIndex * chunkSize
         );
     }
 
-    if (!chunkSize.current) {
+    if (!chunkSize) {
         return <></>
     }
     return (
         <>
-            <group name="chunks" ref={ref}>
+            <group name="chunks" ref={ref} rotation={[0, 0, 0]}>
                 {planeBufferSize.current.map((chunk, i) => (
                     <SwapChunk
                         key={i}
@@ -106,7 +119,14 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
                     />
                 ))}
             </group>
-            {/* <gridHelper ref={gridHelper} args={[sizeX, sizeY, 0x4B4B4B, 0x4B4B4B]} rotation={[0, 0, 0]} /> */}
+            { devMode ? (
+                <group>
+                    <Plane args={[worldSize+chunkSize, worldSize+chunkSize]} rotation={[Math.PI / -2, 0, 0]}>
+                        <meshBasicMaterial color={'white'} {...mapPlaceholder} depthWrite={false} />
+                    </Plane>
+                    <gridHelper ref={gridHelper} args={[sizeX, sizeY, 'red', 'red']} rotation={[0, 0, 0]} />
+                </group>
+            ): <></> }
         </>
     )
 }))

@@ -91,7 +91,7 @@ const Npc = memo(function Npc({ npc }: Props) {
     //     npcRef.current.position.x = currentWorldPosition.current.x
     //     npcRef.current.position.z = currentWorldPosition.current.z
     // }, [currentWorldPosition.current])
-    console.log(npcRef.current)
+    // console.log(npcRef.current)
 
     // Save ref to object to store & rm on unmount
     // useEffect(() => {
@@ -124,19 +124,19 @@ const Npc = memo(function Npc({ npc }: Props) {
     // }
 
     return (
-        // <group name='npc'>
-        //     {/* <Name value={npc?.name} target={npcRef} offset={.05} color={nameColor.current} /> */}
-        //     {/* <HealthBar object={npc} target={npcRef} offset={.45} /> */}
-        //     <primitive 
-        //         onPointerMove={handlePointerEnter}
-        //         onPointerLeave={handlePointerLeave}
-        //         onPointerDown={handleLeftClick}
-        //         ref={npcRef}
-        //         object={model}
-        //     >
-        //     </primitive>
-        // </group>
-        <Box args={[1, 1, 1]} ref={npcRef} />
+        <group name='npc'>
+            {/* <Name value={npc?.name} target={npcRef} offset={.05} color={nameColor.current} /> */}
+            {/* <HealthBar object={npc} target={npcRef} offset={.45} /> */}
+            <primitive 
+                onPointerMove={handlePointerEnter}
+                onPointerLeave={handlePointerLeave}
+                onPointerDown={handleLeftClick}
+                ref={npcRef}
+                object={model}
+            >
+            </primitive>
+        </group>
+        // <Box args={[1, 1, 1]} ref={npcRef} />
     )
 })
 
