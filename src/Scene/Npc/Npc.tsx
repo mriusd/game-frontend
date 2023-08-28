@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef, useMemo, memo } from "react"
+import * as THREE from 'three'
+import { useEffect, useState, useRef, useMemo, memo, useCallback } from "react"
 import Tween from "../utils/tween/tween"
 import { Coordinate } from "interfaces/coordinate.interface"
 import { useSceneContext } from "store/SceneContext"
@@ -12,106 +13,93 @@ import { getShaderedNpc } from "./utils/getShaderedNpc"
 import { shallow } from "zustand/shallow"
 import { useCore } from "store/useCore"
 import { isEqualCoord } from "./utils/isEqualCoord"
+import { useActions } from './hooks/useActions'
+import { useSkillEvent } from './hooks/useSkillEvent'
+import { useUiStore } from 'store/uiStore'
 
 interface Props { npc: Fighter }
 const Npc = memo(function Npc({ npc }: Props) {
+    // Used to set spawn coord without tweening from x:0,z:0
+    const spawned = useRef<boolean>(false)
     // const { html, setTarget, fighter, setHoveredItems, setSceneObject } = useSceneContext()
+    const setCursor = useUiStore(state => state.setCursor)
+
     const matrixCoordToWorld = useCore(state => state.matrixCoordToWorld)
-
-
-    const currentWorldPosition = useRef<Coordinate | null>(null)
-    const targetWorldPosition = useRef<Coordinate | null>(null)
-    const isMoving = useRef<boolean>(false)
-
 
     const npcRef = useRef<THREE.Mesh | null>(null)
     const nameColor = useRef<0xFFFFFF | 0xFF3300>(0xFFFFFF)
-    const { model, animations } = useMemo(() => getShaderedNpc(npc), [npc])
-    const { mixer, actions } = useAnimations(animations, npcRef)
+    const { model, animations } = useMemo(() => getShaderedNpc(npc), [])
+
+    const isMoving = useRef<boolean>(false)
+    const { setAction, action } = useActions(animations, npcRef)
 
     // Fill changed npc properties
     useEffect(() => {
         if (!npcRef.current) { return }
         // console.log(`[NPC]: npc with id '${npc?.id}' updated`, npc)
         if (npc?.isDead) {
-
             // Remove hover on delete
+            setAction('die')
             handlePointerLeave()
             return 
         }
         if (npc?.coordinates) {
-            targetWorldPosition.current = matrixCoordToWorld(npc?.coordinates)
-            if (!currentWorldPosition.current) {
-                currentWorldPosition.current = targetWorldPosition.current
-            }
+            if (!spawned.current) return void (spawned.current = true), setNpcPosition(matrixCoordToWorld(npc?.coordinates), npcRef.current), setAction('stand') 
+            moveNpc(matrixCoordToWorld(npc?.coordinates), npcRef.current)
         }
         if (npc?.direction) {
             npcRef.current.rotation.y = Math.atan2(npc.direction.dx, npc.direction.dz)
         }
     }, [ npc ])
 
-    // Move npc
-    useEffect(() => {
-        if (!npcRef.current) { return }
-        if (!targetWorldPosition.current || !currentWorldPosition.current) { return }
+    const moveNpc = useCallback((to: Coordinate, ref: THREE.Mesh) => {
         if (isMoving.current) { return }
-        // console.log('targetWorldPosition.current', currentWorldPosition.current, targetWorldPosition.current, npcRef.current.position)
 
-        const isEqual = isEqualCoord(currentWorldPosition.current, targetWorldPosition.current)
-        if (isEqual) { return }
+        if (isEqualCoord(ref.position, to)) { return }
 
-        // console.log('Not Equal')
-
-
+        // Used over here instead isMoving useEffect cuz it rms a little delay which looks weird
+        setAction('run')
+        // 
         isMoving.current = true
-        // const currentWorldPosition = { x: npcRef.current.position.x, z: npcRef.current.position.z }
-        // console.log('currentWorldPosition', currentWorldPosition, npcRef.current.position)
-        Tween.to(currentWorldPosition.current, targetWorldPosition.current,
+        const current = { x: ref.position.x, z: ref.position.z }
+        Tween.to(current, to,
             {
-                duration: getMoveDuration(npc.movementSpeed, currentWorldPosition.current, targetWorldPosition.current),
-                onChange(state: { value: Coordinate }) {
-                    if (!npcRef.current) { return }
-                    currentWorldPosition.current.x = state.value.x
-                    currentWorldPosition.current.z = state.value.z
-                    npcRef.current.position.x = state.value.x
-                    npcRef.current.position.z = state.value.z
-                },
-                onComplete() {
-                    if (!npcRef.current) { return }
-                    currentWorldPosition.current.x = targetWorldPosition.current.x
-                    currentWorldPosition.current.z = targetWorldPosition.current.z
-                    isMoving.current = false
-                },
+                duration: getMoveDuration(npc.movementSpeed, current, to),
+                onChange: (state: { value: Coordinate }) => void setNpcPosition(state.value, ref),
+                onComplete: () => void (isMoving.current = false),
             }
         )
-    }, [ targetWorldPosition.current ])
+    }, [])
+    const setNpcPosition = useCallback((to: Coordinate, ref: THREE.Mesh) => {
+        ref.position.x = to.x
+        ref.position.z = to.z
+    }, [])
 
-    // useEffect(() => {
-    //     if (!npcRef.current) { return }
-    //     npcRef.current.position.x = currentWorldPosition.current.x
-    //     npcRef.current.position.z = currentWorldPosition.current.z
-    // }, [currentWorldPosition.current])
-    // console.log(npcRef.current)
+    // Add delay to prevent animation from stop between different chained tweens
+    const timeout = useRef<any>(0)
+    useEffect(() => {
+        clearTimeout(timeout.current)
+        if (isMoving.current) return
+        timeout.current = setTimeout(() => void action.current === 'run' && setAction('stand'), 50)
+    }, [isMoving.current])
 
-    // Save ref to object to store & rm on unmount
-    // useEffect(() => {
-    //     if (npcRef.current) {
-    //         setSceneObject(npc.id, npcRef.current, 'add')
-    //     }
-    //     return () => {
-    //         setSceneObject(npc.id, npcRef.current, 'remove')
-    //     }
-    // }, [npcRef.current])
+
+    useSkillEvent(npc, (event, removeEvent) => {
+        setAction('attack')
+        removeEvent(event)
+    })
+
 
     // Set target & hover
     const handlePointerEnter = () => {
         nameColor.current = 0xFF3300
-        // setCursorPointer(html, true)
+        setCursor('pointer')
+        console.log('onMove')
         // setHoveredItems(npc, 'add')
     }
     const handlePointerLeave = () => {
         nameColor.current = 0xFFFFFF
-        // setCursorPointer(html, false)
+        setCursor('default')
         // setHoveredItems(npc, 'remove')
     }
     const handleLeftClick = () => {
@@ -124,19 +112,20 @@ const Npc = memo(function Npc({ npc }: Props) {
     // }
 
     return (
-        <group name='npc'>
-            {/* <Name value={npc?.name} target={npcRef} offset={.05} color={nameColor.current} /> */}
-            {/* <HealthBar object={npc} target={npcRef} offset={.45} /> */}
+        <group 
+            name='npc'
+            onPointerMove={handlePointerEnter}
+            onPointerLeave={handlePointerLeave}
+            onPointerDown={handleLeftClick}
+        >
+            <Name value={npc?.name} target={npcRef} offset={.65} color={nameColor.current} />
+            <HealthBar object={npc} target={npcRef} offset={1} />
             <primitive 
-                onPointerMove={handlePointerEnter}
-                onPointerLeave={handlePointerLeave}
-                onPointerDown={handleLeftClick}
                 ref={npcRef}
                 object={model}
             >
             </primitive>
         </group>
-        // <Box args={[1, 1, 1]} ref={npcRef} />
     )
 })
 

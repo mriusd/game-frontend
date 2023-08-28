@@ -31,6 +31,11 @@ export interface EventStoreInterface {
     unequipBackpackItem: (itemHash: string, position: { x: number; z: number }) => void
     equipBackpackItem: (itemHash: string, slot: number) => void
 
+
+    // Server Game Events
+    // events: Array<any>
+    // setEvents: (event: any) => void
+
 }
 
 export const useEventStore = create<EventStoreInterface>((set, get) => ({

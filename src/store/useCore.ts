@@ -58,7 +58,7 @@ export const useCore = create<CoreInterface>((set, get) => ({
         }
     },
 
-    devMode: true,
+    devMode: false,
     setDevMode: (value) => set({ devMode: value }),
     
 }))
