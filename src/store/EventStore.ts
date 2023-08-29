@@ -1,4 +1,5 @@
-import { create } from "zustand";
+import { createWithEqualityFn } from 'zustand/traditional'
+import { shallow } from 'zustand/shallow';
 import type { Inventory, InventorySlot } from "interfaces/inventory.interface";
 import { useBackpackStore } from "./backpackStore";
 import { Coordinate } from "interfaces/coordinate.interface";
@@ -10,6 +11,9 @@ import type { JsonValue } from "react-use-websocket/dist/lib/types";
 // For TEST, Then has to get from server
 import { equipment as equipmentSlots } from "interfaces/equipment.interface";
 import type { Equipment } from "interfaces/equipment.interface";
+
+import type { Fighter } from 'interfaces/fighter.interface';
+import type { Skill } from 'interfaces/skill.interface';
 
 // -------------------
 // I use this layer for EventCloud to prevent lots of react rerenders
@@ -36,9 +40,12 @@ export interface EventStoreInterface {
     // events: Array<any>
     // setEvents: (event: any) => void
 
+    // Attack
+    target: { target: Fighter, skill: Skill | null }
+    setTarget: (target: Fighter, skill: Skill) => void
 }
 
-export const useEventStore = create<EventStoreInterface>((set, get) => ({
+export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) => ({
     // Init
     sendJsonMessage: null,
     init: (sendJsonMessage) => {
@@ -187,5 +194,11 @@ export const useEventStore = create<EventStoreInterface>((set, get) => ({
             type: "unequip_backpack_item",
             data: { itemHash, position }
         });
-    }
-}))
+    },
+
+    // Attack
+    // @ts-expect-error
+    target: { target: { id: '0' }, skill: null },
+    setTarget: (target, skill) => set({ target: { target, skill } })
+
+}), shallow)

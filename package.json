@@ -33,7 +33,7 @@
     "web-vitals": "^2.1.0",
     "web3": "^1.9.0",
     "yarn": "^1.22.19",
-    "zustand": "^4.3.8"
+    "zustand": "^4.4.1"
   },
   "scripts": {
     "start": "react-scripts start",

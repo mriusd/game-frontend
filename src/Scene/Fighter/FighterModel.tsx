@@ -18,7 +18,7 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
     }, [baseModel])
 
     // Equipment we take on Fighter
-    // const equipment = useEventStore(state => state.equipment)
+    // const equipment = useEvents(state => state.equipment)
     const equipment = useMemo(() => fighter.equipment, [fighter])
 
     const modelRef = useRef()

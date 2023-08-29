@@ -1,26 +1,27 @@
 import * as THREE from 'three'
-import { useEffect, useState, useRef, useMemo, memo, useCallback } from "react"
+import { useEffect, useRef, useMemo, memo, useCallback } from "react"
 import Tween from "../utils/tween/tween"
 import { Coordinate } from "interfaces/coordinate.interface"
-import { useSceneContext } from "store/SceneContext"
-import { Box, useAnimations } from "@react-three/drei"
 import { getMoveDuration } from '../utils/getMoveDuration'
 import HealthBar from '../components/HealthBar'
 import type { Fighter } from 'interfaces/fighter.interface'
 import Name from '../components/Name'
-import { setCursorPointer } from '../utils/setCursorPointer'
 import { getShaderedNpc } from "./utils/getShaderedNpc"
-import { shallow } from "zustand/shallow"
 import { useCore } from "store/useCore"
 import { isEqualCoord } from "./utils/isEqualCoord"
 import { useActions } from './hooks/useActions'
 import { useSkillEvent } from './hooks/useSkillEvent'
 import { useUiStore } from 'store/uiStore'
+import HeatBox from 'Scene/components/HeatBox'
+import { useEvents } from 'store/EventStore'
+import { useFighter } from 'Scene/Fighter/useFighter'
 
 interface Props { npc: Fighter }
 const Npc = memo(function Npc({ npc }: Props) {
     // Used to set spawn coord without tweening from x:0,z:0
     const spawned = useRef<boolean>(false)
+    const setTarget = useEvents(state => state.setTarget)
+    const fighter = useFighter(state => state.fighter)
     // const { html, setTarget, fighter, setHoveredItems, setSceneObject } = useSceneContext()
     const setCursor = useUiStore(state => state.setCursor)
 
@@ -91,7 +92,8 @@ const Npc = memo(function Npc({ npc }: Props) {
 
 
     // Set target & hover
-    const handlePointerEnter = () => {
+    const handlePointerEnter = (e) => {
+        e.stopPropagation()
         nameColor.current = 0xFF3300
         setCursor('pointer')
         console.log('onMove')
@@ -103,7 +105,7 @@ const Npc = memo(function Npc({ npc }: Props) {
         // setHoveredItems(npc, 'remove')
     }
     const handleLeftClick = () => {
-        // setTarget(npc, fighter.skills[0])
+        setTarget(npc, fighter.skills[0])
     }
     // const handleRightClick = (event: ThreeEvent<PointerEvent>) => {
     //     // onContextMenu
@@ -124,6 +126,7 @@ const Npc = memo(function Npc({ npc }: Props) {
                 ref={npcRef}
                 object={model}
             >
+                <HeatBox target={npcRef} />
             </primitive>
         </group>
     )

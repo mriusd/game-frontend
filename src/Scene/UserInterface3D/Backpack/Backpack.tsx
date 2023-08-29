@@ -6,7 +6,7 @@ import { memo } from 'react'
 import BackpackItem from './BackpackItem'
 import { useBackpackStore } from 'store/backpackStore'
 import { shallow } from 'zustand/shallow'
-import { useEventStore } from 'store/EventStore'
+import { useEvents } from 'store/EventStore'
 import { ThreeEvent, useFrame, useThree } from '@react-three/fiber'
 import { useUiStore } from 'store/uiStore'
 import { getCoordInUISpace } from 'Scene/utils/getCoordInUiSpace'
@@ -41,13 +41,13 @@ const Backpack = memo(function Backpack() {
     // 
 
     // console.log('[CPU CHECK]: Rerender <Backpack>')
-    const [backpack, equipmentSlots, equipment] = useEventStore(state => [state.backpack, state.equipmentSlots, state.equipment], shallow)
+    const [backpack, equipmentSlots, equipment] = useEvents(state => [state.backpack, state.equipmentSlots, state.equipment], shallow)
     const [backpackWidth, backpackHeight, isOpened, slotsRef, equipmentSlotsRef, cellSize] = useBackpackStore(state => 
         [state.width, state.height, state.isOpened, state.slots, state.equipmentSlots, state.cellSize], 
         shallow
     )
     // TODO: change location for handler
-    const [updateBackpackItemPosition, dropBackpackItem, unequipBackpackItem, equipBackpackItem] = useEventStore(state => 
+    const [updateBackpackItemPosition, dropBackpackItem, unequipBackpackItem, equipBackpackItem] = useEvents(state => 
         [state.updateItemBackpackPosition, state.dropBackpackItem, state.unequipBackpackItem, state.equipBackpackItem], 
         shallow
     )
