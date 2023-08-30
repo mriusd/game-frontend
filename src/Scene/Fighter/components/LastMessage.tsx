@@ -6,6 +6,7 @@ import { Text } from "@react-three/drei"
 import { createBillboardMaterial } from "Scene/helpers/createBillboardMaterial"
 import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
 import { Fighter } from "interfaces/fighter.interface"
+import { fonts } from "Scene/core/fonts"
 
 interface Props {
     fighter: Fighter
@@ -32,6 +33,7 @@ const LastMessage = function LastMessage({ fighter, target, offset = .4, color =
     return (
         <Text 
             visible={!!fighter.lastChatMessage}
+            font={fonts["Roboto Slab"]}
             ref={textRef}
             color={color} 
             fillOpacity={1}

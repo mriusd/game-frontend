@@ -76,8 +76,8 @@ const Scene = memo(function Scene() {
                     <GLTFLoader>
                         <NpcList/>
                         {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
-                        {/* {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)} */}
-                        <DecorTest/>
+                        {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)}
+                        {/* <DecorTest/> */}
                         {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)}
                         <Fighter />
                         <Chunks ref={worldRef} />

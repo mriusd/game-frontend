@@ -16,6 +16,17 @@ export const getShaderedNpc = (item: Fighter, uniforms?: any) => {
         if (object.isMesh) {
             object.castShadow = true
             object.revieveShadow = true
+
+            // Detect Heatbox
+            if (object.name.toLowerCase() === 'heatbox') {
+                object.castShadow = false
+                object.revieveShadow = false
+                object.material.transparent = true
+                object.material.opacity = .3
+                object.material.depthTest = false
+                object.material.depthWrite = false
+                object.visible = false
+            }
         }
     })
 

@@ -46,10 +46,10 @@ const DecorTest = memo(function Decor() {
         //         { (grassData as Array<any>).map((_, i) => <InstancedObject  objectData={_} key={i}  />) }
         //     </group>
         // </Instances>
-        // <>
-        // { (grassData as Array<any>).map((_, i) => <BaseObject objectData={_} key={i}  />) }
-        // </>
-        <></>
+        <>
+        { (grassData as Array<any>).map((_, i) => <BaseObject objectData={_} key={i}  />) }
+        </>
+        // <></>
     )
 })
 

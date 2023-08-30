@@ -39,7 +39,7 @@ const Npc = memo(function Npc({ npc }: Props) {
         if (!npcRef.current) { return }
         // console.log(`[NPC]: npc with id '${npc?.id}' updated`, npc)
         if (npc?.isDead) {
-            // Remove hover on delete
+            spawned.current = false
             setAction('die')
             handlePointerLeave()
             return 
@@ -93,9 +93,6 @@ const Npc = memo(function Npc({ npc }: Props) {
     return (
         <group 
             name='npc'
-            onPointerMove={handlePointerEnter}
-            onPointerLeave={handlePointerLeave}
-            onPointerDown={handleLeftClick}
         >
             {
                 !npc.isDead ? (<>
@@ -107,10 +104,10 @@ const Npc = memo(function Npc({ npc }: Props) {
             <primitive 
                 ref={npcRef}
                 object={model}
-            >
-                {/* TODO: rm, Temporary */}
-                <HeatBox target={npcRef} />
-            </primitive>
+                onPointerMove={handlePointerEnter}
+                onPointerLeave={handlePointerLeave}
+                onPointerDown={handleLeftClick}
+            />
         </group>
     )
 })
