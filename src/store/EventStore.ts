@@ -41,7 +41,7 @@ export interface EventStoreInterface {
     // setEvents: (event: any) => void
 
     // Attack
-    target: { target: Fighter, skill: Skill | null }
+    target: { target: Fighter | null, skill: Skill | null }
     setTarget: (target: Fighter, skill: Skill) => void
 }
 
@@ -197,8 +197,7 @@ export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) =>
     },
 
     // Attack
-    // @ts-expect-error
-    target: { target: { id: '0' }, skill: null },
+    target: { target: null, skill: null },
     setTarget: (target, skill) => set({ target: { target, skill } })
 
 }), shallow)

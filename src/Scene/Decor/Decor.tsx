@@ -23,7 +23,7 @@ interface Props {
     } 
 }
 const Decor = memo(function Decor({ objectData }: Props) {
-    const { worldSize, html, setTarget, fighter, setHoveredItems, setSceneObject, getSceneObject } = useSceneContext()
+    const { worldSize, html, setHoveredItems, setSceneObject, getSceneObject } = useSceneContext()
     // const model = useMemo(() => useGLTFLoaderStore.getState().models.current.tree, [])
     const model = useGLTFLoaderStore(state => state.models.current.tree)
 

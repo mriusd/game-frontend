@@ -15,12 +15,12 @@ const HeatBox = ({ target }) => {
             return
         }
         const { width, height, depth } = textBoundingBox.current
-        ref.current.scale.set(width, height, depth)
+        ref.current.scale.set(width / 1.5, depth / 1.5, height / 1.5)
         ref.current.position.y = height / 2
     })
 
     return (
-        <Box ref={ref} args={[1, 1, 1]}>
+        <Box ref={ref} args={[1, 1, 1]} visible={false}>
             <meshBasicMaterial color={'red'} opacity={.2} transparent={true} />
         </Box>
     )

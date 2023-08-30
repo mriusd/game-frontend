@@ -32,9 +32,7 @@ export const EventCloudProvider = ({ children }) => {
 
 	// Refactored States
 	const init = useEvents(state => state.init);
-	useEffect(() => {
-		init(sendJsonMessage)
-	}, [])
+	useEffect(() => void init(sendJsonMessage), [])
 	const target = useEvents(state => state.target)
 	const setNpcList = useNpc(state => state.setNpcList)
 	const [fighter, setFighter] = useFighter(state => [state.fighter, state.setFighter])

@@ -41,7 +41,6 @@ export interface ISceneContext {
 
     VisibleDecor: RefObject<any[]>,
 
-    target: { target: Fighter, skill: Skill } | null, setTarget: (target: Fighter | null, skill: Skill | null) => void,
     itemTarget: ItemDroppedEvent, setItemTarget: (item: ItemDroppedEvent) => void
 
     allPlayerList: Fighter[],

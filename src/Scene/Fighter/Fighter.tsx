@@ -23,6 +23,7 @@ import { useControls } from "leva"
 import LastMessage from "./components/LastMessage"
 import { useCore } from "store/useCore"
 import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
+import { useEvents } from "store/EventStore"
 
 const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
@@ -32,11 +33,14 @@ const Fighter = memo(function Fighter() {
     const gltf = useMemo(() => models.current.fighter_man, [models.current])
 
     const { submitMalee } = useEventCloud()
+
+
+    const [target, setTarget] = useEvents(state => [state.target, state.setTarget])
+
     const {
         fighter,
         moveFighter,
         worldSize,
-        target, setTarget,
         itemTarget, setItemTarget,
 
         isMoving, setIsMoving,

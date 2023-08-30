@@ -52,16 +52,7 @@ const SceneContextProvider = ({ children }: Props) => {
     const [focusedWorldCoordinate, setFocusedWorldCoordinate] = useState<Coordinate | null>(null)
     const [pointerWorldCoordinate, setPointerWorldCoordinate] = useState<Coordinate | null>(null)
 
-    const [ target, _setTarget ] = useState<{ target: Fighter, skill: Skill } | null>(null)
-    const setTarget = (target: Fighter | null, skill: Skill | null) => {
-        if (target && skill) {
-            // Send to server if we used skill, otherwise just set target to object
-            setEventTarget(target.id)
-            _setTarget({ target, skill })
-            return
-        }
-        _setTarget(null)
-    }
+    
     const [ itemTarget, setItemTarget ] = useState<ItemDroppedEvent | null>(null)
 
     const [ hoveredItems, _setHoveredItems ] = useState<Fighter[]>([])
@@ -175,7 +166,6 @@ const SceneContextProvider = ({ children }: Props) => {
         DroppedItems,
         VisibleDecor,
 
-        target, setTarget,
         itemTarget, setItemTarget,
 
         allPlayerList: playerList,

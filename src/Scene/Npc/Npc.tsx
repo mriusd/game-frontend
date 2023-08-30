@@ -9,30 +9,30 @@ import Name from '../components/Name'
 import { getShaderedNpc } from "./utils/getShaderedNpc"
 import { useCore } from "store/useCore"
 import { isEqualCoord } from "./utils/isEqualCoord"
+import HeatBox from 'Scene/components/HeatBox'
+
 import { useActions } from './hooks/useActions'
 import { useSkillEvent } from './hooks/useSkillEvent'
-import { useUiStore } from 'store/uiStore'
-import HeatBox from 'Scene/components/HeatBox'
-import { useEvents } from 'store/EventStore'
-import { useFighter } from 'Scene/Fighter/useFighter'
+import { usePointerEvents } from './hooks/usePointerEvents'
 
 interface Props { npc: Fighter }
 const Npc = memo(function Npc({ npc }: Props) {
     // Used to set spawn coord without tweening from x:0,z:0
     const spawned = useRef<boolean>(false)
-    const setTarget = useEvents(state => state.setTarget)
-    const fighter = useFighter(state => state.fighter)
-    // const { html, setTarget, fighter, setHoveredItems, setSceneObject } = useSceneContext()
-    const setCursor = useUiStore(state => state.setCursor)
-
     const matrixCoordToWorld = useCore(state => state.matrixCoordToWorld)
 
     const npcRef = useRef<THREE.Mesh | null>(null)
-    const nameColor = useRef<0xFFFFFF | 0xFF3300>(0xFFFFFF)
     const { model, animations } = useMemo(() => getShaderedNpc(npc), [])
 
     const isMoving = useRef<boolean>(false)
     const { setAction, action } = useActions(animations, npcRef)
+
+    const {
+        nameColor,
+        handlePointerEnter,
+        handlePointerLeave,
+        handleLeftClick
+    } = usePointerEvents(npc)
 
     // Fill changed npc properties
     useEffect(() => {
@@ -90,29 +90,6 @@ const Npc = memo(function Npc({ npc }: Props) {
         removeEvent(event)
     })
 
-
-    // Set target & hover
-    const handlePointerEnter = (e) => {
-        e.stopPropagation()
-        nameColor.current = 0xFF3300
-        setCursor('pointer')
-        console.log('onMove')
-        // setHoveredItems(npc, 'add')
-    }
-    const handlePointerLeave = () => {
-        nameColor.current = 0xFFFFFF
-        setCursor('default')
-        // setHoveredItems(npc, 'remove')
-    }
-    const handleLeftClick = () => {
-        setTarget(npc, fighter.skills[0])
-    }
-    // const handleRightClick = (event: ThreeEvent<PointerEvent>) => {
-    //     // onContextMenu
-    //     console.log('Right CLick', event)
-    //     setTarget(npc, fighter.skills[1])
-    // }
-
     return (
         <group 
             name='npc'
@@ -120,12 +97,18 @@ const Npc = memo(function Npc({ npc }: Props) {
             onPointerLeave={handlePointerLeave}
             onPointerDown={handleLeftClick}
         >
-            <Name value={npc?.name} target={npcRef} offset={.65} color={nameColor.current} />
-            <HealthBar object={npc} target={npcRef} offset={1} />
+            {
+                !npc.isDead ? (<>
+                    <Name value={npc?.name} target={npcRef} offset={.65} color={nameColor.current} />
+                    <HealthBar object={npc} target={npcRef} offset={1} />
+                </>)
+                : <></>
+            }
             <primitive 
                 ref={npcRef}
                 object={model}
             >
+                {/* TODO: rm, Temporary */}
                 <HeatBox target={npcRef} />
             </primitive>
         </group>

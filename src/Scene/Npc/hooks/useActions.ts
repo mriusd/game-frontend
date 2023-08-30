@@ -17,6 +17,10 @@ export const useActions = (animations: THREE.AnimationClip[], ref: React.RefObje
             clearTimeout(actionTimeout.current)
             actions?.[action]?.reset().fadeIn(FADE_DUR).play()
             actions?.[oldAction]?.fadeOut(FADE_DUR).stop()
+            if (action === 'die') {
+                actions[action].clampWhenFinished = true
+                actions?.[action]?.setLoop(THREE.LoopOnce, 0)
+            } else
             if (action === 'attack') {
                 actionTimeout.current = setTimeout(() => void setAction('stand'), ((actions?.[action]?.getClip()?.duration || 0)) * 1000)
             }
