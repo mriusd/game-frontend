@@ -85,7 +85,7 @@ export const EventCloudProvider = ({ children }) => {
 			type: "auth",
 			data: {
 				// @ts-expect-error
-				playerID: target.id,
+				playerID: target,
 				userAddress: account,
 				locationHash: "lorencia_0_0"
 			}

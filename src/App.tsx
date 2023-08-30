@@ -7,6 +7,7 @@ import Scene from './Scene/Scene';
 import SceneContextProvider from './store/SceneContext';
 
 import Auth from 'Auth/Auth';
+import Chat from 'Scene/UserInterface2D/Chat/Chat';
 
 
 // Placeholder with commands for game is located:
@@ -35,6 +36,7 @@ function App() {
 	return (
 		<DndProvider backend={HTML5Backend}>
 			<Auth />
+			<Chat />
 			{fighter && (
 				<SceneContextProvider>
 					<Scene />

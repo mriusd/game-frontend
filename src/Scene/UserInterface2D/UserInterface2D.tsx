@@ -4,7 +4,6 @@ import { Leva } from 'leva'
 import { useBackpackStore } from 'store/backpackStore'
 import { useSceneContext } from 'store/SceneContext'
 
-import Chat from './Chat/Chat'
 import CommandLine from './CommandLine/CommandLine'
 import Stats from './Stats/Stats'
 import Skills from './Skills/Skills'
@@ -24,7 +23,6 @@ const UserInterface2D = () => {
 
     return (
         <div className={styles.UserInterface2D} >
-            <Chat/>
             <Stats/>
             <Skills/>
             <CommandLine/>
