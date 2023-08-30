@@ -15,6 +15,7 @@ import { useFrame } from "@react-three/fiber"
 import { useTexture } from "@react-three/drei"
 import { useSpring } from "react-spring"
 import { animated } from "@react-spring/three"
+import { easings } from "react-spring"
 
 interface Props { item: ItemDroppedEvent }
 const DroppedItem = memo(function DroppedItem({ item }: Props) {
@@ -135,6 +136,10 @@ const DroppedItem = memo(function DroppedItem({ item }: Props) {
         posX: position.x ? position.x : matrixCoordToWorld(worldSize.current, item.coords).x,
         posY: position.y ? position.y : 2.5,
         posZ: position.z ? position.z : matrixCoordToWorld(worldSize.current, item.coords).z,
+        config: {
+            easing: easings.easeInBack,
+            duration: 500
+        },
     })
 
     if (!currentWorldCoordinate) {
