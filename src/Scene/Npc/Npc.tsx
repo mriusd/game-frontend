@@ -96,8 +96,8 @@ const Npc = memo(function Npc({ npc }: Props) {
         >
             {
                 !npc.isDead ? (<>
-                    <Name value={npc?.name} target={npcRef} offset={.65} color={nameColor.current} />
-                    <HealthBar object={npc} target={npcRef} offset={1} />
+                    <Name value={npc?.name} target={npcRef} offset={.2} color={nameColor.current} />
+                    <HealthBar object={npc} target={npcRef} offset={.5} />
                 </>)
                 : <></>
             }
