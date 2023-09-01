@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { Text } from "@react-three/drei"
+import { Text, Instances, Instance } from "@react-three/drei"
 import { createBillboardMaterial } from "../helpers/createBillboardMaterial"
 import { useEffect, useMemo, useRef } from "react"
 import Tween from "Scene/utils/tween/tween"
@@ -37,6 +37,8 @@ const DamageText = ({ color, value, target, onComplete }: Props) => {
     }, [])
     
     return (
+
+
         <Text 
             ref={textRef}
             color={color} 
@@ -49,6 +51,21 @@ const DamageText = ({ color, value, target, onComplete }: Props) => {
             { value }
         </Text>
     )
+
+    // return (
+    //     <Instances
+    //     limit={1000}
+    //     range={1000}
+    //     >
+    //     <boxGeometry />
+    //     <meshStandardMaterial />
+    //     <Instance
+    //         color="red"
+    //         scale={2}
+    //         position={[1, 2, 3]}
+    //         rotation={[Math.PI / 3, 0, 0]}
+    //     </Instances>
+    // )
 }
 
 export default DamageText

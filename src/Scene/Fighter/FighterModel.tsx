@@ -67,10 +67,10 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
     // Find Armature & Skeleton
     useEffect(() => {
         // @ts-expect-error
-        fighterArmature.current = model.getObjectByName("Armature")
-        fighterSkeleton.current = (model.getObjectByName("standard_helmet") as THREE.SkinnedMesh)?.skeleton
-        fighterBone.current = model.getObjectByName("mixamorigHips") as THREE.Bone
-        // console.log('FighterModel ', fighterArmature.current, fighterSkeleton.current, fighterBone.current)
+        fighterArmature.current = model.getObjectByName("Armature") // Used for show/hide boyd parts
+        fighterSkeleton.current = (model.getObjectByName("standard_helmet") as THREE.SkinnedMesh)?.skeleton // Used for binding fighter skeleton to equipment skinnedMeshes
+        fighterBone.current = model.getObjectByName("mixamorigHips") as THREE.Bone // Main bone in Fighter, Insert inside it equipment Armature
+        // console.log('FighterModel ', model, fighterArmature.current, fighterSkeleton.current, fighterBone.current)
         if (!fighterArmature.current) { console.warn('[FighterModel]: "Armature" not found') }
         if (!fighterSkeleton.current) { console.warn('[FighterModel]: "standard_helmet" not found') }
         if (!fighterBone.current) { console.warn('[FighterModel]: "mixamorigHips" not found') }

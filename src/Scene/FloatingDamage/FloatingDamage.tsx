@@ -1,5 +1,5 @@
 import { useEventCloud } from "store/EventCloudContext"
-import { useEffect, useRef, memo } from "react"
+import { useEffect, useRef, memo, useMemo } from "react"
 import type { Damage } from "interfaces/damage.interface"
 import DamageText from "./DamageText"
 import { useSceneContext } from "store/SceneContext"
@@ -74,6 +74,11 @@ const FloatingDamage = memo(function FloatingDamage() {
             })
         }
     }, [events])
+
+
+    const Text = useMemo(() => {
+
+    }, [])
 
     return (
         <group name="floatingDamage">
