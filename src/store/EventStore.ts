@@ -14,10 +14,10 @@ import type { Equipment } from "interfaces/equipment.interface";
 
 import type { Fighter } from 'interfaces/fighter.interface';
 import type { Skill } from 'interfaces/skill.interface';
+import type { Direction } from 'interfaces/direction.interface';
 
-// -------------------
-// I use this layer for EventCloud to prevent lots of react rerenders
-// -------------------
+
+import { useFighter } from 'Scene/Fighter/useFighter';
 
 export interface EventStoreInterface {
     sendJsonMessage: (jsonMessage: JsonValue) => void | null
@@ -43,14 +43,16 @@ export interface EventStoreInterface {
     // Attack
     target: { target: Fighter | null, skill: Skill | null }
     setTarget: (target: Fighter, skill: Skill) => void
+    selectedSkill: number
+    setSelectedSkill: (skill: number) => void
+    submitSkill: (direction: Direction) => void
+    submitMalee: (direction: Direction) => void
 }
 
 export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) => ({
     // Init
     sendJsonMessage: null,
-    init: (sendJsonMessage) => {
-        set(() => ({ sendJsonMessage }))
-    },
+    init: (sendJsonMessage) => set(() => ({ sendJsonMessage })),
 
     // Backpack
     backpack: null,
@@ -198,6 +200,36 @@ export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) =>
 
     // Attack
     target: { target: null, skill: null },
-    setTarget: (target, skill) => set({ target: { target, skill } })
+    setTarget: (target, skill) => set({ target: { target, skill } }),
+    selectedSkill: 4,
+    setSelectedSkill: (skill: number) => set({ selectedSkill: skill }),
+    submitSkill: async (direction) => {
+        const $this = get()
+        if (!$this?.target?.target?.id) { return }
+        $this.sendJsonMessage({
+            type: "submit_attack",
+            // @ts-expect-error
+            data: {
+                opponentID: $this.target.target.id.toString(),
+                playerID: useFighter.getState().fighter.tokenId.toString(),
+                skill: $this.selectedSkill,
+                direction: direction
+            }
+        });
+    },
+    submitMalee: async (direction: Direction) => {
+        const $this = get()
+        if (!$this?.target?.target?.id) { return }
+        $this.sendJsonMessage({
+            type: "submit_attack",
+            // @ts-expect-error
+            data: {
+                opponentID: $this.target?.target?.id.toString(),
+                playerID: useFighter.getState().fighter.tokenId.toString(),
+                skill: 0,
+                direction: direction
+            }
+        });
+    }
 
 }), shallow)

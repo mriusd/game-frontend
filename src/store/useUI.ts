@@ -15,10 +15,10 @@ export interface UiStoreInterface {
     intersectionPlane: RefObject<THREE.Mesh | null>
 }
 
-export const useUiStore = create<UiStoreInterface>((set, get) => ({
+export const useUi = create<UiStoreInterface>((set, get) => ({
     eventsNode: createRef(),
     setCursor: (property) => {
-        const eventsNode = useUiStore.getState().eventsNode.current
+        const eventsNode = useUi.getState().eventsNode.current
         if (!eventsNode) { return }
         if (property === 'default') {
             eventsNode.style.removeProperty('cursor')

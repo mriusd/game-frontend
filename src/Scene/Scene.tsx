@@ -14,7 +14,7 @@ import Light from "./Light"
 import Chunks from "./Chunks"
 import Fighter from "./Fighter/Fighter"
 import Npc from "./Npc/Npc"
-import Controller from "./Controller"
+import Controller from "./Controls/Controls"
 import DroppedItem from "./DroppedItem"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"
 import Decor from "./Decor/Decor"
@@ -24,7 +24,7 @@ import GLTFLoader from './GLTFLoader/GLTFLoader'
 import OtherFighter from './Fighter/OtherFighter'
 import NpcList from './Npc/NpcList'
 
-import { useUiStore } from 'store/uiStore'
+import { useUi } from 'store/useUI'
 
 import Postprocessing from './Postprocessing'
 import { Environment } from '@react-three/drei'
@@ -41,7 +41,7 @@ import { useControls } from 'leva'
 const Scene = memo(function Scene() {
     const store = useSceneContext()
     const worldRef = useRef<Object3D | null>(null)
-    const eventsNode = useUiStore(state => state.eventsNode)
+    const eventsNode = useUi(state => state.eventsNode)
     const [devMode, setDevMode] = useCore(state => [state.devMode, state.setDevMode], shallow)
 
     const [subscribe, unsubscribe] = useCommandLine(state => [state.subscribeCommandLine, state.unsubscribeCommandLine], shallow)

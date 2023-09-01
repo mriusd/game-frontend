@@ -2,7 +2,7 @@ import { ScreenSpace } from "@react-three/drei"
 import { Plane, Hud } from "@react-three/drei"
 import { memo } from "react"
 
-import { useUiStore } from "store/uiStore"
+import { useUi } from "store/useUI"
 
 import Backpack from "./Backpack/Backpack"
 import BottomMenu from "./BottomMenu"
@@ -13,7 +13,7 @@ import { shallow } from "zustand/shallow"
 import { OrthographicCamera } from "@react-three/drei"
 
 const UserInterface3D = memo(function UserInterface() {
-    const [userInterface, intersectionPlane] = useUiStore(state => [state.userInterface, state.intersectionPlane], shallow)
+    const [userInterface, intersectionPlane] = useUi(state => [state.userInterface, state.intersectionPlane], shallow)
     return (
         <Hud>
             <OrthographicCamera makeDefault position={[0, 0, 10]} />

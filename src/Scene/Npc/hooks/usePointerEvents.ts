@@ -1,5 +1,5 @@
 import React, { useCallback } from "react"
-import { useUiStore } from 'store/uiStore'
+import { useUi } from 'store/useUI'
 import { useEvents } from 'store/EventStore'
 import { useFighter } from 'Scene/Fighter/useFighter'
 
@@ -9,7 +9,7 @@ export const usePointerEvents = (npc: Fighter) => {
     const nameColor = React.useRef<0xFFFFFF | 0xFF3300>(0xFFFFFF)
     const setTarget = useEvents(state => state.setTarget)
     const fighter = useFighter(state => state.fighter)
-    const setCursor = useUiStore(state => state.setCursor)
+    const setCursor = useUi(state => state.setCursor)
 
 
     // Set target & hover

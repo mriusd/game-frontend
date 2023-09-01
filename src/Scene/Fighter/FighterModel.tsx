@@ -10,12 +10,7 @@ import { getEquipmentBodyType } from "./utils/getEquipmentBodyType"
 import LastMessage from './components/LastMessage'
 
 interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, position: number[], rotation?: number[], children?: any }
-const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: baseModel, fighter, position, rotation, children }: Props, ref) {
-    // Clone model for Reuse
-    const model = useMemo(() => {
-        if (!baseModel) { return undefined }
-        return SkeletonUtils.clone(baseModel)
-    }, [baseModel])
+const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, fighter, position, rotation, children }: Props, ref) {
 
     // Equipment we take on Fighter
     // const equipment = useEvents(state => state.equipment)
@@ -51,18 +46,6 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: 
     // Mixer for Equipment Animation
     const mixer = useMemo(() => new THREE.AnimationMixer(model), [])
     const clips = useRef<Array<{ itemHash: string; object: THREE.Object3D | THREE.Mesh | THREE.Group; animation: THREE.AnimationClip }>>([])
-
-    // Enable shadows
-    useEffect(() => {
-        if (!model) { return }
-        model.traverse((child) => {
-            // @ts-expect-error
-            if (child.isMesh) {
-                child.castShadow = true
-                child.receiveShadow = true
-            }
-        }) 
-    }, [model])
 
     // Find Armature & Skeleton
     useEffect(() => {

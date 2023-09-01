@@ -8,7 +8,7 @@ import { useBackpackStore } from 'store/backpackStore'
 import { shallow } from 'zustand/shallow'
 import { useEvents } from 'store/EventStore'
 import { ThreeEvent, useFrame, useThree } from '@react-three/fiber'
-import { useUiStore } from 'store/uiStore'
+import { useUi } from 'store/useUI'
 import { getCoordInUISpace } from 'Scene/utils/getCoordInUiSpace'
 import { useFighterStore } from 'store/fighterStore'
 import { Text } from '@react-three/drei'
@@ -81,7 +81,7 @@ const Backpack = memo(function Backpack() {
         return Object.keys(equipment).map(slot => ({ ...equipment[slot], slot }))
     }, [equipment])
 
-    const setCursor = useUiStore(state => state.setCursor)
+    const setCursor = useUi(state => state.setCursor)
 
     const isItemPinned = useRef<boolean>(false)
     const pinnedItemEvent = useRef<ThreeEvent<PointerEvent> | null>(null)

@@ -1,9 +1,9 @@
 import * as THREE from 'three'
-import { useUiStore } from "store/uiStore"
+import { useUi } from "store/useUI"
 
 export const getCoordInUISpace = (raycaster: THREE.Raycaster) => {
-    const userInterface = useUiStore.getState().userInterface.current
-    const intersectionPlane = useUiStore.getState().intersectionPlane.current
+    const userInterface = useUi.getState().userInterface.current
+    const intersectionPlane = useUi.getState().intersectionPlane.current
     if (!userInterface || !intersectionPlane) { return null }
     const intersection = raycaster.intersectObject(intersectionPlane)
     if (!intersection[0]) { return null }
