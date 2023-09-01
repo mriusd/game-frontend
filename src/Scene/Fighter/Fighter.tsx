@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { useEffect, useState, useRef, memo, useMemo } from "react"
+import { useEffect, useState, useRef, memo, useMemo, useImperativeHandle } from "react"
 import { useThree } from "@react-three/fiber"
 import { useAnimations } from "@react-three/drei"
 import { CAMERA_POSITION } from "../config"
@@ -24,21 +24,19 @@ import LastMessage from "./components/LastMessage"
 import { useCore } from "store/useCore"
 import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
 import { useEvents } from "store/EventStore"
+import { useFighter } from "./useFighter"
+import { getShaderedFighter } from "./utils/getFighterModel"
 
 const Fighter = memo(function Fighter() {
     const cameraPosition = new THREE.Vector3(...CAMERA_POSITION)
     const camera = useThree(state => state.camera)
-    // const gltf = useMemo(() => useGLTFLoaderStore.getState().models.current.fighter_man, [])
-    const models = useGLTFLoaderStore(state => state.models)
-    const gltf = useMemo(() => models.current.fighter_man, [models.current])
+    const { model, animations } = getShaderedFighter('man')
 
-    const { submitMalee } = useEventCloud()
-
-
+    const submitMalee = useEvents(state => state.submitMalee)
     const [target, setTarget] = useEvents(state => [state.target, state.setTarget])
+    const [fighter, fighterNode] = useFighter(state => [state.fighter, state.fighterNode])
 
     const {
-        fighter,
         moveFighter,
         worldSize,
         itemTarget, setItemTarget,
@@ -73,7 +71,9 @@ const Fighter = memo(function Fighter() {
     const ENTER_TO_ISSTAYING_DELAY = 50 //ms
 
     const animationTarget = useRef()
-    const { mixer, actions } = useAnimations(gltf.animations, animationTarget)
+    useImperativeHandle(fighterNode, () => animationTarget.current)
+    const { mixer, actions } = useAnimations(animations, animationTarget)
+
 
     // const [attacks, _setAttacks] = useState([])
     // const setAttacks = (attack: ) => {
@@ -282,7 +282,7 @@ const Fighter = memo(function Fighter() {
             <LastMessage offset={.5} fighter={fighter} target={animationTarget} />
             <FighterModel
                 ref={animationTarget}
-                model={gltf.scene}
+                model={model}
                 fighter={fighter}
                 position={[currentWorldCoordinate.x, 0, currentWorldCoordinate.z]}
                 rotation={[0, direction, 0]}
