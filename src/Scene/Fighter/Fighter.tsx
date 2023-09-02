@@ -25,8 +25,7 @@ import { useFighter } from "./useFighter"
 import { getShaderedFighter } from "./utils/getFighterModel"
 
 const Fighter = memo(function Fighter() {
-    const cameraPosition = useMemo(() => new THREE.Vector3(...CAMERA_POSITION), [])
-    const camera = useThree(state => state.camera)
+    const spawned = useRef(false)
     const submitMalee = useEvents(state => state.submitMalee)
     const [target, setTarget] = useEvents(state => [state.target, state.setTarget])
     const [fighter, fighterNode] = useFighter(state => [state.fighter, state.fighterNode])
@@ -35,17 +34,16 @@ const Fighter = memo(function Fighter() {
     const currentWorldCoordinate = useRef<Coordinate>(null)
     const setCurrentWorldCoordinate = useCallback((coordinate: Coordinate) => {
         if (!fighterNode.current) { return console.warn('[Fighter]: fighterNode not found') }
-        currentWorldCoordinate.current = coordinate
         fighterNode.current.position.set(coordinate.x, fighterNode.current.position.y, coordinate.z)
     }, [])
     const occupiedCoords = useCore(state => state.occupiedCoords)
+    const [setPosition, move] = useFighter(state => [state.setPosition, state.move])
+    const [isMoving, setIsMoving] = useFighter(state => [state.isMoving, state.setIsMoving])
 
     const {
         moveFighter,
         worldSize,
         itemTarget, setItemTarget,
-
-        isMoving, setIsMoving,
 
         // currentMatrixCoordinate, setCurrentMatrixCoordinate,
         // currentWorldCoordinate, setCurrentWorldCoordinate,
@@ -86,15 +84,14 @@ const Fighter = memo(function Fighter() {
     useEffect(() => {
         // console.log('[Fighter]: updated', fighter)
         if (!fighter) { return }
-        if (fighter.coordinates) {
-            // If not spawned yet
-            if (!currentWorldCoordinate.current) {
-                setCurrentWorldCoordinate(matrixCoordToWorld(fighter.coordinates))
-                return
-            }
-            // setServerMatrixCoordinate({ ...fighter.coordinates })
+        if (!fighterNode.current) { return }
+
+        if (fighter?.coordinates) {
+            if (!spawned.current) return void (spawned.current = true), setPosition(matrixCoordToWorld(fighter?.coordinates))/*, setAction('stand')*/ 
+            // move(matrixCoordToWorld(fighter?.coordinates))
         }
-    }, [fighter])
+    }, [fighter, fighterNode.current])
+
 
 
     // Synchronize server and locale Fighter position

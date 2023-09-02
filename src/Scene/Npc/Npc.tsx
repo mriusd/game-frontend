@@ -8,7 +8,7 @@ import type { Fighter } from 'interfaces/fighter.interface'
 import Name from '../components/Name'
 import { getShaderedNpc } from "./utils/getShaderedNpc"
 import { useCore } from "store/useCore"
-import { isEqualCoord } from "./utils/isEqualCoord"
+import { isEqualCoord } from 'Scene/utils/isEqualCoord'
 import HeatBox from 'Scene/components/HeatBox'
 
 import { useActions } from './hooks/useActions'

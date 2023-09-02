@@ -15,6 +15,7 @@ import { angleToVector } from "../utils/angleToVector"
 
 import { useCore } from "store/useCore"
 import { useUi } from "store/useUI"
+import { useFighter } from "Scene/Fighter/useFighter"
 
 const ANGLE_STEP = Math.PI / 4 // 8 directions
 const ANGLE_RANGE = Math.PI / 8 // Set a range of angles to rotate towards
@@ -30,6 +31,7 @@ interface Props { world: RefObject<Object3D | null> }
 const Controller = memo(function Controller({ world }: Props) {
 
     const eventsNode = useUi(state => state.eventsNode)
+    const move = useFighter(state => state.move)
 
     const {
         worldSize,
@@ -131,24 +133,25 @@ const Controller = memo(function Controller({ world }: Props) {
             return
         }
         isHolding.current = true
-        if (!world.current) { return }
+        // if (!world.current) { return }
         if (!savePointerWorldCoordinate.value) { return }
-        if (!saveCurrentWorldCoordinate.value) { return }
+        // if (!saveCurrentWorldCoordinate.value) { return }
         const coordinate = calcPointerCoordinate()
         if (!coordinate) { return }
         if (saveHoveredItems.value?.length) { return }
-        setFocusedMatrixCoordinate(worldCoordToMatrix(worldSize.current, savePointerWorldCoordinate.value))
-        setFocusedWorldCoordinate(savePointerWorldCoordinate.value)
+        // setFocusedMatrixCoordinate(worldCoordToMatrix(worldSize.current, savePointerWorldCoordinate.value))
+        // setFocusedWorldCoordinate(savePointerWorldCoordinate.value)
+        move(savePointerWorldCoordinate.value)
     }
 
     // Calc character rotation angle (direction)
     function mouseMove() {
         const coordinate = calcPointerCoordinate()
         // if ( !coordinate ) { return } 
-        if (!saveCurrentWorldCoordinate.value) { return }
+        // if (!saveCurrentWorldCoordinate.value) { return }
 
         savePointerWorldCoordinate.value = coordinate
-        setPointerWorldCoordinate(savePointerWorldCoordinate.value)
+        // setPointerWorldCoordinate(savePointerWorldCoordinate.value)
         // console.log(savePointerWorldCoordinate.value, worldCoordToMatrix(worldSize.current, savePointerWorldCoordinate.value))
 
         if (saveIsMoving.value) { return }
