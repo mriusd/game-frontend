@@ -9,7 +9,10 @@ const Light = memo(function Light() {
     const fighterNode = useFighter(state => state.fighterNode)
     const shadowlightRef = useRef<THREE.DirectionalLight | null>(null)
     const lightPosition = useMemo(() => new THREE.Vector3(0, 10, 5), [])
-    useEffect(() => void fighterNode.current && shadowlightRef.current && (shadowlightRef.current.target = fighterNode.current), [fighterNode.current, shadowlightRef.current])
+    useEffect(() => {
+        if (!fighterNode.current || !shadowlightRef.current) { return }
+        shadowlightRef.current.target = fighterNode.current
+    }, [fighterNode.current, shadowlightRef.current])
     // Move shadow light shadow
     useFrame(() => {
         if (!fighterNode.current || !shadowlightRef.current) { return }
