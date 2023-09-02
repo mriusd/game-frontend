@@ -1,13 +1,13 @@
 import { useGLTFLoaderStore } from "Scene/GLTFLoader/GLTFLoaderStore"
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader"
 import { getIs } from "Scene/utils/utils"
-import type { InventorySlot } from "interfaces/inventory.interface"
+import { SkeletonUtils } from "three-stdlib"
 
 export const getFighterModel = (name: string): GLTF => {
     const models = useGLTFLoaderStore.getState().models.current
     const is = getIs(name)
-    if (is('man')) return models['man']
-    return models['man']
+    if (is('man')) return models['fighter_man']
+    return models['fighter_man']
 }
 
 export const getShaderedFighter = (name: string) => {

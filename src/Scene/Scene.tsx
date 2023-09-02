@@ -11,7 +11,7 @@ import { Loader, Stats, OrbitControls } from "@react-three/drei"
 import { CAMERA_POSITION } from "./config"
 
 import Light from "./Light"
-import Chunks from "./Chunks"
+import Chunks from "./Chunks/Chunks"
 import Fighter from "./Fighter/Fighter"
 import Npc from "./Npc/Npc"
 import Controller from "./Controls/Controls"
@@ -23,6 +23,7 @@ import UserInterface3D from './UserInterface3D/UserInterface3D'
 import GLTFLoader from './GLTFLoader/GLTFLoader'
 import OtherFighter from './Fighter/OtherFighter'
 import NpcList from './Npc/NpcList'
+import Camera from './Camera'
 
 import { useUi } from 'store/useUI'
 
@@ -55,12 +56,6 @@ const Scene = memo(function Scene() {
         <div id="scene" tabIndex={0} ref={eventsNode} className={styles.scene}>
             <Canvas
                 shadows
-                camera={{
-                    position: new THREE.Vector3(...CAMERA_POSITION),
-                    near: 0.1,
-                    far: devMode ? 1000 : 60,
-                    fov: 45,
-                }}
                 gl={{
                     powerPreference: "high-performance",
                     alpha: false,
@@ -70,7 +65,7 @@ const Scene = memo(function Scene() {
                 <color attach="background" args={[0x000000]} />
                 { !devMode ? <fog attach="fog" args={['black', 5, 25]}></fog> : <></> }
                 { devMode ? <OrbitControls/> : <></> }
-
+                <Camera/>
                 <Stats className='stats' />
                 <Suspense fallback={null}>
                     <GLTFLoader>

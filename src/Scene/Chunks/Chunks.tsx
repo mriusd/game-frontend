@@ -1,27 +1,28 @@
 
 import * as THREE from "three"
-import { forwardRef, useEffect, useMemo, useRef, useState } from "react"
-import { useSceneContext } from "store/SceneContext"
+import { forwardRef, useEffect, useMemo, useRef, useState, RefObject } from "react"
 import { memo } from "react"
 import { Coordinate } from "interfaces/coordinate.interface"
 // import { makeNoise2D } from "open-simplex-noise"
 import { useTexture } from "@react-three/drei"
 
 import { useCore } from "store/useCore"
-import { shallow } from "zustand/shallow"
+import { useFighter } from "../Fighter/useFighter"
 
 import { Plane } from "@react-three/drei"
+import { useFrame } from "@react-three/fiber"
 
-const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
-    const { currentWorldCoordinate } = useSceneContext()
+import { useLocationTextures } from "./useLocationTextures"
 
-    const [ worldSize, chunkSize, chunksPerAxis ] = useCore(state => [state.worldSize, state.chunkSize, state.chunksPerAxis], shallow)
+const Chunks = memo(forwardRef(function Chunks({}, ref: any) {
+    const fighterNode = useFighter(state => state.fighterNode)
+    const [ worldSize, chunkSize, chunksPerAxis ] = useCore(state => [state.worldSize, state.chunkSize, state.chunksPerAxis])
 
     const segmentsSize = 1
     const segmentsX = chunkSize
     const segmentsY = chunkSize
-    const sizeX = segmentsSize * segmentsX
-    const sizeY = segmentsSize * segmentsY
+    const sizeX = useMemo(() => segmentsSize * segmentsX, [])
+    const sizeY = useMemo(() => segmentsSize * segmentsY, [])
     const geometry = useMemo(() => new THREE.PlaneGeometry(sizeX, sizeY, segmentsX, segmentsY), [])
 
     const planeBufferSize = useRef([...new Array(4)])
@@ -29,19 +30,18 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
     const planeTextureUrlBuffer = useRef<{ [key: number]: {} }>({})
     const gridHelper = useRef<THREE.GridHelper | null>(null)
 
+    const textures = useLocationTextures()
 
     // For Dev
     const devMode = useCore(state => state.devMode)
-    const mapPlaceholder = useTexture({ map: '/worlds/alex_ground/minimap/minimap.png' })
+    const mapPlaceholder = useTexture({ map: '/worlds/lorencia/minimap/minimap.png' })
 
-    useEffect(() => {
-        if (!currentWorldCoordinate) { return }
-        updatePlanePositions(currentWorldCoordinate)
-        // Show grid for testing in chunk   
-        if (devMode) {
-            updateGridHelperPosition(currentWorldCoordinate)
-        }
-    }, [currentWorldCoordinate, planeBuffer.current])
+    useFrame(() => {
+        if (!fighterNode.current) { return }
+        updatePlanePositions(fighterNode.current.position)
+        // Show Grid  
+        devMode && updateGridHelperPosition(fighterNode.current.position)
+    })
 
     function updatePlanePositions(characterPosition: Coordinate) {
         const { xIndex, zIndex } = getChunkIndices(characterPosition);
@@ -55,27 +55,21 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
 
             const x = (xIndex * chunkSize) + xOffset;
             const z = (zIndex * chunkSize) + yOffset;
-            if (plane.position.x === x && plane.position.z === z && planeTextureUrlBuffer.current[i]) { return }
-            console.log('[Chunks]: chunks recalculated')
 
-            // Set new texture to chunk
-            // TODO: Remove Clamp, FIXME: fix error index chunk calculation
+            if (plane.position.x === x && plane.position.z === z) { return }
+            console.log('[Chunks]: chunks recalculated')
 
             // CALC THIS CORRECTLY
             const textureX = zIndex + 1 + yOffset/chunkSize
             const textureZ = xIndex + 1 + xOffset/chunkSize
             
-            // Set the plane position based on the current chunk index and offsets
-            // console.log(textureX, textureZ)
             if (textureX >= 0 && textureZ >= 0 && textureX < chunksPerAxis+1 && textureZ < chunksPerAxis+1) {
-                planeTextureUrlBuffer.current[i] =  { 
-                    map: `worlds/alex_ground/map/${textureX}_${textureZ}.png`,
-                    normalMap: `worlds/alex_ground/normalMap/${textureX}_${textureZ}.png`,
-                    roughnessMap: `worlds/alex_ground/roughnessMap/${textureX}_${textureZ}.png`,
-                    metalnessMap: `worlds/alex_ground/metalnessMap/${textureX}_${textureZ}.png`,
-                }
+                plane.material['map'] = textures[`${textureX}_${textureZ}/map`]
+                plane.material['normalMap'] = textures[`${textureX}_${textureZ}/normalMap`]
+                plane.material['roughnessMap'] = textures[`${textureX}_${textureZ}/roughnessMap`]
+                plane.material['metalnessMap'] = textures[`${textureX}_${textureZ}/metalnessMap`]
             }
-
+            
             plane.position.set(x, 0, z)
         }
     }
@@ -114,7 +108,6 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
                         index={i}
                         // @ts-expect-error
                         ref={(ref) => planeBuffer.current[i] = ref}
-                        textureUrls={planeTextureUrlBuffer.current[i] || ''}
                         geometry={geometry}
                     />
                 ))}
@@ -131,8 +124,8 @@ const Chunks = memo(forwardRef(function Chunks(props, ref: any) {
     )
 }))
 
-interface SwapChunkProps { geometry: THREE.PlaneGeometry, textureUrls: {}, index: number }
-const SwapChunk = forwardRef(({ geometry, textureUrls, index }: SwapChunkProps, ref: any) => {
+interface SwapChunkProps { geometry: THREE.PlaneGeometry, index: number }
+const SwapChunk = forwardRef(({ geometry, index }: SwapChunkProps, ref: any) => {
 
     return (
         <mesh
@@ -142,18 +135,10 @@ const SwapChunk = forwardRef(({ geometry, textureUrls, index }: SwapChunkProps, 
             rotation={[Math.PI / -2, 0, 0]}
             geometry={geometry}
         >
-            { 
-                textureUrls ? <ChunkMaterial textureUrls={textureUrls} /> : <meshStandardMaterial color={0x000000}/>
-            }
+            <meshStandardMaterial/>
         </mesh>
     )
 })
-
-interface ChunkMaterialProps { textureUrls: {}, opacity?: number, transparent?: boolean }
-const ChunkMaterial = ({ textureUrls, ...props }: ChunkMaterialProps) => {
-    const textures = useTexture({ ...textureUrls })
-    return <meshStandardMaterial {...textures} {...props} />
-}
 
 
 export default Chunks

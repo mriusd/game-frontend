@@ -1,11 +1,13 @@
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
+import { shallow } from "zustand/shallow";
 import type { OccupiedCoordinate } from "interfaces/occupied.interface";
 import type { Coordinate } from "interfaces/coordinate.interface";
 
 export interface CoreInterface {
-    worldSize: number,
-    chunkSize: number,
-    chunksPerAxis: number,
+    location: string
+    worldSize: number
+    chunkSize: number
+    chunksPerAxis: number
 
     occupiedCoords: OccupiedCoordinate[]
     updateOccupiedCoord: (item: OccupiedCoordinate, action: 'add' | 'remove') => void
@@ -18,7 +20,9 @@ export interface CoreInterface {
     setDevMode: (value: boolean) => void
 }
 
-export const useCore = create<CoreInterface>((set, get) => ({
+export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
+    location: 'Lorencia',
+    
     worldSize: 120,
     chunkSize: 60,
     chunksPerAxis: 120 / 60,
@@ -61,4 +65,4 @@ export const useCore = create<CoreInterface>((set, get) => ({
     devMode: false,
     setDevMode: (value) => set({ devMode: value }),
     
-}))
+}), shallow)

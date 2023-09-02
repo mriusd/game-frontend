@@ -5,7 +5,6 @@ import { InventorySlot } from "interfaces/inventory.interface"
 import { getShaderedEquipment } from "./utils/getShaderedEquipment"
 import { useFrame } from "@react-three/fiber"
 import { Fighter } from "interfaces/fighter.interface"
-import { SkeletonUtils } from "three-stdlib"
 import { getEquipmentBodyType } from "./utils/getEquipmentBodyType"
 import LastMessage from './components/LastMessage'
 

@@ -1,16 +1,19 @@
 import * as THREE from 'three'
 import { Plane, useTexture } from "@react-three/drei"
 import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
-import { useThree } from "@react-three/fiber"
+import { useFrame, useThree } from "@react-three/fiber"
 import React, { useRef, useMemo, useEffect } from "react"
 import { minimap_material } from "./minimap_material"
-import { useSceneContext } from 'store/SceneContext'
-import { matrixCoordToWorld } from 'Scene/utils/matrixCoordToWorld'
+
+import { useCore } from 'store/useCore'
+import { useFighter } from 'Scene/Fighter/useFighter'
 
 const Minimap = ({ ...props }) => {
-    const { worldSize, chunkSize, currentWorldCoordinate } = useSceneContext()
 
-    const textures = useTexture({ map: '/worlds/alex_ground/minimap/minimap.png' })
+    const fighterNode = useFighter(state => state.fighterNode)
+    const [worldSize, chunkSize] = useCore(state => [state.worldSize, state.chunkSize])
+
+    const textures = useTexture({ map: '/worlds/lorencia/minimap/minimap.png' })
     const planeSize = useMemo(() => new THREE.Vector2(100, 100), [])
 
     const minimapMaterial = useMemo(() => minimap_material(), [])
@@ -20,14 +23,14 @@ const Minimap = ({ ...props }) => {
     }, [textures])
 
     // Update Player Position
-    useEffect(() => {
-        if (!currentWorldCoordinate) { return }
+    useFrame(() => {
+        if (!fighterNode.current) { return }
         minimapMaterial.uniforms.uPlayerCoordinate.value = { 
-            x: (currentWorldCoordinate.x + worldSize.current / 2 + chunkSize.current / 2) / (worldSize.current + chunkSize.current),
+            x: (fighterNode.current.position.x + worldSize / 2 + chunkSize / 2) / (worldSize + chunkSize),
             y: 0, 
-            z: (currentWorldCoordinate.z + worldSize.current / 2 + chunkSize.current / 2) / (worldSize.current + chunkSize.current)
+            z: (fighterNode.current.position.z + worldSize / 2 + chunkSize / 2) / (worldSize + chunkSize)
         }
-    }, [currentWorldCoordinate])
+    })
 
     // Update Npc Position
     // useEffect(() => {
@@ -36,9 +39,9 @@ const Minimap = ({ ...props }) => {
     //     console.log(npces)
     //     npces.forEach((npc, i) => {
     //         const uniform = minimapMaterial.uniforms.uNpcCoordinates
-    //         const position = matrixCoordToWorld(worldSize.current, npc.coordinates)
-    //         uniform.value[i].x = (position.x + worldSize.current / 2 + chunkSize.current / 2) / (worldSize.current + chunkSize.current)
-    //         uniform.value[i].z = (position.z + worldSize.current / 2 + chunkSize.current / 2) / (worldSize.current + chunkSize.current)
+    //         const position = matrixCoordToWorld(worldSize, npc.coordinates)
+    //         uniform.value[i].x = (position.x + worldSize / 2 + chunkSize / 2) / (worldSize + chunkSize)
+    //         uniform.value[i].z = (position.z + worldSize / 2 + chunkSize / 2) / (worldSize + chunkSize)
     //         uniform.value[i].y = 0
     //     })
     // }, [NpcList.current])
