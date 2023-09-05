@@ -14,9 +14,10 @@ import { useFrame } from "@react-three/fiber"
 
 import { useLocationTextures } from "./useLocationTextures"
 
-const Chunks = memo(forwardRef(function Chunks({}, ref: any) {
+const Chunks = memo(function Chunks({}) {
     const fighterNode = useFighter(state => state.fighterNode)
     const [ worldSize, chunkSize, chunksPerAxis ] = useCore(state => [state.worldSize, state.chunkSize, state.chunksPerAxis])
+    const groundObject = useCore(state => state.groundObject)
 
     const segmentsSize = 1
     const segmentsX = chunkSize
@@ -101,7 +102,7 @@ const Chunks = memo(forwardRef(function Chunks({}, ref: any) {
     }
     return (
         <>
-            <group name="chunks" ref={ref} rotation={[0, 0, 0]}>
+            <group name="chunks" ref={groundObject} rotation={[0, 0, 0]}>
                 {planeBufferSize.current.map((chunk, i) => (
                     <SwapChunk
                         key={i}
@@ -122,7 +123,7 @@ const Chunks = memo(forwardRef(function Chunks({}, ref: any) {
             ): <></> }
         </>
     )
-}))
+})
 
 interface SwapChunkProps { geometry: THREE.PlaneGeometry, index: number }
 const SwapChunk = forwardRef(({ geometry, index }: SwapChunkProps, ref: any) => {

@@ -75,8 +75,8 @@ const Scene = memo(function Scene() {
                         {/* <DecorTest/> */}
                         {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)}
                         <Fighter />
-                        <Chunks ref={worldRef} />
-                        { !devMode ? <Controller world={worldRef} /> : <></> }
+                        <Chunks />
+                        { !devMode ? <Controller /> : <></> }
                         <FloatingDamage />
                         <UserInterface3D />
                         <Light />

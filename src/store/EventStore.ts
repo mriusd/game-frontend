@@ -23,6 +23,7 @@ export interface EventStoreInterface {
     sendJsonMessage: (jsonMessage: JsonValue) => void | null
     init: (sendJsonMessage: (jsonMessage: JsonValue) => void) => void
 
+    // Inventory
     backpack: Inventory | null
     equipment: Record<number, InventorySlot> | null
     equipmentSlots: Record<number, Equipment> | null
@@ -47,6 +48,10 @@ export interface EventStoreInterface {
     setSelectedSkill: (skill: number) => void
     submitSkill: (direction: Direction) => void
     submitMalee: (direction: Direction) => void
+
+
+    // Fighter
+    moveFighter: (coordinate: Coordinate) => void
 }
 
 export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) => ({
@@ -54,7 +59,7 @@ export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) =>
     sendJsonMessage: null,
     init: (sendJsonMessage) => set(() => ({ sendJsonMessage })),
 
-    // Backpack
+    // Inventory
     backpack: null,
     equipment: null,
     equipmentSlots: equipmentSlots,
@@ -230,6 +235,16 @@ export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) =>
                 direction: direction
             }
         });
+    },
+    
+    // Fighter
+    moveFighter: async (coordinate) => {
+        const $this = get()
+        const { x, z } = coordinate
+		$this.sendJsonMessage({
+			type: "move_fighter",
+			data: { x, z }
+		});
     }
 
 }), shallow)

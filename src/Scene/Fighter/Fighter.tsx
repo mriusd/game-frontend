@@ -88,7 +88,6 @@ const Fighter = memo(function Fighter() {
 
         if (fighter?.coordinates) {
             if (!spawned.current) return void (spawned.current = true), setPosition(matrixCoordToWorld(fighter?.coordinates))/*, setAction('stand')*/ 
-            // move(matrixCoordToWorld(fighter?.coordinates))
         }
     }, [fighter, fighterNode.current])
 

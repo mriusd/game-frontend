@@ -2,12 +2,14 @@ import { createWithEqualityFn } from "zustand/traditional";
 import { shallow } from "zustand/shallow";
 import type { OccupiedCoordinate } from "interfaces/occupied.interface";
 import type { Coordinate } from "interfaces/coordinate.interface";
+import { RefObject, createRef } from "react";
 
 export interface CoreInterface {
     location: string
     worldSize: number
     chunkSize: number
     chunksPerAxis: number
+    groundObject: RefObject<THREE.Group>
 
     occupiedCoords: OccupiedCoordinate[]
     updateOccupiedCoord: (item: OccupiedCoordinate, action: 'add' | 'remove') => void
@@ -26,6 +28,7 @@ export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
     worldSize: 120,
     chunkSize: 60,
     chunksPerAxis: 120 / 60,
+    groundObject: createRef(),
 
     occupiedCoords: [],
     updateOccupiedCoord(item, action) {

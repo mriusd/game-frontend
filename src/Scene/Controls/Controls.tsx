@@ -27,11 +27,11 @@ const saveCurrentWorldCoordinate = { value: null }
 const saveIsMoving = { value: false }
 const saveHoveredItems = { value: [] }
 
-interface Props { world: RefObject<Object3D | null> }
-const Controller = memo(function Controller({ world }: Props) {
+const Controller = memo(function Controller() {
 
     const eventsNode = useUi(state => state.eventsNode)
     const move = useFighter(state => state.move)
+    const [occupiedCoords, groundObject] = useCore(state => [state.occupiedCoords, state.groundObject])
 
     const {
         worldSize,
@@ -51,7 +51,6 @@ const Controller = memo(function Controller({ world }: Props) {
         },
     } = useSceneContext()
 
-    const occupiedCoords = useCore(state => state.occupiedCoords)
 
     const raycaster = useRef(new THREE.Raycaster())
     const pointer = useThree(state => state.pointer)
@@ -70,7 +69,7 @@ const Controller = memo(function Controller({ world }: Props) {
 
     useFrame(() => {
         if (isHolding.current) {
-            if (!world.current) { return }
+            if (!groundObject.current) { return }
             if (!savePointerWorldCoordinate.value) { return }
             const coordinate = calcPointerCoordinate()
             if (!coordinate) { return }
@@ -82,15 +81,6 @@ const Controller = memo(function Controller({ world }: Props) {
     })
 
     useEffect(() => {
-        saveCurrentWorldCoordinate.value = currentWorldCoordinate
-
-        const coordinate = calcPointerCoordinate()
-        if (!coordinate) { return }
-        savePointerWorldCoordinate.value = coordinate
-        setPointerWorldCoordinate(savePointerWorldCoordinate.value)
-    }, [currentWorldCoordinate])
-
-    useEffect(() => {
         saveIsMoving.value = isMoving
     }, [isMoving])
     useEffect(() => {
@@ -98,10 +88,10 @@ const Controller = memo(function Controller({ world }: Props) {
     }, [hoveredItems])
 
     function calcPointerCoordinate() {
-        if (!world.current) { return null }
+        if (!groundObject.current) { return null }
 
         raycaster.current.setFromCamera(pointer, camera)
-        const intersections = raycaster.current.intersectObject(world.current)
+        const intersections = raycaster.current.intersectObject(groundObject.current)
         const point = intersections[0]?.point
         if (!point) { return null }
 

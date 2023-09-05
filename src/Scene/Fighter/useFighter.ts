@@ -6,6 +6,10 @@ import type { Coordinate } from 'interfaces/coordinate.interface';
 import { getMoveDuration } from 'Scene/utils/getMoveDuration';
 import Tween from 'Scene/utils/tween/tween';
 import { isEqualCoord } from 'Scene/utils/isEqualCoord';
+import { getNearestEmptySquareToTarget } from 'Scene/utils/getNextPosition';
+
+import { useCore } from 'store/useCore';
+import { useEvents } from 'store/EventStore';
 
 export interface UseFighterInterface {
     fighter: Fighter | null
@@ -29,24 +33,30 @@ export const useFighter = createWithEqualityFn<UseFighterInterface>((set, get) =
     isMoving: false,
     setIsMoving: (isMoving) => set({ isMoving }),
     move: (to) => {
+        const $core = useCore.getState()
         const $this = get()
         const ref = $this.fighterNode.current
 
         console.log('move', ref.position, to)
         if ($this.isMoving) { return }
 
-        //     const nextMatrixPosition = getNearestEmptySquareToTarget(occupiedCoords, currentMatrixCoordinate, targetMatrixCoordinate)
-
         if (isEqualCoord(ref.position, to)) { return }
 
+        const nextMatrixPosition = getNearestEmptySquareToTarget($core.occupiedCoords, $this.fighter.coordinates, $core.worldCoordToMatrix(to))
+        // console.log('nextMatrixPos', nextMatrixPosition)
+        if (!nextMatrixPosition) { return }
+        const next = $core.matrixCoordToWorld(nextMatrixPosition)
         // Used over here instead isMoving useEffect cuz it rms a little delay which looks weird
         // setAction('run')
         // 
         $this.setIsMoving(true)
+
+        useEvents.getState().moveFighter(nextMatrixPosition)
         const current = { x: ref.position.x, z: ref.position.z }
-        Tween.to(current, to,
+        // console.log('current, next', current, next)
+        Tween.to(current, next,
             {
-                duration: getMoveDuration($this.fighter.movementSpeed, current, to),
+                duration: getMoveDuration($this.fighter.movementSpeed, current, next),
                 onChange: (state: { value: Coordinate }) => void $this.setPosition(state.value),
                 onComplete: () => void $this.setIsMoving(false),
             }
