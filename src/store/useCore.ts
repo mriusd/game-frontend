@@ -3,6 +3,7 @@ import { shallow } from "zustand/shallow";
 import type { OccupiedCoordinate } from "interfaces/occupied.interface";
 import type { Coordinate } from "interfaces/coordinate.interface";
 import { RefObject, createRef } from "react";
+import type { Fighter } from "interfaces/fighter.interface";
 
 export interface CoreInterface {
     location: string
@@ -13,9 +14,13 @@ export interface CoreInterface {
 
     occupiedCoords: OccupiedCoordinate[]
     updateOccupiedCoord: (item: OccupiedCoordinate, action: 'add' | 'remove') => void
+    isOccupiedCoordinate: (coordinate: Coordinate) => boolean
 
     matrixCoordToWorld: (coordinate: Coordinate) => Coordinate
     worldCoordToMatrix: (coordinate: Coordinate) => Coordinate
+
+    hoveredItems: Fighter[],
+    setHoveredItems: (item: Fighter, action: 'add' | 'remove') => void
 
     // For Develop
     devMode: boolean
@@ -48,6 +53,10 @@ export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
         }
         return set({ occupiedCoords: [...newState.slice(0, itemIndex), ...newState.slice(itemIndex + 1), item] }) 
     },
+    isOccupiedCoordinate: (coordinate: Coordinate) => {
+        const occupiedCoordinates = get().occupiedCoords
+        return occupiedCoordinates.findIndex(occupied => occupied.coordinates.x === coordinate.x && occupied.coordinates.z === coordinate.z) !== -1
+    },
     
     matrixCoordToWorld: (coordinate: Coordinate) => {
         const sqsize = (get().worldSize - 1) / 2
@@ -63,6 +72,23 @@ export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
             x: Math.min(Math.max(Math.round(coordinate.x + sqsize), 0), worldSize-1),
             z: Math.min(Math.max(Math.round(coordinate.z + sqsize), 0), worldSize-1)
         }
+    },
+
+    hoveredItems: [],
+    setHoveredItems: (item, action) => {
+        const hoveredItems = get().hoveredItems
+        const itemIndex = hoveredItems.findIndex((hoveredItem: Fighter) => hoveredItem.id === item.id)
+
+        if (action === 'add') {
+            if (itemIndex === -1) {
+                hoveredItems.push(item)
+                return set({ hoveredItems })
+            }
+            return
+        }
+
+        if (itemIndex === -1) { return }
+        return set({ hoveredItems: [...hoveredItems.slice(0, itemIndex), ...hoveredItems.slice(itemIndex + 1)]})
     },
 
     devMode: false,

@@ -8,7 +8,7 @@ import { Fighter } from "interfaces/fighter.interface"
 import { getEquipmentBodyType } from "./utils/getEquipmentBodyType"
 import LastMessage from './components/LastMessage'
 
-interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, position: number[], rotation?: number[], children?: any }
+interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, position?: number[], rotation?: number[], children?: any }
 const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, fighter, position, rotation, children }: Props, ref) {
 
     // Equipment we take on Fighter

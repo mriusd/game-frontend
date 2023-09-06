@@ -37,10 +37,9 @@ export const useFighter = createWithEqualityFn<UseFighterInterface>((set, get) =
         const $this = get()
         const ref = $this.fighterNode.current
 
-        console.log('move', ref.position, to)
         if ($this.isMoving) { return }
-
         if (isEqualCoord(ref.position, to)) { return }
+        console.log('move', ref.position, to)
 
         const nextMatrixPosition = getNearestEmptySquareToTarget($core.occupiedCoords, $this.fighter.coordinates, $core.worldCoordToMatrix(to))
         // console.log('nextMatrixPos', nextMatrixPosition)

@@ -52,6 +52,7 @@ export interface EventStoreInterface {
 
     // Fighter
     moveFighter: (coordinate: Coordinate) => void
+    updateFighterDirection: (direction: Direction) => void
 }
 
 export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) => ({
@@ -245,6 +246,13 @@ export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) =>
 			type: "move_fighter",
 			data: { x, z }
 		});
+    },
+    updateFighterDirection: async (direction) => {
+        const $this = get()
+        $this.sendJsonMessage({
+            type: "update_fighter_direction",
+            data: { direction: direction as any }
+        });
     }
 
 }), shallow)

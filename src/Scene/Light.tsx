@@ -11,7 +11,7 @@ const Light = memo(function Light() {
     const lightPosition = useMemo(() => new THREE.Vector3(0, 10, 5), [])
     useEffect(() => {
         if (!fighterNode.current || !shadowlightRef.current) { return }
-        shadowlightRef.current.target = fighterNode.current
+        shadowlightRef.current.target = fighterNode.current 
     }, [fighterNode.current, shadowlightRef.current])
     // Move shadow light shadow
     useFrame(() => {

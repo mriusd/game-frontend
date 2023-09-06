@@ -9,7 +9,6 @@ import Name from '../components/Name'
 import { getShaderedNpc } from "./utils/getShaderedNpc"
 import { useCore } from "store/useCore"
 import { isEqualCoord } from 'Scene/utils/isEqualCoord'
-import HeatBox from 'Scene/components/HeatBox'
 
 import { useActions } from './hooks/useActions'
 import { useSkillEvent } from './hooks/useSkillEvent'

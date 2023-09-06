@@ -1,6 +1,6 @@
 import * as THREE from "three"
 import { useEffect, useState, useRef, memo, useMemo, useImperativeHandle, useCallback } from "react"
-import { useThree } from "@react-three/fiber"
+import { useFrame, useThree } from "@react-three/fiber"
 import { useAnimations } from "@react-three/drei"
 import { CAMERA_POSITION } from "../config"
 import { getNearestEmptySquareToTarget, getTargetSquareWithAttackDistance } from "../utils/getNextPosition"
@@ -16,13 +16,13 @@ import FighterModel from "./FighterModel"
 import { getAttackAction, getRunAction, getStandAction } from "./utils/getAction"
 // TODO: Temporary, create Skills Manager and swap shader materials instead
 import TwistingSlash from "./Skills/TwistingSlash/TwistingSlash"
-import { useControls } from "leva"
 import LastMessage from "./components/LastMessage"
 import { useCore } from "store/useCore"
 import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
 import { useEvents } from "store/EventStore"
 import { useFighter } from "./useFighter"
 import { getShaderedFighter } from "./utils/getFighterModel"
+import { useControls } from "Scene/Controls/useControls"
 
 const Fighter = memo(function Fighter() {
     const spawned = useRef(false)
@@ -31,40 +31,13 @@ const Fighter = memo(function Fighter() {
     const [fighter, fighterNode] = useFighter(state => [state.fighter, state.fighterNode])
     const { model, animations } = getShaderedFighter('man')
     const matrixCoordToWorld = useCore(state => state.matrixCoordToWorld)
-    const currentWorldCoordinate = useRef<Coordinate>(null)
-    const setCurrentWorldCoordinate = useCallback((coordinate: Coordinate) => {
-        if (!fighterNode.current) { return console.warn('[Fighter]: fighterNode not found') }
-        fighterNode.current.position.set(coordinate.x, fighterNode.current.position.y, coordinate.z)
-    }, [])
     const occupiedCoords = useCore(state => state.occupiedCoords)
     const [setPosition, move] = useFighter(state => [state.setPosition, state.move])
     const [isMoving, setIsMoving] = useFighter(state => [state.isMoving, state.setIsMoving])
 
-    const {
-        moveFighter,
-        worldSize,
-        itemTarget, setItemTarget,
-
-        // currentMatrixCoordinate, setCurrentMatrixCoordinate,
-        // currentWorldCoordinate, setCurrentWorldCoordinate,
-        setNextMatrixCoordinate,
-        setNextWorldCoordinate,
-
-        setSceneObject,
-
-        controller: {
-            focusedMatrixCoordinate,
-            direction,
-        },
-    } = useSceneContext()
-
-
-
     // const [serverMatrixCoordinate, setServerMatrixCoordinate] = useState<Coordinate | null>(null)
     // const [targetMatrixCoordinate, setTargetMatrixCoordinate] = useState<Coordinate | null>(null)
     // const [ targetWorldPosition, setTargetWorldPosition ] = useState(null) // we use 1 cell move instead
-
-    const [saveFocusedMatrixCoordinate, setSaveFocusedMatrixCoordinate] = useState<Coordinate | null>(null)
 
     // Unlike 'isMoving', 'isStaying' sets to TRUE with delay, but sets to FALSE as 'isMoving' immediately
     const [isStaying, setIsStaying] = useState<boolean>(false)
@@ -91,6 +64,11 @@ const Fighter = memo(function Fighter() {
         }
     }, [fighter, fighterNode.current])
 
+    useFrame(() => {
+        if (!fighterNode.current) { return }
+        fighterNode.current.rotation.y = useControls.getState().direction
+    })
+
 
 
     // Synchronize server and locale Fighter position
@@ -103,21 +81,6 @@ const Fighter = memo(function Fighter() {
     //     setCurrentMatrixCoordinate({ ...serverMatrixCoordinate })
     // }, [serverMatrixCoordinate])
 
-    // // Set position to move to
-    // useEffect(() => {
-    //     console.log('[Fighter]: Set target position')
-    //     if (!isSpawned) { return }
-    //     if (!focusedMatrixCoordinate) { return }
-    //     if (isOccupiedCoordinate(occupiedCoords, focusedMatrixCoordinate)) { return }
-    //     setSaveFocusedMatrixCoordinate(focusedMatrixCoordinate)
-    // }, [focusedMatrixCoordinate])
-    // useEffect(() => {
-    //     // use isStaying instead isMoving to prevent "jumping" on checkpoint, and instead set new target on move end in TWEEN
-    //     if (!isStaying) { return }
-    //     if (!saveFocusedMatrixCoordinate) { return }
-    //     setTargetMatrixCoordinate(saveFocusedMatrixCoordinate)
-    // }, [saveFocusedMatrixCoordinate, isMoving])
-    // // Set target position to move on Object click
 
     // // TODO: Fix, just for test
     // const renderEffect = useRef(false)
@@ -224,43 +187,6 @@ const Fighter = memo(function Fighter() {
     // }, [targetMatrixCoordinate, currentMatrixCoordinate])
 
 
-    // // Toggle movement animation
-    // useEffect(() => {
-    //     if (!actions || !fighter) { return }
-    //     console.log('[Fighter]: Toggle isMoving animation', mixer, actions)
-    //     // console.log(actions)
-    //     const { action: runAction, lastAction: lastRunAction } = getRunAction(actions, fighter)
-    //     const { action: standAction, lastAction: lastStandAction } = getStandAction(actions, fighter)
-
-    //     // TODO: do this another way
-    //     // change after ill rewrite fighter
-    //     // Reset old animations
-    //     lastRunAction?.stop()
-    //     lastStandAction?.stop()
-
-    //     if (isStaying) {
-    //         runAction?.fadeOut(.1).stop()
-    //         standAction?.play()
-    //     } else {
-    //         standAction?.fadeOut(.1).stop()
-    //         runAction?.setDuration(60 / fighter.movementSpeed * 3).play()
-    //     }
-    // }, [isStaying])
-
-
-    // // Change Pose if Fighter Equipment Changes
-    // // TODO: Change this to a correct implementation
-    // useEffect(() => {
-    //     if (!actions) { return }
-    //     const { action: standAction, lastAction: lastStandAction } = getStandAction(actions, fighter)
-    //     lastStandAction?.stop()
-    //     standAction?.play()
-    // }, [fighter])
-
-    // if (!currentWorldCoordinate) {
-    //     return <></>
-    // }
-
     return (
         <group>
             <LastMessage offset={.5} fighter={fighter} target={animationTarget} />
@@ -268,9 +194,6 @@ const Fighter = memo(function Fighter() {
                 ref={animationTarget}
                 model={model}
                 fighter={fighter}
-                // position={[currentWorldCoordinate.x, 0, currentWorldCoordinate.z]}
-                position={[0, 0, 0]}
-                rotation={[0, direction, 0]}
             >
                 {/* TODO: Temporary, create Skills Manager and swap shader materials instead */}
                 {/* <TwistingSlash renderEffect={renderEffect} onEffectComplete={() => renderEffect.current = false} /> */}
