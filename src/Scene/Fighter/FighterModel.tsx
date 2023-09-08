@@ -8,8 +8,8 @@ import { Fighter } from "interfaces/fighter.interface"
 import { getEquipmentBodyType } from "./utils/getEquipmentBodyType"
 import LastMessage from './components/LastMessage'
 
-interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, position?: number[], rotation?: number[], children?: any }
-const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, fighter, position, rotation, children }: Props, ref) {
+interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, children?: any }
+const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, fighter, children }: Props, ref) {
 
     // Equipment we take on Fighter
     // const equipment = useEvents(state => state.equipment)
@@ -233,20 +233,13 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
 
     return (
         <group name="fighter-model">
-            <group
+            <primitive 
                 ref={modelRef}
-                // @ts-expect-error
-                position={position}
-                // @ts-expect-error
-                rotation={rotation}
+                object={model}
+                scale={.3}
             >
-                <primitive 
-                    object={model}
-                    scale={.3}
-                    castShadow 
-                />
                 { children }
-            </group>
+            </primitive>
         </group>
     )
 }))

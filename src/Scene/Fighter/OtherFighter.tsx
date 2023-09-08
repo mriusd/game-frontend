@@ -174,8 +174,8 @@ const OtherFighter = memo(function OtherFighter({ fighter }: Props) {
                 ref={animationTarget}
                 model={gltf.scene}
                 fighter={fighter}
-                position={[currentWorldPosition.x, 0, currentWorldPosition.z]}
-                rotation={[0, direction, 0]}
+                // position={[currentWorldPosition.x, 0, currentWorldPosition.z]}
+                // rotation={[0, direction, 0]}
             >
                 <TwistingSlash renderEffect={renderEffect} onEffectComplete={() => renderEffect.current = false}/>
             </FighterModel>

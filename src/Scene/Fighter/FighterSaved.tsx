@@ -23,7 +23,7 @@ import { useCore } from "store/useCore"
 import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
 import { useEvents } from "store/EventStore"
 import { useFighter } from "./useFighter"
-import { getShaderedFighter } from "./utils/getFighterModel"
+import { useShaderedFighter } from "./utils/getFighterModel"
 
 const Fighter = memo(function Fighter() {
     const cameraPosition = useMemo(() => new THREE.Vector3(...CAMERA_POSITION), [])
@@ -31,7 +31,7 @@ const Fighter = memo(function Fighter() {
     const submitMalee = useEvents(state => state.submitMalee)
     const [target, setTarget] = useEvents(state => [state.target, state.setTarget])
     const [fighter, fighterNode] = useFighter(state => [state.fighter, state.fighterNode])
-    const { model, animations } = getShaderedFighter('man')
+    const { model, animations } = useShaderedFighter('man')
 
     const {
         moveFighter,
@@ -105,9 +105,9 @@ const Fighter = memo(function Fighter() {
     useEffect(() => {
         if (!serverMatrixCoordinate || !currentMatrixCoordinate) { return }
         // Check if the same position while staying & does not differ by more than one cell while moving
-        if (euclideanDistance(serverMatrixCoordinate, currentMatrixCoordinate, isStaying ? 0 : 1)) {
-            return
-        }
+        // if (euclideanDistance(serverMatrixCoordinate, currentMatrixCoordinate, isStaying ? 0 : 1)) {
+        //     return
+        // }
         setCurrentMatrixCoordinate({ ...serverMatrixCoordinate })
     }, [serverMatrixCoordinate])
 
@@ -282,8 +282,8 @@ const Fighter = memo(function Fighter() {
                 ref={animationTarget}
                 model={model}
                 fighter={fighter}
-                position={[currentWorldCoordinate.x, 0, currentWorldCoordinate.z]}
-                rotation={[0, direction, 0]}
+                // position={[currentWorldCoordinate.x, 0, currentWorldCoordinate.z]}
+                // rotation={[0, direction, 0]}
             >
                 {/* TODO: Temporary, create Skills Manager and swap shader materials instead */}
                 <TwistingSlash renderEffect={renderEffect} onEffectComplete={() => renderEffect.current = false} />
