@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { create } from "zustand";
 import { getMeshDimensions } from 'Scene/utils/getMeshDimensions';
 import { RefObject, createRef } from 'react';
-import { useEvents } from './EventStore';
+import { useEvents } from '../../../store/EventStore';
 
 export interface BackpackStoreInterface {
     // Backpack slots
@@ -21,7 +21,7 @@ export interface BackpackStoreInterface {
     equipmentSlots: RefObject<{[key: number]: THREE.Mesh}>
 }
 
-export const useBackpackStore = create<BackpackStoreInterface>((set, get) => ({
+export const useBackpack = create<BackpackStoreInterface>((set, get) => ({
     width: 0,
     height: 0,
     cellSize: 48,

@@ -1,8 +1,7 @@
 import styles from './UserInterface2D.module.scss'
 
 import { Leva } from 'leva'
-import { useBackpackStore } from 'store/backpackStore'
-import { useSceneContext } from 'store/SceneContext'
+import { useBackpack } from 'Scene/UserInterface3D/Backpack/useBackpack'
 
 import CommandLine from './CommandLine/CommandLine'
 import Stats from './Stats/Stats'
@@ -10,10 +9,16 @@ import Skills from './Skills/Skills'
 
 import OpenButton from 'Auth/OpenButton'
 
+import { useEvents } from 'store/EventStore'
+import { useFighter } from 'Scene/Fighter/useFighter'
+import { useCore } from 'store/useCore'
+
 
 const UserInterface2D = () => {
-    const store = useSceneContext()
-    const isBackpackOpened = useBackpackStore(state => state.isOpened)
+    const [playerList] = useEvents(state => [state.playerList])
+    const fighterNode = useFighter(state => state.fighterNode)
+    const isBackpackOpened = useBackpack(state => state.isOpened)
+    const [worldSize] = useCore(state => [state.worldSize])
 
     // const handleClick = (e) => {
     //     e.preventDefault()
@@ -33,17 +38,17 @@ const UserInterface2D = () => {
 
             {/* For test */}
             {
-                store.PlayerList.current.length && (
+                playerList.length && (
                     <div className={styles.players}>
-                        <p>Close Players({store.PlayerList.current.length}):</p>
-                        { store.PlayerList.current.map(_ => (<p key={_.id}>{ `${store.fighter.name} [${_.coordinates.x}, ${_.coordinates.z}]` }<span></span></p>)) }
+                        <p>Close Players({playerList.length}):</p>
+                        { playerList.map(_ => (<p key={_.id}>{ `${_.name} [${_.coordinates.x}, ${_.coordinates.z}]` }<span></span></p>)) }
                     </div>
                 )
             }
             <div className={styles.coordinates}>
-                <div>World size [{store.worldSize.current}x{store.worldSize.current}]</div>
+                <div>World size [{worldSize}x{worldSize}]</div>
                 {/* <div>Server coordinate [ X: {store.currentMatrixCoordinate?.x} Z: {store.currentMatrixCoordinate?.z} ]</div> */}
-                <div>Coordinate [ X: {store.currentWorldCoordinate?.x.toFixed(0)} Z: {store.currentWorldCoordinate?.z.toFixed(0)} ]</div>
+                <div>Coordinate [ X: {fighterNode.current?.position?.x.toFixed(0)} Z: {fighterNode.current?.position?.z.toFixed(0)} ]</div>
             </div>
             <Leva
                 hidden={!isBackpackOpened}

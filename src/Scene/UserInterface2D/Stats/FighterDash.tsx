@@ -1,10 +1,10 @@
-import { useEventCloud } from 'store/EventCloudContext';
 import styles from './Stats.module.scss'
-import { useMemo } from 'react';
+import React from 'react';
+import { useFighter } from 'Scene/Fighter/useFighter';
 
 const Fighter = () => {
-	const { fighter } = useEventCloud();
-	const color = useMemo(() => {
+    const fighter = useFighter(state => state.fighter)
+	const color = React.useMemo(() => {
 		const at = fighter.currentHealth / fighter.maxHealth
 		if ( at > .7 ) {
 			return 'green'
@@ -14,8 +14,8 @@ const Fighter = () => {
 		}
 		return 'red'
 	}, [fighter])
-	const width = useMemo(() => fighter.currentHealth / fighter.maxHealth * 100 || 0, [])
-	const progressStyle = useMemo(() => ({ backgroundColor: color, width: width+'%' }), [color, width])
+	const width = React.useMemo(() => fighter.currentHealth / fighter.maxHealth * 100 || 0, [])
+	const progressStyle = React.useMemo(() => ({ backgroundColor: color, width: width+'%' }), [color, width])
 	return (
 		<div className={styles.FighterDash}>
 			<div><div style={progressStyle} ></div></div>

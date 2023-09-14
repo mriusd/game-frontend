@@ -1,20 +1,21 @@
-import { Plane, Text } from "@react-three/drei"
-import { setCursorPointer } from "Scene/utils/setCursorPointer"
-import { useSceneContext } from "store/SceneContext"
+import { useCore } from "store/useCore"
+import { useUi } from "./useUI"
 
 
 const Button = ({ children, name, fontSize = 16, color = 'black', onClick, args = [100, 30], ...props }) => {
-    const { html, setHoveredItems } = useSceneContext()
+    
+    const [setHoveredItems] = useCore(state => [state.setHoveredItems])
+    const setCursor = useUi(state => state.setCursor)
     
     const handlePointerEnter = () => {
-        setCursorPointer(html, true)
+        setCursor('pointer')
         // Just for test, cuz its wrong to hoveredItems provide this way
         // I think ill change this after ill move to another store
         // @ts-expect-error
         setHoveredItems({ id: name }, 'add')
     }
     const handlePointerLeave = () => {
-        setCursorPointer(html, false)
+        setCursor('default')
         // Just for test
         // @ts-expect-error
         setHoveredItems({ id: name }, 'remove')

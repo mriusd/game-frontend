@@ -1,10 +1,14 @@
 import styles from './Skills.module.scss'
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Skill } from 'interfaces/skill.interface';
-import { useEventCloud } from 'store/EventCloudContext';
+
+import { useFighter } from 'Scene/Fighter/useFighter';
+import { useEvents } from 'store/EventStore';
 
 const Skills = () => {
-    const { fighter, selectedSkill, setSelectedSkill } = useEventCloud();
+    const fighter = useFighter(state => state.fighter)
+    const [ selectedSkill, setSelectedSkill ] = useEvents(state => [state.selectedSkill, state.setSelectedSkill]);
+
     const skills = useRef<Record<number, Skill>>({})
 
     const toggleSkill = useCallback((skillId: number) => {

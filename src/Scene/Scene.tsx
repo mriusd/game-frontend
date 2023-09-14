@@ -5,27 +5,24 @@ import { Object3D } from "three"
 
 import { Canvas } from "@react-three/fiber"
 import { useRef, memo, Suspense, useEffect } from "react"
-import { useSceneContext } from "store/SceneContext"
 import { Loader, Stats, OrbitControls } from "@react-three/drei"
-
-import { CAMERA_POSITION } from "./config"
 
 import Light from "./Light"
 import Chunks from "./Chunks/Chunks"
 import Fighter from "./Fighter/Fighter"
 import Npc from "./Npc/Npc"
 import Controller from "./Controls/Controls"
-import DroppedItem from "./DroppedItem"
+import DroppedItem from "./DroppedItem/DroppedItem"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"
 import Decor from "./Decor/Decor"
 import DecorTest from './Decor/DecorTest'
 import UserInterface3D from './UserInterface3D/UserInterface3D'
 import GLTFLoader from './GLTFLoader/GLTFLoader'
-import OtherFighter from './Fighter/OtherFighter'
+import OtherFighter from './Fighter/OtherFighter/OtherFighter'
 import NpcList from './Npc/NpcList'
 import Camera from './Camera'
 
-import { useUi } from 'store/useUI'
+import { useUi } from './UserInterface3D/useUI'
 
 import Postprocessing from './Postprocessing'
 import { Environment } from '@react-three/drei'
@@ -40,7 +37,6 @@ import { AdaptiveDpr } from '@react-three/drei'
 import { useControls } from 'leva'
 
 const Scene = memo(function Scene() {
-    const store = useSceneContext()
     const worldRef = useRef<Object3D | null>(null)
     const eventsNode = useUi(state => state.eventsNode)
     const [devMode, setDevMode] = useCore(state => [state.devMode, state.setDevMode], shallow)
@@ -70,14 +66,14 @@ const Scene = memo(function Scene() {
                 <Suspense fallback={null}>
                     <GLTFLoader>
                         <NpcList/>
-                        {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
-                        {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)}
+                        {/* {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
+                        {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)} */}
                         {/* <DecorTest/> */}
-                        {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)}
+                        {/* {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)} */}
                         <Fighter />
                         <Chunks />
                         { !devMode ? <Controller /> : <></> }
-                        <FloatingDamage />
+                        {/* <FloatingDamage /> */}
                         <UserInterface3D />
                         <Light />
                     </GLTFLoader>

@@ -4,7 +4,6 @@ import { useEffect, useState, useRef, useMemo, memo } from "react"
 import { matrixCoordToWorld } from "../utils/matrixCoordToWorld"
 import Tween from "../utils/tween/tween"
 import { Coordinate } from "interfaces/coordinate.interface"
-import { useSceneContext } from "store/SceneContext"
 import { useAnimations } from "@react-three/drei"
 import { getMoveDuration } from '../utils/getMoveDuration'
 import HealthBar from '../components/HealthBar'
@@ -15,6 +14,8 @@ import { setCursorPointer } from '../utils/setCursorPointer'
 import ReuseModel from '../components/ReuseModel'
 import { useGLTFLoaderStore } from '../GLTFLoader/GLTFLoaderStore'
 
+import { useCore } from 'store/useCore'
+
 interface Props { 
     objectData: {
         location: Coordinate
@@ -23,22 +24,25 @@ interface Props {
     } 
 }
 const Decor = memo(function Decor({ objectData }: Props) {
-    const { worldSize, html, setHoveredItems, setSceneObject, getSceneObject } = useSceneContext()
+    const [matrixCoordToWorld, setSceneObject] = useCore(state => [state.matrixCoordToWorld, state.setSceneObject])
+
+
+
     // const model = useMemo(() => useGLTFLoaderStore.getState().models.current.tree, [])
     const model = useGLTFLoaderStore(state => state.models.current.tree)
 
-    const worldCoordinate = useMemo(() => matrixCoordToWorld(worldSize.current, objectData.location), [objectData])
+    const worldCoordinate = useMemo(() => matrixCoordToWorld(objectData.location), [objectData])
     const modelRef = useRef<THREE.Mesh | null>(null)
 
-    // // Save ref to object to store & rm on unmount
+    // Save ref to object to store & rm on unmount
     // useEffect(() => {
-    //     if (animationTarget.current) {
-    //         setSceneObject(npc.id, animationTarget.current, 'add')
+    //     if (modelRef.current) {
+    //         setSceneObject(npc.id, modelRef.current, 'add')
     //     }
     //     return () => {
-    //         setSceneObject(npc.id, animationTarget.current, 'remove')
+    //         setSceneObject(npc.id, modelRef.current, 'remove')
     //     }
-    // }, [animationTarget.current])
+    // }, [modelRef.current])
 
 
     if (!model || !worldCoordinate) {

@@ -2,7 +2,7 @@ import { ScreenSpace } from "@react-three/drei"
 import { Plane, Hud } from "@react-three/drei"
 import { memo } from "react"
 
-import { useUi } from "store/useUI"
+import { useUi } from "./useUI"
 
 import Backpack from "./Backpack/Backpack"
 import BottomMenu from "./BottomMenu"

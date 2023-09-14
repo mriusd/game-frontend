@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React from "react"
 import { useUi } from "Scene/UserInterface3D/useUI"
 import { useEvents } from 'store/EventStore'
 import { useFighter } from 'Scene/Fighter/useFighter'
@@ -13,7 +13,7 @@ export const usePointerEvents = (npc: Fighter) => {
 
 
     // Set target & hover
-    const handlePointerEnter = useCallback((e) => {
+    const handlePointerEnter = React.useCallback((e) => {
         if (npc.isDead) { return }
         e.stopPropagation()
         nameColor.current = 0xFF3300
@@ -21,13 +21,13 @@ export const usePointerEvents = (npc: Fighter) => {
         // setHoveredItems(npc, 'add')
     }, [npc])
 
-    const handlePointerLeave = useCallback(() => {
+    const handlePointerLeave = React.useCallback(() => {
         nameColor.current = 0xFFFFFF
         setCursor('default')
         // setHoveredItems(npc, 'remove')
     }, [npc])
 
-    const handleLeftClick = useCallback((e) => {
+    const handleLeftClick = React.useCallback((e) => {
         if (npc.isDead) { return }
         e.stopPropagation()
         setTarget(npc, fighter.skills[0])

@@ -3,11 +3,11 @@ import { memo, useCallback } from "react"
 import { useRef, useEffect } from "react"
 import { useFrame, useThree } from "@react-three/fiber"
 import { Box } from "@react-three/drei"
-import { useBackpackStore } from "store/backpackStore"
+import { useBackpack } from "Scene/UserInterface3D/Backpack/useBackpack"
 import { angleToVector } from "../utils/angleToVector"
 
 import { useCore } from "store/useCore"
-import { useUi } from "store/useUI"
+import { useUi } from "Scene/UserInterface3D/useUI"
 import { useFighter } from "Scene/Fighter/useFighter"
 import { useEvents } from "store/EventStore"
 import { useControls } from "./useControls"
@@ -28,7 +28,7 @@ const Controller = memo(function Controller() {
     // TODO: Make Raycaster Cheaper
     useFrame(({ raycaster }) => {
         if (useCore.getState().hoveredItems.length) { return }
-        if (useBackpackStore.getState().isOpened) { return }
+        if (useBackpack.getState().isOpened) { return }
 
         const intersected = calcPointerCoordinate(raycaster)
         if (intersected) { setPointerCoordinate(intersected) }
@@ -64,7 +64,7 @@ const Controller = memo(function Controller() {
         isHolding.current = true
         
         if (useCore.getState().hoveredItems.length) { return }
-        if (useBackpackStore.getState().isOpened) { return }
+        if (useBackpack.getState().isOpened) { return }
 
         move(useControls.getState().pointerCoordinate)
     }, [])

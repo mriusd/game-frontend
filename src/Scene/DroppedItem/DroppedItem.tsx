@@ -1,27 +1,33 @@
 import * as THREE from "three"
 import { Coordinate } from "interfaces/coordinate.interface"
 import { useEffect, useMemo, useRef, useState, memo } from "react"
-import { matrixCoordToWorld } from "./utils/matrixCoordToWorld"
-import { useSceneContext } from "store/SceneContext"
 import { Mesh } from "three"
-import { setCursorPointer } from "./utils/setCursorPointer"
-import { useEventCloud } from "store/EventCloudContext"
+import { setCursorPointer } from "../utils/setCursorPointer"
 import { Plane, Text } from "@react-three/drei"
-import { createBillboardMaterial } from "./helpers/createBillboardMaterial"
-import { getMeshDimensions } from "./utils/getMeshDimensions"
+import { createBillboardMaterial } from "../helpers/createBillboardMaterial"
+import { getMeshDimensions } from "../utils/getMeshDimensions"
 import type { ItemDroppedEvent } from "interfaces/item.interface"
-import { getShaderedBackpackModel } from "./UserInterface3D/Backpack/utils/getShaderedBackpackModel"
+import { getShaderedBackpackModel } from "../UserInterface3D/Backpack/utils/getShaderedBackpackModel"
 import { useFrame } from "@react-three/fiber"
 import { useTexture } from "@react-three/drei"
 import { useSpring } from "react-spring"
 import { animated } from "@react-spring/three"
 import { easings } from "react-spring"
+import { generateItemName } from "Scene/utils/generateItemName"
+
+import { useEvents } from "store/EventStore"
+import { useCore } from "store/useCore"
+import { useUi } from "Scene/UserInterface3D/useUI"
 
 interface Props { item: ItemDroppedEvent }
 const DroppedItem = memo(function DroppedItem({ item }: Props) {
     const itemRef = useRef<Mesh | null>(null)    
-    const { pickupDroppedItem, generateItemName } = useEventCloud()
-    const { worldSize, html, setHoveredItems, setItemTarget } = useSceneContext()
+
+    const [pickupDroppedItem] = useEvents(state => [state.pickupDroppedItem])
+    const [setHoveredItems, matrixCoordToWorld] = useCore(state => [state.setHoveredItems, state.matrixCoordToWorld])
+    const setCursor = useUi(state => state.setCursor)
+
+
     const [ currentWorldCoordinate, setCurrentWorldCoordinate ] = useState<Coordinate | null>(null)
     const rotationZ = useMemo(() => Math.random() * Math.PI * 2, [])
     const offsetX = useMemo(() => Math.random() * .5 - .25, [])
@@ -87,12 +93,12 @@ const DroppedItem = memo(function DroppedItem({ item }: Props) {
     useEffect(() => {
         // console.log(item, 'item')
         if (item?.coords) {
-            setCurrentWorldCoordinate(matrixCoordToWorld(worldSize.current, item.coords))
+            setCurrentWorldCoordinate(matrixCoordToWorld(item.coords))
         }
     }, [item])
 
     const handlePointerEnter = () => {
-        setCursorPointer(html, true)
+        setCursor('pointer')
         // @ts-expect-error
         setHoveredItems(item, 'add')
         if (!itemRef.current) { return }
@@ -101,7 +107,7 @@ const DroppedItem = memo(function DroppedItem({ item }: Props) {
         setOpacity(itemRef.current, .4)
     }
     const handlePointerLeave = () => {
-        setCursorPointer(html, false)
+        setCursor('default')
         // @ts-expect-error
         setHoveredItems(item, 'remove')
         if (!itemRef.current) { return }
@@ -122,7 +128,8 @@ const DroppedItem = memo(function DroppedItem({ item }: Props) {
     }
     const handlePointerClick = () => {
         pickupDroppedItem(item)
-        setItemTarget(item)
+        // TODO: Check what it was
+        // setItemTarget(item)
     }
 
     useFrame(({ clock }) => {
@@ -133,9 +140,9 @@ const DroppedItem = memo(function DroppedItem({ item }: Props) {
 
     // Drop animation
     const { posX, posY, posZ } = useSpring({
-        posX: position.x ? position.x : matrixCoordToWorld(worldSize.current, item.coords).x,
+        posX: position.x ? position.x : matrixCoordToWorld(item.coords).x,
         posY: position.y ? position.y : 2.5,
-        posZ: position.z ? position.z : matrixCoordToWorld(worldSize.current, item.coords).z,
+        posZ: position.z ? position.z : matrixCoordToWorld(item.coords).z,
         config: {
             easing: easings.easeInBack,
             duration: 500

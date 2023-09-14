@@ -7,7 +7,6 @@ import type { Coordinate } from 'interfaces/coordinate.interface';
 import { getMoveDuration } from 'Scene/utils/getMoveDuration';
 import Tween from 'Scene/utils/tween/tween';
 import { isEqualCoord } from 'Scene/utils/isEqualCoord';
-import { getNearestEmptySquareToTarget } from 'Scene/utils/getNextPosition';
 
 import { useCore } from 'store/useCore';
 import { useEvents } from 'store/EventStore';
@@ -43,7 +42,7 @@ export const useFighter = createWithEqualityFn<UseFighterInterface>((set, get) =
     fighterNode: createRef(),
     otherFightersNode: [],
     // TODO: Add other fighters node manager system
-    setOtherFightersNode: (node, action) => { },
+    setOtherFightersNode: (node, action) => {},
     isMoving: false,
     setIsMoving: (isMoving) => set({ isMoving }),
     move: (to) => {
@@ -55,7 +54,7 @@ export const useFighter = createWithEqualityFn<UseFighterInterface>((set, get) =
         if (isEqualCoord(ref.position, to)) { return }
         // console.log('move', ref.position, to)
 
-        const nextMatrixPosition = getNearestEmptySquareToTarget($core.occupiedCoords, $this.fighter.coordinates, $core.worldCoordToMatrix(to))
+        const nextMatrixPosition = $core.getNearestEmptySquareToTarget($this.fighter.coordinates, $core.worldCoordToMatrix(to))
         // console.log('nextMatrixPos', nextMatrixPosition)
         if (!nextMatrixPosition) { return }
         const next = $core.matrixCoordToWorld(nextMatrixPosition)
@@ -73,7 +72,7 @@ export const useFighter = createWithEqualityFn<UseFighterInterface>((set, get) =
                 onChange: (state: { value: Coordinate }) => void $this.setPosition(state.value),
                 onComplete: () => { 
                     $this.setIsMoving(false)
-                    set({ actionTimeout: setTimeout(() => get().action === 'run' && $this.setAction('stand'), 50)})
+                    set({ actionTimeout: setTimeout(() => get().action.includes('run') && $this.setAction('stand'), 50)})
                 },
             }
         )
@@ -90,28 +89,30 @@ export const useFighter = createWithEqualityFn<UseFighterInterface>((set, get) =
     actionTimeout: 0,
     setAction: (outerAction) => {
         const $this = get()
+
         const oldAction = $this.action
         const action = getActionName(outerAction, $this.fighter)
-        console.log(oldAction, action)
+        const timeScale = getActionTimeScale(outerAction, $this.fighter)
         set({ action })
 
         // console.log($this.actions)
         if (oldAction !== action) {
             clearTimeout($this.actionTimeout)
-            $this.actions?.[oldAction]?.fadeOut(FADE_DUR).stop()
-            $this.actions?.[action]?.reset().fadeIn(FADE_DUR).play()
+            $this.actions?.[oldAction]?.stop()
+            $this.actions?.[action]?.reset().setEffectiveTimeScale(timeScale).play()
+
             if (action.includes('die')) {
                 $this.actions[action].clampWhenFinished = true
                 $this.actions?.[action]?.setLoop(THREE.LoopOnce, 0)
             } else
             if (action.includes('attack')) {
-                set({ actionTimeout: setTimeout(() => void $this.setAction('stand'), (($this.actions?.[action]?.getClip()?.duration || 0)) * 1000) })
+                set({ actionTimeout: setTimeout(() => void $this.setAction('stand'), (($this.actions?.[action]?.getClip()?.duration / timeScale || 0)) * 1000) })
             }
         }
         // For Infinite Attack
         else if (oldAction === action && action.includes('attack')) {
             clearTimeout($this.actionTimeout)
-            set({ actionTimeout: setTimeout(() => void $this.setAction('stand'), (($this.actions?.[action]?.getClip()?.duration || 0)) * 1000) })
+            set({ actionTimeout: setTimeout(() => void $this.setAction('stand'), (($this.actions?.[action]?.getClip()?.duration / timeScale || 0)) * 1000) })
         }
     },
 }), shallow)
@@ -134,4 +135,14 @@ function getActionName(action: ActionsType, fighter: Fighter) {
     } else {
         return action
     }
+}
+
+function getActionTimeScale(action: ActionsType, fighter: Fighter) {
+    if (action === 'run') {
+        return 60 / fighter.movementSpeed * 4
+    } else
+    if (action === 'attack') {
+        return fighter.attackSpeed || 3
+    }
+    return 1
 }

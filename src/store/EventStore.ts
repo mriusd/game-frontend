@@ -1,27 +1,44 @@
 import { createWithEqualityFn } from 'zustand/traditional'
 import { shallow } from 'zustand/shallow';
-import type { Inventory, InventorySlot } from "interfaces/inventory.interface";
-import { useBackpackStore } from "./backpackStore";
-import { Coordinate } from "interfaces/coordinate.interface";
-
-// TODO: Move the hole websocket over here or just change the EventCloud
-// import useWebSocket from "react-use-websocket";
-import type { JsonValue } from "react-use-websocket/dist/lib/types";
 
 // For TEST, Then has to get from server
 import { equipment as equipmentSlots } from "interfaces/equipment.interface";
-import type { Equipment } from "interfaces/equipment.interface";
+// 
 
+import type { JsonValue } from "react-use-websocket/dist/lib/types";
+import type { Equipment } from "interfaces/equipment.interface";
 import type { Fighter } from 'interfaces/fighter.interface';
 import type { Skill } from 'interfaces/skill.interface';
 import type { Direction } from 'interfaces/direction.interface';
-
+import type { FighterAttributes } from 'interfaces/fighterAttributes.interface';
+import type { Inventory, InventorySlot } from "interfaces/inventory.interface";
+import type { Coordinate } from "interfaces/coordinate.interface";
+import type { ItemDroppedEvent } from 'interfaces/item.interface';
+import type { MapObject } from 'interfaces/mapObject.interface';
 
 import { useFighter } from 'Scene/Fighter/useFighter';
+import { useBackpack } from "../Scene/UserInterface3D/Backpack/useBackpack";
+
 
 export interface EventStoreInterface {
     sendJsonMessage: (jsonMessage: JsonValue) => void | null
     init: (sendJsonMessage: (jsonMessage: JsonValue) => void) => void
+
+
+    // Auth
+    account: string
+    setAccount: (account: string) => void
+    sendAuth: (target: any) => void
+    userFighters: FighterAttributes[]
+    setUserFighters: (userFighters: FighterAttributes[]) => void
+    fetchUserFighters: (ownerAddress: string) => void
+    createFighter: (ownerAddress: string, fighterClass: string, name: string) => void
+
+
+    // Players
+    playerList: Fighter[],
+    setPlayerList: (playerList: Fighter[]) => void
+
 
     // Inventory
     backpack: Inventory | null
@@ -30,16 +47,13 @@ export interface EventStoreInterface {
     updateEquipment: (equipment: Record<number, InventorySlot>) => void
     updateBackpack: (backpack: Inventory) => void
 
+
     // User Events
     updateItemBackpackPosition: (itemHash: string, position: { x: number; z: number }) => void
     dropBackpackItem: (itemHash: string, position: { x: number; z: number }) => void
     unequipBackpackItem: (itemHash: string, position: { x: number; z: number }) => void
     equipBackpackItem: (itemHash: string, slot: number) => void
 
-
-    // Server Game Events
-    // events: Array<any>
-    // setEvents: (event: any) => void
 
     // Attack
     target: { target: Fighter | null, skill: Skill | null }
@@ -53,12 +67,75 @@ export interface EventStoreInterface {
     // Fighter
     moveFighter: (coordinate: Coordinate) => void
     updateFighterDirection: (direction: Direction) => void
+
+
+    // Server Game Events
+    events: any[]
+    addEvent: (event: any) => void
+    removeEvent: (event: any) => void
+
+    
+    // Items
+    droppedItems: Record<string, ItemDroppedEvent>
+    setDroppedItems: (droppedItems: Record<string, ItemDroppedEvent>) => void
+    pickupDroppedItem: (event) => void
+    refreshFighterItems: () => void
+
+
+    // Command Line
+    sendCommand: (text: string) => void
+
+
+    // Chat
+	chatLog: any[]
+    setChatLog: (chatLog: {}) => void
+
+
+    // Different
+	mapObjects: MapObject[]
+    setMapObjects: (mapObjects: MapObject[]) => void
 }
 
 export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) => ({
     // Init
     sendJsonMessage: null,
     init: (sendJsonMessage) => set(() => ({ sendJsonMessage })),
+
+
+    // Auth
+    account: '',
+    setAccount: (account) => set({ account }),
+    sendAuth: (target) => {
+        const $this = get()
+        $this.sendJsonMessage({
+            type: "auth",
+            data: {
+                playerID: target,
+                userAddress: $this.account,
+                locationHash: "lorencia_0_0"
+            }
+        });
+    },
+    userFighters: [],
+    setUserFighters: (userFighters) => set({ userFighters }),
+    fetchUserFighters: (ownerAddress) => {
+        get().sendJsonMessage({
+            type: "get_user_fighters",
+            data: { ownerAddress }
+        });
+    },
+    createFighter(ownerAddress: string, fighterClass: string, name: string) {
+        get().sendJsonMessage({
+            type: "create_fighter",
+            data: { ownerAddress, fighterClass, name }
+        });
+    },
+
+
+    // Players
+    playerList: [],
+    setPlayerList: (playerList) => set({ playerList }),
+
 
     // Inventory
     backpack: null,
@@ -71,7 +148,7 @@ export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) =>
     updateBackpack: (backpack) => {
         set(() => ({ backpack: backpack }))
         // Sets the size of backpack based on Server Side
-        useBackpackStore.setState(() => ({ width: backpack.grid[0].length, height: backpack.grid.length }))
+        useBackpack.setState(() => ({ width: backpack.grid[0].length, height: backpack.grid.length }))
     },
 
     updateItemBackpackPosition(itemHash, position) {
@@ -204,6 +281,7 @@ export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) =>
         });
     },
 
+
     // Attack
     target: { target: null, skill: null },
     setTarget: (target, skill) => set({ target: { target, skill } }),
@@ -237,15 +315,16 @@ export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) =>
             }
         });
     },
-    
+
+
     // Fighter
     moveFighter: async (coordinate) => {
         const $this = get()
         const { x, z } = coordinate
-		$this.sendJsonMessage({
-			type: "move_fighter",
-			data: { x, z }
-		});
+        $this.sendJsonMessage({
+            type: "move_fighter",
+            data: { x, z }
+        });
     },
     updateFighterDirection: async (direction) => {
         const $this = get()
@@ -253,6 +332,53 @@ export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) =>
             type: "update_fighter_direction",
             data: { direction: direction as any }
         });
-    }
+    },
 
+
+    // Server Game Events
+    events: [],
+    addEvent: (event) => void set(state => ({ events: [...state.events, event] })),
+    removeEvent: (event) => void set(state => ({ events: state.events.filter((e) => e !== event) })),
+
+
+    // Items
+    droppedItems: {},
+    setDroppedItems: (droppedItems) => set({ droppedItems }),
+    pickupDroppedItem: (event) => {
+        get().sendJsonMessage({
+            type: "pickup_dropped_item",
+            data: {
+                itemHash: event.itemHash,
+            }
+
+        });
+    },
+    refreshFighterItems: () => {
+        const $fighter = useFighter.getState()
+        get().sendJsonMessage({
+            type: "get_fighter_items",
+            data: {
+                fighterId: parseInt($fighter.fighter.tokenId as any),
+            }
+        });
+    },
+
+
+    // Command Line
+    sendCommand: (text) => {
+		get().sendJsonMessage({
+			type: "message",
+			data: { text }
+		});
+	},
+
+
+    // Chat
+    chatLog: [],
+    setChatLog: (chatLog) => set(state => ({ chatLog: [...state.chatLog, chatLog] })),
+
+
+    // Different
+    mapObjects: [],
+    setMapObjects: (mapObjects) => set({ mapObjects })
 }), shallow)

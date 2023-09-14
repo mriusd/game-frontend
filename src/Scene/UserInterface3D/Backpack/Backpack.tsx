@@ -4,16 +4,16 @@ import { Flex, Box } from '@react-three/flex'
 import { Center, Plane } from '@react-three/drei'
 import { memo } from 'react'
 import BackpackItem from './BackpackItem'
-import { useBackpackStore } from 'store/backpackStore'
+import { useBackpack } from 'Scene/UserInterface3D/Backpack/useBackpack'
 import { shallow } from 'zustand/shallow'
 import { useEvents } from 'store/EventStore'
 import { ThreeEvent, useFrame, useThree } from '@react-three/fiber'
-import { useUi } from 'store/useUI'
+import { useUi } from '../useUI'
 import { getCoordInUISpace } from 'Scene/utils/getCoordInUiSpace'
-import { useFighterStore } from 'store/fighterStore'
 import { Text } from '@react-three/drei'
 import EquipmentItem from './EquipmentItem'
 import { getMeshDimensions } from 'Scene/utils/getMeshDimensions'
+import { useFighter } from 'Scene/Fighter/useFighter'
 
 type CellType = 'equipment' | 'backpack'
 
@@ -42,7 +42,7 @@ const Backpack = memo(function Backpack() {
 
     // console.log('[CPU CHECK]: Rerender <Backpack>')
     const [backpack, equipmentSlots, equipment] = useEvents(state => [state.backpack, state.equipmentSlots, state.equipment], shallow)
-    const [backpackWidth, backpackHeight, isOpened, slotsRef, equipmentSlotsRef, cellSize] = useBackpackStore(state => 
+    const [backpackWidth, backpackHeight, isOpened, slotsRef, equipmentSlotsRef, cellSize] = useBackpack(state => 
         [state.width, state.height, state.isOpened, state.slots, state.equipmentSlots, state.cellSize], 
         shallow
     )
@@ -66,9 +66,6 @@ const Backpack = memo(function Backpack() {
         const backpackWidth = getMeshDimensions(InventorySlotsContainerRef.current).width
         backpackRef.current.position.x = canvasWidth / 2 - backpackWidth - marginRight
     })
-
-    // TODO: Causes lots of backpack rerenders
-    const fighterCurrentMatrixCoordinate = useFighterStore(state => state.currentMatrixCoordinate)
     
     // Transform items to Array for rendering
     const items = useMemo(() => {
@@ -198,7 +195,7 @@ const Backpack = memo(function Backpack() {
             // Drop if nothing hovered
             if (!pointerCell.current) {
                 item.visible = false
-                dropBackpackItem(itemHash, fighterCurrentMatrixCoordinate)
+                dropBackpackItem(itemHash, useFighter.getState().fighter.coordinates)
                 return
             }
 

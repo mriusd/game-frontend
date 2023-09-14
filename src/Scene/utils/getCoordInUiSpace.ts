@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { useUi } from "store/useUI"
+import { useUi } from 'Scene/UserInterface3D/useUI'
 
 export const getCoordInUISpace = (raycaster: THREE.Raycaster) => {
     const userInterface = useUi.getState().userInterface.current

@@ -1,12 +1,12 @@
 import * as THREE from 'three'
 import React, { useEffect, useMemo, useRef } from "react"
-import { useSceneContext } from "store/SceneContext"
 import { InventorySlot } from "interfaces/inventory.interface"
-import { getShaderedEquipment } from "./utils/getShaderedEquipment"
+import { getShaderedEquipment } from "../utils/getShaderedEquipment"
 import { useFrame } from "@react-three/fiber"
 import { Fighter } from "interfaces/fighter.interface"
-import { getEquipmentBodyType } from "./utils/getEquipmentBodyType"
-import LastMessage from './components/LastMessage'
+import { getEquipmentBodyType } from "../utils/getEquipmentBodyType"
+import LastMessage from './LastMessage'
+import { useCore } from 'store/useCore'
 
 interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, children?: any }
 const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, fighter, children }: Props, ref) {
@@ -19,9 +19,8 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
     // Forward ref
     React.useImperativeHandle(ref, () => modelRef.current)
 
-    // TODO: Fix this, dont use sceneContext
-    const { setSceneObject } = useSceneContext()
-
+    // Store Ref Object
+    const setSceneObject = useCore(state => state.setSceneObject)
 
     // Space in Fighter model where we insert all Equipment
     const fighterArmature = useRef<THREE.Group | null>(null)

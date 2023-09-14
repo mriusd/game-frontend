@@ -1,12 +1,13 @@
-import { useEventCloud } from "store/EventCloudContext"
 import { useEffect, useRef, memo, useMemo } from "react"
 import type { Damage } from "interfaces/damage.interface"
 import DamageText from "./DamageText"
-import { useSceneContext } from "store/SceneContext"
 import type { ObjectData } from "interfaces/sceneData.interface"
 import { getDamageColor } from "Scene/utils/getDamageColor"
 import { getDamageValue } from "Scene/utils/getDamageValue"
+
 import { useNpc } from "Scene/Npc/useNpc"
+import { useEvents } from "store/EventStore"
+import { useCore } from "store/useCore"
 
 interface TriggerDamage {
     label: string
@@ -18,8 +19,9 @@ interface TriggerDamage {
 }
 
 const FloatingDamage = memo(function FloatingDamage() {
-    const { events, removeEvent } = useEventCloud()
-    const { getSceneObject, allPlayerList } = useSceneContext()
+    const [events, removeEvent] = useEvents(state => [state.events, state.removeEvent])
+    const [playerList] = useEvents(state => [state.playerList])
+    const [getSceneObject] = useCore(state => [state.getSceneObject])
 
     const npcList = useNpc(state => state.npcList)
 
@@ -51,7 +53,7 @@ const FloatingDamage = memo(function FloatingDamage() {
         if (damageEvents.length > 0) {
             damageEvents.forEach((damageEvent: Damage) => {
                 const npc = npcList.find(npc => npc?.id === String(damageEvent.npcId))
-                const fighter = allPlayerList.find(player => player?.id === String(damageEvent.npcId))
+                const fighter = playerList.find(player => player?.id === String(damageEvent.npcId))
                 const object = npc || fighter
 
                 // TODO: rm bc it kill cpu, should remake damage indicators
@@ -63,22 +65,18 @@ const FloatingDamage = memo(function FloatingDamage() {
                 const target = getSceneObject(object.id)
                 if (!target) { return removeEvent(damageEvent) }
 
-                triggerDamage.current.push(createDamage(damageEvent, target))
+                triggerDamage.current.push(createDamage(damageEvent, target as any))
 
                 // Send one more if double
                 if (damageEvent.dmgType.isDouble) {
                     setTimeout(() => {
-                        triggerDamage.current.push(createDamage(damageEvent, target))
+                        triggerDamage.current.push(createDamage(damageEvent, target as any))
                     }, 100)
                 }
             })
         }
     }, [events])
 
-
-    const Text = useMemo(() => {
-
-    }, [])
 
     return (
         <group name="floatingDamage">

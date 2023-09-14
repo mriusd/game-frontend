@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
-import { useEventCloud } from '../store/EventCloudContext';
-import Web3 from 'web3';
 import styles from './Auth.module.scss'
+
+import React from 'react';
+import Web3 from 'web3';
+
 import { useAuth } from './useAuth';
+import { useEvents } from 'store/EventStore';
 
 function MetamaskDialog() {
-	const [fighterName, setFighterName] = useState<string>('');
-	const { account, setAccount, userFighters, fetchUserFighters, createFighter, sendAuth } = useEventCloud();
+	const [fighterName, setFighterName] = React.useState<string>('');
+	const [account, setAccount, sendAuth, fetchUserFighters, createFighter, userFighters] = useEvents(state => [state.account, state.setAccount, state.sendAuth, state.fetchUserFighters, state.createFighter, state.userFighters])
 	const hide = useAuth(state => state.hide)
 
-	useEffect(() => {
+	React.useEffect(() => {
 		connectToMetamask();
 	}, []);
 

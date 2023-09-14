@@ -11,8 +11,9 @@ import { useCore } from "store/useCore"
 import { isEqualCoord } from 'Scene/utils/isEqualCoord'
 
 import { useActions } from './hooks/useActions'
-import { useSkillEvent } from './hooks/useSkillEvent'
+import { useEvent } from 'Scene/hooks/useEvent'
 import { usePointerEvents } from './hooks/usePointerEvents'
+
 
 interface Props { npc: Fighter }
 const Npc = memo(function Npc({ npc }: Props) {
@@ -84,7 +85,7 @@ const Npc = memo(function Npc({ npc }: Props) {
     }, [isMoving.current])
 
 
-    useSkillEvent(npc, (event, removeEvent) => {
+    useEvent(npc, 'skill', (event, removeEvent) => {
         setAction('attack')
         removeEvent(event)
     })
