@@ -8,8 +8,8 @@ import { getMoveDuration } from 'Scene/utils/getMoveDuration';
 import Tween from 'Scene/utils/tween/tween';
 import { isEqualCoord } from 'Scene/utils/isEqualCoord';
 
-import { useCore } from 'store/useCore';
-import { useEvents } from 'store/EventStore';
+import { useCore } from 'Scene/useCore';
+import { useCloud } from 'EventCloud/useCloud';
 
 export type AllActionsType =  'stand' | 'run' | 'attack' | 'die' | 'sword_attack' | 'sword_run' | 'sword_stand' | 'none'
 export type ActionsType =  'stand' | 'run' | 'attack' | 'die' | 'none'
@@ -63,7 +63,7 @@ export const useFighter = createWithEqualityFn<UseFighterInterface>((set, get) =
         clearTimeout($this.actionTimeout)
         $this.setAction('run')
 
-        useEvents.getState().moveFighter(nextMatrixPosition)
+        useCloud.getState().moveFighter(nextMatrixPosition)
         const current = { x: ref.position.x, z: ref.position.z }
         // console.log('current, next', current, next)
         Tween.to(current, next,

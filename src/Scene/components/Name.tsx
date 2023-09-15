@@ -3,7 +3,7 @@ import { RefObject, useEffect, useMemo, useRef } from "react"
 import type { Mesh, Group } from "three"
 import { useFrame } from "@react-three/fiber"
 import { Text } from "@react-three/drei"
-import { createBillboardMaterial } from "../helpers/createBillboardMaterial"
+import { createBillboardMaterial } from "../materials/createBillboardMaterial"
 import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
 
 interface Props {

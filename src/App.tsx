@@ -1,5 +1,6 @@
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { EventCloudProvider } from 'EventCloud/EventCloud';
 
 import Scene from './Scene/Scene';
 
@@ -33,15 +34,13 @@ function App() {
 	const fighter = useFighter(state => state.fighter)
 
 	return (
-		<DndProvider backend={HTML5Backend}>
-			<Auth />
-			<Chat />
-			{fighter && (
-				// <SceneContextProvider>
-					<Scene />
-				// </SceneContextProvider>
-			)}
-		</DndProvider>
+		<EventCloudProvider>
+			<DndProvider backend={HTML5Backend}>
+				<Auth />
+				<Chat />
+				{fighter && <Scene />}
+			</DndProvider>
+		</EventCloudProvider>
 	);
 
 }

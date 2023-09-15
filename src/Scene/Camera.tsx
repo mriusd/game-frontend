@@ -5,7 +5,7 @@ import { useFrame } from "@react-three/fiber"
 import { PerspectiveCamera } from "@react-three/drei"
 import { CAMERA_POSITION } from "./config"
 
-import { useCore } from "store/useCore"
+import { useCore } from "Scene/useCore"
 import { useFighter } from "./Fighter/useFighter"
 
 const Camera = () => {

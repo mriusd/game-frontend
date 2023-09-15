@@ -1,6 +1,6 @@
 import { useTexture } from "@react-three/drei"
 import { useMemo } from "react"
-import { useCore } from "store/useCore"
+import { useCore } from "Scene/useCore"
 
 export const useLocationTextures = () => {
     const [location, worldSize, chunkSize, chunksPerAxis] = useCore(state => [state.location, state.worldSize, state.chunkSize, state.chunksPerAxis])

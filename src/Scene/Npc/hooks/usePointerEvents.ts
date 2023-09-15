@@ -1,13 +1,13 @@
 import React, { useCallback } from "react"
 import { useUi } from "Scene/UserInterface3D/useUI"
-import { useEvents } from 'store/EventStore'
+import { useCloud } from 'EventCloud/useCloud'
 import { useFighter } from 'Scene/Fighter/useFighter'
 
 import type { Fighter } from "interfaces/fighter.interface"
 
 export const usePointerEvents = (npc: Fighter) => {
     const nameColor = React.useRef<0xFFFFFF | 0xFF3300>(0xFFFFFF)
-    const setTarget = useEvents(state => state.setTarget)
+    const setTarget = useCloud(state => state.setTarget)
     const fighter = useFighter(state => state.fighter)
     const setCursor = useUi(state => state.setCursor)
 

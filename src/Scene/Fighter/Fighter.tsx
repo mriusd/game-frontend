@@ -9,16 +9,16 @@ import TwistingSlash from "./Skills/TwistingSlash/TwistingSlash"
 import LastMessage from "./components/LastMessage"
 import FighterModel from "./components/FighterModel"
 
-import { useCore } from "store/useCore"
-import { useEvents } from "store/EventStore"
+import { useCore } from "Scene/useCore"
+import { useCloud } from "EventCloud/useCloud"
 import { useFighter } from "./useFighter"
 import { useShaderedFighter } from "./utils/getFighterModel"
 import { useControls } from "Scene/Controls/useControls"
 
 const Fighter = React.memo(function Fighter() {
     const spawned = React.useRef(false)
-    const submitMalee = useEvents(state => state.submitMalee)
-    const [target, setTarget] = useEvents(state => [state.target, state.setTarget])
+    const submitMalee = useCloud(state => state.submitMalee)
+    const [target, setTarget] = useCloud(state => [state.target, state.setTarget])
     const [fighter, fighterNode] = useFighter(state => [state.fighter, state.fighterNode])
     const { model, animations } = useShaderedFighter('man')
     const [matrixCoordToWorld, worldCoordToMatrix] = useCore(state => [state.matrixCoordToWorld, state.worldCoordToMatrix])

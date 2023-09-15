@@ -1,9 +1,9 @@
 import * as THREE from 'three'
 import { Text } from "@react-three/drei"
-import { createBillboardMaterial } from "Scene/helpers/createBillboardMaterial"
+import { createBillboardMaterial } from "Scene/materials/createBillboardMaterial"
 import { useMemo } from "react"
 import type { InventorySlot } from 'interfaces/inventory.interface'
-import { generateItemName } from 'helpers/generateItemName'
+import { generateItemName } from 'Scene/utils/generateItemName'
 
 interface Props {
     item: InventorySlot

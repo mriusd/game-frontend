@@ -5,7 +5,7 @@ import { useFrame, useThree } from "@react-three/fiber"
 import React, { useRef, useMemo, useEffect } from "react"
 import { minimap_material } from "./minimap_material"
 
-import { useCore } from 'store/useCore'
+import { useCore } from 'Scene/useCore'
 import { useFighter } from 'Scene/Fighter/useFighter'
 
 const Minimap = ({ ...props }) => {

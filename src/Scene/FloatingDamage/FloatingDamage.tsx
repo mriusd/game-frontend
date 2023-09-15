@@ -6,8 +6,8 @@ import { getDamageColor } from "Scene/utils/getDamageColor"
 import { getDamageValue } from "Scene/utils/getDamageValue"
 
 import { useNpc } from "Scene/Npc/useNpc"
-import { useEvents } from "store/EventStore"
-import { useCore } from "store/useCore"
+import { useCloud } from "EventCloud/useCloud"
+import { useCore } from "Scene/useCore"
 
 interface TriggerDamage {
     label: string
@@ -19,8 +19,8 @@ interface TriggerDamage {
 }
 
 const FloatingDamage = memo(function FloatingDamage() {
-    const [events, removeEvent] = useEvents(state => [state.events, state.removeEvent])
-    const [playerList] = useEvents(state => [state.playerList])
+    const [events, removeEvent] = useCloud(state => [state.events, state.removeEvent])
+    const [playerList] = useCloud(state => [state.playerList])
     const [getSceneObject] = useCore(state => [state.getSceneObject])
 
     const npcList = useNpc(state => state.npcList)

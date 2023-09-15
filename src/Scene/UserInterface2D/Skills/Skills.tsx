@@ -3,11 +3,11 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Skill } from 'interfaces/skill.interface';
 
 import { useFighter } from 'Scene/Fighter/useFighter';
-import { useEvents } from 'store/EventStore';
+import { useCloud } from 'EventCloud/useCloud';
 
 const Skills = () => {
     const fighter = useFighter(state => state.fighter)
-    const [ selectedSkill, setSelectedSkill ] = useEvents(state => [state.selectedSkill, state.setSelectedSkill]);
+    const [ selectedSkill, setSelectedSkill ] = useCloud(state => [state.selectedSkill, state.setSelectedSkill]);
 
     const skills = useRef<Record<number, Skill>>({})
 

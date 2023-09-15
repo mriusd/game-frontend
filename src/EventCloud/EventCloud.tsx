@@ -1,23 +1,28 @@
 import React from 'react';
 import useWebSocket from 'react-use-websocket';
 
-import { useEvents } from 'store/EventStore';
+import type { Fighter } from 'interfaces/fighter.interface';
+
+import { useCloud } from 'EventCloud/useCloud';
 import { useFighter } from 'Scene/Fighter/useFighter';
 import { useNpc } from 'Scene/Npc/useNpc';
+import { useDroppedItem } from 'Scene/DroppedItem/useDroppedItem';
+import { useOtherFighter } from 'Scene/Fighter/OtherFighter/useOtherFighter';
 
 
 const EventCloudContext = React.createContext({});
 const socketUrl = process.env.REACT_APP_WS_URL; // ws://149.100.159.50:8080/ws
-export const EventCloudProvider = ({ children }) => {
-	const setNpcList = useNpc(state => state.setNpcList)
+export const EventCloudProvider = React.memo(function EventCloudProvider({ children }: any) {
+	const [setNpcList] = useNpc(state => [state.setNpcList])
 	const [setFighter] = useFighter(state => [state.setFighter])
-	const [addEvent, setUserFighters] = useEvents(state => [state.addEvent, state.setUserFighters])
-	const [setDroppedItems] = useEvents(state => [state.setDroppedItems]);
-	const [updateBackpack, updateEquipment] = useEvents(state => [state.updateBackpack, state.updateEquipment]);
-	const [refreshFighterItems] = useEvents(state => [state.refreshFighterItems])
-	const [setChatLog] = useEvents(state => [state.setChatLog])
-	const [setPlayerList] = useEvents(state => [state.setPlayerList])
-	const [setMapObjects] = useEvents(state => [state.setMapObjects])
+	const [addEvent, setUserFighters] = useCloud(state => [state.addEvent, state.setUserFighters])
+	const [setDroppedItems] = useDroppedItem(state => [state.setDroppedItems]);
+	const [updateBackpack, updateEquipment] = useCloud(state => [state.updateBackpack, state.updateEquipment]);
+	const [refreshFighterItems] = useCloud(state => [state.refreshFighterItems])
+	const [setChatLog] = useCloud(state => [state.setChatLog])
+	const [setPlayerList] = useCloud(state => [state.setPlayerList])
+	const [setMapObjects] = useCloud(state => [state.setMapObjects])
+	const [setOtherFighter] = useOtherFighter(state => [state.setOtherFighterList])
 
 	const processIncomingMessage = React.useCallback((event: any) => {
 		const msg = JSON.parse(event.data);
@@ -89,11 +94,12 @@ export const EventCloudProvider = ({ children }) => {
 			addEvent({ type: 'damage', npcId: opponent, damage, dmgType, skill, playerFighter, opponentFighter });
 		}
 
-		function handlePing(fighter, mapObjects, npcs, players) {
+		function handlePing(fighter, mapObjects, npcs, players: Fighter[]) {
 			setFighter(fighter);
 			setMapObjects(mapObjects);
 			setNpcList(npcs);
 			setPlayerList(players);
+			setOtherFighter(players.filter(_ => _.id !== useFighter.getState().fighter.id))
 		}
 
 		function handleUpdateBackpack(newBackpack, newEquipment) {
@@ -123,8 +129,8 @@ export const EventCloudProvider = ({ children }) => {
 		onMessage: (event) => processIncomingMessage(event)
 	}), [processIncomingMessage])
 	const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(socketUrl, socketOptions);
-	React.useLayoutEffect(() => void useEvents.getState().init(sendJsonMessage), [])
+	React.useLayoutEffect(() => void useCloud.getState().init(sendJsonMessage), [])
 
 	return <EventCloudContext.Provider value={{}}>{children}</EventCloudContext.Provider>
-};
+});
 

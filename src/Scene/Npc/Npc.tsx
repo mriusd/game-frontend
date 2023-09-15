@@ -7,7 +7,7 @@ import HealthBar from '../components/HealthBar'
 import type { Fighter } from 'interfaces/fighter.interface'
 import Name from '../components/Name'
 import { getShaderedNpc } from "./utils/getShaderedNpc"
-import { useCore } from "store/useCore"
+import { useCore } from "Scene/useCore"
 import { isEqualCoord } from 'Scene/utils/isEqualCoord'
 
 import { useActions } from './hooks/useActions'

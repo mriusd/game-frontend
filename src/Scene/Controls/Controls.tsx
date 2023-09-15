@@ -6,10 +6,10 @@ import { Box } from "@react-three/drei"
 import { useBackpack } from "Scene/UserInterface3D/Backpack/useBackpack"
 import { angleToVector } from "../utils/angleToVector"
 
-import { useCore } from "store/useCore"
+import { useCore } from "Scene/useCore"
 import { useUi } from "Scene/UserInterface3D/useUI"
 import { useFighter } from "Scene/Fighter/useFighter"
-import { useEvents } from "store/EventStore"
+import { useCloud } from "EventCloud/useCloud"
 import { useControls } from "./useControls"
 
 
@@ -19,7 +19,7 @@ const Controller = memo(function Controller() {
     const [isOccupiedCoordinate, groundObject] = useCore(state => [state.isOccupiedCoordinate, state.groundObject])
     const canvas = useThree(state => state.gl.domElement)
     const isHolding = useRef(false)
-    const updateFighterDirection = useEvents(state => state.updateFighterDirection)
+    const updateFighterDirection = useCloud(state => state.updateFighterDirection)
     const [calcDirection, setPointerCoordinate, setDirection] = useControls(state => [state.calcDirection, state.setPointerCoordinate, state.setDirection])
     
     const [worldCoordToMatrix, matrixCoordToWorld] = useCore(state => [state.worldCoordToMatrix, state.matrixCoordToWorld])

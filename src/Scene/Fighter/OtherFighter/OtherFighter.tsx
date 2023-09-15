@@ -10,7 +10,7 @@ import Name from 'Scene/components/Name'
 import FighterModel from '../components/FighterModel'
 import LastMessage from '../components/LastMessage'
 
-import { useCore } from "store/useCore"
+import { useCore } from "Scene/useCore"
 
 import { useActions } from './hooks/useActions'
 import { usePointerEvents } from './hooks/usePointerEvents'

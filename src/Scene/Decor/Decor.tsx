@@ -14,7 +14,7 @@ import { setCursorPointer } from '../utils/setCursorPointer'
 import ReuseModel from '../components/ReuseModel'
 import { useGLTFLoaderStore } from '../GLTFLoader/GLTFLoaderStore'
 
-import { useCore } from 'store/useCore'
+import { useCore } from 'Scene/useCore'
 
 interface Props { 
     objectData: {

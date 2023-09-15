@@ -1,11 +1,11 @@
 import { useRef, useMemo, memo } from "react"
 import ReuseModel from '../components/ReuseModel'
 import { getShaderedDecor } from "./utils/getShaderedDecor"
-import { useCore } from "store/useCore"
+import { useCore } from "Scene/useCore"
 import { Coordinate } from "interfaces/coordinate.interface"
 import { Merged } from "@react-three/drei"
 import { Instances, Instance } from "@react-three/drei"
-import { createBillboardMaterial } from "Scene/helpers/createBillboardMaterial"
+import { createBillboardMaterial } from "Scene/materials/createBillboardMaterial"
 
 
 // Objects Data

@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { create } from "zustand";
 import { getMeshDimensions } from 'Scene/utils/getMeshDimensions';
 import { RefObject, createRef } from 'react';
-import { useEvents } from '../../../store/EventStore';
+import { useCloud } from '../../../EventCloud/useCloud';
 
 export interface BackpackStoreInterface {
     // Backpack slots

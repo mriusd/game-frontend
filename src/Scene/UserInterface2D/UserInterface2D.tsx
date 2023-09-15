@@ -9,13 +9,13 @@ import Skills from './Skills/Skills'
 
 import OpenButton from 'Auth/OpenButton'
 
-import { useEvents } from 'store/EventStore'
+import { useOtherFighter } from 'Scene/Fighter/OtherFighter/useOtherFighter'
 import { useFighter } from 'Scene/Fighter/useFighter'
-import { useCore } from 'store/useCore'
+import { useCore } from 'Scene/useCore'
 
 
 const UserInterface2D = () => {
-    const [playerList] = useEvents(state => [state.playerList])
+    const [otherFighterList] = useOtherFighter(state => [state.otherFighterList])
     const fighterNode = useFighter(state => state.fighterNode)
     const isBackpackOpened = useBackpack(state => state.isOpened)
     const [worldSize] = useCore(state => [state.worldSize])
@@ -38,10 +38,10 @@ const UserInterface2D = () => {
 
             {/* For test */}
             {
-                playerList.length && (
+                otherFighterList.length && (
                     <div className={styles.players}>
-                        <p>Close Players({playerList.length}):</p>
-                        { playerList.map(_ => (<p key={_.id}>{ `${_.name} [${_.coordinates.x}, ${_.coordinates.z}]` }<span></span></p>)) }
+                        <p>Close Players({otherFighterList.length}):</p>
+                        { otherFighterList.map(_ => (<p key={_.id}>{ `${_.name} [${_.coordinates.x}, ${_.coordinates.z}]` }<span></span></p>)) }
                     </div>
                 )
             }

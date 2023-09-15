@@ -6,13 +6,13 @@ import { useFrame } from "@react-three/fiber"
 import { Fighter } from "interfaces/fighter.interface"
 import { getEquipmentBodyType } from "../utils/getEquipmentBodyType"
 import LastMessage from './LastMessage'
-import { useCore } from 'store/useCore'
+import { useCore } from 'Scene/useCore'
 
 interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, children?: any }
 const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, fighter, children }: Props, ref) {
 
     // Equipment we take on Fighter
-    // const equipment = useEvents(state => state.equipment)
+    // const equipment = useCloud(state => state.equipment)
     const equipment = useMemo(() => fighter.equipment, [fighter])
 
     const modelRef = useRef()

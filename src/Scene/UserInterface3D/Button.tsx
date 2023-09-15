@@ -1,4 +1,4 @@
-import { useCore } from "store/useCore"
+import { useCore } from "Scene/useCore"
 import { useUi } from "./useUI"
 
 

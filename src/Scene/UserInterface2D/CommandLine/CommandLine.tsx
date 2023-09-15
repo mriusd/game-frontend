@@ -2,10 +2,10 @@ import { useCallback, useEffect, useRef } from 'react'
 import styles from './CommandLine.module.scss'
 import { useCommandLine } from './useCommandLine'
 import CommandsPlaceholder from './CommandsPlaceholder'
-import { useEvents } from 'store/EventStore'
+import { useCloud } from 'EventCloud/useCloud'
 
 const CommandLine = () => {
-    const sendCommand = useEvents(state => state.sendCommand)
+    const sendCommand = useCloud(state => state.sendCommand)
     const inputRef = useRef<HTMLInputElement | null>(null)
     const commandLineRef = useCommandLine(state => state.commandLineRef)
     const opened = useCommandLine(state => state.opened)

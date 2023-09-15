@@ -1,14 +1,15 @@
-import { create } from "zustand";
-import type { Fighter } from "interfaces/fighter.interface";
+import { createWithEqualityFn } from "zustand/traditional";
+import { shallow } from "zustand/shallow";
 
-import { useCore } from "store/useCore";
+import type { Fighter } from "interfaces/fighter.interface";
+import { useCore } from "Scene/useCore";
 
 export interface NpcInterface {
     npcList: Fighter[]
     setNpcList: ( npcList: Fighter[] ) => void
 }
 
-export const useNpc = create<NpcInterface>((set, get) => ({
+export const useNpc = createWithEqualityFn<NpcInterface>((set, get) => ({
     npcList: [],
     setNpcList: ( npcList: Fighter[] ) => {
         if (!npcList) { console.error('[useNpc]: npcList not provided') }
@@ -31,4 +32,4 @@ export const useNpc = create<NpcInterface>((set, get) => ({
 
         set({ npcList })
     }
-}))
+}), shallow)

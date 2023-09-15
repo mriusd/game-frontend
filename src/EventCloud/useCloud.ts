@@ -20,7 +20,7 @@ import { useFighter } from 'Scene/Fighter/useFighter';
 import { useBackpack } from "../Scene/UserInterface3D/Backpack/useBackpack";
 
 
-export interface EventStoreInterface {
+export interface CloudStoreInterface {
     sendJsonMessage: (jsonMessage: JsonValue) => void | null
     init: (sendJsonMessage: (jsonMessage: JsonValue) => void) => void
 
@@ -76,8 +76,6 @@ export interface EventStoreInterface {
 
     
     // Items
-    droppedItems: Record<string, ItemDroppedEvent>
-    setDroppedItems: (droppedItems: Record<string, ItemDroppedEvent>) => void
     pickupDroppedItem: (event) => void
     refreshFighterItems: () => void
 
@@ -96,7 +94,7 @@ export interface EventStoreInterface {
     setMapObjects: (mapObjects: MapObject[]) => void
 }
 
-export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) => ({
+export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => ({
     // Init
     sendJsonMessage: null,
     init: (sendJsonMessage) => set(() => ({ sendJsonMessage })),
@@ -342,8 +340,6 @@ export const useEvents = createWithEqualityFn<EventStoreInterface>((set, get) =>
 
 
     // Items
-    droppedItems: {},
-    setDroppedItems: (droppedItems) => set({ droppedItems }),
     pickupDroppedItem: (event) => {
         get().sendJsonMessage({
             type: "pickup_dropped_item",

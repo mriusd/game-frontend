@@ -1,109 +1,79 @@
-import * as THREE from "three"
-import { Coordinate } from "interfaces/coordinate.interface"
-import { useEffect, useMemo, useRef, useState, memo } from "react"
-import { Mesh } from "three"
-import { setCursorPointer } from "../utils/setCursorPointer"
-import { Plane, Text } from "@react-three/drei"
-import { createBillboardMaterial } from "../helpers/createBillboardMaterial"
-import { getMeshDimensions } from "../utils/getMeshDimensions"
-import type { ItemDroppedEvent } from "interfaces/item.interface"
-import { getShaderedBackpackModel } from "../UserInterface3D/Backpack/utils/getShaderedBackpackModel"
-import { useFrame } from "@react-three/fiber"
-import { useTexture } from "@react-three/drei"
-import { useSpring } from "react-spring"
-import { animated } from "@react-spring/three"
-import { easings } from "react-spring"
-import { generateItemName } from "Scene/utils/generateItemName"
+import React from "react"
 
-import { useEvents } from "store/EventStore"
-import { useCore } from "store/useCore"
+import * as THREE from "three"
+import { useFrame } from "@react-three/fiber"
+import { Plane, Text } from "@react-three/drei"
+
+import { useSpring, easings } from "react-spring"
+import { animated } from "@react-spring/three"
+
+import { createBillboardMaterial } from "Scene/materials/createBillboardMaterial"
+import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
+import { generateItemName } from "Scene/utils/generateItemName"
+import { isException } from "./utils/isException"
+
+import type { ItemDroppedEvent } from "interfaces/item.interface"
+
+import { useShaderedItem } from "./utils/useShaderedItem"
+import { useModelScale } from "./utils/useModelScale"
+
+import { useCloud } from "EventCloud/useCloud"
+import { useCore } from "Scene/useCore"
 import { useUi } from "Scene/UserInterface3D/useUI"
 
 interface Props { item: ItemDroppedEvent }
-const DroppedItem = memo(function DroppedItem({ item }: Props) {
-    const itemRef = useRef<Mesh | null>(null)    
+const DroppedItem = React.memo(function DroppedItem({ item }: Props) {
+    const itemRef = React.useRef<THREE.Mesh | null>(null)    
 
-    const [pickupDroppedItem] = useEvents(state => [state.pickupDroppedItem])
+    const [pickupDroppedItem] = useCloud(state => [state.pickupDroppedItem])
     const [setHoveredItems, matrixCoordToWorld] = useCore(state => [state.setHoveredItems, state.matrixCoordToWorld])
     const setCursor = useUi(state => state.setCursor)
 
+    // Model
+    const { model, uniforms } = useShaderedItem(item)
 
-    const [ currentWorldCoordinate, setCurrentWorldCoordinate ] = useState<Coordinate | null>(null)
-    const rotationZ = useMemo(() => Math.random() * Math.PI * 2, [])
-    const offsetX = useMemo(() => Math.random() * .5 - .25, [])
-    const offsetZ = useMemo(() => Math.random() * .5 - .25, [])
-    const material = useMemo(() => new THREE.MeshStandardMaterial({ color: 0xFFAA00 }), [])
-    const materialActive = useMemo(() => new THREE.MeshStandardMaterial({ color: 0xFFFF00 }), [])
-    const textBillboardMaterial = useMemo(() => createBillboardMaterial(new THREE.MeshBasicMaterial()), [])
-    const backgroundBillboardMaterial = useMemo(() => createBillboardMaterial(new THREE.MeshBasicMaterial({ color: 0x000000, opacity: .7, transparent: true })), [])
-    const backgroundBillboardMaterialActive = useMemo(() => createBillboardMaterial(new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 1, transparent: true })), [])
-    const textRef = useRef<Mesh | null>(null)
-    const textBackgroundRef = useRef<THREE.Mesh | null>(null)
-    const generatedName = useMemo(() => generateItemName(item.item, item.qty), [item])
-    const isActive = useRef<boolean>(false)
-    const textBoundingBox = useMemo(() => {
-        if (!textRef.current) return null
-        return getMeshDimensions(textRef.current)
-    }, [textRef.current, isActive.current])
+    const scale = useModelScale(item)
 
-    const { map } = useTexture({ map: 'assets/notexture.png' })
-    const uniforms = useRef({ uTime: { value: 0 } })
-    // @ts-expect-error
-    const model = useMemo<THREE.Mesh>(() => {
-        const newModel = getShaderedBackpackModel(item.item, uniforms)
-
-        if (!newModel) {
-            return new THREE.Mesh(
-                new THREE.BoxGeometry(+item.item.itemParameters.itemWidth / 4 || .5, +item.item.itemParameters.itemHeight / 4 || .5, +item.item.itemParameters.itemWidth / 4 || .5),
-                new THREE.MeshStandardMaterial({ color: 'pink', map })
-            )
-        }
-        return newModel
-    }, [item, map])
-
-    // Clone to try to fix upping issue
-    const clonedModel = useMemo(() => model.clone(), [model])
-
-    const position = useMemo(() => {
+    // Positioning
+    const rotationZ = React.useMemo(() => Math.random() * Math.PI * 2, [])
+    const offsetX = React.useMemo(() => Math.random() * .5 - .25, [])
+    const offsetZ = React.useMemo(() => Math.random() * .5 - .25, [])
+    const position = React.useMemo(() => {
         if (!model) { return new THREE.Vector3(0, 0, 0) }
-        if (!currentWorldCoordinate) { return new THREE.Vector3(0, 0, 0) }
         const bb = getMeshDimensions(model)
-        const depth = isException() ? bb.height / 2 : bb.depth / 2
-        return new THREE.Vector3(currentWorldCoordinate.x + offsetX, depth, currentWorldCoordinate.z + offsetZ)
-    }, [currentWorldCoordinate, model])
-    const rotation = useMemo(() => {
-        if (isException()) {
+        const depth = isException(item) ? bb.height / 2 : bb.depth / 2
+        const coordinate = matrixCoordToWorld(item.coords)
+        return new THREE.Vector3(coordinate.x + offsetX, depth * scale.y, coordinate.z + offsetZ)
+    }, [model, item, scale])
+
+    // Billboard Material
+    const textBillboardMaterial = React.useMemo(() => createBillboardMaterial(new THREE.MeshBasicMaterial()), [])
+    const backgroundBillboardMaterial = React.useMemo(() => createBillboardMaterial(new THREE.MeshBasicMaterial({ color: 0x000000, opacity: .7, transparent: true })), [])
+
+    const textRef = React.useRef<THREE.Mesh | null>(null)
+    
+    // Text
+    const generatedName = React.useMemo(() => generateItemName(item.item, item.qty), [item])
+    const width = React.useMemo(() => generatedName.length / 10, [generatedName])
+
+    const rotation = React.useMemo(() => {
+        if (isException(item)) {
             return [0, rotationZ, 0]
         }
         return [-Math.PI / 2, 0, rotationZ]
     }, [])
-    function isException() {
-        return ( item.item.name.toLowerCase().includes('box') || item.item.name.toLowerCase().includes('gold') )
-    }
 
-    useEffect(() => {
-        setTimeout(() => {
-            isActive.current = true
-        }, 30)
+    React.useEffect(() => {
         return () => {
             handlePointerLeave()
         }
     }, [])
-
-    useEffect(() => {
-        // console.log(item, 'item')
-        if (item?.coords) {
-            setCurrentWorldCoordinate(matrixCoordToWorld(item.coords))
-        }
-    }, [item])
 
     const handlePointerEnter = () => {
         setCursor('pointer')
         // @ts-expect-error
         setHoveredItems(item, 'add')
         if (!itemRef.current) { return }
-        if (!textBackgroundRef.current) { return }
-        textBackgroundRef.current.material = backgroundBillboardMaterialActive
         setOpacity(itemRef.current, .4)
     }
     const handlePointerLeave = () => {
@@ -111,8 +81,6 @@ const DroppedItem = memo(function DroppedItem({ item }: Props) {
         // @ts-expect-error
         setHoveredItems(item, 'remove')
         if (!itemRef.current) { return }
-        if (!textBackgroundRef.current) { return }
-        textBackgroundRef.current.material = backgroundBillboardMaterial
         setOpacity(itemRef.current, 1)
     }
     function setOpacity(item: THREE.Group | THREE.Mesh, opacity: number) {
@@ -139,19 +107,16 @@ const DroppedItem = memo(function DroppedItem({ item }: Props) {
     })
 
     // Drop animation
-    const { posX, posY, posZ } = useSpring({
-        posX: position.x ? position.x : matrixCoordToWorld(item.coords).x,
-        posY: position.y ? position.y : 2.5,
-        posZ: position.z ? position.z : matrixCoordToWorld(item.coords).z,
+    const [props, api] = useSpring(() => ({
+        posX: matrixCoordToWorld(item.coords).x,
+        posY: 2.5,
+        posZ: matrixCoordToWorld(item.coords).z,
         config: {
             easing: easings.easeInBack,
             duration: 500
-        },
-    })
-
-    if (!currentWorldCoordinate) {
-        return <></>
-    }
+        }
+    }))
+    React.useEffect(() => void setTimeout(() => api.start({ posX: position.x, posY: position.y, posZ: position.z }), 10), [])
 
     return (
         <group
@@ -159,39 +124,39 @@ const DroppedItem = memo(function DroppedItem({ item }: Props) {
             onPointerLeave={handlePointerLeave}
             onPointerDown={handlePointerClick}
         >
-                <group 
-                    visible={!!isActive.current}
-                    position={[position.x, position.y + 1, position.z]}
-                >
-                    <Plane 
-                        ref={textBackgroundRef} 
-                        material={backgroundBillboardMaterial}
-                        args={[(textBoundingBox?.width || .5) + .25, (textBoundingBox?.height || .2) + .2]}
-                    />
-                    <Text 
-                        position={[0, 0, .001]}
-                        ref={textRef}
-                        color={0xFF8800} 
-                        fillOpacity={1}
-                        anchorX="center" 
-                        anchorY="middle" 
-                        fontSize={.25}
-                        material={textBillboardMaterial}
-                    >
-                        { generatedName }
-                    </Text>
-                </group>
                 <animated.group 
-                    position-x={posX}
-                    position-y={posY}
-                    position-z={posZ}
+                    position-x={props.posX}
+                    position-y={props.posY}
+                    position-z={props.posZ}
                 >
+                    <group 
+                        // visible={!!isActive.current}
+                        position={[0, 1, 0]}
+                    >
+                        <Plane 
+                            material={backgroundBillboardMaterial}
+                            args={[width, .25]}
+                        />
+                        <Text 
+                            position={[0, 0, .001]}
+                            ref={textRef}
+                            color={0xFF8800} 
+                            fillOpacity={1}
+                            anchorX="center" 
+                            anchorY="middle" 
+                            fontSize={.15}
+                            material={textBillboardMaterial}
+                        >
+                            { generatedName }
+                        </Text>
+                    </group>
                     <primitive
                         ref={itemRef}
-                        object={clonedModel}
+                        object={model}
                         castShadow 
                         // position={position} 
                         rotation={rotation}
+                        scale={scale}
                     />
                 </animated.group>
         </group>

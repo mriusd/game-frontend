@@ -3,7 +3,7 @@ import { shallow } from "zustand/shallow";
 
 import type { Fighter } from "interfaces/fighter.interface";
 
-import { useCore } from "store/useCore";
+import { useCore } from "Scene/useCore";
 
 export interface OtherFighterInterface {
     otherFighterList: Fighter[]

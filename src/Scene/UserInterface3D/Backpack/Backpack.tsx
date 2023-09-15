@@ -6,7 +6,7 @@ import { memo } from 'react'
 import BackpackItem from './BackpackItem'
 import { useBackpack } from 'Scene/UserInterface3D/Backpack/useBackpack'
 import { shallow } from 'zustand/shallow'
-import { useEvents } from 'store/EventStore'
+import { useCloud } from 'EventCloud/useCloud'
 import { ThreeEvent, useFrame, useThree } from '@react-three/fiber'
 import { useUi } from '../useUI'
 import { getCoordInUISpace } from 'Scene/utils/getCoordInUiSpace'
@@ -41,13 +41,13 @@ const Backpack = memo(function Backpack() {
     // 
 
     // console.log('[CPU CHECK]: Rerender <Backpack>')
-    const [backpack, equipmentSlots, equipment] = useEvents(state => [state.backpack, state.equipmentSlots, state.equipment], shallow)
+    const [backpack, equipmentSlots, equipment] = useCloud(state => [state.backpack, state.equipmentSlots, state.equipment], shallow)
     const [backpackWidth, backpackHeight, isOpened, slotsRef, equipmentSlotsRef, cellSize] = useBackpack(state => 
         [state.width, state.height, state.isOpened, state.slots, state.equipmentSlots, state.cellSize], 
         shallow
     )
     // TODO: change location for handler
-    const [updateBackpackItemPosition, dropBackpackItem, unequipBackpackItem, equipBackpackItem] = useEvents(state => 
+    const [updateBackpackItemPosition, dropBackpackItem, unequipBackpackItem, equipBackpackItem] = useCloud(state => 
         [state.updateItemBackpackPosition, state.dropBackpackItem, state.unequipBackpackItem, state.equipBackpackItem], 
         shallow
     )

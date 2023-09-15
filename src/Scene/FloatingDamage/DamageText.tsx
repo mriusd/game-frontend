@@ -1,6 +1,6 @@
 import * as THREE from "three"
 import { Text, Instances, Instance } from "@react-three/drei"
-import { createBillboardMaterial } from "../helpers/createBillboardMaterial"
+import { createBillboardMaterial } from "../materials/createBillboardMaterial"
 import { useEffect, useMemo, useRef } from "react"
 import Tween from "Scene/utils/tween/tween"
 import type { ObjectData } from "interfaces/sceneData.interface"

@@ -2,10 +2,10 @@ import type { Fighter } from "interfaces/fighter.interface"
 
 import { useEffect } from "react"
 
-import { useEvents } from "store/EventStore"
+import { useCloud } from "EventCloud/useCloud"
 
 export const useEvent = (fighter: Fighter, eventType: 'skill' | 'damage', callback: (event: any, removeEvent: any) => void) => {
-    const [ events, removeEvent ] = useEvents(state => [state.events, state.removeEvent])
+    const [ events, removeEvent ] = useCloud(state => [state.events, state.removeEvent])
     useEffect(() => {
         const selectedEvents = events.filter((event: any) => event.type === eventType)
         selectedEvents.forEach((skillEvent: any)  => {

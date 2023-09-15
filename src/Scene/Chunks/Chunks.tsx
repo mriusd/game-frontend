@@ -6,7 +6,7 @@ import { Coordinate } from "interfaces/coordinate.interface"
 // import { makeNoise2D } from "open-simplex-noise"
 import { useTexture } from "@react-three/drei"
 
-import { useCore } from "store/useCore"
+import { useCore } from "Scene/useCore"
 import { useFighter } from "../Fighter/useFighter"
 
 import { Plane } from "@react-three/drei"
