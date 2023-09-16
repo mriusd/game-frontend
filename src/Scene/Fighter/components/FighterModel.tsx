@@ -29,7 +29,7 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
     // Save main Bone & then insert equipment bones there
     const fighterBone = useRef<THREE.Bone | null>(null)
     // Save all currently equipmented items to remove then
-    const equipedMeshes = useRef<Array<{ itemHash: string, objects: {name: string}[] }>>([])
+    const equipedMeshes = useRef<Array<{ itemHash: string, objects: (THREE.Mesh | THREE.Group)[] }>>([])
 
     // Store last equipment state
     const lastEquipment = useRef<InventorySlot[]>([])
@@ -103,10 +103,11 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
             // Remove from stored array
             equipedMeshes.current.splice(meshIndex, 1)
         })
-        function removeFromScene(model: { itemHash: string, objects: {name: string}[] }) {
+        function removeFromScene(model: { itemHash: string, objects: (THREE.Mesh | THREE.Group)[] }) {
             // console.log('removeFromScene', model)
             model.objects.forEach(_ => {
                 const object = fighterBone.current.getObjectByName(_.name)
+                console.log(_.name)
                 // console.log('Object to remove', object)
                 // // @ts-expect-error
                 // if (object.isBone) {
@@ -131,77 +132,44 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
         equipmentToTakeON.current.forEach(item => {
             const { model, animations } = getShaderedEquipment(item, uniforms)
             if (!model) { return console.warn('[FighterModel<takeOn>]: Equipment Model not Found') }
-
             const modelArmature = model.getObjectByName('Armature')
             // console.log('modelArmature', modelArmature)
             if (!modelArmature) { return console.warn('[FighterModel<takeOn>]: Model Armature not found, mb it is renamed') }
             
             // console.log('fighterArmature', fighterArmature)
             // Store Mixer to Animate equipment
-            const animation = animations.find(_ => _.name === 'fly')
+            console.log(animations)
+            const animation = animations.find(_ => _.name === "Armature|mixamo.com|Layer0.001" || _.name === 'fly')
             if (animation) {
-                mixer.clipAction(animation, model).setDuration(1).play()
+                console.log(animation)
+                mixer.clipAction(animation, model).setDuration(.5).play()
                 clips.current.push({ itemHash: item.itemHash, animation, object: model })
             }
 
             // Set itemHash to remove via it then
             modelArmature.userData.itemHash = item.itemHash
             modelArmature.userData.name = item.itemAttributes.name
+            modelArmature.name += item.itemAttributes.name
 
             hideBodyPart(item)
             addToScene(modelArmature as THREE.Group)
         })
-        function addToScene(model: THREE.Group | THREE.SkinnedMesh) {
-            const equiped = { itemHash: model.userData.itemHash, objects: [] }
-            // model.children.forEach((object,i) => {
-            //     // @ts-expect-error
-            //     if (object.isGroup) {
-            //         // Clone children bc it fixes the issue with missed skinned mesh
-            //         const children = [...object.children]
-            //         // console.log('children', children)
-            //         children.forEach((mesh: THREE.SkinnedMesh) => { 
-            //             console.log(mesh.name)
-            //             if (!mesh.isSkinnedMesh) { return console.error('[FighterModel<takeOn>]: Wrong Equipment Model, skinnedMesh expected, with name', model.name) }
-            //             // Add hash to name to find skinnedMesh via it later
-            //             mesh.name += model.userData.name + i
-                        
-            //             mesh.bind(fighterSkeleton.current, mesh.matrixWorld) // Bind Fighter Skeleton
-                        
-            //             fighterArmature.current.add(mesh) 
-            //             equiped.objects.push({ name: mesh.name })
-            //         })
-            //     } 
-            //     // @ts-expect-error
-            //     else if (object.isSkinnedMesh) {
-            //         (object as THREE.SkinnedMesh).bind(fighterSkeleton.current, object.matrixWorld) // Bind Fighter Skeleton
-            //         object.name += model.userData.name + i
+        function addToScene(modelArmature: THREE.Group | THREE.SkinnedMesh) {
+            const isBones = !!modelArmature.getObjectByName('main')
 
-            //         fighterArmature.current.add(object)
-            //         equiped.objects.push({ name: object.name })
-            //         // @ts-expect-error
-            //     } else if (object.isBone) {
-            //         // console.log('Bone added')
-            //         object.name += model.userData.name + i
+            if (!isBones) {
+                modelArmature.traverse((object) => {
+                    // @ts-expect-error
+                    if (object.isSkinnedMesh) {
+                        (object as THREE.SkinnedMesh).bind(fighterSkeleton.current, object.matrixWorld) // Bind Fighter Skeleton
+                    }
+                })
+            }
+            fighterBone.current.add( modelArmature )
+            modelArmature.position.set(0, -300, 100)
 
-            //         // fighterBone.current.add(object)
-            //         // equiped.objects.push({ name: object.name })
-            //     } else {
-            //         console.warn('[FighterModel<takeOn>]: No SkinnedMesh Found')
-            //     }
-            // })
-            model.traverse((object) => {
-                // @ts-expect-error
-                if (object.isSkinnedMesh) {
-                    (object as THREE.SkinnedMesh).bind(fighterSkeleton.current, object.matrixWorld) // Bind Fighter Skeleton
-                }
-            })
-            model.name += model.userData.name
-            equiped.objects.push({ name: model.name })
-            fighterBone.current.add( model )
-
-            // Store 
-            equipedMeshes.current.push(equiped)
-            // console.log(equipedMeshes.current)
+            // Store
+            equipedMeshes.current.push({ itemHash: modelArmature.userData.itemHash, objects: [modelArmature] })
         }
         function hideBodyPart(item: InventorySlot) {
             // Remove part of body

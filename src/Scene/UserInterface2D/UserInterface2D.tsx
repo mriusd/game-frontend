@@ -16,9 +16,9 @@ import { useCore } from 'Scene/useCore'
 
 const UserInterface2D = () => {
     const [otherFighterList] = useOtherFighter(state => [state.otherFighterList])
-    const fighterNode = useFighter(state => state.fighterNode)
+    const fighter = useFighter(state => state.fighter)
     const isBackpackOpened = useBackpack(state => state.isOpened)
-    const [worldSize] = useCore(state => [state.worldSize])
+    const [worldSize, matrixCoordToWorld] = useCore(state => [state.worldSize, state.matrixCoordToWorld])
 
     // const handleClick = (e) => {
     //     e.preventDefault()
@@ -48,7 +48,7 @@ const UserInterface2D = () => {
             <div className={styles.coordinates}>
                 <div>World size [{worldSize}x{worldSize}]</div>
                 {/* <div>Server coordinate [ X: {store.currentMatrixCoordinate?.x} Z: {store.currentMatrixCoordinate?.z} ]</div> */}
-                <div>Coordinate [ X: {fighterNode.current?.position?.x.toFixed(0)} Z: {fighterNode.current?.position?.z.toFixed(0)} ]</div>
+                {fighter?.coordinates && <div>Coordinate [ X: {matrixCoordToWorld(fighter.coordinates)?.x} Z: {matrixCoordToWorld(fighter.coordinates)?.z} ]</div>}
             </div>
             <Leva
                 hidden={!isBackpackOpened}
