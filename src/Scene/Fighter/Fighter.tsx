@@ -12,15 +12,16 @@ import FighterModel from "./components/FighterModel"
 import { useCore } from "Scene/useCore"
 import { useCloud } from "EventCloud/useCloud"
 import { useFighter } from "./useFighter"
-import { useShaderedFighter } from "./utils/getFighterModel"
+import { useFighterSkin } from "./hooks/useFighterSkin"
 import { useControls } from "Scene/Controls/useControls"
+import { useEquipmentChange } from "./hooks/useEquipmentChange"
 
 const Fighter = React.memo(function Fighter() {
     const spawned = React.useRef(false)
     const submitMalee = useCloud(state => state.submitMalee)
     const [target, setTarget] = useCloud(state => [state.target, state.setTarget])
     const [fighter, fighterNode] = useFighter(state => [state.fighter, state.fighterNode])
-    const { model, animations } = useShaderedFighter('man')
+    const { model, animations } = useFighterSkin('man')
     const [matrixCoordToWorld, worldCoordToMatrix] = useCore(state => [state.matrixCoordToWorld, state.worldCoordToMatrix])
     const setPosition = useFighter(state => state.setPosition)
 
@@ -68,9 +69,18 @@ const Fighter = React.memo(function Fighter() {
         }
     }, [target])
 
+
+    // Change Animations On Equipment Change
+    useEquipmentChange(fighter, (changes) => {
+        if (changes.changedSlots.includes(6) || changes.changedSlots.includes(7)) {
+            const action = useFighter.getState().action
+            if (action.includes('stand')) { setAction('stand') }
+        }
+    })
+
     return (
         <group>
-            <LastMessage offset={.5} fighter={fighter} target={fighterNode} />
+            <LastMessage offset={.7} fighter={fighter} target={fighterNode} />
             <FighterModel
                 ref={fighterNode}
                 model={model}

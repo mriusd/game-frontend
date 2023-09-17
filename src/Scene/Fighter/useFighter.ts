@@ -11,16 +11,16 @@ import { isEqualCoord } from 'Scene/utils/isEqualCoord';
 import { useCore } from 'Scene/useCore';
 import { useCloud } from 'EventCloud/useCloud';
 
+import { getActionName } from './utils/getActionName';
+import { getActionTimeScale } from './utils/getActionTimeScale';
+
 export type AllActionsType =  'stand' | 'run' | 'attack' | 'die' | 'sword_attack' | 'sword_run' | 'sword_stand' | 'none'
 export type ActionsType =  'stand' | 'run' | 'attack' | 'die' | 'none'
-
 
 export interface UseFighterInterface {
     fighter: Fighter | null
     setFighter: (fighter: Fighter) => void
     fighterNode: RefObject<THREE.Mesh | null>
-    otherFightersNode: RefObject<THREE.Mesh | null>[]
-    setOtherFightersNode: (node: THREE.Mesh, action: 'add' | 'remove') => void
     isMoving: boolean
     setIsMoving: (isMoving: boolean) => void
     move: (to: Coordinate) => void
@@ -34,15 +34,10 @@ export interface UseFighterInterface {
     actionTimeout: any
 }
 
-const FADE_DUR = .3
-
 export const useFighter = createWithEqualityFn<UseFighterInterface>((set, get) => ({
     fighter: null,
     setFighter: (fighter) => set({ fighter }),
     fighterNode: createRef(),
-    otherFightersNode: [],
-    // TODO: Add other fighters node manager system
-    setOtherFightersNode: (node, action) => {},
     isMoving: false,
     setIsMoving: (isMoving) => set({ isMoving }),
     move: (to) => {
@@ -116,33 +111,3 @@ export const useFighter = createWithEqualityFn<UseFighterInterface>((set, get) =
         }
     },
 }), shallow)
-
-function getActionName(action: ActionsType, fighter: Fighter) {
-    const isEmptyHand = !Object.keys(fighter.equipment).find(slotKey => (+slotKey === 6 || +slotKey === 7))
-
-    if (action === 'run') {
-        if (!isEmptyHand) return 'sword_run'
-        return 'run'
-    } else 
-    if (action === 'attack') {
-        // const isUseSkill = skill.skillId > 0
-        if (!isEmptyHand) return 'sword_attack'
-        return 'attack'
-    } else 
-    if (action === 'stand') {
-        if (!isEmptyHand) return 'sword_stand'
-        return 'stand'
-    } else {
-        return action
-    }
-}
-
-function getActionTimeScale(action: ActionsType, fighter: Fighter) {
-    if (action === 'run') {
-        return 60 / fighter.movementSpeed * 4
-    } else
-    if (action === 'attack') {
-        return fighter.attackSpeed || 3
-    }
-    return 1
-}

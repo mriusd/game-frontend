@@ -4,14 +4,14 @@ import { getIs } from "Scene/utils/utils"
 import { SkeletonUtils } from "three-stdlib"
 import { useMemo } from "react"
 
-export const getFighterModel = (name: string): GLTF => {
+const getFighterModel = (name: string): GLTF => {
     const models = useGLTFLoaderStore.getState().models.current
     const is = getIs(name)
     if (is('man')) return models['fighter_man']
     return models['fighter_man']
 }
 
-export const useShaderedFighter = (name: string) => {
+export const useFighterSkin = (name: string) => {
     return useMemo(() => {
         const gltf: GLTF = getFighterModel(name)
         if (!gltf) { return null }

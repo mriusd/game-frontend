@@ -13,7 +13,6 @@ import type { Direction } from 'interfaces/direction.interface';
 import type { FighterAttributes } from 'interfaces/fighterAttributes.interface';
 import type { Inventory, InventorySlot } from "interfaces/inventory.interface";
 import type { Coordinate } from "interfaces/coordinate.interface";
-import type { ItemDroppedEvent } from 'interfaces/item.interface';
 import type { MapObject } from 'interfaces/mapObject.interface';
 
 import { useFighter } from 'Scene/Fighter/useFighter';

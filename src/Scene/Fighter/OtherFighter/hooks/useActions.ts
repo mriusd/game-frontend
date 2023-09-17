@@ -1,36 +1,44 @@
-import * as THREE from 'three'
 import React from "react";
+
+import * as THREE from 'three'
 import { useAnimations } from '@react-three/drei';
 
-const FADE_DUR = .3
+import { getActionName } from 'Scene/Fighter/utils/getActionName';
+import { getActionTimeScale } from 'Scene/Fighter/utils/getActionTimeScale';
+
+import type { Fighter } from 'interfaces/fighter.interface';
+import type { AllActionsType } from "Scene/Fighter/useFighter";
+import type { ActionsType } from "Scene/Fighter/useFighter";
+
 
 export const useActions = (animations: THREE.AnimationClip[], ref: React.RefObject<THREE.Mesh>) => {
     const { actions } = useAnimations(animations, ref)
     const actionTimeout = React.useRef<any>(0)
-    const npcAction = React.useRef<'stand' | 'run' | 'attack' | 'die' | 'none'>('none')
-    const setAction = React.useCallback((action: 'stand' | 'run' | 'attack' | 'die' | 'none') => {
-        // console.log('setAction', action)
-        const oldAction = npcAction.current
-        npcAction.current = action
+    const action = React.useRef<AllActionsType>('none')
 
-        if (oldAction !== action) {
+    const setAction = React.useCallback((outerAction: ActionsType, fighter: Fighter) => {
+        const oldAction = action.current
+        const timeScale = getActionTimeScale(outerAction, fighter)
+        action.current = getActionName(outerAction, fighter)
+
+        if (oldAction !== action.current) {
             clearTimeout(actionTimeout.current)
-            actions?.[action]?.reset().fadeIn(FADE_DUR).play()
-            actions?.[oldAction]?.fadeOut(FADE_DUR).stop()
-            if (action === 'die') {
-                actions[action].clampWhenFinished = true
-                actions?.[action]?.setLoop(THREE.LoopOnce, 0)
+            actions?.[oldAction]?.stop()
+            actions?.[action.current]?.reset().setEffectiveTimeScale(timeScale).play()
+            if (action.current.includes('die')) {
+                actions[action.current].clampWhenFinished = true
+                actions?.[action.current]?.setLoop(THREE.LoopOnce, 0)
             } else
-            if (action === 'attack') {
-                actionTimeout.current = setTimeout(() => void setAction('stand'), ((actions?.[action]?.getClip()?.duration || 0)) * 1000)
+            if (action.current.includes('attack')) {
+                actionTimeout.current = setTimeout(() => void setAction('stand', fighter), ((actions?.[action.current]?.getClip()?.duration || 0)) * 1000)
             }
         }
         // For Infinite Attack
-        else if (oldAction === action && action === 'attack') {
+        else if (oldAction === action.current && action.current.includes('attack')) {
             clearTimeout(actionTimeout.current)
-            actionTimeout.current = setTimeout(() => void setAction('stand'), ((actions?.[action]?.getClip()?.duration || 0)) * 1000)
+            actionTimeout.current = setTimeout(() => void setAction('stand', fighter), ((actions?.[action.current]?.getClip()?.duration || 0)) * 1000)
         }
     }, [])
 
-    return { setAction, action: npcAction }
+    return { setAction, action }
 }

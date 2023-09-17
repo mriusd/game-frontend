@@ -26,7 +26,7 @@ const HeatBox = ({ target }) => {
     })
 
     return (
-        <Box ref={ref} args={[1, 1, 1]} visible={false}>
+        <Box ref={ref} args={[1, 1, 1]} visible={true}>
             <meshBasicMaterial color={'red'} opacity={.2} transparent={true} />
         </Box>
     )

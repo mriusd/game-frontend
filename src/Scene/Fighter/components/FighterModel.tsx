@@ -5,14 +5,12 @@ import { getShaderedEquipment } from "../utils/getShaderedEquipment"
 import { useFrame } from "@react-three/fiber"
 import { Fighter } from "interfaces/fighter.interface"
 import { getEquipmentBodyType } from "../utils/getEquipmentBodyType"
-import LastMessage from './LastMessage'
 import { useCore } from 'Scene/useCore'
 
-interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, children?: any }
-const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, fighter, children }: Props, ref) {
+interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, children?: any, onPointerMove?: (e: any) => void, onPointerLeave?: (e: any) => void, onPointerDown?: (e: any) => void }
+const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, fighter, children, onPointerMove, onPointerLeave, onPointerDown }: Props, ref) {
 
     // Equipment we take on Fighter
-    // const equipment = useCloud(state => state.equipment)
     const equipment = useMemo(() => fighter.equipment, [fighter])
 
     const modelRef = useRef()
@@ -138,10 +136,10 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
             
             // console.log('fighterArmature', fighterArmature)
             // Store Mixer to Animate equipment
-            console.log(animations)
+            // console.log(animations)
             const animation = animations.find(_ => _.name === "Armature|mixamo.com|Layer0.001" || _.name === 'fly')
             if (animation) {
-                console.log(animation)
+                // console.log(animation)
                 mixer.clipAction(animation, model).setDuration(.5).play()
                 clips.current.push({ itemHash: item.itemHash, animation, object: model })
             }
@@ -166,7 +164,7 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
                 })
             }
             fighterBone.current.add( modelArmature )
-            modelArmature.position.set(0, -300, 100)
+            modelArmature.position.set(0, -300, 10)
 
             // Store
             equipedMeshes.current.push({ itemHash: modelArmature.userData.itemHash, objects: [modelArmature] })
@@ -199,7 +197,12 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
     }, [modelRef.current, fighter])
 
     return (
-        <group name="fighter-model">
+        <group 
+            name="fighter-model"
+            onPointerMove={onPointerMove}
+            onPointerLeave={onPointerLeave}
+            onPointerDown={onPointerDown}
+        >
             <primitive 
                 ref={modelRef}
                 object={model}

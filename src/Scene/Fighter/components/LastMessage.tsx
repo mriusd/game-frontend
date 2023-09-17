@@ -32,7 +32,7 @@ const LastMessage = function LastMessage({ fighter, target, offset = .4, color =
 
     return (
         <Text 
-            visible={!!fighter.lastChatMessage}
+            visible={!!fighter?.lastChatMessage}
             font={fonts["Roboto Slab"]}
             ref={textRef}
             color={color} 
@@ -43,7 +43,7 @@ const LastMessage = function LastMessage({ fighter, target, offset = .4, color =
             material={textBillboardMaterial}
         >
             {
-                fighter.lastChatMessage && target.current && textBoundingBox.current ? fighter.lastChatMessage : ''
+                fighter?.lastChatMessage && target.current && textBoundingBox.current ? fighter?.lastChatMessage : ''
             }
         </Text>
     )
