@@ -19,7 +19,7 @@ interface Props { npc: Fighter }
 const Npc = memo(function Npc({ npc }: Props) {
     // Used to set spawn coord without tweening from x:0,z:0
     const spawned = useRef<boolean>(false)
-    const matrixCoordToWorld = useCore(state => state.matrixCoordToWorld)
+    const [matrixCoordToWorld, setSceneObject] = useCore(state => [state.matrixCoordToWorld, state.setSceneObject])
 
     const npcRef = useRef<THREE.Mesh | null>(null)
     const { model, animations } = useMemo(() => getShaderedNpc(npc), [])
@@ -89,6 +89,16 @@ const Npc = memo(function Npc({ npc }: Props) {
         setAction('attack')
         removeEvent(event)
     })
+
+        // Save ref to object to store & rm on unmount
+    useEffect(() => {
+        if (npcRef.current) {
+            setSceneObject(npc.id, npcRef.current, 'add')
+        }
+        return () => {
+            setSceneObject(npc.id, npcRef.current, 'remove')
+        }
+    }, [npcRef.current, npc])
 
     return (
         <group 

@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { Text, Instances, Instance } from "@react-three/drei"
+import { Text, Instance } from "@react-three/drei"
 import { createBillboardMaterial } from "../materials/createBillboardMaterial"
 import { useEffect, useMemo, useRef } from "react"
 import Tween from "Scene/utils/tween/tween"
@@ -26,9 +26,9 @@ const DamageText = ({ color, value, target, onComplete }: Props) => {
         Tween.to(from, to, {
             duration: 700,
             onChange(state) {
-                textRef.current.position.y = height + state.value.offsetY
-                // @ts-expect-error
-                textRef.current.material.uniforms['customAlpha'].value = state.value.opacity
+                // textRef.current.position.y = height + state.value.offsetY
+                // // @ts-expect-error
+                // textRef.current.material.uniforms['customAlpha'].value = state.value.opacity
             },
             onComplete() {
                 onComplete()
@@ -37,35 +37,20 @@ const DamageText = ({ color, value, target, onComplete }: Props) => {
     }, [])
     
     return (
+        <Instance position={[0, 0, 0]} ref={textRef} />
 
-
-        <Text 
-            ref={textRef}
-            color={color} 
-            fillOpacity={1}
-            anchorX="center" 
-            anchorY="middle" 
-            fontSize={.2}
-            material={textBillboardMaterial}
-        >
-            { value }
-        </Text>
+        // <Text 
+        //     ref={textRef}
+        //     color={color} 
+        //     fillOpacity={1}
+        //     anchorX="center" 
+        //     anchorY="middle" 
+        //     fontSize={.2}
+        //     material={textBillboardMaterial}
+        // >
+        //     { value }
+        // </Text>
     )
-
-    // return (
-    //     <Instances
-    //     limit={1000}
-    //     range={1000}
-    //     >
-    //     <boxGeometry />
-    //     <meshStandardMaterial />
-    //     <Instance
-    //         color="red"
-    //         scale={2}
-    //         position={[1, 2, 3]}
-    //         rotation={[Math.PI / 3, 0, 0]}
-    //     </Instances>
-    // )
 }
 
 export default DamageText

@@ -101,13 +101,13 @@ export const useFighter = createWithEqualityFn<UseFighterInterface>((set, get) =
                 $this.actions?.[action]?.setLoop(THREE.LoopOnce, 0)
             } else
             if (action.includes('attack')) {
-                set({ actionTimeout: setTimeout(() => void $this.setAction('stand'), (($this.actions?.[action]?.getClip()?.duration / timeScale || 0)) * 1000) })
+                set({ actionTimeout: setTimeout(() => void $this.setAction('stand'), ((($this.actions?.[action]?.getClip()?.duration + .1) / timeScale || 0)) * 1000) })
             }
         }
         // For Infinite Attack
         else if (oldAction === action && action.includes('attack')) {
             clearTimeout($this.actionTimeout)
-            set({ actionTimeout: setTimeout(() => void $this.setAction('stand'), (($this.actions?.[action]?.getClip()?.duration / timeScale || 0)) * 1000) })
+            set({ actionTimeout: setTimeout(() => void $this.setAction('stand'), ((($this.actions?.[action]?.getClip()?.duration + .1) / timeScale || 0)) * 1000) })
         }
     },
 }), shallow)

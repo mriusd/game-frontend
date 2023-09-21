@@ -69,11 +69,10 @@ const Scene = React.memo(function Scene() {
                         <OtherFighterList/>
                         {/* {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)} */}
                         {/* <DecorTest/> */}
-                        {/* {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)} */}
                         <Fighter />
                         <Chunks />
                         { !devMode ? <Controller /> : <></> }
-                        {/* <FloatingDamage /> */}
+                        <FloatingDamage />
                         <UserInterface3D />
                         <Light />
                     </GLTFLoader>

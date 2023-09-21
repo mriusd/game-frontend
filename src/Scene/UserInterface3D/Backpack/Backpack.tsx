@@ -160,6 +160,7 @@ const Backpack = memo(function Backpack() {
         
         onPointerMove(e)
         setTimeout(() => {
+            if (!hoveredItemEvent.current) { return } // Try fix issue, test required
             isItemPinned.current = !isItemPinned.current
             if (isItemPinned.current) {
                 pinnedItemEvent.current = e
