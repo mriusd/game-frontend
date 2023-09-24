@@ -1,7 +1,5 @@
-import React, { useRef } from "react"
-import { Instances, Instance } from "@react-three/drei"
-
-import DamageText from "./DamageText"
+import React from "react"
+// import { Instances, Instance } from "@react-three/drei"
 
 import { getDamageColor } from "Scene/utils/getDamageColor"
 import { getDamageValue } from "Scene/utils/getDamageValue"
@@ -13,17 +11,9 @@ import { useCore } from "Scene/useCore"
 import type { Damage } from "interfaces/damage.interface"
 import type { ObjectData } from "interfaces/sceneData.interface"
 
-import { BillboardTextMaterial } from "./materials/billboardTextMaterial"
-import { useFrame } from "@react-three/fiber"
+import { BillboardTextMaterial, setShaderText, setShaderTextColor, setShaderAlpha } from "./materials/billboardTextMaterial"
 
-interface TriggerDamage {
-    label: string
-    event: Damage
-    remove: () => void
-    color: number
-    target: ObjectData
-    message: string
-}
+import Tween from "Scene/utils/tween/tween"
 
 const FloatingDamage = React.memo(function FloatingDamage() {
     const [events, removeEvent] = useCloud(state => [state.events, state.removeEvent])
@@ -32,127 +22,97 @@ const FloatingDamage = React.memo(function FloatingDamage() {
 
     const npcList = useNpc(state => state.npcList)
 
-    const triggerDamage = React.useRef<TriggerDamage[]>([])
-
     // Store All Instance Ref to Reuse them
-    // 1000 - Max Amount Of Damage Indicators
-    const instancesSize = 1000
-    const instancesSizeArray = useRef(new Array(instancesSize)) 
-    const instanceRefs = useRef({}) 
-    const availableInstanceIds = useRef(Array.from({ length: instancesSize }, (_, index) => index))
-
-
-    const removeTriggerDamage = (label: string, instanceId: number) => {
-        // Push to available instances
-        availableInstanceIds.current.push(instanceId)
-        // 
-        triggerDamage.current = triggerDamage.current.filter((_: TriggerDamage) => _.label !== label)
-    }
-
-    const createDamage = (damageEvent: Damage, target: ObjectData) => {
-        const label = `${damageEvent.npcId}${Date.now() * Math.random()}${damageEvent.damage}`
-
-        // Remove from Available Instances
-        const instanceId = availableInstanceIds.current[0]
-        if (!instanceId) {
-            removeTriggerDamage(label, instanceId)
-            removeEvent(damageEvent)
-            return
-        }
-        const instance = instanceRefs.current[instanceId]
-        availableInstanceIds.current = availableInstanceIds.current.filter((id: number) => id !== instanceId)
-        // 
-
-        return {
-            label,
-            target,
-            event: damageEvent,
-            message: getDamageValue(damageEvent),
-            remove: () => {
-                removeTriggerDamage(label, instanceId)
-                removeEvent(damageEvent)
-            },
-            color: getDamageColor(damageEvent),
-            instanceId,
-            instance,
-        }
-    }
-
+    // 100 - Max Amount Of Damage Indicators
+    const instancesSize = 100
+    const instancesSizeArray = React.useRef(new Array(instancesSize)) 
+    const instanceRefs = React.useRef<{ [key: number]: THREE.Mesh }>({}) 
+    const availableInstanceIds = React.useRef(Array.from({ length: instancesSize }, (_, index) => index))
 
 
     // Generate damage indicators
     React.useEffect(() => {
         // console.log('events', events)
-        const damageEvents = events.filter((event: any) => event.type === 'damage')
-
-        console.log('damageEvents', damageEvents)
-        console.log('availableInstanceIds', availableInstanceIds)
-
-        if (damageEvents.length > 0) {
-            damageEvents.forEach((damageEvent: Damage) => {
-                const npc = npcList.find(npc => npc?.id === String(damageEvent.npcId))
-                const fighter = playerList.find(player => player?.id === String(damageEvent.npcId))
+        // console.log('availableInstanceIds', availableInstanceIds)
+        events.forEach(event => {
+            if (event.type === 'damage') {
+                const npc = npcList.find(npc => npc?.id === String(event.npcId))
+                const fighter = playerList.find(player => player?.id === String(event.npcId))
                 const object = npc || fighter
+                removeEvent(event)
 
-                // TODO: rm bc it kill cpu, should remake damage indicators
-                // Create optimized version based on InstancedMesh
-                // I got an idea to use map textures for numbers
-                // removeEvent(damageEvent)
-
-                // if (fighter) { return removeEvent(damageEvent) }
-
-                if (!object) { return removeEvent(damageEvent) }
-                // console.log(`[FloatingDamage]: ID ${damageEvent.npcId} received ${damageEvent.damage} damage.`)
+                if (!object) { return }
 
                 const target = getSceneObject(object.id)
-                if (!target) { return removeEvent(damageEvent) }
+                if (!target) { return }
 
-                triggerDamage.current.push(createDamage(damageEvent, target as any))
+                playDamage(event, target as any)
 
                 // Send one more if double
-                if (damageEvent.dmgType.isDouble) {
+                if (event.dmgType.isDouble) {
                     setTimeout(() => {
-                        triggerDamage.current.push(createDamage(damageEvent, target as any))
+                        playDamage(event, target as any)
                     }, 100)
                 }
-            })
-        }
+            }
+        })
     }, [events])
 
+    const playDamage = React.useCallback((damageEvent: Damage, target: ObjectData) => {
+        const instanceId = availableInstanceIds.current[0]
+        if (typeof instanceId !== 'number') {
+            return
+        }
 
-    // Render Damage
-    useFrame(() => {
-        triggerDamage.current.forEach(_ => {
-            _.remove()
+        const instance = instanceRefs.current[instanceId]
+        availableInstanceIds.current = availableInstanceIds.current.filter((id: number) => id !== instanceId)
+
+        // Play Logic
+        if (!target.ref) { return }
+
+        setShaderTextColor(getDamageColor(damageEvent), instance)
+        setShaderText(getDamageValue(damageEvent), instance)
+
+        const { x, z } = target.ref.position
+        const { height } = target.dimensions
+        const from = { opacity: 1.5, offsetY: .5 }
+        const to = { opacity: 0, offsetY: 1.3 }
+
+        instance.position.set(x, height+from.offsetY, z)
+
+        Tween.to(from, to, {
+            duration: 700,
+            onChange(state) {
+                instance.position.y = height + state.value.offsetY
+                // // @ts-expect-error
+                // textRef.current.material.uniforms['customAlpha'].value = state.value.opacity
+                setShaderAlpha(state.value.opacity, instance)
+            },
+            onComplete: () => {
+                setShaderAlpha(0, instance)
+                // Release Instance
+                if (!availableInstanceIds.current.includes(instanceId)) {
+                    availableInstanceIds.current.push(instanceId)
+                }
+            }
         })
-    })
+    }, [])
 
 
     return (
         <group name="floating-damage">
-            <Instances limit={instancesSize} range={instancesSize}>
+            {/* <Instances limit={instancesSize} range={instancesSize}>
                 <planeGeometry />
                 <BillboardTextMaterial/>
-                {/* {triggerDamage.current.map((_: TriggerDamage) => (
-                    <DamageText
-                        key={_.label}
-                        color={_.color}
-                        value={_.message}
-                        target={_.target}
-                        onComplete={() => _.remove()}
-                    />
-                ))} */}
-                {[...instancesSizeArray.current].map((_, i) => <Instance key={i} ref={r => instanceRefs.current[i] = r} visible={false}/>)}
-            </Instances>
-            {/* {triggerDamage.current.map((_: TriggerDamage) => (
-                <DamageText
-                    key={_.label}
-                    color={_.color}
-                    value={_.message}
-                    target={_.target}
-                    onComplete={() => _.remove()}
-                />
-            ))} */}
+                {[...instancesSizeArray.current].map((_, i) => <Instance color={'red'} key={i} ref={r => instanceRefs.current[i] = r}/>)}
+            </Instances> */}
+
+            {[...instancesSizeArray.current].map((_, i) => (
+                <mesh key={i} ref={r => instanceRefs.current[i] = r}>
+                    <planeGeometry args={[3, 3, 1]} />
+                    <BillboardTextMaterial/>
+                </mesh>
+            ))}
         </group>
     )
 })

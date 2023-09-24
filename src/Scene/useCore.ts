@@ -125,6 +125,7 @@ export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
 
         const currentDistance = euclideanDistance(currentCoordinate, targetCoordinate)
         const availableNearestSquares = $this._getAvailableNearestSquares(currentCoordinate)
+        if (!availableNearestSquares.length) { return null }
         const sortedSquares = availableNearestSquares.map(square => ({
           square,
           distance: euclideanDistance(square, targetCoordinate)
