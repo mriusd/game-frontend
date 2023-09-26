@@ -36,7 +36,6 @@ const Controls = React.memo(function Controls() {
         if (intersected) { setPointerCoordinate(intersected) }
 
         if (isHolding.current) {
-            console.log('Controls Move')
             move(useControls.getState().pointerCoordinate)
         }
 
