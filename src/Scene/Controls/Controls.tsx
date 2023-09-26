@@ -14,24 +14,26 @@ import { useControls } from "./useControls"
 
 // TODO: Remove Raycaster, calc vai GEOMETRY instead
 
+
 const Controller = memo(function Controller() {
     const eventsNode = useUi(state => state.eventsNode)
     const move = useFighter(state => state.move)
-    const [isOccupiedCoordinate, groundObject] = useCore(state => [state.isOccupiedCoordinate, state.groundObject])
+    const [isOccupiedCoordinate] = useCore(state => [state.isOccupiedCoordinate])
     const canvas = useThree(state => state.gl.domElement)
     const isHolding = useRef(false)
     const updateFighterDirection = useCloud(state => state.updateFighterDirection)
     const [calcDirection, setPointerCoordinate, setDirection] = useControls(state => [state.calcDirection, state.setPointerCoordinate, state.setDirection])
     
+    const intersection = useRef(new THREE.Vector3())
+
     const [worldCoordToMatrix, matrixCoordToWorld] = useCore(state => [state.worldCoordToMatrix, state.matrixCoordToWorld])
     const boxRef = useRef<THREE.Mesh>()
 
-    // TODO: Make Raycaster Cheaper
-    useFrame(({ raycaster }) => {
+    useFrame(({ raycaster, pointer, camera }) => {
         if (useCore.getState().hoveredItems.length) { return }
         if (useBackpack.getState().isOpened) { return }
 
-        const intersected = calcPointerCoordinate(raycaster)
+        const intersected = calcPointerCoordinate(raycaster, pointer, camera as any)
         if (intersected) { setPointerCoordinate(intersected) }
 
         if (isHolding.current) {
@@ -39,16 +41,14 @@ const Controller = memo(function Controller() {
             move(useControls.getState().pointerCoordinate)
         }
     })
-    // 
-    const calcPointerCoordinate = useCallback((raycaster: THREE.Raycaster) => {
-        if (!groundObject.current) { return null }
-
-        const intersections = raycaster.intersectObject(groundObject.current)
-        const point = intersections[0]?.point
-        if (!point) { return null }
-
-        return point
-    }, [])
+    const calcPointerCoordinate = (raycaster: THREE.Raycaster, pointer: THREE.Vector2, camera: THREE.PerspectiveCamera) => {
+        raycaster.setFromCamera(pointer, camera)
+        // Interset with plane y = 0
+        const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        raycaster.ray.intersectPlane(plane, intersection.current)
+        return intersection.current
+    }
+    
 
     useEffect(() => {
         if (!eventsNode.current) { return }
