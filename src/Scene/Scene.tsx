@@ -11,7 +11,7 @@ import { Loader, Stats, OrbitControls } from "@react-three/drei"
 import Light from "./Light"
 import Chunks from "./Chunks/Chunks"
 import Fighter from "./Fighter/Fighter"
-import Controller from "./Controls/Controls"
+import Controls from "./Controls/Controls"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"
 import Decor from "./Decor/Decor"
 import DecorTest from './Decor/DecorTest'
@@ -71,7 +71,7 @@ const Scene = React.memo(function Scene() {
                         {/* <DecorTest/> */}
                         <Fighter />
                         <Chunks />
-                        { !devMode ? <Controller /> : <></> }
+                        { !devMode ? <Controls /> : <></> }
                         <FloatingDamage />
                         <UserInterface3D />
                         <Light />

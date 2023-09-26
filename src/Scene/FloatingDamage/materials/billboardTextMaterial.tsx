@@ -14,7 +14,7 @@ export const BillboardTextMaterial = () => {
             transparent: true,
             depthTest: false,
             uniforms: {
-                uNumber: { value: [] }, // Array of numbers in ASCII
+                uNumber: { value: Array.from({ length: numberSize }, () => 0) }, // Array of numbers in ASCII
                 uChannel0: { value: textImage },
                 uColor: { value: { r: 0, g: 0, b: 0 } },
                 uAlpha: { value: 0 }
