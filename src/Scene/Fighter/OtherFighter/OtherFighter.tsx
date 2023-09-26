@@ -76,7 +76,7 @@ const OtherFighter = React.memo(function OtherFighter({ fighter }: Props) {
                 onChange: (state: { value: WorldCoordinate }) => void setPosition(state.value, ref),
                 onComplete: () =>  { 
                     isMoving.current = false
-                    actionTimeout.current = setTimeout(() => { action.current.includes('run') && setAction('stand', fighter) }, 200) 
+                    actionTimeout.current = setTimeout(() => { action.current.includes('run') && setAction('stand', fighter) }, 50) 
                 } 
             }
         )

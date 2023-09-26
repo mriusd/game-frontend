@@ -1,7 +1,10 @@
 import React from "react"
+
+
 import { useUi } from "Scene/UserInterface3D/useUI"
 import { useCloud } from 'EventCloud/useCloud'
 import { useFighter } from 'Scene/Fighter/useFighter'
+import { useCore } from "Scene/useCore"
 
 import type { Fighter } from "interfaces/fighter.interface"
 
@@ -10,6 +13,7 @@ export const usePointerEvents = (npc: Fighter) => {
     const setTarget = useCloud(state => state.setTarget)
     const fighter = useFighter(state => state.fighter)
     const setCursor = useUi(state => state.setCursor)
+    const setHoveredItems = useCore(state => state.setHoveredItems)
 
 
     // Set target & hover
@@ -18,13 +22,13 @@ export const usePointerEvents = (npc: Fighter) => {
         e.stopPropagation()
         nameColor.current = 0xFF3300
         setCursor('pointer')
-        // setHoveredItems(npc, 'add')
+        setHoveredItems(npc, 'add')
     }, [npc])
 
     const handlePointerLeave = React.useCallback(() => {
         nameColor.current = 0xFFFFFF
         setCursor('default')
-        // setHoveredItems(npc, 'remove')
+        setHoveredItems(npc, 'remove')
     }, [npc])
 
     const handleLeftClick = React.useCallback((e) => {

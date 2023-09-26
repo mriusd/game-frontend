@@ -1,14 +1,19 @@
-import { createWithEqualityFn } from "zustand/traditional";
-import { shallow } from "zustand/shallow";
+import { createWithEqualityFn } from "zustand/traditional"
+import { shallow } from "zustand/shallow"
 
-import React from "react";
+import React from "react"
 
-import type { OccupiedCoordinate } from "interfaces/occupied.interface";
-import type { ServerCoordinate, WorldCoordinate } from "interfaces/coordinate.interface";
-import type { Fighter } from "interfaces/fighter.interface";
+import type { OccupiedCoordinate } from "interfaces/occupied.interface"
+import type { ServerCoordinate, WorldCoordinate } from "interfaces/coordinate.interface"
+import type { Fighter } from "interfaces/fighter.interface"
 
-import { euclideanDistance } from "Scene/utils/euclideanDistance";
-import { getMeshDimensions } from "Scene/utils/getMeshDimensions";
+import { euclideanDistance } from "Scene/utils/euclideanDistance"
+import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
+
+import { useFighter } from "./Fighter/useFighter"
+import { useCloud } from "EventCloud/useCloud"
+import { useControls } from "Scene/Controls/useControls"
+import { calcDirection } from "Scene/utils/calcDirection"
 
 export interface CoreInterface {
     location: string
@@ -95,6 +100,19 @@ export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
 
         if (action === 'add') {
             if (itemIndex === -1) {
+
+                // Update Direction To Hovered Object
+                // console.log('hovered', item)
+                const $cloud = useCloud.getState()
+                const $fighter = useFighter.getState()
+                const $controls = useControls.getState()
+                if ($fighter.fighter?.coordinates && item?.coordinates) {
+                    const direction = calcDirection($fighter.fighter.coordinates, item.coordinates)
+                    $controls.setDirection(Math.atan2(direction.dx, direction.dz))
+                    $cloud.updateFighterDirection(direction)
+                }
+                // 
+
                 hoveredItems.push(item)
                 return set({ hoveredItems })
             }
@@ -121,6 +139,7 @@ export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
     getNearestEmptySquareToTarget: (currentCoordinate, targetCoordinate) => {
         const $this = get()
 
+        if (!currentCoordinate || !targetCoordinate) { return null }
         if (targetCoordinate.x === currentCoordinate.x && targetCoordinate.z === currentCoordinate.z) { return null }
 
         const currentDistance = euclideanDistance(currentCoordinate, targetCoordinate)
