@@ -12,6 +12,7 @@ import { useFighter } from "Scene/Fighter/useFighter"
 import { useCloud } from "EventCloud/useCloud"
 import { useControls } from "./useControls"
 
+// TODO: Remove Raycaster, calc vai GEOMETRY instead
 
 const Controller = memo(function Controller() {
     const eventsNode = useUi(state => state.eventsNode)
@@ -34,6 +35,7 @@ const Controller = memo(function Controller() {
         if (intersected) { setPointerCoordinate(intersected) }
 
         if (isHolding.current) {
+            // mouseMove()
             move(useControls.getState().pointerCoordinate)
         }
     })

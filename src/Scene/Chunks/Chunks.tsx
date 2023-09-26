@@ -57,13 +57,12 @@ const Chunks = memo(function Chunks({}) {
             const x = (xIndex * chunkSize) + xOffset;
             const z = (zIndex * chunkSize) + yOffset;
 
-            if (plane.position.x === x && plane.position.z === z) { return }
-            console.log('[Chunks]: chunks recalculated')
+            // console.log('[Chunks]: chunks recalculated')
 
             // CALC THIS CORRECTLY
             const textureX = zIndex + 1 + yOffset/chunkSize
             const textureZ = xIndex + 1 + xOffset/chunkSize
-            
+
             if (textureX >= 0 && textureZ >= 0 && textureX < chunksPerAxis+1 && textureZ < chunksPerAxis+1) {
                 plane.material['map'] = textures[`${textureX}_${textureZ}/map`]
                 plane.material['normalMap'] = textures[`${textureX}_${textureZ}/normalMap`]
