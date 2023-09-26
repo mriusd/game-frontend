@@ -24,16 +24,17 @@ const Controller = memo(function Controller() {
     const updateFighterDirection = useCloud(state => state.updateFighterDirection)
     const [calcDirection, setPointerCoordinate, setDirection] = useControls(state => [state.calcDirection, state.setPointerCoordinate, state.setDirection])
     
+    const intersectionPlane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0))
     const intersection = useRef(new THREE.Vector3())
 
     const [worldCoordToMatrix, matrixCoordToWorld] = useCore(state => [state.worldCoordToMatrix, state.matrixCoordToWorld])
     const boxRef = useRef<THREE.Mesh>()
 
-    useFrame(({ raycaster, pointer, camera }) => {
+    useFrame(({ raycaster }) => {
         if (useCore.getState().hoveredItems.length) { return }
         if (useBackpack.getState().isOpened) { return }
 
-        const intersected = calcPointerCoordinate(raycaster, pointer, camera as any)
+        const intersected = raycaster.ray.intersectPlane(intersectionPlane.current, intersection.current)
         if (intersected) { setPointerCoordinate(intersected) }
 
         if (isHolding.current) {
@@ -41,14 +42,6 @@ const Controller = memo(function Controller() {
             move(useControls.getState().pointerCoordinate)
         }
     })
-    const calcPointerCoordinate = (raycaster: THREE.Raycaster, pointer: THREE.Vector2, camera: THREE.PerspectiveCamera) => {
-        raycaster.setFromCamera(pointer, camera)
-        // Interset with plane y = 0
-        const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-        raycaster.ray.intersectPlane(plane, intersection.current)
-        return intersection.current
-    }
-    
 
     useEffect(() => {
         if (!eventsNode.current) { return }
