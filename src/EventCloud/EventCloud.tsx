@@ -1,5 +1,4 @@
 import React from 'react';
-import useWebSocket from 'react-use-websocket';
 
 import type { Fighter } from 'interfaces/fighter.interface';
 
@@ -9,10 +8,11 @@ import { useNpc } from 'Scene/Npc/useNpc';
 import { useDroppedItem } from 'Scene/DroppedItem/useDroppedItem';
 import { useOtherFighter } from 'Scene/Fighter/OtherFighter/useOtherFighter';
 
+import { useWorkerWebSocket } from './hooks/useWorkerWebSocket';
 
 const EventCloudContext = React.createContext({});
 const socketUrl = process.env.REACT_APP_WS_URL; // ws://149.100.159.50:8080/ws
-export const EventCloudProvider = React.memo(function EventCloudProvider({ children }: any) {
+export const EventCloudProvider = React.memo(function EventCloudProvider({ children }: any) {	
 	const [setNpcList] = useNpc(state => [state.setNpcList])
 	const [setFighter] = useFighter(state => [state.setFighter])
 	const [addEvent, setUserFighters] = useCloud(state => [state.addEvent, state.setUserFighters])
@@ -25,7 +25,7 @@ export const EventCloudProvider = React.memo(function EventCloudProvider({ child
 	const [setOtherFighter] = useOtherFighter(state => [state.setOtherFighterList])
 
 	const processIncomingMessage = React.useCallback((event: any) => {
-		const msg = JSON.parse(event.data);
+		const msg = JSON.parse(event.data)
 
 		switch (msg.action) {
 			case "item_picked":
@@ -121,15 +121,15 @@ export const EventCloudProvider = React.memo(function EventCloudProvider({ child
 		}
 	}, [])
 
-	// WebSocket Initialization
 	const socketOptions = React.useMemo(() => ({
-		onOpen: (event) => {},
-		onError: (event) => {console.error('WebSocket error:', event)},
-		onClose: (event) => {},
 		onMessage: (event) => processIncomingMessage(event)
 	}), [processIncomingMessage])
-	const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(socketUrl, socketOptions);
-	React.useLayoutEffect(() => void useCloud.getState().init(sendJsonMessage), [])
+	const { sendJsonMessage, readyState } = useWorkerWebSocket(socketUrl, socketOptions)
+	React.useLayoutEffect(() => {
+		if (readyState) {
+			useCloud.getState().init(sendJsonMessage)
+		}
+	}, [readyState])
 
 	return <EventCloudContext.Provider value={{}}>{children}</EventCloudContext.Provider>
 });

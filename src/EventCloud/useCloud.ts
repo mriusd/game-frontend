@@ -5,7 +5,7 @@ import { shallow } from 'zustand/shallow';
 import { equipment as equipmentSlots } from "interfaces/equipment.interface";
 // 
 
-import type { JsonValue } from "react-use-websocket/dist/lib/types";
+import type { JsonValue } from './hooks/useWorkerWebSocket';
 import type { Equipment } from "interfaces/equipment.interface";
 import type { Fighter } from 'interfaces/fighter.interface';
 import type { Skill } from 'interfaces/skill.interface';
@@ -20,6 +20,7 @@ import { useBackpack } from "../Scene/UserInterface3D/Backpack/useBackpack";
 
 
 export interface CloudStoreInterface {
+    readyState: boolean
     sendJsonMessage: (jsonMessage: JsonValue) => void | null
     init: (sendJsonMessage: (jsonMessage: JsonValue) => void) => void
 
@@ -95,8 +96,9 @@ export interface CloudStoreInterface {
 
 export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => ({
     // Init
+    readyState: false,
     sendJsonMessage: null,
-    init: (sendJsonMessage) => set(() => ({ sendJsonMessage })),
+    init: (sendJsonMessage) => set(() => ({ sendJsonMessage, readyState: true })),
 
 
     // Auth
@@ -289,7 +291,6 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
         if (!$this?.target?.target?.id) { return }
         $this.sendJsonMessage({
             type: "submit_attack",
-            // @ts-expect-error
             data: {
                 opponentID: $this.target.target.id.toString(),
                 playerID: useFighter.getState().fighter.tokenId.toString(),
@@ -303,7 +304,6 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
         if (!$this?.target?.target?.id) { return }
         $this.sendJsonMessage({
             type: "submit_attack",
-            // @ts-expect-error
             data: {
                 opponentID: $this.target?.target?.id.toString(),
                 playerID: useFighter.getState().fighter.tokenId.toString(),

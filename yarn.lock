@@ -12449,11 +12449,6 @@ react-use-measure@^2.1.1:
   dependencies:
     debounce "^1.2.1"
 
-react-use-websocket@^4.3.1:
-  version "4.3.1"
-  resolved "https://registry.npmjs.org/react-use-websocket/-/react-use-websocket-4.3.1.tgz"
-  integrity sha512-zHPLWrgcqydJaak2O5V9hiz4q2dwkwqNQqpgFVmSuPxLZdsZlnDs8DVHy3WtHH+A6ms/8aHIyX7+7ulOcrnR0Q==
-
 react@^18.2.0:
   version "18.2.0"
   resolved "https://registry.npmjs.org/react/-/react-18.2.0.tgz"
