@@ -1,6 +1,7 @@
 import * as THREE from "three"
 import { useMemo, useRef, memo, useEffect } from "react"
 // import { useHelper } from "@react-three/drei"
+import { Environment } from "@react-three/drei"
 
 import { useFighter } from "./Fighter/useFighter"
 import { useFrame } from "@react-three/fiber"
@@ -23,9 +24,9 @@ const Light = memo(function Light() {
 
     return (
         <group name="light">
-            <hemisphereLight args={[0xEEF3FF, 0x300B14]} intensity={.3} />
+            <hemisphereLight args={[0xEEF3FF, 0x300B14]} intensity={.8} />
             <directionalLight 
-                intensity={.5}
+                intensity={1}
                 color={0xFFFADE} 
                 ref={shadowlightRef}
                 castShadow
@@ -38,6 +39,7 @@ const Light = memo(function Light() {
                 shadow-camera-top={20}
                 shadow-camera-bottom={-20}
             />
+            <Environment files="/assets/sandsloot_1k.hdr"/>
         </group>
     )
 })

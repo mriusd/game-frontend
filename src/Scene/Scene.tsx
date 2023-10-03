@@ -25,7 +25,6 @@ import DroppedItemList from './DroppedItem/DroppedItemList'
 import { useUi } from './UserInterface3D/useUI'
 
 import Postprocessing from './Postprocessing'
-import { Environment } from '@react-three/drei'
 
 import { shallow } from 'zustand/shallow'
 import UserInterface2D from './UserInterface2D/UserInterface2D'
