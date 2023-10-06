@@ -1,4 +1,4 @@
-import { useRef, useMemo, memo } from "react"
+import { useRef, useMemo, memo, MutableRefObject } from "react"
 import ReuseModel from '../components/ReuseModel'
 import { getShaderedDecor } from "./utils/getShaderedDecor"
 import { useCore } from "Scene/useCore"
@@ -10,7 +10,12 @@ import { createBillboardMaterial } from "Scene/materials/createBillboardMaterial
 
 // Objects Data
 import grassData from './data/grass.json'
+import christmasTreeData from './data/christmass_tree.json'
+import treeData from './data/tree.json'
+
 import { shallow } from "zustand/shallow"
+import { useFighter } from "Scene/Fighter/useFighter"
+import { useFrame } from "@react-three/fiber"
 
 const DecorTest = memo(function Decor() {
     console.log('rerender')
@@ -21,10 +26,11 @@ const DecorTest = memo(function Decor() {
     // // @ts-expect-error
     // console.log('nodes', grass.gltf.nodes)
 
+    console.log(grass)
     // const worldCoordinate = useMemo(() => matrixCoordToWorld(objectData.location), [grassData])
 
     // @ts-expect-error
-    const meshes = useMemo(() => ({ Grass: grass.gltf.nodes.grass13139,  Tree: tree.gltf.nodes.tree_1 }), [grass, tree])
+    const meshes = useMemo(() => ({ Grass: grass.gltf.nodes.grass015,  Tree: tree.gltf.nodes.tree_1 }), [grass, tree])
     // console.log('meshes', meshes)
     return (
         // <Merged meshes={meshes}>
@@ -39,15 +45,21 @@ const DecorTest = memo(function Decor() {
         //         </group>
         //     )}
         // </Merged>
-        // <Instances geometry={meshes.Grass.geometry} material={meshes.Grass.material}>
-        //     {/* <meshBasicMaterial color={'red'} /> */}
-        //     {/* <sphereGeometry args={[1, 64, 64]}/> */}
-        //     <group position={[0, 0, 0]}>
-        //         { (grassData as Array<any>).map((_, i) => <InstancedObject  objectData={_} key={i}  />) }
-        //     </group>
-        // </Instances>
+
         <>
-        { (grassData as Array<any>).map((_, i) => <BaseObject objectData={_} key={i}  />) }
+        {/* { (grassData as Array<any>).map((_, i) => <mesh key={i}>
+            <meshBasicMaterial color={'red'} />
+            <sphereGeometry args={[1, 16, 16]}/>
+        </mesh>) } */}
+
+        <Instances geometry={meshes.Grass.geometry} material={meshes.Grass.material}>
+            <group position={[0, 0, 0]}>
+                { (grassData as Array<any>).map((_, i) => <InstancedObject  objectData={_} key={i}  />) }
+            </group>
+        </Instances>
+        {/* { (grassData as Array<any>).map((_, i) => <BaseObject objectData={_} name="grass" key={i}  />) } */}
+        { (christmasTreeData as Array<any>).map((_, i) => <BaseObject objectData={_} name="christmas_tree"  key={i}  />) }
+        { (treeData as Array<any>).map((_, i) => <BaseObject objectData={_} name="tree" key={i}  />) }
         </>
         // <></>
     )
@@ -59,8 +71,10 @@ interface Props {
         location: Coordinate
         rotation: { x: number, y: number, z: number }
         scale: { x: number, y: number, z: number }
+        size: { width: number, height: number, length: number }
     },
     models?: any
+    name?: string
 }
 function Object({ objectData, models }: Props) {
     const ref = useRef<THREE.Mesh | null>(null)
@@ -91,37 +105,54 @@ function InstancedObject({ objectData }: Props) {
     return (
         <group name='instanced-object'>
             <Instance
-                color={'red'}
                 ref={ref}
-                position={[worldCoordinate.x, 0, worldCoordinate.z]}
-                rotation={[objectData.rotation.x, objectData.rotation.y-Math.PI / 2.5, objectData.rotation.z]}
-                // scale={[objectData.scale.x-0.5, objectData.scale.y-0.5, objectData.scale.z-0.5]}
-                // scale={[0.33, 0.33, 0.33]}
+                position={[worldCoordinate.x - 40/2, 0, worldCoordinate.z - 40/2]}
+                rotation={[objectData.rotation.x, objectData.rotation.y, objectData.rotation.z]}
+                scale={[objectData.scale.x, objectData.scale.y, objectData.scale.z]}
             />
         </group>
     )
 }
 
 
-function BaseObject({ objectData }: Props) {
+function BaseObject({ objectData, name }: Props) {
     const ref = useRef<THREE.Mesh | null>(null)
-    const [worldSize, chunkSize] = useCore(state => [state.worldSize, state.chunkSize], shallow)
+    const [matrixCoordToWorld, chunkSize] = useCore(state => [state.matrixCoordToWorld, state.chunkSize])
+    const uniforms = useRef({ uTime: { value: 0 }, uVisible: { value: true } })
+    const { model } = useMemo(() => getShaderedDecor(name, uniforms), [])
+    const worldCoordinate = useMemo(() => matrixCoordToWorld(objectData.location), [objectData])
 
-    const worldCoordinate = useMemo(() => ({
-        x: objectData.location.x - worldSize / 2 - chunkSize / 2,
-        z: objectData.location.z - worldSize / 2 - chunkSize / 2
-    }), [grassData])
-    const { model } = useMemo(() => getShaderedDecor('grass'), [])
+    // Check Collision
+    useFrame(({ clock }) => {
+        if (!ref.current) { return }
+        const coordinate = useFighter.getState().fighter?.coordinates
+        if (!coordinate) { return }
+        const {x, z} = coordinate
+
+        const objX = objectData.location.x - chunkSize/2
+        const objZ = objectData.location.z - chunkSize/2
+
+        const objWidth = objectData.size.width
+        const objHeight = objectData.size.length
+
+        if (x >= objX - objWidth/2 && x <= objX + objHeight
+            && z >= objZ - objWidth/2 && z <= objZ + objWidth/2
+        ) {
+            uniforms.current.uVisible.value = false
+        } else {
+            uniforms.current.uVisible.value = true
+        }
+        uniforms.current.uTime.value = clock.getElapsedTime()
+    })
 
     return (
         <group name='decor'>
             <primitive
                 ref={ref}
                 object={model}
-                position={[worldCoordinate.x, 0, worldCoordinate.z]}
-                // rotation={[objectData.rotation.x, objectData.rotation.y, objectData.rotation.z]}
-                // scale={[objectData.scale.x, objectData.scale.y, objectData.scale.z]}
-                // scale={[0.33, 0.33, 0.33]}
+                position={[worldCoordinate.x - chunkSize/2, 0, worldCoordinate.z - chunkSize/2]}
+                rotation={[objectData.rotation.x, objectData.rotation.y, objectData.rotation.z]}
+                scale={[objectData.scale.x, objectData.scale.y, objectData.scale.z]}
             />
         </group>
     )

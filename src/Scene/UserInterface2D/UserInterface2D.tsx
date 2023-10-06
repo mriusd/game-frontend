@@ -51,7 +51,7 @@ const UserInterface2D = () => {
                 {fighter?.coordinates && <div>Coordinate [ X: {matrixCoordToWorld(fighter.coordinates)?.x} Z: {matrixCoordToWorld(fighter.coordinates)?.z} ]</div>}
             </div>
             <Leva
-                hidden={!isBackpackOpened}
+                // hidden={!isBackpackOpened}
                 flat
             />
         </div>

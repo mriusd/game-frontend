@@ -6,10 +6,13 @@ import { Environment } from "@react-three/drei"
 import { useFighter } from "./Fighter/useFighter"
 import { useFrame } from "@react-three/fiber"
 
+import { useControls } from "leva"
+
 const Light = memo(function Light() {
     const fighterNode = useFighter(state => state.fighterNode)
     const shadowlightRef = useRef<THREE.DirectionalLight | null>(null)
     const lightPosition = useMemo(() => new THREE.Vector3(0, 10, 5), [])
+    // const lightPosition = useMemo(() => new THREE.Vector3(0, 0.5, 0.866), []) // ~60º
     useEffect(() => {
         if (!fighterNode.current || !shadowlightRef.current) { return }
         shadowlightRef.current.target = fighterNode.current 
@@ -22,12 +25,21 @@ const Light = memo(function Light() {
     // Helper
     // useHelper(shadowlightRef, THREE.DirectionalLightHelper, 0x000000)
 
+    const data = useControls({
+        colorHemi: { value: '#FFFFFF' },
+        intenHemi: { value: .3, min: 0, max: 2 },
+
+        colorDirectional: { value: '#FFFFFF' },
+        intenDirectional: { value: 0.3, min: 0, max: 5 }
+    })
+
     return (
         <group name="light">
-            <hemisphereLight args={[0xEEF3FF, 0x300B14]} intensity={.8} />
+            {/* <hemisphereLight args={[data.colorGround, data.colorSky]} intensity={data.intenHemi} /> */}
+            <ambientLight color={data.colorHemi} intensity={data.intenHemi} />
             <directionalLight 
-                intensity={1}
-                color={0xFFFADE} 
+                intensity={data.intenDirectional}
+                color={data.colorDirectional} 
                 ref={shadowlightRef}
                 castShadow
                 shadow-mapSize-width={2048}
@@ -39,7 +51,7 @@ const Light = memo(function Light() {
                 shadow-camera-top={20}
                 shadow-camera-bottom={-20}
             />
-            <Environment files="/assets/sandsloot_1k.hdr"/>
+            {/* <Environment files="/assets/autumn_forest.hdr"/> */}
         </group>
     )
 })

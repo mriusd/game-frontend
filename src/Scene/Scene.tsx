@@ -44,6 +44,10 @@ const Scene = React.memo(function Scene() {
         if (eventsNode.current) { subscribe(eventsNode.current) }
         return () => unsubscribe()
     }, [eventsNode.current])
+
+    const data = useControls({
+        exposure: { value: 0.9, min: 0, max: 10 }
+    })
     
 
     return (
@@ -53,7 +57,11 @@ const Scene = React.memo(function Scene() {
                 gl={{
                     powerPreference: "high-performance",
                     alpha: false,
-                    antialias: false,
+                    antialias: true,
+                    toneMappingExposure: data.exposure,
+                    // toneMapping: THREE.LinearToneMapping,
+                    toneMapping: THREE.ACESFilmicToneMapping,
+                    useLegacyLights: true
                 }}
             >
                 <color attach="background" args={[0x000000]} />
@@ -67,7 +75,7 @@ const Scene = React.memo(function Scene() {
                         <DroppedItemList/>
                         <OtherFighterList/>
                         {/* {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)} */}
-                        {/* <DecorTest/> */}
+                        <DecorTest/>
                         <Fighter />
                         <Chunks />
                         { !devMode ? <Controls /> : <></> }

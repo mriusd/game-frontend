@@ -19,6 +19,9 @@ export const useLocationTextures = () => {
                 data[`${i}_${j}/normalMap`] = `worlds/${location.toLowerCase()}/normalMap/${i}_${j}.png`
                 data[`${i}_${j}/roughnessMap`] = `worlds/${location.toLowerCase()}/roughnessMap/${i}_${j}.png`
                 data[`${i}_${j}/metalnessMap`] = `worlds/${location.toLowerCase()}/metalnessMap/${i}_${j}.png`
+                // data[`${i}_${j}/heightMap`] = `worlds/${location.toLowerCase()}/heightMap/${i}_${j}.png`
+
+                // data[`${i}_${j}/occlusionMap`] = `worlds/${location.toLowerCase()}/occlusionMap/${i}_${j}.png`
             }
         }
         return data

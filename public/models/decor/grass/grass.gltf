@@ -1,11 +1,12 @@
 {
 	"asset":{
-		"copyright":"textures",
 		"generator":"Khronos glTF Blender I/O v3.5.30",
 		"version":"2.0"
 	},
 	"extensionsUsed":[
-		"KHR_draco_mesh_compression"
+		"KHR_draco_mesh_compression",
+		"KHR_materials_specular",
+		"KHR_materials_ior"
 	],
 	"extensionsRequired":[
 		"KHR_draco_mesh_compression"
@@ -22,38 +23,37 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"grass.13139",
-			"rotation":[
-				0,
-				0.904794454574585,
-				0,
-				0.42584869265556335
-			],
-			"translation":[
-				-4.795389652252197,
-				0.17901208996772766,
-				9.789215087890625
-			]
+			"name":"grass.015"
 		}
 	],
 	"materials":[
 		{
-			"alphaCutoff":0.5,
-			"alphaMode":"MASK",
+			"alphaMode":"BLEND",
 			"doubleSided":true,
-			"name":"Grass_Green_PNG_Clip_Art_Image",
+			"extensions":{
+				"KHR_materials_specular":{
+					"specularColorFactor":[
+						0.36179324743311136,
+						0.36179324743311136,
+						0.36179324743311136
+					]
+				},
+				"KHR_materials_ior":{
+					"ior":1.4500000476837158
+				}
+			},
+			"name":"Mask group",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":0
 				},
-				"metallicFactor":0,
-				"roughnessFactor":0.925981879234314
+				"metallicFactor":0
 			}
 		}
 	],
 	"meshes":[
 		{
-			"name":"Plane.13140",
+			"name":"grass.7419",
 			"primitives":[
 				{
 					"attributes":{
@@ -87,46 +87,46 @@
 	"images":[
 		{
 			"mimeType":"image/png",
-			"name":"Grass_Green_PNG_Clip_Art_Image 1",
-			"uri":"textures/Grass_Green_PNG_Clip_Art_Image%201.png"
+			"name":"Mask group",
+			"uri":"textures/Mask%20group.png"
 		}
 	],
 	"accessors":[
 		{
 			"componentType":5126,
-			"count":38,
+			"count":1260,
 			"max":[
-				0.6885199546813965,
-				0.34520387649536133,
-				0.32613110542297363
+				6.205785751342773,
+				0.6996269226074219,
+				5.612207889556885
 			],
 			"min":[
-				-0.6885209083557129,
-				-0.1985364556312561,
-				-0.3261314630508423
+				-5.741161823272705,
+				-8.821487426757812e-06,
+				-5.209226131439209
 			],
 			"type":"VEC3"
 		},
 		{
 			"componentType":5126,
-			"count":38,
+			"count":1260,
 			"type":"VEC2"
 		},
 		{
 			"componentType":5126,
-			"count":38,
+			"count":1260,
 			"type":"VEC3"
 		},
 		{
 			"componentType":5123,
-			"count":72,
+			"count":1890,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":436,
+			"byteLength":6624,
 			"byteOffset":0
 		}
 	],
@@ -140,7 +140,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":436,
+			"byteLength":6624,
 			"uri":"grass.bin"
 		}
 	]

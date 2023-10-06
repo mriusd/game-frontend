@@ -28,10 +28,11 @@ const Controls = React.memo(function Controls() {
     const [worldCoordToMatrix, matrixCoordToWorld] = useCore(state => [state.worldCoordToMatrix, state.matrixCoordToWorld])
     const boxRef = React.useRef<THREE.Mesh>()
 
-    useFrame(({ raycaster }) => {
+    useFrame(({ raycaster, camera, pointer }) => {
         if (useCore.getState().hoveredItems.length) { return }
         if (useBackpack.getState().isOpened) { return }
 
+        raycaster.setFromCamera(pointer, camera)
         const intersected = raycaster.ray.intersectPlane(intersectionPlane.current, intersection.current)
         if (intersected) { setPointerCoordinate(intersected) }
 

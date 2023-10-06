@@ -96,8 +96,6 @@ export const shader_level = () => {
             return color;
         }
         
-        
-
         vec3 getGlossColor() {
             return normalize(uColorPrimary) * uLaminateIntensity;
         }

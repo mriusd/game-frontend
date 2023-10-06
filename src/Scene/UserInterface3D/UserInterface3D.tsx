@@ -6,7 +6,6 @@ import { useUi } from "./useUI"
 
 import Backpack from "./Backpack/Backpack"
 import BottomMenu from "./BottomMenu"
-import Minimap from "./Minimap/Minimap"
 
 import { shallow } from "zustand/shallow"
 
@@ -24,7 +23,6 @@ const UserInterface3D = memo(function UserInterface() {
             <group position={[0, 0, -1000]} ref={userInterface} name="user-interface">
                 <Backpack/>
                 <BottomMenu/>
-                <Minimap/>
                 <Plane ref={intersectionPlane} name='intersection-plane' visible={false} args={[4000, 4000, 1]}></Plane>
             </group>
         </Hud>

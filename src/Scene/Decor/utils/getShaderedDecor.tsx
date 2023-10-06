@@ -3,6 +3,7 @@ import { GLTF } from "three/examples/jsm/loaders/GLTFLoader"
 import { SkeletonUtils } from "three-stdlib"
 import * as THREE from 'three'
 import { getDecorModel } from "./getDecorModel"
+import { shader_hidden } from "Scene/shaders/shader_hidden"
 
 
 // TODO: Think about this
@@ -12,42 +13,42 @@ export const getShaderedDecor = (name: string, uniforms?: any) => {
     // TODO: Think about another way store models, im not sure that clonning is a good idea for cpu
     // @ts-expect-error
     const model: THREE.Group | THREE.SkinnedMesh = SkeletonUtils.clone(gltf.scene)
+    const levelShader = shader_hidden()
+    // console.log(model, item.itemAttributes.name)
 
     model.traverse((object: any) => {
         if (object.isMesh) {
-            object.castShadow = true
-            object.revieveShadow = true
-
             const material = object.material.clone()
 
+            object.castShadow = true
+            object.revieveShadow = true
             material.transparent = true
-            // console.log('MMMaterial', material)
-            material.onBeforeCompile = (_shader: THREE.Shader) => {
-                // // Injection
-                // _shader.vertexShader = _shader.vertexShader.replace('#include <common>', `
-                //     #include <common>
-                //     ${levelShader.injectVertexShader.header}
-                // `)
-                // _shader.vertexShader = _shader.vertexShader.replace('#include <fog_vertex>', `
-                //     // #include <fog_vertex>
-                //     // vec3 scale = vec3(
-                //     //     length(modelViewMatrix[0].xyz),
-                //     //     length(modelViewMatrix[1].xyz),
-                //     //     length(modelViewMatrix[2].xyz)
-                //     // );
-                //     // // size attenuation: scale *= -mvPosition.z * 0.2;
-                //     // mvPosition.xyz += position * scale;
-                //     // gl_Position = projectionMatrix * mvPosition;
-                //     gl_Position = projectionMatrix * (modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0) + vec4(position.x, position.y, 0.0, 0.0));
-                // `)
-                // _shader.fragmentShader = _shader.fragmentShader.replace('#include <dithering_fragment>', `
-                //     #include <dithering_fragment>
-                //     gl_FragColor.a = .5;
-                // `)
 
-                // console.log(levelShader.injectFragmentShader.footer)
-                console.log(_shader.vertexShader)
-                // shader.value = _shader
+            // Shader For Invisible Objects
+            material.onBeforeCompile = (_shader: THREE.Shader) => {
+                // Uniforms
+                _shader.uniforms = { ..._shader.uniforms, ...levelShader.uniforms, ...uniforms.current  }
+                _shader.uniforms['uHiddenAlpha'] = { value: .3 }
+
+                // Injection
+                _shader.vertexShader = _shader.vertexShader.replace('#include <common>', `
+                    #include <common>
+                    ${levelShader.injectVertexShader.header}
+                `)
+                _shader.vertexShader = _shader.vertexShader.replace('#include <fog_vertex>', `
+                    #include <fog_vertex>
+                    ${levelShader.injectVertexShader.footer}
+                `)
+        
+                _shader.fragmentShader = _shader.fragmentShader.replace('#include <common>', `
+                    #include <common>
+                    uniform float visible;
+                    ${levelShader.injectFragmentShader.header}
+                `)
+                _shader.fragmentShader = _shader.fragmentShader.replace('#include <dithering_fragment>', `
+                    #include <dithering_fragment>
+                    ${levelShader.injectFragmentShader.footer}
+                `)
             }
             object.material = material
         }

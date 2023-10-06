@@ -16,7 +16,7 @@ import { useLocationTextures } from "./useLocationTextures"
 
 const Chunks = memo(function Chunks({}) {
     const fighterNode = useFighter(state => state.fighterNode)
-    const [ worldSize, chunkSize, chunksPerAxis ] = useCore(state => [state.worldSize, state.chunkSize, state.chunksPerAxis])
+    const [ worldSize, chunkSize, chunksPerAxis, location ] = useCore(state => [state.worldSize, state.chunkSize, state.chunksPerAxis, state.location])
     const groundObject = useCore(state => state.groundObject)
 
     const segmentsSize = 1
@@ -35,7 +35,7 @@ const Chunks = memo(function Chunks({}) {
 
     // For Dev
     const devMode = useCore(state => state.devMode)
-    const mapPlaceholder = useTexture({ map: '/worlds/lorencia/minimap/minimap.png' })
+    const mapPlaceholder = useTexture({ map: `/worlds/${location}/minimap/minimap.png` })
 
     useFrame(() => {
         if (!fighterNode.current) { return }
@@ -68,6 +68,8 @@ const Chunks = memo(function Chunks({}) {
                 plane.material['normalMap'] = textures[`${textureX}_${textureZ}/normalMap`]
                 plane.material['roughnessMap'] = textures[`${textureX}_${textureZ}/roughnessMap`]
                 plane.material['metalnessMap'] = textures[`${textureX}_${textureZ}/metalnessMap`]
+                // plane.material['displacementMap'] = textures[`${textureX}_${textureZ}/heightMap`]
+                // plane.material['aoMap'] = textures[`${textureX}_${textureZ}/occlusionMap`]
             }
             
             plane.position.set(x, 0, z)
@@ -101,7 +103,7 @@ const Chunks = memo(function Chunks({}) {
     }
     return (
         <>
-            <group name="chunks" ref={groundObject} rotation={[0, 0, 0]}>
+            <group name="chunks" ref={groundObject} position={[0, 0, 0]} rotation={[0, 0, 0]}>
                 {planeBufferSize.current.map((chunk, i) => (
                     <SwapChunk
                         key={i}
