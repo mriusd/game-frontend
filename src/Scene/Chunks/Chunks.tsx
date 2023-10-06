@@ -35,7 +35,7 @@ const Chunks = memo(function Chunks({}) {
 
     // For Dev
     const devMode = useCore(state => state.devMode)
-    const mapPlaceholder = useTexture({ map: `/worlds/${location}/minimap/minimap.png` })
+    const mapPlaceholder = useTexture({ map: `/worlds/${location.toLowerCase()}/minimap/minimap.png` })
 
     useFrame(() => {
         if (!fighterNode.current) { return }
