@@ -3,43 +3,36 @@ import { BlurPass, Resizer, KernelSize, Resolution } from 'postprocessing'
 import { ToneMapping } from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'
 import { SelectiveBloom } from '@react-three/postprocessing'
-
+import { BrightnessContrast, Sepia } from '@react-three/postprocessing'
 import { useControls } from 'leva'
 
 const Postprocessing = () => {
 
-    const { blendFunction } = useControls({
+    const data = useControls('Postprocessing', {
+        enabled: false,
         blendFunction: {
             label: "Blend Function",
-            options: [
-                BlendFunction.OVERLAY,
-                BlendFunction.NORMAL,
-                BlendFunction.ADD,
-                BlendFunction.COLOR_BURN,
-                BlendFunction.COLOR_DODGE,
-                BlendFunction.DARKEN,
-                BlendFunction.LIGHTEN,
-                BlendFunction.MULTIPLY
-            ]
-        }
-    });
-
-    const { hue, saturation } = useControls({
+            options: {
+                'normal': BlendFunction.NORMAL,
+                'overlay': BlendFunction.OVERLAY,
+                'add': BlendFunction.ADD,
+                'color burn': BlendFunction.COLOR_BURN,
+                'color dodge': BlendFunction.COLOR_DODGE,
+                'darken': BlendFunction.DARKEN,
+                'lighten': BlendFunction.LIGHTEN,
+                'multiply': BlendFunction.MULTIPLY
+            }
+        },
         hue: {
-            value: 0,
+            value: Math.PI,
             min: 0,
-            max: Math.PI,
-            step: 0.1
+            max: Math.PI*2,
         },
         saturation: {
             value: Math.PI,
             min: 0,
-            max: Math.PI,
-            step: 0.1
-        }
-    });
-
-    const { middleGrey, maxLuminance } = useControls({
+            max: Math.PI*2,
+        },
         middleGrey: {
             min: 0,
             max: 1,
@@ -51,15 +44,34 @@ const Postprocessing = () => {
             max: 64,
             value: 16,
             step: 1
+        },
+        brightness: {
+            min: -1,
+            max: 1,
+            value: 0,
+        },
+        contrast: {
+            min: -1,
+            max: 1,
+            value: 0,
+        },
+        sepia: {
+            min: 0,
+            max: 1,
+            value: 0,
         }
     });
 
+
     return (
-        <EffectComposer>
-            <ColorAverage blendFunction={blendFunction} />
-            <HueSaturation hue={hue} saturation={saturation} />
-            <ToneMapping middleGrey={middleGrey} maxLuminance={maxLuminance} />
-            <Bloom kernelSize={KernelSize.LARGE} luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />
+        <EffectComposer
+            enabled={data.enabled}
+        >
+            <BrightnessContrast brightness={data.brightness} contrast={data.contrast} />
+            <HueSaturation hue={data.hue} saturation={data.saturation} />
+            <ToneMapping middleGrey={data.middleGrey} maxLuminance={data.maxLuminance} />
+            <Sepia intensity={data.sepia} />
+            {/* <Bloom kernelSize={KernelSize.LARGE} luminanceThreshold={0} luminanceSmoothing={0.9} height={300} /> */}
             {/* <SelectiveBloom
                         // lights={[lightRef1, lightRef2]} // ⚠️ REQUIRED! all relevant lights
                         selection={[worldRef]} // selection of objects that will have bloom effect

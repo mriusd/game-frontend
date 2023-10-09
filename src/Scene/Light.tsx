@@ -20,18 +20,20 @@ const Light = memo(function Light() {
     // Move shadow light shadow
     useFrame(() => {
         if (!fighterNode.current || !shadowlightRef.current) { return }
-        shadowlightRef.current.position.set(fighterNode.current.position.x, fighterNode.current.position.y, fighterNode.current.position.z).add(lightPosition)
+        shadowlightRef.current.position.set(fighterNode.current.position.x, fighterNode.current.position.y, fighterNode.current.position.z).add(lightPositionTest)
     })
     // Helper
     // useHelper(shadowlightRef, THREE.DirectionalLightHelper, 0x000000)
 
-    const data = useControls({
+    const data = useControls('Lights', {
         colorHemi: { value: '#FFFFFF' },
         intenHemi: { value: .3, min: 0, max: 2 },
 
         colorDirectional: { value: '#FFFFFF' },
-        intenDirectional: { value: 0.3, min: 0, max: 5 }
+        intenDirectional: { value: 0.3, min: 0, max: 5 },
+        posDirectional: { value: { x: 0, y: 10, z: 5 } }
     })
+    const lightPositionTest = useMemo(() => new THREE.Vector3(data.posDirectional.x, data.posDirectional.y, data.posDirectional.z), [data])
 
     return (
         <group name="light">

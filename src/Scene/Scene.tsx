@@ -45,8 +45,24 @@ const Scene = React.memo(function Scene() {
         return () => unsubscribe()
     }, [eventsNode.current])
 
-    const data = useControls({
-        exposure: { value: 0.9, min: 0, max: 10 }
+    const data = useControls('GL', {
+        exposure: { value: 0.9, min: 0, max: 10 },
+        toneMapping: {
+            options: {
+                'notone': THREE.NoToneMapping,
+                'filmic': THREE.ACESFilmicToneMapping,
+                'linear': THREE.LinearToneMapping,
+                'reinhard': THREE.ReinhardToneMapping,
+                'cineon': THREE.CineonToneMapping
+            },
+        },
+        legacyLights: { value: true },
+        encoding: {
+            options: {
+                'linear': THREE.LinearEncoding,
+                'rgb': THREE.sRGBEncoding
+            }
+        }
     })
     
 
@@ -60,8 +76,10 @@ const Scene = React.memo(function Scene() {
                     antialias: true,
                     toneMappingExposure: data.exposure,
                     // toneMapping: THREE.LinearToneMapping,
-                    toneMapping: THREE.ACESFilmicToneMapping,
-                    useLegacyLights: true
+                    toneMapping: data.toneMapping,
+                    useLegacyLights: data.legacyLights,
+                    outputEncoding: data.encoding,
+                    
                 }}
             >
                 <color attach="background" args={[0x000000]} />
@@ -84,7 +102,7 @@ const Scene = React.memo(function Scene() {
                         <Light />
                     </GLTFLoader>
                 </React.Suspense>
-                {/* <Postprocessing/> */}
+                <Postprocessing/>
                 {/* <AdaptiveDpr/> */}
             </Canvas>
             <UserInterface2D/>
