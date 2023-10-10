@@ -124,7 +124,7 @@ const TwistingSlash = ({ renderEffect, onEffectComplete }) => {
                 object={twisting}
             >
             </primitive>
-            { swords.map(_ => 
+            {/* { swords.map(_ => 
                 <TwistingSword 
                     settings={swordSetting}
                     duration={settings.duration}
@@ -132,7 +132,7 @@ const TwistingSlash = ({ renderEffect, onEffectComplete }) => {
                     radius={settings.moveRadius}
                     key={_.id}
                 />
-            )}
+            )} */}
         </group>
 
     )

@@ -64,6 +64,7 @@ const Controls = React.memo(function Controls() {
     }, [])
     const mouseMove = React.useCallback(() => {
         if (useFighter.getState().isMoving) { return }
+        if (useCore.getState().hoveredItems.length) { return }
         const direction = calcDirection()
         if (!direction) { return }
         setDirection(direction)

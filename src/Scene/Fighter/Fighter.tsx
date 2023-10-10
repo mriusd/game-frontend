@@ -5,7 +5,6 @@ import { euclideanDistance } from "../utils/euclideanDistance"
 import { calcDirection } from "../utils/calcDirection"
 // TODO: Temporary, create Skills Manager and swap shader materials instead
 
-import TwistingSlash from "./Skills/TwistingSlash/TwistingSlash"
 import LastMessage from "./components/LastMessage"
 import FighterModel from "./components/FighterModel"
 
@@ -16,14 +15,17 @@ import { useFighterSkin } from "./hooks/useFighterSkin"
 import { useControls } from "Scene/Controls/useControls"
 import { useEquipmentChange } from "./hooks/useEquipmentChange"
 
+import { useEvent } from "Scene/hooks/useEvent"
+
 const Fighter = React.memo(function Fighter() {
     const spawned = React.useRef(false)
-    const submitMalee = useCloud(state => state.submitMalee)
+    const submitAttack = useCloud(state => state.submitAttack)
     const [target, setTarget] = useCloud(state => [state.target, state.setTarget])
-    const [fighter, fighterNode] = useFighter(state => [state.fighter, state.fighterNode])
+    const [fighter, fighterNode, move] = useFighter(state => [state.fighter, state.fighterNode, state.move])
     const { model, animations } = useFighterSkin('man')
     const [matrixCoordToWorld, worldCoordToMatrix] = useCore(state => [state.matrixCoordToWorld, state.worldCoordToMatrix])
     const setPosition = useFighter(state => state.setPosition)
+    const setDirection = useControls(state => state.setDirection)
 
     const setAllActions = useFighter(state => state.setAllActions)
     const { actions } = useAnimations(animations, fighterNode)
@@ -58,15 +60,22 @@ const Fighter = React.memo(function Fighter() {
 
     // React on Target and Do Action
     React.useEffect(() => {
-        if (target && target?.skill) {
-            const objectCoordinate = target.target.coordinates
-            // TODO: Make Logic For Attack With Skills
-            setAction('attack')
-            submitMalee(calcDirection(worldCoordToMatrix(fighterNode.current.position), objectCoordinate))
-            setTarget(null, null)
-            // 
-            return
+        if (!target?.target) { return }
+        const objectCoordinate = target.target.coordinates
+
+        if (target?.skill) {
+            // Check the distance, if too long - move fighter
+            if (euclideanDistance(objectCoordinate, fighter.coordinates) <= target.skill.activeDistance) {
+                const direction = calcDirection(worldCoordToMatrix(fighterNode.current.position), objectCoordinate)
+                setDirection(Math.atan2(direction.dx, direction.dz)) // Additionally set direction on attack, to be sure that fighter look at opponent
+                setAction('attack')
+                submitAttack(direction)
+                setTarget(null, null)
+                return
+            }
+            move(matrixCoordToWorld(objectCoordinate))
         }
+
     }, [target])
 
 
@@ -76,6 +85,12 @@ const Fighter = React.memo(function Fighter() {
             const action = useFighter.getState().action
             if (action.includes('stand')) { setAction('stand') }
         }
+    })
+
+    // Animate Skills on Server Event
+    useEvent(fighter, 'skill', (event, removeEvent) => {
+        // TODO: Animate Skills
+        removeEvent(event)
     })
 
     return (

@@ -30,13 +30,13 @@ export const useActions = (animations: THREE.AnimationClip[], ref: React.RefObje
                 actions?.[action.current]?.setLoop(THREE.LoopOnce, 0)
             } else
             if (action.current.includes('attack')) {
-                actionTimeout.current = setTimeout(() => void setAction('stand', fighter), ((actions?.[action.current]?.getClip()?.duration || 0)) * 1000)
+                actionTimeout.current = setTimeout(() => void setAction('stand', fighter), (((actions?.[action.current]?.getClip()?.duration + .1) / timeScale || 0)) * 1000)
             }
         }
         // For Infinite Attack
         else if (oldAction === action.current && action.current.includes('attack')) {
             clearTimeout(actionTimeout.current)
-            actionTimeout.current = setTimeout(() => void setAction('stand', fighter), ((actions?.[action.current]?.getClip()?.duration || 0)) * 1000)
+            actionTimeout.current = setTimeout(() => void setAction('stand', fighter), (((actions?.[action.current]?.getClip()?.duration + .1) / timeScale || 0)) * 1000)
         }
     }, [])
 

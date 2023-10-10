@@ -31,6 +31,7 @@ export interface CoreInterface {
 
     hoveredItems: Fighter[],
     setHoveredItems: (item: Fighter, action: 'add' | 'remove') => void
+    isItemHovered: (item: Fighter) => boolean
 
     _getAvailableNearestSquares: (coordinate: ServerCoordinate) => ServerCoordinate[]
     getNearestEmptySquareToTarget: (currentCoordinate: ServerCoordinate, targetCoordinate: ServerCoordinate) => ServerCoordinate
@@ -102,14 +103,17 @@ export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
             if (itemIndex === -1) {
 
                 // Update Direction To Hovered Object
-                // console.log('hovered', item)
                 const $cloud = useCloud.getState()
                 const $fighter = useFighter.getState()
                 const $controls = useControls.getState()
                 if ($fighter.fighter?.coordinates && item?.coordinates) {
                     const direction = calcDirection($fighter.fighter.coordinates, item.coordinates)
-                    $controls.setDirection(Math.atan2(direction.dx, direction.dz))
-                    $cloud.updateFighterDirection(direction)
+                    // Delay to Set direction after controls useFrame will be turned off
+                    setTimeout(() => {
+                        $controls.setDirection(Math.atan2(direction.dx, direction.dz))
+                        $cloud.updateFighterDirection(direction)
+                    }, 30) 
+                    // console.log('direction', direction)
                 }
                 // 
 
@@ -122,6 +126,7 @@ export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
         if (itemIndex === -1) { return }
         return set({ hoveredItems: [...hoveredItems.slice(0, itemIndex), ...hoveredItems.slice(itemIndex + 1)]})
     },
+    isItemHovered: (item) => !!get().hoveredItems.find((hoveredItem: Fighter) => hoveredItem.id === item.id),
 
     _getAvailableNearestSquares: (coordinate) => {
         const nearestSquares = [

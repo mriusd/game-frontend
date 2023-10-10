@@ -17,6 +17,8 @@ import { usePointerEvents } from './hooks/usePointerEvents'
 import { useFighterSkin } from '../hooks/useFighterSkin'
 import { useEquipmentChange } from '../hooks/useEquipmentChange'
 
+import { useEvent } from 'Scene/hooks/useEvent'
+
 import { getMoveDuration } from 'Scene/utils/getMoveDuration'
 import { isEqualCoord } from 'Scene/utils/isEqualCoord'
 
@@ -93,12 +95,19 @@ const OtherFighter = React.memo(function OtherFighter({ fighter }: Props) {
         }
     })
 
+    // Animate Skills on Server Event
+    useEvent(fighter, 'skill', (event, removeEvent) => {
+        // console.log('Attack', event)
+        setAction('attack', fighter)
+        removeEvent(event)
+    })
+
     return (
         <group name="other-fighter">
             {
                 !fighter.isDead ? (<>
-                    <Name value={fighter.name} target={fighterRef} offset={-2} />
-                    {/* <HealthBar object={fighter} target={fighterRef} offset={0} /> */}
+                    <Name value={fighter.name} target={fighterRef} offset={-1.8} />
+                    <HealthBar object={fighter} target={fighterRef} offset={-1.6} />
                     <LastMessage offset={-1.5} fighter={fighter} target={fighterRef} />
                 </>)
                 : <></>

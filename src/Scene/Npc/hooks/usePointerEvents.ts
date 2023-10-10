@@ -11,7 +11,7 @@ export const usePointerEvents = (npc: Fighter) => {
     const setTarget = useCloud(state => state.setTarget)
     const fighter = useFighter(state => state.fighter)
     const setCursor = useUi(state => state.setCursor)
-    const setHoveredItems = useCore(state => state.setHoveredItems)
+    const [setHoveredItems, isItemHovered] = useCore(state => [state.setHoveredItems, state.isItemHovered])
 
 
     // Set target & hover
@@ -24,6 +24,7 @@ export const usePointerEvents = (npc: Fighter) => {
     }, [npc])
 
     const handlePointerLeave = useCallback(() => {
+        if (!isItemHovered(npc)) { return } // To prevent extra leave events, what leads to mouse flickering
         nameColor.current = 0xFFFFFF
         setCursor('default')
         setHoveredItems(npc, 'remove')

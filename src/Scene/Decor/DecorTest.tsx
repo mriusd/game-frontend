@@ -18,7 +18,7 @@ import { useFighter } from "Scene/Fighter/useFighter"
 import { useFrame } from "@react-three/fiber"
 
 const DecorTest = memo(function Decor() {
-    console.log('rerender')
+    // console.log('rerender')
 
     // const matrixCoordToWorld = useCore(state => state.matrixCoordToWorld)
     const grass = useMemo(() => getShaderedDecor('grass'), [])
@@ -26,7 +26,7 @@ const DecorTest = memo(function Decor() {
     // // @ts-expect-error
     // console.log('nodes', grass.gltf.nodes)
 
-    console.log(grass)
+    // console.log(grass)
     // const worldCoordinate = useMemo(() => matrixCoordToWorld(objectData.location), [grassData])
 
     // @ts-expect-error
