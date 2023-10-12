@@ -6,6 +6,7 @@ import type { Skill } from "./skill.interface"
 import type { ItemDroppedEvent } from "./item.interface"
 import type { Group, Mesh } from "three"
 import type { ObjectData } from "./sceneData.interface"
+import type { Direction } from "./direction.interface"
 
 export interface ISceneContext {
     html: HTMLElement | null
@@ -14,7 +15,6 @@ export interface ISceneContext {
     chunkSize: RefObject<number>
     chunksPerAxis: RefObject<number>
 
-    NpcList: RefObject<Fighter[]>
     setSceneObject: (id: string, object: Mesh | Group, action: 'add' | 'remove') => void, getSceneObject: (id: string) => ObjectData | null,
     DroppedItems: RefObject<any[]>
     fighter: Fighter | null
@@ -39,8 +39,11 @@ export interface ISceneContext {
         pointerWorldCoordinate: Coordinate | null, setPointerWorldCoordinate: (coordinate: Coordinate) => void
     },
 
-    occupiedCoords: OccupiedCoordinate[], setOccupedCoords: (item: OccupiedCoordinate) => void,
+    VisibleDecor: RefObject<any[]>,
 
-    target: { target: Fighter, skill: Skill } | null, setTarget: (target: Fighter | null, skill: Skill | null) => void,
     itemTarget: ItemDroppedEvent, setItemTarget: (item: ItemDroppedEvent) => void
+
+    allPlayerList: Fighter[],
+    PlayerList: RefObject<Fighter[]>,
+    updateFighterDirection: (direction: Direction) => void
 }

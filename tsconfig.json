@@ -3,8 +3,12 @@
     "jsx": "react-jsx",
     "baseUrl": "src",
     "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
 }
+
+
 
 // {
 //   "compilerOptions": {

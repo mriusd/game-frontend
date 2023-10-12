@@ -1,11 +1,12 @@
 import type { Fighter } from "./fighter.interface";
 import type { Coordinate } from "./coordinate.interface";
-import { BackpackSlot } from './backpack.interface';
+import { InventorySlot } from './inventory.interface';
 import type { ItemDroppedEvent } from "./item.interface"; 
 import type { Direction } from "./direction.interface"; 
+import type { MapObject } from "./mapObject.interface"; 
+import type { FighterAttributes } from "./fighterAttributes.interface"; 
 
 export interface EventCloud {
-    PlayerID: any 
     events: any 
     addDamageEvent: any 
     setEvents: any
@@ -14,7 +15,7 @@ export interface EventCloud {
     npcList: Fighter[] 
     droppedItems: any
     money: any 
-    equipment: Record<number, BackpackSlot> 
+    equipment: Record<number, InventorySlot> 
     moveFighter: (coordinate: Coordinate) => void 
     submitSkill: (direction: Direction) => void
     submitMalee: (direction: Direction) => void
@@ -32,4 +33,14 @@ export interface EventCloud {
     equipBackpackItem: any
     unequipBackpackItem: any
     sendCommand: (text: string) => void
+    mapObjects: MapObject[],
+    userFighters: FighterAttributes[],
+    fetchUserFighters: (ownerAddress: string) => void,
+    createFighter: (ownerAddress: string, fighterClass: string, name: string) => void,
+    sendAuth: any,
+    account: string,
+    setAccount: any,
+    playerList: Fighter[],
+    updateFighterDirection: (direction: Direction) => void,
+    chatLog: any
 }

@@ -1,78 +1,82 @@
 import type { BigNumber } from "bignumber.js"
 import type { Coordinate } from "./coordinate.interface";
 
-export interface ItemAttributes {
-	name: string;
-	tokenId: BigNumber;
-	itemLevel: BigNumber;
-	maxLevel: BigNumber;
-	durability: BigNumber;
-	classRequired: BigNumber;
-	strengthRequired: BigNumber;
-	agilityRequired: BigNumber;
-	energyRequired: BigNumber;
-	vitalityRequired: BigNumber;
-	itemWidth: BigNumber;
-	itemHeight: BigNumber;
-	acceptableSlot1: BigNumber;
-	acceptableSlot2: BigNumber;
-	physicalDamage: BigNumber;
-	magicDamage: BigNumber;
-	defense: BigNumber;
-	attackSpeed: BigNumber;
-	defenseSuccessRate: BigNumber;
-	additionalDamage: BigNumber;
-	additionalDefense: BigNumber;
-	increasedExperienceGain: BigNumber;
-	damageIncrease: BigNumber;
-	defenseSuccessRateIncrease: BigNumber;
-	lifeAfterMonsterIncrease: BigNumber;
-	manaAfterMonsterIncrease: BigNumber;
-	goldAfterMonsterIncrease: BigNumber;
-	doubleDamageProbabilityIncrease: BigNumber;
-	excellentDamageProbabilityIncrease: BigNumber;
-	ignoreOpponentsDefenseRateIncrease: BigNumber;
-	reflectDamage: BigNumber;
-	maxLifeIncrease: BigNumber;
-	maxManaIncrease: BigNumber;
-	excellentDamageRateIncrease: BigNumber;
-	doubleDamageRateIncrease: BigNumber;
-	ignoreOpponentsDefenseSuccessRateIncrease: BigNumber;
-	attackDamageIncrease: BigNumber;
-	isAncient: BigNumber;
-	reflectDamageRateIncrease: BigNumber;
-	decreaseDamageRateIncrease: BigNumber;
-	hpRecoveryRateIncrease: BigNumber;
-	mpRecoveryRateIncrease: BigNumber;
-	defenceIncreasePerLevel: BigNumber;
-	damageIncreasePerLevel: BigNumber;
-	increaseDefenseRate: BigNumber;
-	strengthReqIncreasePerLevel: BigNumber;
-	agilityReqIncreasePerLevel: BigNumber;
-	energyReqIncreasePerLevel: BigNumber;
-	vitalityReqIncreasePerLevel: BigNumber;
-	attackSpeedIncrease: BigNumber;
-
-	fighterId: BigNumber;
-	lastUpdBlock: BigNumber;
-	itemRarityLevel: BigNumber;
-
-	itemAttributesId: BigNumber;
-
-	luck: boolean;
-	skill: boolean;
-	isBox: boolean;
-	isWeapon: boolean;
-	isArmour: boolean;
-	isJewel: boolean;
-	isMisc: boolean;
-	isConsumable: boolean;
-	inShop: boolean;
+export interface TokenAttributes {
+    name: string;
+    tokenId?: BigNumber;
+    itemLevel?: BigNumber;
+    additionalDamage?: BigNumber;
+    additionalDefense?: BigNumber;
+    fighterId?: BigNumber;
+    lastUpdBlock?: BigNumber;
+    packSize?: BigNumber;
+    luck: boolean;
+    skill: boolean;
+    itemAttributes?: ItemAttributes;
+    itemParameters?: ItemParameters;
+    excellentItemAttributes?: ExcellentItemAttributes;
 }
+
+interface ItemParameters {
+    durability: number;
+    classRequired: string;
+    strengthRequired: number;
+    agilityRequired: number;
+    energyRequired: number;
+    vitalityRequired: number;
+    itemWidth: number;
+    itemHeight: number;
+    acceptableSlot1: number;
+    acceptableSlot2: number;
+    minPhysicalDamage: number;
+    maxPhysicalDamage: number;
+    minMagicDamage: number;
+    maxMagicDamage: number;
+    defense: number;
+    attackSpeed: number;
+}
+
+interface ItemAttributes {
+    name: string;
+    maxLevel?: BigNumber;
+    isPackable: boolean;
+    isBox: boolean;
+    isWeapon: boolean;
+    isArmour: boolean;
+    isJewel: boolean;
+    isWings: boolean;
+    isMisc: boolean;
+    isConsumable: boolean;
+    inShop: boolean;
+}
+
+interface ExcellentItemAttributes {
+    increaseAttackSpeedPoints?: BigNumber;
+    reflectDamagePercent?: BigNumber;
+    restoreHPChance?: BigNumber;
+    restoreMPChance?: BigNumber;
+    doubleDamageChance?: BigNumber;
+    ignoreOpponentDefenseChance?: BigNumber;
+    lifeAfterMonsterIncrease?: BigNumber;
+    manaAfterMonsterIncrease?: BigNumber;
+    excellentDamageProbabilityIncrease?: BigNumber;
+    attackSpeedIncrease?: BigNumber;
+    attackLvl20?: BigNumber;
+    attackIncreasePercent?: BigNumber;
+    defenseSuccessRateIncrease?: BigNumber;
+    goldAfterMonsterIncrease?: BigNumber;
+    reflectDamage?: BigNumber;
+    maxLifeIncrease?: BigNumber;
+    maxManaIncrease?: BigNumber;
+    hpRecoveryRateIncrease?: BigNumber;
+    mpRecoveryRateIncrease?: BigNumber;
+    decreaseDamageRateIncrease?: BigNumber;
+}
+
 
 export interface ItemDroppedEvent {
 	itemHash: string;
-	item: ItemAttributes;
+	item: TokenAttributes;
 	qty: BigNumber;
 	blockNumber: BigNumber;
 	coords: Coordinate;

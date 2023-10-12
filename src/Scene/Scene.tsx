@@ -1,64 +1,113 @@
+import styles from './Scene.module.scss'
+
+import React from "react"
+
 import * as THREE from "three"
 import { Object3D } from "three"
 
 import { Canvas } from "@react-three/fiber"
-import { useRef, memo } from "react"
-import { useSceneContext } from "store/SceneContext"
-import LoadAssetsContextProvider from "store/LoadAssetsContext"
-import { OrbitControls, Stats } from "@react-three/drei"
-
-import { CAMERA_POSITION } from "./config"
+import { Loader, Stats, OrbitControls } from "@react-three/drei"
 
 import Light from "./Light"
-import Chunks from "./Chunks"
-import Fighter from "./Fighter"
-import Npc from "./Npc"
-import Controller from "./Controller"
-import DroppedItem from "./DroppedItem"
+import Chunks from "./Chunks/Chunks"
+import Fighter from "./Fighter/Fighter"
+import Controls from "./Controls/Controls"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"
+import Decor from "./Decor/Decor"
+import DecorTest from './Decor/DecorTest'
+import UserInterface3D from './UserInterface3D/UserInterface3D'
+import GLTFLoader from './GLTFLoader/GLTFLoader'
+import OtherFighterList from './Fighter/OtherFighter/OtherFighterList'
+import NpcList from './Npc/NpcList'
+import Camera from './Camera'
+import DroppedItemList from './DroppedItem/DroppedItemList'
 
-const Scene = memo(function Scene() {
-    const store = useSceneContext()
-    const worldRef = useRef<Object3D | null>(null)
+import { useUi } from './UserInterface3D/useUI'
+
+import Postprocessing from './Postprocessing'
+
+import { shallow } from 'zustand/shallow'
+import UserInterface2D from './UserInterface2D/UserInterface2D'
+import { useCommandLine } from './UserInterface2D/CommandLine/useCommandLine'
+
+import { useCore } from 'Scene/useCore'
+
+import { AdaptiveDpr } from '@react-three/drei'
+import { useControls } from 'leva'
+
+const Scene = React.memo(function Scene() {
+    const eventsNode = useUi(state => state.eventsNode)
+    const [devMode, setDevMode] = useCore(state => [state.devMode, state.setDevMode], shallow)
+
+    const [subscribe, unsubscribe] = useCommandLine(state => [state.subscribeCommandLine, state.unsubscribeCommandLine], shallow)
+    React.useEffect(() => {
+        if (eventsNode.current) { subscribe(eventsNode.current) }
+        return () => unsubscribe()
+    }, [eventsNode.current])
+
+    const data = useControls('GL', {
+        exposure: { value: 0.9, min: 0, max: 10 },
+        toneMapping: {
+            options: {
+                'notone': THREE.NoToneMapping,
+                'filmic': THREE.ACESFilmicToneMapping,
+                'linear': THREE.LinearToneMapping,
+                'reinhard': THREE.ReinhardToneMapping,
+                'cineon': THREE.CineonToneMapping
+            },
+        },
+        legacyLights: { value: true },
+        encoding: {
+            options: {
+                'linear': THREE.LinearEncoding,
+                'rgb': THREE.sRGBEncoding
+            }
+        }
+    })
+    
+
     return (
-        <>
+        <div id="scene" tabIndex={0} ref={eventsNode} className={styles.scene}>
             <Canvas
                 shadows
-                camera={{
-                    position: new THREE.Vector3(...CAMERA_POSITION),
-                    near: 0.1,
-                    far: 60,
-                    fov: 45,
+                gl={{
+                    powerPreference: "high-performance",
+                    alpha: false,
+                    antialias: true,
+                    toneMappingExposure: data.exposure,
+                    // toneMapping: THREE.LinearToneMapping,
+                    toneMapping: data.toneMapping,
+                    useLegacyLights: data.legacyLights,
+                    outputEncoding: data.encoding,
+                    
                 }}
             >
-                <LoadAssetsContextProvider>
-                    {/* <color attach="background" args={[0x000000]} /> */}
-                    {/* <fog attach="fog" color={0x000000} near={1} far={30} /> */}
-                    {/* <OrbitControls/> */}
-                    <Light />
-                    {store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />)}
-                    {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
-                    <Fighter />
-                    <Chunks ref={worldRef} />
-                    <Controller world={worldRef} />
-                    <FloatingDamage />
-                </LoadAssetsContextProvider>
-                <Stats/>
+                <color attach="background" args={[0x000000]} />
+                { !devMode ? <fog attach="fog" args={['black', 5, 25]}></fog> : <></> }
+                { devMode ? <OrbitControls/> : <></> }
+                <Camera/>
+                <Stats className='stats' />
+                <React.Suspense fallback={null}>
+                    <GLTFLoader>
+                        <NpcList/>
+                        <DroppedItemList/>
+                        <OtherFighterList/>
+                        {/* {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)} */}
+                        <DecorTest/>
+                        <Fighter />
+                        <Chunks />
+                        { !devMode ? <Controls /> : <></> }
+                        <FloatingDamage />
+                        <UserInterface3D />
+                        <Light />
+                    </GLTFLoader>
+                </React.Suspense>
+                <Postprocessing/>
+                {/* <AdaptiveDpr/> */}
             </Canvas>
-            <div style={{
-                position: 'absolute',
-                top: '30px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                fontSize: '20px',
-                color: 'white',
-                userSelect: 'none'
-            }}>
-                <div>World size [{store.worldSize.current}x{store.worldSize.current}]</div>
-                <div>Server coordinate [ X: {store.currentMatrixCoordinate?.x} Z: {store.currentMatrixCoordinate?.z} ]</div>
-                <div>World coordinate [ X: {store.currentWorldCoordinate?.x.toFixed(0)} Z: {store.currentWorldCoordinate?.z.toFixed(0)} ]</div>
-            </div>
-        </>
+            <UserInterface2D/>
+            <Loader/>
+        </div>
     )
 })
 

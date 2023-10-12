@@ -9,18 +9,14 @@ const HealthBar = memo(function HealthBar({ object, target, offset = 0 }: any) {
     const shader = useRef<Shader | null>(null)
     const textBoundingBox = useRef<ReturnType<typeof getMeshDimensions> | null>(null)
 
-    useEffect(() => {
-        if (!target.current) { return }
-        setTimeout(() => {
-            textBoundingBox.current = getMeshDimensions(target.current)
-        }, 30)
-    }, [target.current])
-
     useFrame(() => {
         if (!bar.current) { return }
         if (!object) { return }
         if (!target.current) { return }
-        if (!textBoundingBox.current) { return }
+        if (!textBoundingBox.current) {
+            textBoundingBox.current = getMeshDimensions(target.current)
+            return
+        }
         const { x, y, z } = target.current.position
         bar.current.position.set(x, y + textBoundingBox.current.height + offset, z)
     })

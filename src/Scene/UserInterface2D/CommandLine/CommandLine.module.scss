@@ -1,0 +1,42 @@
+.CommandLine {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translate(-50%);
+    width: 60%;
+    min-width: 300px;
+    height: 36px;
+    background-color: black;
+    border: 1px solid #ff7b00;
+    pointer-events: all;
+
+    input {
+        position: absolute;
+        top: 0; left: 0;
+        height: 100%;
+        background: transparent;
+        border: none;
+        outline: none;
+        width: 100%;
+        padding: 0 12px;
+        font-size: 18px;
+        margin: 0;
+        color: #ff7b00;
+    }
+}
+
+.CommandsPlaceholder {
+    position: absolute;
+    width: 100%;
+    height: auto;
+    left: 0;
+    bottom: calc(100% + 120px);
+    color: white;
+    opacity: .5;
+    font-size: 12px;
+
+    pre {
+        margin: 0;
+        padding: 0;
+    }
+}

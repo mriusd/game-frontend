@@ -1,81 +1,117 @@
-import { useEventCloud } from "EventCloudContext"
-import { useEffect, useRef, memo } from "react"
-import type { Damage } from "interfaces/damage.interface"
-import DamageText from "./DamageText"
-import { useSceneContext } from "store/SceneContext"
-import type { ObjectData } from "interfaces/sceneData.interface"
+import React from "react"
+// import { Instances, Instance } from "@react-three/drei"
+
 import { getDamageColor } from "Scene/utils/getDamageColor"
 import { getDamageValue } from "Scene/utils/getDamageValue"
 
-interface TriggerDamage {
-    label: string
-    event: Damage
-    remove: () => void
-    color: number
-    target: ObjectData
-    message: string
-}
+import { useNpc } from "Scene/Npc/useNpc"
+import { useCloud } from "EventCloud/useCloud"
+import { useCore } from "Scene/useCore"
 
-const FloatingDamage = memo(function FloatingDamage() {
-    const { events, removeEvent } = useEventCloud()
-    const { NpcList, getSceneObject } = useSceneContext()
+import type { Damage } from "interfaces/damage.interface"
+import type { ObjectData } from "interfaces/sceneData.interface"
 
-    const triggerDamage = useRef<TriggerDamage[]>([])
-    const removeTriggerDamage = (label: string) => {
-        triggerDamage.current = triggerDamage.current.filter((_: TriggerDamage) => _.label !== label)
-    }
+import { BillboardTextMaterial, setShaderText, setShaderTextColor, setShaderAlpha } from "./materials/billboardTextMaterial"
 
-    const createDamage = (damageEvent: Damage, target: ObjectData) => {
-        const label = `${damageEvent.npcId}${Date.now() * Math.random()}${damageEvent.damage}`
-        return {
-            label,
-            target,
-            event: damageEvent,
-            message: getDamageValue(damageEvent),
-            remove: () => {
-                removeTriggerDamage(label)
-                removeEvent(damageEvent)
-            },
-            color: getDamageColor(damageEvent),
-        }
-    }
+import Tween from "Scene/utils/tween/tween"
+
+const FloatingDamage = React.memo(function FloatingDamage() {
+    const [events, removeEvent] = useCloud(state => [state.events, state.removeEvent])
+    const [playerList] = useCloud(state => [state.playerList])
+    const [getSceneObject] = useCore(state => [state.getSceneObject])
+
+    const npcList = useNpc(state => state.npcList)
+
+    // Store All Instance Ref to Reuse them
+    // 100 - Max Amount Of Damage Indicators
+    const instancesSize = 100
+    const instancesSizeArray = React.useRef(new Array(instancesSize)) 
+    const instanceRefs = React.useRef<{ [key: number]: THREE.Mesh }>({}) 
+    const availableInstanceIds = React.useRef(Array.from({ length: instancesSize }, (_, index) => index))
+
 
     // Generate damage indicators
-    useEffect(() => {
-        console.log('events', events)
-        const damageEvents = events.filter((event: any) => event.type === 'damage')
-        console.log('damageEvents', damageEvents)
-        if (damageEvents.length > 0) {
-            damageEvents.forEach((damageEvent: Damage) => {
-                const npc = NpcList.current.find(npc => npc?.id === String(damageEvent.npcId))
-                if (!npc) { return }
-                // console.log(`[FloatingDamage]: ID ${damageEvent.npcId} received ${damageEvent.damage} damage.`)
+    React.useEffect(() => {
+        // console.log('events', events)
+        // console.log('availableInstanceIds', availableInstanceIds)
+        events.forEach(event => {
+            if (event.type === 'damage') {
+                const npc = npcList.find(npc => npc?.id === String(event.npcId))
+                const fighter = playerList.find(player => player?.id === String(event.npcId))
+                const object = npc || fighter
+                removeEvent(event)
 
-                const target = getSceneObject(npc.id)
+                if (!object) { return }
+
+                const target = getSceneObject(object.id)
                 if (!target) { return }
 
-                triggerDamage.current.push(createDamage(damageEvent, target))
+                playDamage(event, target as any)
 
                 // Send one more if double
-                if (damageEvent.dmgType.isDouble) {
+                if (event.dmgType.isDouble) {
                     setTimeout(() => {
-                        triggerDamage.current.push(createDamage(damageEvent, target))
+                        playDamage(event, target as any)
                     }, 100)
                 }
-            })
-        }
+            }
+        })
     }, [events])
 
+    const playDamage = React.useCallback((damageEvent: Damage, target: ObjectData) => {
+        const instanceId = availableInstanceIds.current[0]
+        if (typeof instanceId !== 'number') {
+            return
+        }
+
+        const instance = instanceRefs.current[instanceId]
+        availableInstanceIds.current = availableInstanceIds.current.filter((id: number) => id !== instanceId)
+
+        // Play Logic
+        if (!target.ref) { return }
+
+        setShaderTextColor(getDamageColor(damageEvent), instance)
+        setShaderText(getDamageValue(damageEvent), instance)
+
+        const { x, z } = target.ref.position
+        const { height } = target.dimensions
+        const from = { opacity: 1.5, offsetY: .5 }
+        const to = { opacity: 0, offsetY: 1.3 }
+
+        instance.position.set(x, height+from.offsetY, z)
+
+        Tween.to(from, to, {
+            duration: 700,
+            onChange(state) {
+                instance.position.y = height + state.value.offsetY
+                // // @ts-expect-error
+                // textRef.current.material.uniforms['customAlpha'].value = state.value.opacity
+                setShaderAlpha(state.value.opacity, instance)
+            },
+            onComplete: () => {
+                setShaderAlpha(0, instance)
+                // Release Instance
+                if (!availableInstanceIds.current.includes(instanceId)) {
+                    availableInstanceIds.current.push(instanceId)
+                }
+            }
+        })
+    }, [])
+
+
     return (
-        <group name="floatingDamage">
-            {triggerDamage.current.map((_: TriggerDamage) => (
-                <DamageText
-                    key={_.label}
-                    color={_.color}
-                    value={_.message}
-                    target={_.target}
-                    onComplete={() => _.remove()}
-                />
+        <group name="floating-damage">
+            {/* <Instances limit={instancesSize} range={instancesSize}>
+                <planeGeometry />
+                <BillboardTextMaterial/>
+                {[...instancesSizeArray.current].map((_, i) => <Instance color={'red'} key={i} ref={r => instanceRefs.current[i] = r}/>)}
+            </Instances> */}
+
+            {[...instancesSizeArray.current].map((_, i) => (
+                <mesh key={i} ref={r => instanceRefs.current[i] = r}>
+                    <planeGeometry args={[3, 3, 1]} />
+                    <BillboardTextMaterial/>
+                </mesh>
             ))}
         </group>
     )
