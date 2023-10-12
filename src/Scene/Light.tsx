@@ -1,19 +1,26 @@
 import * as THREE from "three"
-import { useMemo, useRef, memo, useEffect } from "react"
+import React from "react"
 // import { useHelper } from "@react-three/drei"
 import { Environment } from "@react-three/drei"
 
 import { useFighter } from "./Fighter/useFighter"
 import { useFrame } from "@react-three/fiber"
 
+import { usePost } from "./Postprocessing/usePost"
+
+
 import { useControls } from "leva"
 
-const Light = memo(function Light() {
+const Light = React.memo(function Light() {
+    const updateLights = usePost(state => state.updateLights)
+
     const fighterNode = useFighter(state => state.fighterNode)
-    const shadowlightRef = useRef<THREE.DirectionalLight | null>(null)
-    const lightPosition = useMemo(() => new THREE.Vector3(0, 10, 5), [])
+    const shadowlightRef = React.useRef<THREE.DirectionalLight | null>(null)
+    const lightPosition = React.useMemo(() => new THREE.Vector3(0, 10, 5), [])
+    React.useLayoutEffect(() => updateLights(shadowlightRef.current, 'add'), [shadowlightRef.current])
     // const lightPosition = useMemo(() => new THREE.Vector3(0, 0.5, 0.866), []) // ~60º
-    useEffect(() => {
+
+    React.useEffect(() => {
         if (!fighterNode.current || !shadowlightRef.current) { return }
         shadowlightRef.current.target = fighterNode.current 
     }, [fighterNode.current, shadowlightRef.current])
@@ -33,7 +40,7 @@ const Light = memo(function Light() {
         intenDirectional: { value: 0.3, min: 0, max: 5 },
         posDirectional: { value: { x: 0, y: 10, z: 5 } }
     })
-    const lightPositionTest = useMemo(() => new THREE.Vector3(data.posDirectional.x, data.posDirectional.y, data.posDirectional.z), [data])
+    const lightPositionTest = React.useMemo(() => new THREE.Vector3(data.posDirectional.x, data.posDirectional.y, data.posDirectional.z), [data])
 
     return (
         <group name="light">

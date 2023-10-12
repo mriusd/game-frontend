@@ -24,7 +24,7 @@ import DroppedItemList from './DroppedItem/DroppedItemList'
 
 import { useUi } from './UserInterface3D/useUI'
 
-import Postprocessing from './Postprocessing'
+import Postprocessing from './Postprocessing/Postprocessing2'
 
 import { shallow } from 'zustand/shallow'
 import UserInterface2D from './UserInterface2D/UserInterface2D'
@@ -49,8 +49,8 @@ const Scene = React.memo(function Scene() {
         exposure: { value: 0.9, min: 0, max: 10 },
         toneMapping: {
             options: {
-                'notone': THREE.NoToneMapping,
                 'filmic': THREE.ACESFilmicToneMapping,
+                'notone': THREE.NoToneMapping,
                 'linear': THREE.LinearToneMapping,
                 'reinhard': THREE.ReinhardToneMapping,
                 'cineon': THREE.CineonToneMapping
@@ -59,8 +59,8 @@ const Scene = React.memo(function Scene() {
         legacyLights: { value: true },
         encoding: {
             options: {
+                'rgb': THREE.sRGBEncoding,
                 'linear': THREE.LinearEncoding,
-                'rgb': THREE.sRGBEncoding
             }
         }
     })

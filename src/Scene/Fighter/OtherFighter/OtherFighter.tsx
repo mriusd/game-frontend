@@ -18,6 +18,7 @@ import { useFighterSkin } from '../hooks/useFighterSkin'
 import { useEquipmentChange } from '../hooks/useEquipmentChange'
 
 import { useEvent } from 'Scene/hooks/useEvent'
+import { useSkillEffects } from '../hooks/useSkillEffects/useSkillEffects'
 
 import { getMoveDuration } from 'Scene/utils/getMoveDuration'
 import { isEqualCoord } from 'Scene/utils/isEqualCoord'
@@ -42,6 +43,8 @@ const OtherFighter = React.memo(function OtherFighter({ fighter }: Props) {
         handlePointerLeave,
         handleLeftClick
     } = usePointerEvents(fighter)
+
+    const { effects, play: playSkillEffect } = useSkillEffects()
 
     // Fill changed fighter properties
     React.useEffect(() => {
@@ -97,7 +100,7 @@ const OtherFighter = React.memo(function OtherFighter({ fighter }: Props) {
 
     // Animate Skills on Server Event
     useEvent(fighter, 'skill', (event, removeEvent) => {
-        // console.log('Attack', event)
+        playSkillEffect(event)
         setAction('attack', fighter)
         removeEvent(event)
     })
@@ -122,7 +125,7 @@ const OtherFighter = React.memo(function OtherFighter({ fighter }: Props) {
             >
                 {/* TODO: Add HeatBox in 3d tool */}
                 <Box visible={false} args={[2.5,15,2.5]}/>
-                {/* <TwistingSlash renderEffect={renderEffect} onEffectComplete={() => renderEffect.current = false}/> */}
+                {effects.map((_, i) => <primitive object={_} key={i} />)}
             </FighterModel>
         </group>
     )

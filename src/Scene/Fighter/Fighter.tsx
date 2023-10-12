@@ -16,6 +16,7 @@ import { useControls } from "Scene/Controls/useControls"
 import { useEquipmentChange } from "./hooks/useEquipmentChange"
 
 import { useEvent } from "Scene/hooks/useEvent"
+import { useSkillEffects } from "./hooks/useSkillEffects/useSkillEffects"
 
 const Fighter = React.memo(function Fighter() {
     const spawned = React.useRef(false)
@@ -31,6 +32,8 @@ const Fighter = React.memo(function Fighter() {
     const { actions } = useAnimations(animations, fighterNode)
     React.useLayoutEffect(() => setAllActions(actions), [actions])
     const [ setAction ] = useFighter(state => [state.setAction])
+
+    const { effects, play: playSkillEffect } = useSkillEffects()
 
     // Manage fighter changes from server
     React.useEffect(() => {
@@ -89,20 +92,19 @@ const Fighter = React.memo(function Fighter() {
 
     // Animate Skills on Server Event
     useEvent(fighter, 'skill', (event, removeEvent) => {
-        // TODO: Animate Skills
+        playSkillEffect(event)
         removeEvent(event)
     })
 
     return (
         <group>
-            <LastMessage offset={.7} fighter={fighter} target={fighterNode} />
+            <LastMessage offset={2.2} fighter={fighter} target={fighterNode} />
             <FighterModel
                 ref={fighterNode}
                 model={model}
                 fighter={fighter}
             >
-                {/* TODO: Temporary, create Skills Manager and swap shader materials instead */}
-                {/* <TwistingSlash renderEffect={renderEffect} onEffectComplete={() => renderEffect.current = false} /> */}
+                {effects.map((_, i) => <primitive object={_} key={i} />)}
             </FighterModel>
         </group>
     )
