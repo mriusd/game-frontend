@@ -81,7 +81,7 @@ const Npc = memo(function Npc({ npc }: Props) {
     useEffect(() => {
         clearTimeout(timeout.current)
         if (isMoving.current) return
-        timeout.current = setTimeout(() => void action.current === 'run' && setAction('stand'), 50)
+        timeout.current = setTimeout(() => void setAction('stand'), 50)
     }, [isMoving.current])
 
 
