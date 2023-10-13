@@ -137,7 +137,7 @@ const SwapChunk = forwardRef(({ geometry, index }: SwapChunkProps, ref: any) => 
             rotation={[Math.PI / -2, 0, 0]}
             geometry={geometry}
         >
-            <meshStandardMaterial displacementScale={5} displacementBias={-2.5} />
+            <meshStandardMaterial displacementScale={8} displacementBias={-4} />
         </mesh>
     )
 })

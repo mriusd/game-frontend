@@ -34,11 +34,12 @@ import { useCore } from 'Scene/useCore'
 
 import { AdaptiveDpr } from '@react-three/drei'
 import { useControls } from 'leva'
+import { useFighter } from './Fighter/useFighter'
 
 const Scene = React.memo(function Scene() {
     const eventsNode = useUi(state => state.eventsNode)
     const [devMode, setDevMode] = useCore(state => [state.devMode, state.setDevMode], shallow)
-
+    const fighterNode = useFighter(state => state.fighterNode)
     const [subscribe, unsubscribe] = useCommandLine(state => [state.subscribeCommandLine, state.unsubscribeCommandLine], shallow)
     React.useEffect(() => {
         if (eventsNode.current) { subscribe(eventsNode.current) }
@@ -91,7 +92,7 @@ const Scene = React.memo(function Scene() {
             >
                 <color attach="background" args={[0x000000]} />
                 { !devMode ? <fog attach="fog" args={['black', 5, 25]}></fog> : <></> }
-                { devMode ? <OrbitControls/> : <></> }
+                { devMode ? <OrbitControls target={fighterNode.current?.position || new THREE.Vector3(0, 0, 0)} /> : <></> }
                 <Camera/>
                 <Stats className='stats' />
                 <React.Suspense fallback={null}>
