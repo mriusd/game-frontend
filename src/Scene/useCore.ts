@@ -214,7 +214,7 @@ export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
         return get().sceneObjects[id] || null
     },
 
-    devMode: false,
+    devMode: true,
     setDevMode: (value) => set({ devMode: value }),
     
 }), shallow)

@@ -68,7 +68,7 @@ const Chunks = memo(function Chunks({}) {
                 plane.material['normalMap'] = textures[`${textureX}_${textureZ}/normalMap`]
                 plane.material['roughnessMap'] = textures[`${textureX}_${textureZ}/roughnessMap`]
                 plane.material['metalnessMap'] = textures[`${textureX}_${textureZ}/metalnessMap`]
-                // plane.material['displacementMap'] = textures[`${textureX}_${textureZ}/heightMap`]
+                plane.material['displacementMap'] = textures[`${textureX}_${textureZ}/displacementMap`]
                 // plane.material['aoMap'] = textures[`${textureX}_${textureZ}/occlusionMap`]
             }
             
@@ -137,7 +137,7 @@ const SwapChunk = forwardRef(({ geometry, index }: SwapChunkProps, ref: any) => 
             rotation={[Math.PI / -2, 0, 0]}
             geometry={geometry}
         >
-            <meshStandardMaterial/>
+            <meshStandardMaterial displacementScale={5} displacementBias={-2.5} />
         </mesh>
     )
 })
