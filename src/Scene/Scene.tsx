@@ -64,6 +64,13 @@ const Scene = React.memo(function Scene() {
             }
         }
     })
+
+    const dev = useControls('Camera', {
+        freeCamera: false
+    })
+    React.useEffect(() => {
+        setDevMode(dev.freeCamera)
+    }, [dev])
     
 
     return (
@@ -96,7 +103,7 @@ const Scene = React.memo(function Scene() {
                         <DecorTest/>
                         <Fighter />
                         <Chunks />
-                        { !devMode ? <Controls /> : <></> }
+                        <Controls />
                         <FloatingDamage />
                         <UserInterface3D />
                         <Light />
