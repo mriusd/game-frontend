@@ -47,17 +47,17 @@ const Scene = React.memo(function Scene() {
     }, [eventsNode.current])
 
     const data = useControls('GL', {
-        exposure: { value: 0.9, min: 0, max: 10 },
+        exposure: { value: 0, min: -5, max: 5 },
         toneMapping: {
             options: {
+                'linear': THREE.LinearToneMapping,
                 'filmic': THREE.ACESFilmicToneMapping,
                 'notone': THREE.NoToneMapping,
-                'linear': THREE.LinearToneMapping,
                 'reinhard': THREE.ReinhardToneMapping,
                 'cineon': THREE.CineonToneMapping
             },
         },
-        legacyLights: { value: true },
+        legacyLights: { value: false },
         encoding: {
             options: {
                 'rgb': THREE.sRGBEncoding,
@@ -66,12 +66,8 @@ const Scene = React.memo(function Scene() {
         }
     })
 
-    const dev = useControls('Camera', {
-        freeCamera: false
-    })
-    React.useEffect(() => {
-        setDevMode(dev.freeCamera)
-    }, [dev])
+    const dev = useControls('Camera', { freeCamera: false })
+    React.useEffect(() => void setDevMode(dev.freeCamera), [dev])
     
 
     return (
@@ -82,7 +78,7 @@ const Scene = React.memo(function Scene() {
                     powerPreference: "high-performance",
                     alpha: false,
                     antialias: true,
-                    toneMappingExposure: data.exposure,
+                    toneMappingExposure: Math.pow(2, data.exposure),
                     // toneMapping: THREE.LinearToneMapping,
                     toneMapping: data.toneMapping,
                     useLegacyLights: data.legacyLights,
