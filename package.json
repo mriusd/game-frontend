@@ -18,6 +18,7 @@
     "bignumber.js": "^9.1.1",
     "leva": "^0.9.35",
     "open-simplex-noise": "^2.5.0",
+    "rc-slider": "^10.3.1",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",

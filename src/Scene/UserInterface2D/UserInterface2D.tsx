@@ -6,6 +6,7 @@ import { useBackpack } from 'Scene/UserInterface3D/Backpack/useBackpack'
 import CommandLine from './CommandLine/CommandLine'
 import Stats from './Stats/Stats'
 import Skills from './Skills/Skills'
+import Settings from './Settings/Settings'
 
 import OpenButton from 'Auth/OpenButton'
 
@@ -31,6 +32,7 @@ const UserInterface2D = () => {
             <Stats/>
             <Skills/>
             <CommandLine/>
+            <Settings/>
 
             {/* Auth Modal */}
             <OpenButton/>

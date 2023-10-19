@@ -147,7 +147,7 @@ export const shader_level = () => {
                 baseColor = (gl_FragColor.rgb - darkest/1.5) * gl_FragColor.a;
                 colorAccentWave = colorAccent * pow(uLevel + 20., 1.25) * flashAlpha * flashing;
             } else {
-                baseColor = (gl_FragColor.rgb - darkest) * gl_FragColor.a;
+                baseColor = (gl_FragColor.rgb - darkest/1.5) * gl_FragColor.a;
                 colorAccentWave = normalize(uColorPrimary) * pow(uLevel + 15., 1.25) * flashAlpha * flashing;
             }
 

@@ -116,9 +116,9 @@ const Chunks = memo(function Chunks({}) {
             </group>
             { devMode ? (
                 <group>
-                    {/* <Plane args={[worldSize+chunkSize, worldSize+chunkSize]} rotation={[Math.PI / -2, 0, 0]} position={[0,-0.1,0]}>
+                    <Plane args={[worldSize+chunkSize, worldSize+chunkSize]} rotation={[Math.PI / -2, 0, 0]} position={[0,-0.1,0]}>
                         <meshBasicMaterial color={'white'} {...mapPlaceholder} depthWrite={false} />
-                    </Plane> */}
+                    </Plane>
                     <gridHelper ref={gridHelper} args={[sizeX, sizeY, 'red', 'red']} rotation={[0, 0, 0]} />
                 </group>
             ): <></> }

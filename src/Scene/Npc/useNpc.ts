@@ -9,6 +9,7 @@ export interface NpcInterface {
     setNpcList: ( npcList: Fighter[] ) => void
 }
 
+// TODO: Update OccupiedCoords more reliably way
 export const useNpc = createWithEqualityFn<NpcInterface>((set, get) => ({
     npcList: [],
     setNpcList: ( npcList: Fighter[] ) => {

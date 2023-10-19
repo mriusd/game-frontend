@@ -36,6 +36,10 @@ import { AdaptiveDpr } from '@react-three/drei'
 import { useControls } from 'leva'
 import { useFighter } from './Fighter/useFighter'
 
+// import FPSLimiter from './UserInterface2D/Settings/FPSLimiter'
+// import FPSLimiter from './UserInterface2D/Settings/FPSLimitter'
+import FPSLimiter from './UserInterface2D/Settings/FPSLimiter2'
+
 const Scene = React.memo(function Scene() {
     const eventsNode = useUi(state => state.eventsNode)
     const [devMode, setDevMode] = useCore(state => [state.devMode, state.setDevMode], shallow)
@@ -74,6 +78,7 @@ const Scene = React.memo(function Scene() {
         <div id="scene" tabIndex={0} ref={eventsNode} className={styles.scene}>
             <Canvas
                 shadows
+                frameloop='demand' // Required 'demand' for fps clipping
                 gl={{
                     powerPreference: "high-performance",
                     alpha: false,
@@ -88,26 +93,28 @@ const Scene = React.memo(function Scene() {
             >
                 <color attach="background" args={[0x000000]} />
                 { !devMode ? <fog attach="fog" args={['black', 5, 25]}></fog> : <></> }
-                { devMode ? <OrbitControls target={fighterNode.current?.position || new THREE.Vector3(0, 0, 0)} /> : <></> }
-                <Camera/>
-                <Stats className='stats' />
-                <React.Suspense fallback={null}>
-                    <GLTFLoader>
-                        <NpcList/>
-                        <DroppedItemList/>
-                        <OtherFighterList/>
-                        {/* {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)} */}
-                        <DecorTest/>
-                        <Fighter />
-                        <Chunks />
-                        <Controls />
-                        <FloatingDamage />
-                        <UserInterface3D />
-                        <Light />
-                    </GLTFLoader>
-                </React.Suspense>
-                <Postprocessing/>
-                {/* <AdaptiveDpr/> */}
+                <FPSLimiter>
+                    { devMode ? <OrbitControls target={fighterNode.current?.position || new THREE.Vector3(0, 0, 0)} /> : <></> }
+                    <Camera/>
+                    <Stats className='stats' />
+                    <React.Suspense fallback={null}>
+                        <GLTFLoader>
+                            <NpcList/>
+                            <DroppedItemList/>
+                            <OtherFighterList/>
+                            {/* {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)} */}
+                            <DecorTest/>
+                            <Fighter />
+                            <Chunks />
+                            <Controls />
+                            <FloatingDamage />
+                            <UserInterface3D />
+                            <Light />
+                        </GLTFLoader>
+                    </React.Suspense>
+                    <Postprocessing/>
+                    {/* <AdaptiveDpr/> */}
+                </FPSLimiter>
             </Canvas>
             <UserInterface2D/>
             <Loader/>
