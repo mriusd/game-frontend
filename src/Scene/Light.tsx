@@ -34,14 +34,14 @@ const Light = React.memo(function Light() {
 
     const data = useControls('Lights', {
         colorHemi: { value: '#FFFFFF' },
-        intenHemi: { value: .3, min: 0, max: 2 },
+        intenHemi: { value: .95, min: 0, max: 2 },
 
         colorDirectional: { value: '#FFFFFF' },
-        intenDirectional: { value: 2.5, min: 0, max: 5 },
+        intenDirectional: { value: 2.4, min: 0, max: 5 },
         posDirectional: { value: { x: 1, y: 0, z: 0.866 } },
 
         colorShadow: { value: '#FFFFFF' },
-        intenShadow: { value: 0.3, min: 0, max: 5 },
+        intenShadow: { value: 1, min: 0, max: 5 },
         posShadow: { value: { x: 0, y: 10, z: 5 } },
     })
     const lightPositionTest = React.useMemo(() => new THREE.Vector3(data.posShadow.x, data.posShadow.y, data.posShadow.z), [data])

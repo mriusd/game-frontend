@@ -1,4 +1,4 @@
-export const CAMERA_POSITION = [ -8, 8, 3.3136 ] // used for camera, to save distance to object
+export const CAMERA_POSITION = [ -8.84, 8.84, 3.66 ] // used for camera, to save distance to object
 // export const CAMERA_POSITION = [ -8, 8, 8 ] // used for camera, to save distance to object
 // export const CAMERA_POSITION = [ 0, 15, 0] // for dev
 

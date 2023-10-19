@@ -51,11 +51,11 @@ const Scene = React.memo(function Scene() {
     }, [eventsNode.current])
 
     const data = useControls('GL', {
-        exposure: { value: 0, min: -5, max: 5 },
+        exposure: { value: 0.8, min: -5, max: 5 },
         toneMapping: {
             options: {
-                'linear': THREE.LinearToneMapping,
                 'filmic': THREE.ACESFilmicToneMapping,
+                'linear': THREE.LinearToneMapping,
                 'notone': THREE.NoToneMapping,
                 'reinhard': THREE.ReinhardToneMapping,
                 'cineon': THREE.CineonToneMapping
