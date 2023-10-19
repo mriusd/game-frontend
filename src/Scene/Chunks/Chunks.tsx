@@ -67,7 +67,7 @@ const Chunks = memo(function Chunks({}) {
                 plane.material['map'] = textures[`${textureX}_${textureZ}/map`]
                 plane.material['normalMap'] = textures[`${textureX}_${textureZ}/normalMap`]
                 plane.material['roughnessMap'] = textures[`${textureX}_${textureZ}/roughnessMap`]
-                plane.material['metalnessMap'] = textures[`${textureX}_${textureZ}/metalnessMap`]
+                // plane.material['metalnessMap'] = textures[`${textureX}_${textureZ}/metalnessMap`]
                 plane.material['displacementMap'] = textures[`${textureX}_${textureZ}/displacementMap`]
                 // plane.material['aoMap'] = textures[`${textureX}_${textureZ}/occlusionMap`]
             }
