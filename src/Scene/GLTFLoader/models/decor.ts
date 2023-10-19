@@ -13,5 +13,15 @@ export const decor = [
     {
         name: 'decor_grass',
         url: 'models/decor/grass/grass.gltf'
+    },
+    // Flower
+    {
+        name: 'decor_flower',
+        url: 'models/decor/flower/house.gltf'
+    },
+    // House
+    {
+        name: 'decor_house',
+        url: 'models/decor/house/house.gltf'
     }
 ]

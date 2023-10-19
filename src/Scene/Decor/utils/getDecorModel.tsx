@@ -15,10 +15,11 @@ export const getDecorModel = (name: string): GLTF => {
     // Grass
     if (is('grass')) return models['decor_grass']
 
+    // Flower
+    if (is('flower')) return models['decor_flower']
 
-
-    
-
+    // House
+    if (is('house')) return models['decor_house']
 
     return null
 }

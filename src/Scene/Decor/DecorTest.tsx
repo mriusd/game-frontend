@@ -1,28 +1,27 @@
-import { useRef, useMemo, memo, MutableRefObject } from "react"
-import ReuseModel from '../components/ReuseModel'
+import React from "react"
 import { getShaderedDecor } from "./utils/getShaderedDecor"
 import { useCore } from "Scene/useCore"
 import { Coordinate } from "interfaces/coordinate.interface"
-import { Merged } from "@react-three/drei"
 import { Instances, Instance } from "@react-three/drei"
-import { createBillboardMaterial } from "Scene/materials/createBillboardMaterial"
-
-
-// Objects Data
-import grassData from './data/grass.json'
-import christmasTreeData from './data/christmass_tree.json'
-import treeData from './data/tree.json'
 
 import { shallow } from "zustand/shallow"
 import { useFighter } from "Scene/Fighter/useFighter"
 import { useFrame } from "@react-three/fiber"
 
-const DecorTest = memo(function Decor() {
+// Objects Data
+import grassData from './data/grass.json'
+import christmasTreeData from './data/christmass_tree.json'
+import treeData from './data/tree.json'
+import flowerData from './data/flower.json'
+import houseData from './data/house.json'
+
+
+const DecorTest = React.memo(function Decor() {
     // console.log('rerender')
 
     // const matrixCoordToWorld = useCore(state => state.matrixCoordToWorld)
-    const grass = useMemo(() => getShaderedDecor('grass'), [])
-    const tree = useMemo(() => getShaderedDecor('tree'), [])
+    const grass = React.useMemo(() => getShaderedDecor('grass'), [])
+    const tree = React.useMemo(() => getShaderedDecor('tree'), [])
     // // @ts-expect-error
     // console.log('nodes', grass.gltf.nodes)
 
@@ -30,7 +29,7 @@ const DecorTest = memo(function Decor() {
     // const worldCoordinate = useMemo(() => matrixCoordToWorld(objectData.location), [grassData])
 
     // @ts-expect-error
-    const meshes = useMemo(() => ({ Grass: grass.gltf.nodes.grass015,  Tree: tree.gltf.nodes.tree_1 }), [grass, tree])
+    const meshes = React.useMemo(() => ({ Grass: grass.gltf.nodes.grass015,  Tree: tree.gltf.nodes.tree_1 }), [grass, tree])
     // console.log('meshes', meshes)
     return (
         // <Merged meshes={meshes}>
@@ -60,6 +59,8 @@ const DecorTest = memo(function Decor() {
         {/* { (grassData as Array<any>).map((_, i) => <BaseObject objectData={_} name="grass" key={i}  />) } */}
         { (christmasTreeData as Array<any>).map((_, i) => <BaseObject objectData={_} name="christmas_tree"  key={i}  />) }
         { (treeData as Array<any>).map((_, i) => <BaseObject objectData={_} name="tree" key={i}  />) }
+        { (flowerData as Array<any>).map((_, i) => <BaseObject objectData={_} name="flower" key={i}  />) }
+        { (houseData as Array<any>).map((_, i) => <BaseObject objectData={_} name="house" key={i}  />) }
         </>
         // <></>
     )
@@ -68,6 +69,7 @@ const DecorTest = memo(function Decor() {
 
 interface Props { 
     objectData: {
+        type: string
         location: Coordinate
         rotation: { x: number, y: number, z: number }
         scale: { x: number, y: number, z: number }
@@ -77,9 +79,9 @@ interface Props {
     name?: string
 }
 function Object({ objectData, models }: Props) {
-    const ref = useRef<THREE.Mesh | null>(null)
+    const ref = React.useRef<THREE.Mesh | null>(null)
     const matrixCoordToWorld = useCore(state => state.matrixCoordToWorld)
-    const worldCoordinate = useMemo(() => matrixCoordToWorld(objectData.location), [grassData])
+    const worldCoordinate = React.useMemo(() => matrixCoordToWorld(objectData.location), [grassData])
     return (
         <models.Grass
             ref={ref}
@@ -99,9 +101,9 @@ function Object({ objectData, models }: Props) {
     )
 }
 function InstancedObject({ objectData }: Props) {
-    const ref = useRef<THREE.Mesh | null>(null)
+    const ref = React.useRef<THREE.Mesh | null>(null)
     const matrixCoordToWorld = useCore(state => state.matrixCoordToWorld)
-    const worldCoordinate = useMemo(() => matrixCoordToWorld(objectData.location), [grassData])
+    const worldCoordinate = React.useMemo(() => matrixCoordToWorld(objectData.location), [grassData])
     return (
         <group name='instanced-object'>
             <Instance
@@ -116,14 +118,15 @@ function InstancedObject({ objectData }: Props) {
 
 
 function BaseObject({ objectData, name }: Props) {
-    const ref = useRef<THREE.Mesh | null>(null)
+    const ref = React.useRef<THREE.Mesh | null>(null)
     const [matrixCoordToWorld, chunkSize] = useCore(state => [state.matrixCoordToWorld, state.chunkSize])
-    const uniforms = useRef({ uTime: { value: 0 }, uVisible: { value: true } })
-    const { model } = useMemo(() => getShaderedDecor(name, uniforms), [])
-    const worldCoordinate = useMemo(() => matrixCoordToWorld(objectData.location), [objectData])
+    const uniforms = React.useRef({ uTime: { value: 0 }, uVisible: { value: true } })
+    const { model } = React.useMemo(() => getShaderedDecor(name, uniforms), [])
+    const worldCoordinate = React.useMemo(() => matrixCoordToWorld(objectData.location), [objectData])
 
     // Check Collision
     useFrame(({ clock }) => {
+        if (!objectData.type.includes('tree')) { return }
         if (!ref.current) { return }
         const coordinate = useFighter.getState().fighter?.coordinates
         if (!coordinate) { return }
