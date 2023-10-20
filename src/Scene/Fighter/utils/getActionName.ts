@@ -14,7 +14,7 @@ export const getActionName = (action: ActionsType, fighter: Fighter) => {
         return 'attack'
     } else 
     if (action === 'stand') {
-        if (!isEmptyHand) return 'sword_stand'
+        if (!isEmptyHand) return 'stand'
         return 'stand'
     } else {
         return action

@@ -206,7 +206,7 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
             <primitive 
                 ref={modelRef}
                 object={model}
-                scale={.2}
+                scale={.32}
             >
                 { children }
             </primitive>

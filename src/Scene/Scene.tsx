@@ -92,7 +92,7 @@ const Scene = React.memo(function Scene() {
                 }}
             >
                 <color attach="background" args={[0x000000]} />
-                { !devMode ? <fog attach="fog" args={['black', 5, 25]}></fog> : <></> }
+                { !devMode ? <fog attach="fog" args={['black', 10, 28]}></fog> : <></> }
                 <FPSLimiter>
                     { devMode ? <OrbitControls target={fighterNode.current?.position || new THREE.Vector3(0, 0, 0)} /> : <></> }
                     <Camera/>
