@@ -6,7 +6,7 @@ import * as THREE from "three"
 import { Object3D } from "three"
 
 import { Canvas } from "@react-three/fiber"
-import { Loader, Stats, OrbitControls } from "@react-three/drei"
+import { Loader, Stats, OrbitControls, Hud } from "@react-three/drei"
 
 import Light from "./Light"
 import Chunks from "./Chunks/Chunks"
@@ -24,7 +24,7 @@ import DroppedItemList from './DroppedItem/DroppedItemList'
 
 import { useUi } from './UserInterface3D/useUI'
 
-import Postprocessing from './Postprocessing/Postprocessing2'
+import Postprocessing from './Postprocessing/Postprocessing'
 
 import { shallow } from 'zustand/shallow'
 import UserInterface2D from './UserInterface2D/UserInterface2D'
@@ -35,6 +35,7 @@ import { useCore } from 'Scene/useCore'
 import { AdaptiveDpr } from '@react-three/drei'
 import { useControls } from 'leva'
 import { useFighter } from './Fighter/useFighter'
+import { useSettings } from './UserInterface2D/Settings/useSettings'
 
 // import FPSLimiter from './UserInterface2D/Settings/FPSLimiter'
 // import FPSLimiter from './UserInterface2D/Settings/FPSLimitter'
@@ -67,18 +68,21 @@ const Scene = React.memo(function Scene() {
                 'rgb': THREE.sRGBEncoding,
                 'linear': THREE.LinearEncoding,
             }
-        }
+        },
     })
 
     const dev = useControls('Camera', { freeCamera: false })
     React.useEffect(() => void setDevMode(dev.freeCamera), [dev])
-    
+
 
     return (
         <div id="scene" tabIndex={0} ref={eventsNode} className={styles.scene}>
             <Canvas
-                shadows
                 frameloop='demand' // Required 'demand' for fps clipping
+                shadows={{
+                    enabled: useSettings.getState().enableShadows,
+                    type: THREE.PCFSoftShadowMap
+                }}
                 gl={{
                     powerPreference: "high-performance",
                     alpha: false,
@@ -88,33 +92,35 @@ const Scene = React.memo(function Scene() {
                     toneMapping: data.toneMapping,
                     useLegacyLights: data.legacyLights,
                     outputEncoding: data.encoding,
-                    
                 }}
             >
-                <color attach="background" args={[0x000000]} />
-                { !devMode ? <fog attach="fog" args={['black', 10, 28]}></fog> : <></> }
-                <FPSLimiter>
-                    { devMode ? <OrbitControls target={fighterNode.current?.position || new THREE.Vector3(0, 0, 0)} /> : <></> }
-                    <Camera/>
-                    <Stats className='stats' />
-                    <React.Suspense fallback={null}>
-                        <GLTFLoader>
-                            <NpcList/>
-                            <DroppedItemList/>
-                            <OtherFighterList/>
-                            {/* {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)} */}
-                            <DecorTest/>
-                            <Fighter />
-                            <Chunks />
-                            <Controls />
-                            <FloatingDamage />
-                            <UserInterface3D />
-                            <Light />
-                        </GLTFLoader>
-                    </React.Suspense>
-                    <Postprocessing/>
-                    {/* <AdaptiveDpr/> */}
-                </FPSLimiter>
+                {/* TODO: Think abput this */}
+                {/* <Hud> */}
+                    <color attach="background" args={[0x000000]} />
+                    { !devMode ? <fog attach="fog" args={['black', 10, 28]}></fog> : <></> }
+                    <FPSLimiter>
+                        { devMode ? <OrbitControls target={fighterNode.current?.position || new THREE.Vector3(0, 0, 0)} /> : <></> }
+                        <Camera/>
+                        <Stats className='stats' />
+                        <React.Suspense fallback={null}>
+                            <GLTFLoader>
+                                <NpcList/>
+                                <DroppedItemList/>
+                                <OtherFighterList/>
+                                {/* {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)} */}
+                                <DecorTest/>
+                                <Fighter />
+                                <Chunks />
+                                <Controls />
+                                <FloatingDamage />
+                                <UserInterface3D />
+                                <Light />
+                            </GLTFLoader>
+                        </React.Suspense>
+                        <Postprocessing/>
+                        {/* <AdaptiveDpr/> */}
+                    </FPSLimiter>
+                {/* </Hud> */}
             </Canvas>
             <UserInterface2D/>
             <Loader/>

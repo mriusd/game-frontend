@@ -1,5 +1,6 @@
 import { createWithEqualityFn } from "zustand/traditional";
 import { shallow } from "zustand/shallow";
+import { createRef } from "react";
 
 export interface UsePost {
     lights: any[]
@@ -13,9 +14,11 @@ export const usePost = createWithEqualityFn<UsePost>((set, get) => ({
     updateLights: (light, action) => {
         if (!light) { return }
         const $this = get()
-        const index = $this.lights.findIndex(_ => _.uuid === light.uuid)
+        const index = $this.lights.findIndex(_ => _.current.uuid === light.uuid)
         if (action === 'add' && index === -1) {
-            set({ lights: [...$this.lights, light] })
+            // @ts-expect-error
+            const ref = createRef(); ref.current = light
+            set({ lights: [...$this.lights, ref] })
             return
         }
         if (action === 'remove' && index !== -1) {
@@ -29,9 +32,11 @@ export const usePost = createWithEqualityFn<UsePost>((set, get) => ({
     updateBloomObjects: (object, action) => {
         if (!object) { return }
         const $this = get()
-        const index = $this.bloomObjects.findIndex(_ => _.uuid === object.uuid)
+        const index = $this.bloomObjects.findIndex(_ => _.current.uuid === object.uuid)
         if (action === 'add' && index === -1) {
-            set({ bloomObjects: [...$this.bloomObjects, object] })
+            // @ts-expect-error
+            const ref = createRef(); ref.current = object
+            set({ bloomObjects: [...$this.bloomObjects, ref] })
             return
         }
         if (action === 'remove' && index !== -1) {

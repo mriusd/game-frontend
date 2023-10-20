@@ -1,13 +1,18 @@
 import * as THREE from "three"
 import { useFrame } from "@react-three/fiber"
-import { useEffect, useRef, memo } from "react"
+import React, { useEffect, useRef, memo } from "react"
 import { Sprite, Shader } from "three"
 import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
+
+import { usePost } from "Scene/Postprocessing/usePost"
 
 const HealthBar = memo(function HealthBar({ object, target, offset = 0 }: any) {
     const bar = useRef<Sprite | null>(null)
     const shader = useRef<Shader | null>(null)
     const textBoundingBox = useRef<ReturnType<typeof getMeshDimensions> | null>(null)
+
+    const updateBloomObjects = usePost(state => state.updateBloomObjects)
+    React.useLayoutEffect(() => updateBloomObjects(bar.current, 'add'), [bar.current])
 
     useFrame(() => {
         if (!bar.current) { return }

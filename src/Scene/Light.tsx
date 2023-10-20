@@ -2,7 +2,6 @@ import * as THREE from "three"
 import React from "react"
 // import { useHelper } from "@react-three/drei"
 import { Environment } from "@react-three/drei"
-
 import { useFighter } from "./Fighter/useFighter"
 import { useFrame } from "@react-three/fiber"
 
@@ -16,8 +15,11 @@ const Light = React.memo(function Light() {
 
     const fighterNode = useFighter(state => state.fighterNode)
     const shadowlightRef = React.useRef<THREE.DirectionalLight | null>(null)
+    const directionallightRef = React.useRef<THREE.DirectionalLight | null>(null)
     const lightPosition = React.useMemo(() => new THREE.Vector3(0, 10, 5), [])
     React.useLayoutEffect(() => updateLights(shadowlightRef.current, 'add'), [shadowlightRef.current])
+    React.useLayoutEffect(() => updateLights(directionallightRef.current, 'add'), [directionallightRef.current])
+
     // const lightPosition = useMemo(() => new THREE.Vector3(0, 0.5, 0.866), []) // ~60º
 
     React.useEffect(() => {
@@ -42,22 +44,34 @@ const Light = React.memo(function Light() {
 
         colorShadow: { value: '#FFFFFF' },
         intenShadow: { value: 1, min: 0, max: 5 },
-        posShadow: { value: { x: 0, y: 10, z: 5 } },
+        posShadow: { value: { x: 0, y: 10, z: 2 } },
+
+        shadows: { value: false }
     })
     const lightPositionTest = React.useMemo(() => new THREE.Vector3(data.posShadow.x, data.posShadow.y, data.posShadow.z), [data])
+
+    // const gl = useThree(state => state.gl)
+    // React.useEffect(() => {
+    //     gl.shadowMap.enabled = data.shadows
+    // }, [data])
+    // useFrame(({ gl }) => {
+    //     if (gl.shadowMap.enabled) {
+    //         gl.shadowMap.needsUpdate = true
+    //     }
+    // })
 
     return (
         <group name="light">
             {/* <hemisphereLight args={[data.colorGround, data.colorSky]} intensity={data.intenHemi} /> */}
             <ambientLight color={data.colorHemi} intensity={data.intenHemi} />
-            <directionalLight color={data.colorDirectional} intensity={data.intenDirectional} position={[data.posDirectional.x,data.posDirectional.y,data.posDirectional.z]}/>
+            <directionalLight ref={directionallightRef} color={data.colorDirectional} intensity={data.intenDirectional} position={[data.posDirectional.x,data.posDirectional.y,data.posDirectional.z]}/>
             <directionalLight 
                 intensity={data.intenShadow}
                 color={data.colorShadow} 
                 ref={shadowlightRef}
                 castShadow
-                shadow-mapSize-width={2048}
-                shadow-mapSize-height={2048}
+                shadow-mapSize-width={512}
+                shadow-mapSize-height={512}
                 shadow-camera-near={0.1}
                 shadow-camera-far={500}
                 shadow-camera-left={-20}

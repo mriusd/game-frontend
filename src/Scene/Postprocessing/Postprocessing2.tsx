@@ -10,6 +10,7 @@ import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader'
 import { UnrealBloomPass } from 'three-stdlib'
 
 import { useThree, useFrame } from '@react-three/fiber'
+import { Effects } from '@react-three/drei'
 
 extend({ EffectComposer, ShaderPass, RenderPass, FXAAShader, UnrealBloomPass })
 
@@ -28,11 +29,12 @@ const Postprocessing = () => {
     }, 2)
 
     return (
-        <effectComposer ref={composer} args={[gl]}>
+        // <effectComposer ref={composer} args={[gl]}>
+        <Effects>
             <renderPass attachArray="passes" scene={scene} camera={camera} />
             <shaderPass attachArray="passes" args={[FXAAShader]} material-uniforms-resolution-value={[1 / size.width, 1 / size.height]} />
             <unrealBloomPass attachArray="passes" args={[size.width/size.height, .5, 1.5, .1]} />
-        </effectComposer>
+        </Effects>
     )
 }
 

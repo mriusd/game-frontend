@@ -54,6 +54,7 @@ const UserInterface2D = () => {
             </div>
             <Leva
                 // hidden={!isBackpackOpened}
+                collapsed
                 flat
             />
         </div>

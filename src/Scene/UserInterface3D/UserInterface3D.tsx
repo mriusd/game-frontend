@@ -14,7 +14,7 @@ import { OrthographicCamera } from "@react-three/drei"
 const UserInterface3D = memo(function UserInterface() {
     const [userInterface, intersectionPlane] = useUi(state => [state.userInterface, state.intersectionPlane], shallow)
     return (
-        <Hud>
+        <Hud /* renderPriority={3}*/>
             <OrthographicCamera makeDefault position={[0, 0, 10]} />
             <ambientLight color={0xFFFFFF} intensity={.5} />
             <directionalLight color={0xFFFFFF} position={[-5, 0, 10]} intensity={.5} />

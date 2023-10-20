@@ -7,11 +7,19 @@ import { BrightnessContrast, Sepia } from '@react-three/postprocessing'
 import { useControls } from 'leva'
 
 import { usePost } from './usePost'
+import { useSettings } from 'Scene/UserInterface2D/Settings/useSettings'
+
 import React from 'react'
+import { Box } from '@react-three/drei'
 
 const Postprocessing = () => {
+    const enabled = useSettings(state => state.enablePostprocessing)
 
-    // const [lights, bloomObjects] = usePost(state => [state.lights, state.bloomObjects])
+    const [lights, bloomObjects] = usePost(state => [state.lights, state.bloomObjects])
+
+    const testRef = React.useRef()
+    const updateBloomObjects = usePost(state => state.updateBloomObjects)
+    React.useEffect(() => void updateBloomObjects(testRef.current, 'add'), [testRef.current])
 
     // const data = useControls('Postprocessing', {
     //     enabled: false,
@@ -67,31 +75,39 @@ const Postprocessing = () => {
     //     }
     // });
 
-    // React.useEffect(() => {
-    //     console.log('Update Post', lights, bloomObjects)
-    // }, [lights, bloomObjects])
+    React.useEffect(() => {
+        console.log('Update Post', lights, bloomObjects)
+    }, [lights, bloomObjects])
 
+
+    if (!enabled) return null
 
     return (
-        <EffectComposer>
+        <>
+        <EffectComposer 
+            renderPriority={2}
+        >
             {/* <BrightnessContrast brightness={data.brightness} contrast={data.contrast} />
             <HueSaturation hue={data.hue} saturation={data.saturation} />
             <ToneMapping middleGrey={data.middleGrey} maxLuminance={data.maxLuminance} />
             <Sepia intensity={data.sepia} /> */}
-            <Bloom kernelSize={KernelSize.LARGE} luminanceThreshold={0.1} luminanceSmoothing={0.5} height={300} />
-              {/* <SelectiveBloom
-                lights={lights.map(_ => ({ current: _ }))} // ⚠️ REQUIRED! all relevant lights
-                selection={bloomObjects.map(_ => ({ current: _ }))} // selection of objects that will have bloom effect
+            {/* <Bloom kernelSize={KernelSize.LARGE} luminanceThreshold={0.1} luminanceSmoothing={0.5} height={300} /> */}
+              <SelectiveBloom
+                lights={lights} // ⚠️ REQUIRED! all relevant lights
+                selection={bloomObjects} // selection of objects that will have bloom effect
                 selectionLayer={10} // selection layer
                 intensity={1.0} // The bloom intensity.
                 // blurPass={undefined} // A blur pass.
                 // width={Resizer.AUTO_SIZE} // render width
                 // height={Resizer.AUTO_SIZE} // render height
-                kernelSize={KernelSize.LARGE} // blur kernel size
-                luminanceThreshold={0.9} // luminance threshold. Raise this value to mask out darker elements in the scene.
+                kernelSize={KernelSize.HUGE} // blur kernel size
+                luminanceThreshold={0.1} // luminance threshold. Raise this value to mask out darker elements in the scene.
                 luminanceSmoothing={0.025} // smoothness of the luminance threshold. Range is [0, 1]
-            /> */}
+            />
         </EffectComposer>
+        <Box ref={testRef} args={[10, 10]}/>
+        </>
+        
     )
 }
 

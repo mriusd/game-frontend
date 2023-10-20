@@ -12,6 +12,14 @@ export interface UseSettings {
     stepFps: number,
     clipFps: number,
     updateClipFps: (value: number) => void
+
+    // Shadows
+    enableShadows: boolean
+    updateShadows: (value: boolean) => void
+
+    // Postprocessing
+    enablePostprocessing: boolean
+    updatePostprocessing: (value: boolean) => void
 }
 
 export const useSettings = createWithEqualityFn<UseSettings>((set, get) => ({
@@ -24,5 +32,22 @@ export const useSettings = createWithEqualityFn<UseSettings>((set, get) => ({
     minFps: 30,
     stepFps: 5,
     clipFps: 240, // Initial Value
-    updateClipFps: (value: number) => set({ clipFps: value })
+    updateClipFps: (value: number) => { 
+        localStorage.setItem('settings_clipFps', value+'')
+        set({ clipFps: value }) 
+    },
+
+    // Shadows
+    enableShadows: true,
+    updateShadows: (value: boolean) => { 
+        localStorage.setItem('settings_enableShadows', value+'')
+        set({ enableShadows: value }) 
+    },
+
+    // Postprocessing
+    enablePostprocessing: false,
+    updatePostprocessing: (value: boolean) => { 
+        localStorage.setItem('settings_enablePostprocessing', value+'')
+        set({ enablePostprocessing: value }) 
+    }
 }), shallow)
