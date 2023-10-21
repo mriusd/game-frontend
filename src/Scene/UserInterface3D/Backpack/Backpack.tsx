@@ -165,14 +165,14 @@ const Backpack = memo(function Backpack() {
             if (isItemPinned.current) {
                 pinnedItemEvent.current = e
                 // @ts-expect-error
-                hoveredItemEvent.current.object.parent.material.opacity = 0 // TODO: sometimes get error over here
+                hoveredItemEvent.current?.object?.parent?.material?.opacity && (hoveredItemEvent.current.object.parent.material.opacity = 0) // TODO: sometimes get error over here
                 // Display previous cell
                 setPlaceholderCells(pinnedItemEvent.current, true)
                 // setObjectRenderLayer(pinnedItemEvent.current, 'highest')
             } else {
                 setPlaceholderCells(pinnedItemEvent.current, false)
                 // @ts-expect-error
-                hoveredItemEvent.current.object.parent.material.opacity = .2
+                hoveredItemEvent.current?.object?.parent?.material?.opacity && (hoveredItemEvent.current.object.parent.material.opacity = .2)
                 placeItemToCell(pinnedItemEvent.current)
                 // setObjectRenderLayer(pinnedItemEvent.current, 'default')
                 pinnedItemEvent.current = null

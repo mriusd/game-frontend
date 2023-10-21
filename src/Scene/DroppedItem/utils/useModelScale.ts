@@ -13,28 +13,29 @@ export const useModelScale = (item: ItemDroppedEvent) => {
         const vec3 = new THREE.Vector3(1, 1, 1)
         const is = getIs(item.item.name)
         if (is('helm')) {
-            return vec3.multiplyScalar(.7)
+            return vec3.multiplyScalar(.45)
         }
         if (is('armour')) {
-            return vec3.multiplyScalar(.8)
+            return vec3.multiplyScalar(.55
+                )
         }
         if (is('pants')) {
-            return vec3.multiplyScalar(.8)
+            return vec3.multiplyScalar(.55)
         }
         if (is('boots')) {
-            return vec3.multiplyScalar(.9)
+            return vec3.multiplyScalar(.55)
         }
         if (is('gloves')) {
-            return vec3.multiplyScalar(1)
+            return vec3.multiplyScalar(.65)
         }
         if (is('crystal', 'sword')) {
             return vec3.multiplyScalar(2)
         }
         if (is('wings')) {
-            return vec3.multiplyScalar(3)
+            return vec3.multiplyScalar(2.5)
         }
         if (is('magic', 'box')) {
-            return vec3.multiplyScalar(.6)
+            return vec3.multiplyScalar(.4)
         }
         return vec3
     }, [item])
