@@ -8,9 +8,7 @@ import { usePost } from "Scene/Postprocessing/usePost"
 // For optimization purpose we should find method to prerender all effects
 // And then just swap them & use
 export const useSkillEffects = () => {
-    const updateBloomObjects = usePost(state => state.updateBloomObjects)
     const twistingSlash = useTwistingSlash()
-    React.useEffect(() => void updateBloomObjects(twistingSlash.mesh, 'add'), [twistingSlash.mesh])
     // React.useEffect(() => {
     //     setInterval(() => twistingSlash.play(), 500)
     // },[])

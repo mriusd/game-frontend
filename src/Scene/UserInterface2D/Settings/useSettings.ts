@@ -45,7 +45,7 @@ export const useSettings = createWithEqualityFn<UseSettings>((set, get) => ({
     },
 
     // Postprocessing
-    enablePostprocessing: false,
+    enablePostprocessing: true,
     updatePostprocessing: (value: boolean) => { 
         localStorage.setItem('settings_enablePostprocessing', value+'')
         set({ enablePostprocessing: value }) 

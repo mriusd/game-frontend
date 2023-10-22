@@ -22,13 +22,13 @@ const config = {
     strikeSpeed: 2,
     position: { x: 0, y: 2, z: 0 },
     rotation: { x: 0, y: Math.PI / 2, z: 0 },
+    bloomIntencity: 8
 }
 
 export const useTwistingSlash = () => {
     const points = React.useMemo(() => {
         const material = new THREE.ShaderMaterial({
             transparent: true,
-            toneMapped: false,
             uniforms: {
                 uTime: { value: 0 },
                 uProgress: { value: 0 },
@@ -42,7 +42,8 @@ export const useTwistingSlash = () => {
                 uStrikePointSize: { value: config.strikePointSize },
                 uStrikeSpeed: { value: config.strikeSpeed },
     
-                uColor: { value: config.color }
+                uColor: { value: config.color },
+                uBloomIntencity: { value: config.bloomIntencity }
             },
             vertexShader: `
                 attribute vec3 initialPosition;
@@ -116,11 +117,11 @@ export const useTwistingSlash = () => {
                 uniform float uAlphaMultiplier;
                 uniform vec3 uColor;
                 uniform float uLengthCoef;
+                uniform float uBloomIntencity;
                 varying float relativeAngle;
                 varying float vSpeed;
                 varying float vStrikeSpeed;
                 varying float vStrikeProgess;
-                
     
                 #define PI 3.1415926535
     
@@ -130,9 +131,10 @@ export const useTwistingSlash = () => {
                     if (uProgress < .01) { 
                         discard;
                     }
+                    vec3 color = uColor*uBloomIntencity;
     
                     if (vStrikeSpeed > 0.) {
-                        gl_FragColor = vec4(normalizeColor(uColor), 1. - vStrikeProgess);
+                        gl_FragColor = vec4(normalizeColor(color), 1. - vStrikeProgess);
                     } else {
                         // TODO: fix error, relative angle a little wrong, some points just invisible all the time
                         if (relativeAngle > PI) {
@@ -144,10 +146,10 @@ export const useTwistingSlash = () => {
                         }
                         
                         float alpha = clamp(0., 1., (vSpeed - uAlphaDifference) * uAlphaMultiplier);
-                        gl_FragColor = vec4(normalizeColor(uColor), alpha);
+                        gl_FragColor = vec4(normalizeColor(color), alpha);
                     }
                 }
-            `
+            `,
         })
     
     

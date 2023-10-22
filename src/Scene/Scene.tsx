@@ -6,7 +6,7 @@ import * as THREE from "three"
 import { Object3D } from "three"
 
 import { Canvas } from "@react-three/fiber"
-import { Loader, Stats, OrbitControls, Hud } from "@react-three/drei"
+import { Loader, Stats, OrbitControls, Hud, Box } from "@react-three/drei"
 
 import Light from "./Light"
 import Chunks from "./Chunks/Chunks"
@@ -38,7 +38,6 @@ import { useFighter } from './Fighter/useFighter'
 import { useSettings } from './UserInterface2D/Settings/useSettings'
 
 // import FPSLimiter from './UserInterface2D/Settings/FPSLimiter'
-// import FPSLimiter from './UserInterface2D/Settings/FPSLimitter'
 import FPSLimiter from './UserInterface2D/Settings/FPSLimiter2'
 
 const Scene = React.memo(function Scene() {
@@ -74,7 +73,6 @@ const Scene = React.memo(function Scene() {
     const dev = useControls('Camera', { freeCamera: false })
     React.useEffect(() => void setDevMode(dev.freeCamera), [dev])
 
-
     return (
         <div id="scene" tabIndex={0} ref={eventsNode} className={styles.scene}>
             <Canvas
@@ -88,7 +86,6 @@ const Scene = React.memo(function Scene() {
                     alpha: false,
                     antialias: true,
                     toneMappingExposure: Math.pow(2, data.exposure),
-                    // toneMapping: THREE.LinearToneMapping,
                     toneMapping: data.toneMapping,
                     useLegacyLights: data.legacyLights,
                     outputEncoding: data.encoding,
@@ -102,6 +99,7 @@ const Scene = React.memo(function Scene() {
                         { devMode ? <OrbitControls target={fighterNode.current?.position || new THREE.Vector3(0, 0, 0)} /> : <></> }
                         <Camera/>
                         <Stats className='stats' />
+                        <Postprocessing/>
                         <React.Suspense fallback={null}>
                             <GLTFLoader>
                                 <NpcList/>
@@ -117,7 +115,6 @@ const Scene = React.memo(function Scene() {
                                 <Light />
                             </GLTFLoader>
                         </React.Suspense>
-                        <Postprocessing/>
                         {/* <AdaptiveDpr/> */}
                     </FPSLimiter>
                 {/* </Hud> */}

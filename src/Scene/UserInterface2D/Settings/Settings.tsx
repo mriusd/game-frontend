@@ -47,7 +47,7 @@ const Settings = () => {
                             <div className={styles.row}>
                                 <p className={styles.title}>Enable postprocessing</p>
                                 <Checkbox defaultChecked={defaults.enablePostprocessing} onChange={(e) => updatePostprocessing(e.target.checked)} />
-                                <p className={`${styles.info} ${styles.yellow}`}>(Restart required)</p>
+                                {/* <p className={`${styles.info} ${styles.yellow}`}>(Restart required)</p> */}
                             </div>
                         </form>
                     </div>

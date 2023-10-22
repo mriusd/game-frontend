@@ -3,6 +3,7 @@ import { Plane, Hud } from "@react-three/drei"
 import { memo } from "react"
 
 import { useUi } from "./useUI"
+import { useSettings } from "Scene/UserInterface2D/Settings/useSettings"
 
 import Backpack from "./Backpack/Backpack"
 import BottomMenu from "./BottomMenu"
@@ -13,8 +14,9 @@ import { OrthographicCamera } from "@react-three/drei"
 
 const UserInterface3D = memo(function UserInterface() {
     const [userInterface, intersectionPlane] = useUi(state => [state.userInterface, state.intersectionPlane], shallow)
+    const enablePost = useSettings(state => state.enablePostprocessing)
     return (
-        <Hud /* renderPriority={3}*/>
+        <Hud renderPriority={enablePost ? 3 : 1}>
             <OrthographicCamera makeDefault position={[0, 0, 10]} />
             <ambientLight color={0xFFFFFF} intensity={.5} />
             <directionalLight color={0xFFFFFF} position={[-5, 0, 10]} intensity={.5} />

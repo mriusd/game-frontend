@@ -2,7 +2,7 @@ import React from "react"
 import { getShaderedDecor } from "./utils/getShaderedDecor"
 import { useCore } from "Scene/useCore"
 import { Coordinate } from "interfaces/coordinate.interface"
-import { Instances, Instance } from "@react-three/drei"
+import { Instances, Instance, Box } from "@react-three/drei"
 
 import { shallow } from "zustand/shallow"
 import { useFighter } from "Scene/Fighter/useFighter"
@@ -31,6 +31,7 @@ const DecorTest = React.memo(function Decor() {
     // @ts-expect-error
     const meshes = React.useMemo(() => ({ Grass: grass.gltf.nodes.grass015,  Tree: tree.gltf.nodes.tree_1 }), [grass, tree])
     // console.log('meshes', meshes)
+
     return (
         // <Merged meshes={meshes}>
         //     {(models) => (
@@ -50,7 +51,6 @@ const DecorTest = React.memo(function Decor() {
             <meshBasicMaterial color={'red'} />
             <sphereGeometry args={[1, 16, 16]}/>
         </mesh>) } */}
-
         <Instances geometry={meshes.Grass.geometry} material={meshes.Grass.material}>
             <group position={[0, 0, 0]}>
                 { (grassData as Array<any>).map((_, i) => <InstancedObject  objectData={_} key={i}  />) }
@@ -145,6 +145,9 @@ function BaseObject({ objectData, name }: Props) {
         } else {
             uniforms.current.uVisible.value = true
         }
+    })
+    // Render Time Uniform
+    useFrame(({ clock }) => {
         uniforms.current.uTime.value = clock.getElapsedTime()
     })
 
@@ -156,7 +159,7 @@ function BaseObject({ objectData, name }: Props) {
                 position={[worldCoordinate.x - chunkSize/2, 0, worldCoordinate.z - chunkSize/2]}
                 rotation={[objectData.rotation.x, objectData.rotation.y, objectData.rotation.z]}
                 scale={[objectData.scale.x, objectData.scale.y, objectData.scale.z]}
-            />
+            ></primitive>
         </group>
     )
 }

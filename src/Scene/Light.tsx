@@ -50,16 +50,6 @@ const Light = React.memo(function Light() {
     })
     const lightPositionTest = React.useMemo(() => new THREE.Vector3(data.posShadow.x, data.posShadow.y, data.posShadow.z), [data])
 
-    // const gl = useThree(state => state.gl)
-    // React.useEffect(() => {
-    //     gl.shadowMap.enabled = data.shadows
-    // }, [data])
-    // useFrame(({ gl }) => {
-    //     if (gl.shadowMap.enabled) {
-    //         gl.shadowMap.needsUpdate = true
-    //     }
-    // })
-
     return (
         <group name="light">
             {/* <hemisphereLight args={[data.colorGround, data.colorSky]} intensity={data.intenHemi} /> */}
@@ -70,8 +60,8 @@ const Light = React.memo(function Light() {
                 color={data.colorShadow} 
                 ref={shadowlightRef}
                 castShadow
-                shadow-mapSize-width={512}
-                shadow-mapSize-height={512}
+                shadow-mapSize-width={2048}
+                shadow-mapSize-height={2048}
                 shadow-camera-near={0.1}
                 shadow-camera-far={500}
                 shadow-camera-left={-20}
