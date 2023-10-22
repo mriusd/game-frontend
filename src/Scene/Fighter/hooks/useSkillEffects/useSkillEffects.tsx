@@ -8,7 +8,12 @@ import { usePost } from "Scene/Postprocessing/usePost"
 // For optimization purpose we should find method to prerender all effects
 // And then just swap them & use
 export const useSkillEffects = () => {
-    const twistingSlash = useTwistingSlash()
+    const twistingSlash = useTwistingSlash({})
+    const arrow = useTwistingSlash({color: { r:0, g: 0, b: 800 }})
+    const trippleShot = useTwistingSlash({color: { r:0, g: 255, b: 0 }})
+    const darkSpirits = useTwistingSlash({color: { r:255, g: 0, b: 0 }})
+
+
     // React.useEffect(() => {
     //     setInterval(() => twistingSlash.play(), 500)
     // },[])
@@ -18,13 +23,13 @@ export const useSkillEffects = () => {
         // console.log('skillName', event.skill.name)
         if (is('malee')) { return }
         if (is('slash')) { twistingSlash.play(); return }
-        if (is('arrow')) { /* Effect here */; return }
-        if (is('tripple', 'shot')) { /* Effect here */; return }
-        if (is('dark', 'spirits')) { /* Effect here */; return }
+        if (is('arrow')) { arrow.play(); return }
+        if (is('tripple', 'shot')) { trippleShot.play(); return }
+        if (is('dark', 'spirits')) { darkSpirits.play(); return }
     }, [])
     
     return {
-        effects: [twistingSlash.mesh],
+        effects: [twistingSlash.mesh, arrow.mesh, trippleShot.mesh, darkSpirits.mesh],
         play
     }
 }

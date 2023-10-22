@@ -15,10 +15,7 @@ const Light = React.memo(function Light() {
 
     const fighterNode = useFighter(state => state.fighterNode)
     const shadowlightRef = React.useRef<THREE.DirectionalLight | null>(null)
-    const directionallightRef = React.useRef<THREE.DirectionalLight | null>(null)
     const lightPosition = React.useMemo(() => new THREE.Vector3(0, 10, 5), [])
-    React.useLayoutEffect(() => updateLights(shadowlightRef.current, 'add'), [shadowlightRef.current])
-    React.useLayoutEffect(() => updateLights(directionallightRef.current, 'add'), [directionallightRef.current])
 
     // const lightPosition = useMemo(() => new THREE.Vector3(0, 0.5, 0.866), []) // ~60º
 
@@ -42,8 +39,12 @@ const Light = React.memo(function Light() {
         intenDirectional: { value: 2.4, min: 0, max: 5 },
         posDirectional: { value: { x: 1, y: 0, z: 0.866 } },
 
+        colorFill: { value: '#FFFFFF' },
+        intenFill: { value: 1, min: 0, max: 5 },
+        posFill: { value: { x: -50, y: 0, z: -5 } },
+
         colorShadow: { value: '#FFFFFF' },
-        intenShadow: { value: 1, min: 0, max: 5 },
+        intenShadow: { value: 0.5, min: 0, max: 5 },
         posShadow: { value: { x: 0, y: 10, z: 2 } },
 
         shadows: { value: false }
@@ -54,7 +55,9 @@ const Light = React.memo(function Light() {
         <group name="light">
             {/* <hemisphereLight args={[data.colorGround, data.colorSky]} intensity={data.intenHemi} /> */}
             <ambientLight color={data.colorHemi} intensity={data.intenHemi} />
-            <directionalLight ref={directionallightRef} color={data.colorDirectional} intensity={data.intenDirectional} position={[data.posDirectional.x,data.posDirectional.y,data.posDirectional.z]}/>
+            <directionalLight color={data.colorDirectional} intensity={data.intenDirectional} position={[data.posDirectional.x,data.posDirectional.y,data.posDirectional.z]}/>
+            <directionalLight color={data.colorFill} intensity={data.intenFill} position={[data.posFill.x,data.posFill.y,data.posFill.z]}/>
+
             <directionalLight 
                 intensity={data.intenShadow}
                 color={data.colorShadow} 
@@ -69,7 +72,6 @@ const Light = React.memo(function Light() {
                 shadow-camera-top={20}
                 shadow-camera-bottom={-20}
             />
-            {/* <Environment files="/assets/autumn_forest.hdr"/> */}
         </group>
     )
 })

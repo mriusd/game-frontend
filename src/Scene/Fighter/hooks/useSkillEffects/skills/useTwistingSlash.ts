@@ -25,7 +25,8 @@ const config = {
     bloomIntencity: 8
 }
 
-export const useTwistingSlash = () => {
+// Provide color just for test to show different effects
+export const useTwistingSlash = ({ color = null }: {color?: {r: number, g: number, b: number}}) => {
     const points = React.useMemo(() => {
         const material = new THREE.ShaderMaterial({
             transparent: true,
@@ -42,7 +43,7 @@ export const useTwistingSlash = () => {
                 uStrikePointSize: { value: config.strikePointSize },
                 uStrikeSpeed: { value: config.strikeSpeed },
     
-                uColor: { value: config.color },
+                uColor: { value: color || config.color },
                 uBloomIntencity: { value: config.bloomIntencity }
             },
             vertexShader: `
