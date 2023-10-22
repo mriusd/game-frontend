@@ -7,7 +7,7 @@ import { useAuth } from './useAuth';
 import { useCloud } from 'EventCloud/useCloud';
 
 function MetamaskDialog() {
-	const fighterName = React.useRef('')
+	const [fighterName, setFighterName] = React.useState<string>('');
 	const [readyState, account, setAccount, sendAuth, fetchUserFighters, createFighter, userFighters] = useCloud(state => [state.readyState ,state.account, state.setAccount, state.sendAuth, state.fetchUserFighters, state.createFighter, state.userFighters])
 	const hide = useAuth(state => state.hide)
 
@@ -38,12 +38,12 @@ function MetamaskDialog() {
 	}, [setAccount, fetchUserFighters])
 
 	const createWarrior = React.useCallback(() => {
-		createFighter(account, "Warrior", fighterName.current)
-	}, [createFighter])
+		createFighter(account, "Warrior", fighterName)
+	}, [account, createFighter, fighterName])
 
 	const createWizard = React.useCallback(() => {
-		createFighter(account, "Wizard", fighterName.current)
-	}, [createFighter])
+		createFighter(account, "Wizard", fighterName)
+	}, [account, createFighter, fighterName])
 
 	if (!account) {
 		return (
@@ -70,8 +70,8 @@ function MetamaskDialog() {
 				<input
 					type="text"
 					placeholder="Enter Fighter Name"
-					// value={fighterName.current}
-					onChange={(e) => fighterName.current = e.target.value}
+					value={fighterName}
+					onChange={(e) => setFighterName(e.target.value)}
 				/>
 
 				<button onClick={createWarrior}>Create Warrior</button>
