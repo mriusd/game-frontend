@@ -123,6 +123,7 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
         });
     },
     createFighter(ownerAddress: string, fighterClass: string, name: string) {
+        console.log('create fighter', { ownerAddress, fighterClass, name })
         get().sendJsonMessage({
             type: "create_fighter",
             data: { ownerAddress, fighterClass, name }
