@@ -15,7 +15,7 @@ export const useSkillEffects = () => {
 
     const play = React.useCallback((event: any) => {
         const is = getIs(event.skill.name)
-        console.log('skillName', event.skill.name)
+        // console.log('skillName', event.skill.name)
         if (is('malee')) { return }
         if (is('slash')) { twistingSlash.play(); return }
         if (is('arrow')) { /* Effect here */; return }

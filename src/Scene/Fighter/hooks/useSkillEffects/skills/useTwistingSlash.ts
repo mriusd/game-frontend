@@ -8,11 +8,11 @@ import { useControls } from 'leva'
 
 const config = {
     duration: 700,
-    pointSize: 10,
-    density: 5000,
+    pointSize: 5,
+    density: 7000,
     speedMin: 0,
     tubeRadius: .5,
-    moveRadius: 2,
+    moveRadius: 2.5,
     alphaDifference: .45,
     alphaMultiplier: 1.2,
     lengthCoef: .05,
@@ -20,7 +20,7 @@ const config = {
     strikeDensity: 100,
     strikePointSize: 4,
     strikeSpeed: 2,
-    position: { x: 0, y: 2, z: 0 },
+    position: { x: 0, y: 2.5, z: 0 },
     rotation: { x: 0, y: Math.PI / 2, z: 0 },
     bloomIntencity: 8
 }
@@ -146,7 +146,7 @@ export const useTwistingSlash = () => {
                         }
                         
                         float alpha = clamp(0., 1., (vSpeed - uAlphaDifference) * uAlphaMultiplier);
-                        gl_FragColor = vec4(normalizeColor(color), alpha);
+                        gl_FragColor = vec4(normalizeColor(color), max(alpha, 0.));
                     }
                 }
             `,
