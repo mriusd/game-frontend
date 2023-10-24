@@ -1,12 +1,12 @@
 import React from "react"
 import { getShaderedDecor } from "./utils/getShaderedDecor"
-import { useCore } from "Scene/useCore"
 import { Coordinate } from "interfaces/coordinate.interface"
 import { Instances, Instance, Box } from "@react-three/drei"
 
 import { shallow } from "zustand/shallow"
 import { useFighter } from "Scene/Fighter/useFighter"
 import { useFrame } from "@react-three/fiber"
+import { useCore } from "Scene/useCore"
 
 // Objects Data
 import grassData from './data/grass.json'
@@ -74,6 +74,7 @@ interface Props {
         rotation: { x: number, y: number, z: number }
         scale: { x: number, y: number, z: number }
         size: { width: number, height: number, length: number }
+        occupiedCoords?: [{x: number, z: number}]
     },
     models?: any
     name?: string
@@ -150,6 +151,14 @@ function BaseObject({ objectData, name }: Props) {
     useFrame(({ clock }) => {
         uniforms.current.uTime.value = clock.getElapsedTime()
     })
+    // Occupied Coordinates
+    const updateOccupiedCoord = useCore(state => state.updateOccupiedCoord)
+    React.useEffect(() => {
+        const coords = objectData.occupiedCoords
+        if (!coords) { return }
+        coords.forEach(_ => {updateOccupiedCoord({ id: objectData.type+_.x+_.z, coordinates: {x:_.x-chunkSize/2, z:_.z-chunkSize/2}}, 'add')})
+        return () => coords.forEach(_ => {updateOccupiedCoord({ id: objectData.type+_.x+_.z, coordinates: {x:0,z:0} }, 'remove')})
+    }, [])
 
     return (
         <group name='decor'>

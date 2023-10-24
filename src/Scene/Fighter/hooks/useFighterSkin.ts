@@ -4,6 +4,8 @@ import { getIs } from "Scene/utils/utils"
 import { SkeletonUtils } from "three-stdlib"
 import { useMemo } from "react"
 
+import { useSettings } from "Scene/UserInterface2D/Settings/useSettings"
+
 const getFighterModel = (name: string): GLTF => {
     const models = useGLTFLoaderStore.getState().models.current
     const is = getIs(name)
@@ -13,14 +15,15 @@ const getFighterModel = (name: string): GLTF => {
 
 export const useFighterSkin = (name: string) => {
     return useMemo(() => {
+        const enableDynamicShadows = useSettings.getState().enableShadows
         const gltf: GLTF = getFighterModel(name)
         if (!gltf) { return null }
         // @ts-expect-error
         const model: THREE.Group | THREE.SkinnedMesh = SkeletonUtils.clone(gltf.scene)
         model.traverse((object: any) => {
             if (object.isMesh) {
-                object.castShadow = true
-                object.revieveShadow = true
+                object.castShadow = enableDynamicShadows
+                object.revieveShadow = enableDynamicShadows
             }
         })
         return { model, animations: gltf.animations }

@@ -1,21 +1,26 @@
 import * as THREE from "three"
 import React from "react"
-// import { useHelper } from "@react-three/drei"
-import { Environment } from "@react-three/drei"
+
 import { useFighter } from "./Fighter/useFighter"
-import { useFrame } from "@react-three/fiber"
-
-import { usePost } from "./Postprocessing/usePost"
-
+import { useFrame, useThree } from "@react-three/fiber"
 
 import { useControls } from "leva"
+import { useSettings } from "./UserInterface2D/Settings/useSettings"
 
 const Light = React.memo(function Light() {
-    const updateLights = usePost(state => state.updateLights)
-
     const fighterNode = useFighter(state => state.fighterNode)
     const shadowlightRef = React.useRef<THREE.DirectionalLight | null>(null)
     const lightPosition = React.useMemo(() => new THREE.Vector3(0, 10, 5), [])
+
+    const get = useThree(state => state.get)
+    // Set Shadows Mode
+    React.useEffect(() => {
+        const enableDynamicShadows = useSettings.getState().enableShadows
+        const gl = get().gl
+        if (!enableDynamicShadows) {
+            gl.shadowMap.autoUpdate = false
+        }
+    }, [])
 
     // const lightPosition = useMemo(() => new THREE.Vector3(0, 0.5, 0.866), []) // ~60º
 

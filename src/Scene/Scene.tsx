@@ -21,6 +21,7 @@ import OtherFighterList from './Fighter/OtherFighter/OtherFighterList'
 import NpcList from './Npc/NpcList'
 import Camera from './Camera'
 import DroppedItemList from './DroppedItem/DroppedItemList'
+import { DevHelpers } from './devHelpers/DevHelpers'
 
 import { useUi } from './UserInterface3D/useUI'
 
@@ -39,6 +40,7 @@ import { useSettings } from './UserInterface2D/Settings/useSettings'
 
 // import FPSLimiter from './UserInterface2D/Settings/FPSLimiter'
 import FPSLimiter from './UserInterface2D/Settings/FPSLimiter2'
+
 
 const Scene = React.memo(function Scene() {
     const eventsNode = useUi(state => state.eventsNode)
@@ -78,7 +80,7 @@ const Scene = React.memo(function Scene() {
             <Canvas
                 frameloop='demand' // Required 'demand' for fps clipping
                 shadows={{
-                    enabled: useSettings.getState().enableShadows,
+                    enabled: true, // Always Enabled, but in Lights.tsx control render mode
                     type: THREE.PCFSoftShadowMap
                 }}
                 gl={{
@@ -113,6 +115,7 @@ const Scene = React.memo(function Scene() {
                                 <FloatingDamage />
                                 <UserInterface3D />
                                 <Light />
+                                <DevHelpers/>
                             </GLTFLoader>
                         </React.Suspense>
                         {/* <AdaptiveDpr/> */}

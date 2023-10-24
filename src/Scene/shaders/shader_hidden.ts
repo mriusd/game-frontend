@@ -50,21 +50,21 @@ export const shader_hidden = () => {
         }
     `
     const fragmentShaderFooter = `
-        if (uVisible) { return; }
-
-        // Model Color
-        vec3 baseColor = gl_FragColor.rgb * gl_FragColor.a;
-
-        // Choose Color
-        vec3 colorAccent = uColorAccent;
-
-        float t_waveBase = uTime * uWaveBaseSpeed;
-        float waveBaseAccentPerling = perlin4d(vec4(vec3(newUv.x - t_waveBase, newUv.y + newUv.x - t_waveBase, 1.) * uWaveBaseFrequency, 1.)) * uWaveBaseStrength;
-        float waveBaseAccentAlpha = getFlashAlpha(waveBaseAccentPerling);
-        vec3 waveBaseAccentColor = normalize(colorAccent) * waveBaseAccentAlpha * uWaveBaseAlpha;
-
-        vec3 glossColor = getGlossColor();
-        gl_FragColor = vec4(baseColor + waveBaseAccentColor + glossColor, gl_FragColor.a * uHiddenAlpha);
+        if (!uVisible) {
+            // Model Color
+            vec3 baseColor = gl_FragColor.rgb * gl_FragColor.a;
+    
+            // Choose Color
+            vec3 colorAccent = uColorAccent;
+    
+            float t_waveBase = uTime * uWaveBaseSpeed;
+            float waveBaseAccentPerling = perlin4d(vec4(vec3(newUv.x - t_waveBase, newUv.y + newUv.x - t_waveBase, 1.) * uWaveBaseFrequency, 1.)) * uWaveBaseStrength;
+            float waveBaseAccentAlpha = getFlashAlpha(waveBaseAccentPerling);
+            vec3 waveBaseAccentColor = normalize(colorAccent) * waveBaseAccentAlpha * uWaveBaseAlpha;
+    
+            vec3 glossColor = getGlossColor();
+            gl_FragColor = vec4(baseColor + waveBaseAccentColor + glossColor, gl_FragColor.a * uHiddenAlpha);
+        }
     `
 
     const uniforms = {

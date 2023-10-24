@@ -5,7 +5,7 @@ export const getActionName = (action: ActionsType, fighter: Fighter) => {
     const isEmptyHand = !Object.keys(fighter.equipment).find(slotKey => (+slotKey === 6 || +slotKey === 7))
 
     if (action === 'run') {
-        if (!isEmptyHand) return 'sword_run'
+        if (!isEmptyHand) return 'run'
         return 'run'
     } else 
     if (action === 'attack') {

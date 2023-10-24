@@ -61,7 +61,7 @@ export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
         
         const newState = get().occupiedCoords
         const itemIndex = newState.findIndex((occupiedCoord: OccupiedCoordinate) => occupiedCoord.id === item.id)
-        
+
         if (action === 'remove') {
             if (itemIndex === -1) { return newState }
             return set({ occupiedCoords: [...newState.slice(0, itemIndex), ...newState.slice(itemIndex + 1)] })
@@ -71,6 +71,7 @@ export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
             newState.push(item)
             return set({ occupiedCoords: newState }) 
         }
+        
         return set({ occupiedCoords: [...newState.slice(0, itemIndex), ...newState.slice(itemIndex + 1), item] }) 
     },
     isOccupiedCoordinate: (coordinate) => {

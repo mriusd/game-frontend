@@ -13,6 +13,8 @@ import { useFighter } from "Scene/Fighter/useFighter"
 import { useCloud } from "EventCloud/useCloud"
 import { useControls } from "./useControls"
 
+const color = new THREE.Color()
+
 const Controls = React.memo(function Controls() {
     const eventsNode = useUi(state => state.eventsNode)
     const move = useFighter(state => state.move)
@@ -74,15 +76,22 @@ const Controls = React.memo(function Controls() {
     const updatePointerHelper = React.useCallback(() => {
         const coordinate = useControls.getState().pointerCoordinate
         if (!coordinate) { return }
-        const pointerCoordinate = matrixCoordToWorld(worldCoordToMatrix(coordinate))
-        const color = isOccupiedCoordinate(pointerCoordinate) ? 0xFF0000 : 0x00FF00
+        const matrixPointerCoordinate = worldCoordToMatrix(coordinate)
+        const pointerCoordinate = matrixCoordToWorld(matrixPointerCoordinate)
+        const color = isOccupiedCoordinate(matrixPointerCoordinate) ? 0xFF0000 : 0x00FF00
         
         const isItems = !!useCore.getState().hoveredItems.length
         boxRef.current.position.set(pointerCoordinate.x, 0.001, pointerCoordinate.z)
-        // @ts-expect-error
-        boxRef.current.material.color = isItems ? 0x000000 : color
-        // @ts-expect-error
-        boxRef.current.material.opacity = isItems ? 0 : .5
+        if (isItems) {
+            // @ts-expect-error
+            boxRef.current.material.color.setHex(0x000000)
+        } else {
+            // @ts-expect-error
+            boxRef.current.material.color.setHex(color)
+        }
+
+        // // @ts-expect-error
+        // boxRef.current.material.opacity = isItems ? 0 : .5
     }, [])
 
     const mouseUp = React.useCallback(() => { isHolding.current = false }, [])

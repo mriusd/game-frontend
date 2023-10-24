@@ -40,7 +40,7 @@ const Settings = () => {
                                 <Slider min={minFps} max={maxFps} defaultValue={defaults.clipFps} onChange={updateClipFps} step={stepFps} />
                             </div>
                             <div className={styles.row}>
-                                <p className={styles.title}>Enable shadows</p>
+                                <p className={styles.title}>Enable Dynamic shadows</p>
                                 <Checkbox defaultChecked={defaults.enableShadows} onChange={(e) => updateShadows(e.target.checked)} />
                                 <p className={`${styles.info} ${styles.yellow}`}>(Restart required)</p>
                             </div>

@@ -50,7 +50,7 @@ const UserInterface2D = () => {
             <div className={styles.coordinates}>
                 <div>World size [{worldSize}x{worldSize}]</div>
                 {/* <div>Server coordinate [ X: {store.currentMatrixCoordinate?.x} Z: {store.currentMatrixCoordinate?.z} ]</div> */}
-                {fighter?.coordinates && <div>Coordinate [ X: {matrixCoordToWorld(fighter.coordinates)?.x} Z: {matrixCoordToWorld(fighter.coordinates)?.z} ]</div>}
+                {fighter?.coordinates && <div>Coordinate [ X: {matrixCoordToWorld(fighter.coordinates)?.x+60-.5} Z: {matrixCoordToWorld(fighter.coordinates)?.z+60-.5} ]</div>}
             </div>
             <Leva
                 // hidden={!isBackpackOpened}

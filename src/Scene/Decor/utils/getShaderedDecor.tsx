@@ -30,7 +30,7 @@ export const getShaderedDecor = (name: string, uniforms?: any) => {
             const material = object.material.clone()
 
             object.castShadow = true
-            object.revieveShadow = true
+            object.recieveShadow = true
             material.transparent = true
 
             // Shader For Invisible Objects
@@ -60,6 +60,7 @@ export const getShaderedDecor = (name: string, uniforms?: any) => {
                     #include <dithering_fragment>
                     ${inject('flower', bloomShader.injectFragmentShader.footer)}
                     ${hiddenShader.injectFragmentShader.footer}
+                    // gl_FragColor.a = .4; // for testing
                 `)
             }
             object.material = material
