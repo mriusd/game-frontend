@@ -6,7 +6,7 @@ import { calcDirection } from "../utils/calcDirection"
 // TODO: Temporary, create Skills Manager and swap shader materials instead
 
 import LastMessage from "./components/LastMessage"
-import FighterModel from "./components/FighterModel"
+import FighterModel from "./components/FighterModel/FighterModel"
 
 import { useCore } from "Scene/useCore"
 import { useCloud } from "EventCloud/useCloud"
@@ -27,6 +27,9 @@ const Fighter = React.memo(function Fighter() {
     const [matrixCoordToWorld, worldCoordToMatrix] = useCore(state => [state.matrixCoordToWorld, state.worldCoordToMatrix])
     const setPosition = useFighter(state => state.setPosition)
     const setDirection = useControls(state => state.setDirection)
+    // TODO: Fix this
+    // This state used just for Sword equipment on move
+    const isMoving = useFighter(state => state.isMoving)
 
     const setAllActions = useFighter(state => state.setAllActions)
     const { actions } = useAnimations(animations, fighterNode)
@@ -103,6 +106,7 @@ const Fighter = React.memo(function Fighter() {
                 ref={fighterNode}
                 model={model}
                 fighter={fighter}
+                isMove={isMoving}
             >
                 {effects.map((_, i) => <primitive object={_} key={i} />)}
             </FighterModel>

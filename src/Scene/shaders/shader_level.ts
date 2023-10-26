@@ -188,6 +188,7 @@ export const shader_level = () => {
             gl_FragColor = vec4(baseColor + waveBaseAccentColor, gl_FragColor.a);
             gl_FragColor.rgb += verticalFlickerAlpha;
             gl_FragColor.rgb += verticalFlickerReversed;
+            gl_FragColor.rgb *= 2.;
             return;
         }
     `

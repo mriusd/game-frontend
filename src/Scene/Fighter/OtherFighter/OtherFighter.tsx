@@ -7,7 +7,7 @@ import type { WorldCoordinate } from 'interfaces/coordinate.interface'
 import Tween from 'Scene/utils/tween/tween'
 import HealthBar from 'Scene/components/HealthBar'
 import Name from 'Scene/components/Name'
-import FighterModel from '../components/FighterModel'
+import FighterModel from '../components/FighterModel/FighterModel'
 import LastMessage from '../components/LastMessage'
 
 import { useCore } from "Scene/useCore"
@@ -34,7 +34,8 @@ const OtherFighter = React.memo(function OtherFighter({ fighter }: Props) {
     const fighterRef = React.useRef<THREE.Mesh | null>(null)
     const { model, animations } = useFighterSkin('man')
 
-    const isMoving = React.useRef<boolean>(false)
+    // const isMoving = React.useRef<boolean>(false)
+    const [isMoving, setIsMoving] = React.useState(false)
     const { setAction, action } = useActions(animations, fighterRef)
 
     const {
@@ -67,25 +68,27 @@ const OtherFighter = React.memo(function OtherFighter({ fighter }: Props) {
 
     const actionTimeout = React.useRef<any>(0)
     const move = React.useCallback((to: WorldCoordinate, ref: THREE.Mesh) => {
-        if (isMoving.current) { return }
+        if (isMoving) { return }
 
         if (isEqualCoord(ref.position, to)) { return }
 
         clearTimeout(actionTimeout.current)
         setAction('run', fighter)
-        isMoving.current = true
+        // isMoving.current = true
+        setIsMoving(true)
         const current = { x: ref.position.x, z: ref.position.z }
         Tween.to(current, to,
             {
                 duration: getMoveDuration(fighter.movementSpeed, current, to),
                 onChange: (state: { value: WorldCoordinate }) => void setPosition(state.value, ref),
                 onComplete: () =>  { 
-                    isMoving.current = false
+                    // isMoving.current = false
+                    setIsMoving(false)
                     actionTimeout.current = setTimeout(() => { action.current.includes('run') && setAction('stand', fighter) }, 50) 
                 } 
             }
         )
-    }, [])
+    }, [isMoving])
     const setPosition = React.useCallback((to: WorldCoordinate, ref: THREE.Mesh) => {
         ref.position.x = to.x
         ref.position.z = to.z
@@ -122,6 +125,7 @@ const OtherFighter = React.memo(function OtherFighter({ fighter }: Props) {
                 onPointerMove={handlePointerEnter}
                 onPointerLeave={handlePointerLeave}
                 onPointerDown={handleLeftClick}
+                isMove={isMoving}
             >
                 {/* TODO: Add HeatBox in 3d tool */}
                 <Box visible={false} args={[2.5,15,2.5]}/>

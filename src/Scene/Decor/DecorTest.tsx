@@ -139,7 +139,7 @@ function BaseObject({ objectData, name }: Props) {
         const objWidth = objectData.size.width
         const objHeight = objectData.size.length
 
-        if (x >= objX - objWidth/2 && x <= objX + objHeight
+        if (x >= objX /*- objWidth/2*/ && x <= objX + objHeight
             && z >= objZ - objWidth/2 && z <= objZ + objWidth/2
         ) {
             uniforms.current.uVisible.value = false

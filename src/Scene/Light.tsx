@@ -51,18 +51,14 @@ const Light = React.memo(function Light() {
         colorShadow: { value: '#FFFFFF' },
         intenShadow: { value: 0.5, min: 0, max: 5 },
         posShadow: { value: { x: 0, y: 10, z: 2 } },
-
-        shadows: { value: false }
     })
     const lightPositionTest = React.useMemo(() => new THREE.Vector3(data.posShadow.x, data.posShadow.y, data.posShadow.z), [data])
 
     return (
         <group name="light">
-            {/* <hemisphereLight args={[data.colorGround, data.colorSky]} intensity={data.intenHemi} /> */}
             <ambientLight color={data.colorHemi} intensity={data.intenHemi} />
             <directionalLight color={data.colorDirectional} intensity={data.intenDirectional} position={[data.posDirectional.x,data.posDirectional.y,data.posDirectional.z]}/>
             <directionalLight color={data.colorFill} intensity={data.intenFill} position={[data.posFill.x,data.posFill.y,data.posFill.z]}/>
-
             <directionalLight 
                 intensity={data.intenShadow}
                 color={data.colorShadow} 
