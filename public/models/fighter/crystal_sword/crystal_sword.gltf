@@ -15,7 +15,7 @@
 	"nodes":[
 		{
 			"extras":{
-				"binders":"[{\"id\":\"position_1\",\"rotation\":{\"x\":90,\"y\":5.34,\"z\":-122.43},\"position\":{\"x\":-2.466,\"y\":4.574,\"z\":5.99},\"scale\":{\"x\":1,\"y\":1,\"z\":1},\"parentNodeName\":\"mixamorig:RightHandIndex1\"},{\"id\":\"position_2\",\"rotation\":{\"x\":90,\"y\":-63.18,\"z\":-90},\"position\":{\"x\":-40.364,\"y\":57.605,\"z\":-27.828},\"scale\":{\"x\":1,\"y\":1,\"z\":1},\"parentNodeName\":\"mixamorig:Spine2\"}]"
+				"binders":"[ { \"id\": \"position_1\", \"rotation\": { \"x\": 90, \"y\": 5.34, \"z\": -122.43 }, \"position\": { \"x\": -10.600, \"y\": 3.047, \"z\": 11.197 }, \"scale\":{\"x\":1,\"y\":1,\"z\":1}, \"parentNodeName\": \"mixamorig:RightHandIndex1\" }, { \"id\": \"position_2\", \"rotation\": { \"x\": 90, \"y\": -63.18, \"z\": -90 }, \"position\": { \"x\": -40.364, \"y\": 93.906, \"z\": -27.334 }, \"scale\":{\"x\":1,\"y\":1,\"z\":1}, \"parentNodeName\": \"mixamorig:Spine2\" } ]"
 			},
 			"mesh":0,
 			"name":"crystal_sword",
@@ -143,9 +143,9 @@
 		{
 			"bufferView":4,
 			"componentType":5126,
-			"count":15,
+			"count":2,
 			"max":[
-				0.6166666696468989
+				0.07500000298023224
 			],
 			"min":[
 				0.033333336313565574
@@ -155,19 +155,19 @@
 		{
 			"bufferView":5,
 			"componentType":5126,
-			"count":15,
+			"count":2,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":6,
 			"componentType":5126,
-			"count":15,
+			"count":2,
 			"type":"VEC4"
 		},
 		{
 			"bufferView":7,
 			"componentType":5126,
-			"count":15,
+			"count":2,
 			"type":"VEC3"
 		}
 	],
@@ -198,28 +198,28 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":60,
+			"byteLength":8,
 			"byteOffset":28328
 		},
 		{
 			"buffer":0,
-			"byteLength":180,
-			"byteOffset":28388
+			"byteLength":24,
+			"byteOffset":28336
 		},
 		{
 			"buffer":0,
-			"byteLength":240,
-			"byteOffset":28568
+			"byteLength":32,
+			"byteOffset":28360
 		},
 		{
 			"buffer":0,
-			"byteLength":180,
-			"byteOffset":28808
+			"byteLength":24,
+			"byteOffset":28392
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":28988,
+			"byteLength":28416,
 			"uri":"crystal_sword.bin"
 		}
 	]

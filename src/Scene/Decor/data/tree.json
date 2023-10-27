@@ -1,6 +1,7 @@
 [
     {
         "type": "tree",
+        "collapsed": true,
         "location": {
             "x": 32,
             "z": 41
@@ -61,6 +62,7 @@
     },
     {
         "type": "tree.001",
+        "collapsed": true,
         "location": {
             "x": 64,
             "z": 44
@@ -89,6 +91,7 @@
     },
     {
         "type": "tree.002",
+        "collapsed": true,
         "location": {
             "x": 96,
             "z": 51
@@ -161,6 +164,7 @@
     },
     {
         "type": "tree.003",
+        "collapsed": true,
         "location": {
             "x": 95,
             "z": 21
@@ -189,6 +193,7 @@
     },
     {
         "type": "tree.004",
+        "collapsed": true,
         "location": {
             "x": 49,
             "z": 89
@@ -249,6 +254,7 @@
     },
     {
         "type": "tree.005",
+        "collapsed": true,
         "location": {
             "x": 81,
             "z": 92
@@ -277,6 +283,7 @@
     },
     {
         "type": "tree.006",
+        "collapsed": true,
         "location": {
             "x": 23,
             "z": 79
@@ -305,6 +312,7 @@
     },
     {
         "type": "tree.007",
+        "collapsed": true,
         "location": {
             "x": 23,
             "z": 31
@@ -333,6 +341,7 @@
     },
     {
         "type": "tree.008",
+        "collapsed": true,
         "location": {
             "x": 58,
             "z": 21
@@ -393,6 +402,7 @@
     },
     {
         "type": "tree.009",
+        "collapsed": true,
         "location": {
             "x": 51,
             "z": 26
@@ -481,6 +491,7 @@
     },
     {
         "type": "tree.010",
+        "collapsed": true,
         "location": {
             "x": 60,
             "z": 98
@@ -509,6 +520,7 @@
     },
     {
         "type": "tree.011",
+        "collapsed": true,
         "location": {
             "x": 63,
             "z": 75
@@ -537,6 +549,7 @@
     },
     {
         "type": "tree.012",
+        "collapsed": true,
         "location": {
             "x": 75,
             "z": 25
@@ -597,6 +610,7 @@
     },
     {
         "type": "tree.013",
+        "collapsed": true,
         "location": {
             "x": 80,
             "z": 36
@@ -625,6 +639,7 @@
     },
     {
         "type": "tree.014",
+        "collapsed": true,
         "location": {
             "x": 85,
             "z": 54
@@ -653,6 +668,7 @@
     },
     {
         "type": "tree.015",
+        "collapsed": true,
         "location": {
             "x": 47,
             "z": 69
@@ -681,6 +697,7 @@
     },
     {
         "type": "tree.016",
+        "collapsed": true,
         "location": {
             "x": 75,
             "z": 73
@@ -709,6 +726,7 @@
     },
     {
         "type": "tree.017",
+        "collapsed": true,
         "location": {
             "x": 93,
             "z": 67

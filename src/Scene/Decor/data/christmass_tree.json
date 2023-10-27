@@ -1,6 +1,7 @@
 [
     {
         "type": "christmas_tree.09",
+        "collapsed": true,
         "location": {
             "x": 35,
             "z": 62
@@ -61,6 +62,7 @@
     },
     {
         "type": "christmas_tree.001",
+        "collapsed": true,
         "location": {
             "x": 24,
             "z": 65
@@ -121,6 +123,7 @@
     },
     {
         "type": "christmas_tree.002",
+        "collapsed": true,
         "location": {
             "x": 81,
             "z": 22
@@ -181,6 +184,7 @@
     },
     {
         "type": "christmas_tree.003",
+        "collapsed": true,
         "location": {
             "x": 84,
             "z": 27
@@ -221,6 +225,7 @@
     },
     {
         "type": "christmas_tree.004",
+        "collapsed": true,
         "location": {
             "x": 85,
             "z": 23
@@ -309,6 +314,7 @@
     },
     {
         "type": "christmas_tree.005",
+        "collapsed": true,
         "location": {
             "x": 98,
             "z": 30
@@ -369,6 +375,7 @@
     },
     {
         "type": "christmas_tree.006",
+        "collapsed": true,
         "location": {
             "x": 38,
             "z": 97
@@ -429,6 +436,7 @@
     },
     {
         "type": "christmas_tree.007",
+        "collapsed": true,
         "location": {
             "x": 32,
             "z": 94
@@ -469,6 +477,7 @@
     },
     {
         "type": "christmas_tree.008",
+        "collapsed": true,
         "location": {
             "x": 25,
             "z": 97
@@ -557,6 +566,7 @@
     },
     {
         "type": "christmas_tree.010",
+        "collapsed": true,
         "location": {
             "x": 20,
             "z": 92
@@ -617,6 +627,7 @@
     },
     {
         "type": "christmas_tree.011",
+        "collapsed": true,
         "location": {
             "x": 80,
             "z": 52
@@ -677,6 +688,7 @@
     },
     {
         "type": "christmas_tree.012",
+        "collapsed": true,
         "location": {
             "x": 74,
             "z": 58
@@ -717,6 +729,7 @@
     },
     {
         "type": "christmas_tree.013",
+        "collapsed": true,
         "location": {
             "x": 74,
             "z": 66
@@ -777,6 +790,7 @@
     },
     {
         "type": "christmas_tree.014",
+        "collapsed": true,
         "location": {
             "x": 80,
             "z": 61
@@ -865,6 +879,7 @@
     },
     {
         "type": "christmas_tree.015",
+        "collapsed": true,
         "location": {
             "x": 99,
             "z": 81
@@ -925,6 +940,7 @@
     },
     {
         "type": "christmas_tree.016",
+        "collapsed": true,
         "location": {
             "x": 98,
             "z": 90
@@ -1013,6 +1029,7 @@
     },
     {
         "type": "christmas_tree.017",
+        "collapsed": true,
         "location": {
             "x": 35,
             "z": 31
@@ -1073,6 +1090,7 @@
     },
     {
         "type": "christmas_tree.018",
+        "collapsed": true,
         "location": {
             "x": 92,
             "z": 98
@@ -1145,6 +1163,7 @@
     },
     {
         "type": "christmas_tree.019",
+        "collapsed": true,
         "location": {
             "x": 58,
             "z": 80
@@ -1205,6 +1224,7 @@
     },
     {
         "type": "christmas_tree.020",
+        "collapsed": true,
         "location": {
             "x": 56,
             "z": 25
@@ -1245,6 +1265,7 @@
     },
     {
         "type": "christmas_tree.021",
+        "collapsed": true,
         "location": {
             "x": 79,
             "z": 27
@@ -1285,6 +1306,7 @@
     },
     {
         "type": "christmas_tree.022",
+        "collapsed": true,
         "location": {
             "x": 79,
             "z": 24
@@ -1345,6 +1367,7 @@
     },
     {
         "type": "christmas_tree.023",
+        "collapsed": true,
         "location": {
             "x": 81,
             "z": 25
@@ -1405,6 +1428,7 @@
     },
     {
         "type": "christmas_tree.024",
+        "collapsed": true,
         "location": {
             "x": 66,
             "z": 31
@@ -1465,6 +1489,7 @@
     },
     {
         "type": "christmas_tree.025",
+        "collapsed": true,
         "location": {
             "x": 68,
             "z": 33
@@ -1525,6 +1550,7 @@
     },
     {
         "type": "christmas_tree.026",
+        "collapsed": true,
         "location": {
             "x": 70,
             "z": 31
@@ -1585,6 +1611,7 @@
     },
     {
         "type": "christmas_tree.027",
+        "collapsed": true,
         "location": {
             "x": 89,
             "z": 45
@@ -1645,6 +1672,7 @@
     },
     {
         "type": "christmas_tree.028",
+        "collapsed": true,
         "location": {
             "x": 90,
             "z": 43
@@ -1705,6 +1733,7 @@
     },
     {
         "type": "christmas_tree.029",
+        "collapsed": true,
         "location": {
             "x": 92,
             "z": 48
@@ -1765,6 +1794,7 @@
     },
     {
         "type": "christmas_tree.030",
+        "collapsed": true,
         "location": {
             "x": 89,
             "z": 48
@@ -1825,6 +1855,7 @@
     },
     {
         "type": "christmas_tree.031",
+        "collapsed": true,
         "location": {
             "x": 78,
             "z": 57
@@ -1885,6 +1916,7 @@
     },
     {
         "type": "christmas_tree.032",
+        "collapsed": true,
         "location": {
             "x": 49,
             "z": 45
@@ -1945,6 +1977,7 @@
     },
     {
         "type": "christmas_tree.033",
+        "collapsed": true,
         "location": {
             "x": 51,
             "z": 47
@@ -2005,6 +2038,7 @@
     },
     {
         "type": "christmas_tree.034",
+        "collapsed": true,
         "location": {
             "x": 53,
             "z": 45
@@ -2065,6 +2099,7 @@
     },
     {
         "type": "christmas_tree.035",
+        "collapsed": true,
         "location": {
             "x": 51,
             "z": 43
@@ -2125,6 +2160,7 @@
     },
     {
         "type": "christmas_tree.036",
+        "collapsed": true,
         "location": {
             "x": 53,
             "z": 73
@@ -2185,6 +2221,7 @@
     },
     {
         "type": "christmas_tree.037",
+        "collapsed": true,
         "location": {
             "x": 55,
             "z": 76
@@ -2245,6 +2282,7 @@
     },
     {
         "type": "christmas_tree.038",
+        "collapsed": true,
         "location": {
             "x": 43,
             "z": 68
@@ -2305,6 +2343,7 @@
     },
     {
         "type": "christmas_tree.039",
+        "collapsed": true,
         "location": {
             "x": 40,
             "z": 69
@@ -2365,6 +2404,7 @@
     },
     {
         "type": "christmas_tree.040",
+        "collapsed": true,
         "location": {
             "x": 44,
             "z": 65
@@ -2405,6 +2445,7 @@
     },
     {
         "type": "christmas_tree.041",
+        "collapsed": true,
         "location": {
             "x": 41,
             "z": 72
@@ -2445,6 +2486,7 @@
     },
     {
         "type": "christmas_tree.042",
+        "collapsed": true,
         "location": {
             "x": 37,
             "z": 62
@@ -2485,6 +2527,7 @@
     },
     {
         "type": "christmas_tree.043",
+        "collapsed": true,
         "location": {
             "x": 30,
             "z": 34
@@ -2545,6 +2588,7 @@
     },
     {
         "type": "christmas_tree.044",
+        "collapsed": true,
         "location": {
             "x": 31,
             "z": 36
@@ -2605,6 +2649,7 @@
     },
     {
         "type": "christmas_tree.045",
+        "collapsed": true,
         "location": {
             "x": 33,
             "z": 35
@@ -2665,6 +2710,7 @@
     },
     {
         "type": "christmas_tree.046",
+        "collapsed": true,
         "location": {
             "x": 31,
             "z": 32
@@ -2725,6 +2771,7 @@
     },
     {
         "type": "christmas_tree.047",
+        "collapsed": true,
         "location": {
             "x": 20,
             "z": 55
@@ -2785,6 +2832,7 @@
     },
     {
         "type": "christmas_tree.048",
+        "collapsed": true,
         "location": {
             "x": 22,
             "z": 49
@@ -2845,6 +2893,7 @@
     },
     {
         "type": "christmas_tree.049",
+        "collapsed": true,
         "location": {
             "x": 19,
             "z": 48
@@ -2905,6 +2954,7 @@
     },
     {
         "type": "christmas_tree.050",
+        "collapsed": true,
         "location": {
             "x": 19,
             "z": 50
@@ -2965,6 +3015,7 @@
     },
     {
         "type": "christmas_tree.051",
+        "collapsed": true,
         "location": {
             "x": 22,
             "z": 52
@@ -3025,6 +3076,7 @@
     },
     {
         "type": "christmas_tree.052",
+        "collapsed": true,
         "location": {
             "x": 26,
             "z": 91
@@ -3085,6 +3137,7 @@
     },
     {
         "type": "christmas_tree.053",
+        "collapsed": true,
         "location": {
             "x": 35,
             "z": 87
@@ -3145,6 +3198,7 @@
     },
     {
         "type": "christmas_tree.054",
+        "collapsed": true,
         "location": {
             "x": 30,
             "z": 85
@@ -3205,6 +3259,7 @@
     },
     {
         "type": "christmas_tree.055",
+        "collapsed": true,
         "location": {
             "x": 28,
             "z": 87
@@ -3265,6 +3320,7 @@
     },
     {
         "type": "christmas_tree.056",
+        "collapsed": true,
         "location": {
             "x": 30,
             "z": 90
@@ -3325,6 +3381,7 @@
     },
     {
         "type": "christmas_tree.057",
+        "collapsed": true,
         "location": {
             "x": 78,
             "z": 88
@@ -3385,6 +3442,7 @@
     },
     {
         "type": "christmas_tree.058",
+        "collapsed": true,
         "location": {
             "x": 71,
             "z": 90
@@ -3445,6 +3503,7 @@
     },
     {
         "type": "christmas_tree.059",
+        "collapsed": true,
         "location": {
             "x": 74,
             "z": 90
@@ -3493,6 +3552,7 @@
     },
     {
         "type": "christmas_tree.060",
+        "collapsed": true,
         "location": {
             "x": 74,
             "z": 86
@@ -3553,6 +3613,7 @@
     },
     {
         "type": "christmas_tree.061",
+        "collapsed": true,
         "location": {
             "x": 67,
             "z": 98
@@ -3613,6 +3674,7 @@
     },
     {
         "type": "christmas_tree.062",
+        "collapsed": true,
         "location": {
             "x": 63,
             "z": 99
@@ -3673,6 +3735,7 @@
     },
     {
         "type": "christmas_tree.063",
+        "collapsed": true,
         "location": {
             "x": 84,
             "z": 83
@@ -3733,6 +3796,7 @@
     },
     {
         "type": "christmas_tree.064",
+        "collapsed": true,
         "location": {
             "x": 86,
             "z": 84
@@ -3781,6 +3845,7 @@
     },
     {
         "type": "christmas_tree.065",
+        "collapsed": true,
         "location": {
             "x": 88,
             "z": 83
@@ -3841,6 +3906,7 @@
     },
     {
         "type": "christmas_tree.066",
+        "collapsed": true,
         "location": {
             "x": 87,
             "z": 81
@@ -3901,6 +3967,7 @@
     },
     {
         "type": "christmas_tree.067",
+        "collapsed": true,
         "location": {
             "x": 31,
             "z": 74
@@ -3961,6 +4028,7 @@
     },
     {
         "type": "christmas_tree.068",
+        "collapsed": true,
         "location": {
             "x": 29,
             "z": 72

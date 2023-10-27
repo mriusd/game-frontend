@@ -37,8 +37,8 @@ const Light = React.memo(function Light() {
     // useHelper(shadowlightRef, THREE.DirectionalLightHelper, 0x000000)
 
     const data = useControls('Lights', {
-        colorHemi: { value: '#FFFFFF' },
-        intenHemi: { value: .95, min: 0, max: 2 },
+        colorHemi: { value: '#8588ad' },
+        intenHemi: { value: 2, min: 0, max: 5 },
 
         colorDirectional: { value: '#FFFFFF' },
         intenDirectional: { value: 2.4, min: 0, max: 5 },
@@ -49,7 +49,7 @@ const Light = React.memo(function Light() {
         posFill: { value: { x: -50, y: 0, z: -5 } },
 
         colorShadow: { value: '#FFFFFF' },
-        intenShadow: { value: 0.5, min: 0, max: 5 },
+        intenShadow: { value: 0.2, min: 0, max: 5 },
         posShadow: { value: { x: 0, y: 10, z: 2 } },
     })
     const lightPositionTest = React.useMemo(() => new THREE.Vector3(data.posShadow.x, data.posShadow.y, data.posShadow.z), [data])

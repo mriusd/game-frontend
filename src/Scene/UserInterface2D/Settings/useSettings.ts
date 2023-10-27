@@ -13,6 +13,13 @@ export interface UseSettings {
     clipFps: number,
     updateClipFps: (value: number) => void
 
+    // DPR
+    setDPR: (value: number) => void
+    maxDPR: number,
+    minDPR: number,
+    stepDPR: number,
+    clipDPR: number,
+
     // Shadows
     enableShadows: boolean
     updateShadows: (value: boolean) => void
@@ -20,6 +27,10 @@ export interface UseSettings {
     // Postprocessing
     enablePostprocessing: boolean
     updatePostprocessing: (value: boolean) => void
+
+    // Hide small objects
+    hideSmallObjects: boolean
+    setHideSmallObjects: (value: boolean) => void
 }
 
 export const useSettings = createWithEqualityFn<UseSettings>((set, get) => ({
@@ -37,6 +48,16 @@ export const useSettings = createWithEqualityFn<UseSettings>((set, get) => ({
         set({ clipFps: value }) 
     },
 
+    // DPR
+    maxDPR: 2,
+    minDPR: .1,
+    stepDPR: .1,
+    clipDPR: 2, // Initial Value
+    setDPR: (value: number) => { 
+        localStorage.setItem('settings_clipDPR', value+'')
+        set({ clipDPR: value }) 
+    },
+
     // Shadows
     enableShadows: true,
     updateShadows: (value: boolean) => { 
@@ -48,6 +69,13 @@ export const useSettings = createWithEqualityFn<UseSettings>((set, get) => ({
     enablePostprocessing: false,
     updatePostprocessing: (value: boolean) => { 
         localStorage.setItem('settings_enablePostprocessing', value+'')
-        set({ enablePostprocessing: value }) 
-    }
+        set({ enablePostprocessing: value })
+    },
+
+    // Hide small objects
+    hideSmallObjects: false,
+    setHideSmallObjects: (value: boolean) => { 
+        localStorage.setItem('settings_hideSmallObjects', value+'')
+        set({ hideSmallObjects: value }) 
+    },
 }), shallow)

@@ -1,6 +1,7 @@
 import { ScreenSpace } from "@react-three/drei"
 import { Plane, Hud } from "@react-three/drei"
 import { memo } from "react"
+// import { BloomHud } from "Scene/components/r3f/BloomHud"
 
 import { useUi } from "./useUI"
 import { useSettings } from "Scene/UserInterface2D/Settings/useSettings"

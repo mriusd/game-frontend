@@ -3,10 +3,10 @@ import { getShaderedDecor } from "./utils/getShaderedDecor"
 import { Coordinate } from "interfaces/coordinate.interface"
 import { Instances, Instance, Box } from "@react-three/drei"
 
-import { shallow } from "zustand/shallow"
 import { useFighter } from "Scene/Fighter/useFighter"
 import { useFrame } from "@react-three/fiber"
 import { useCore } from "Scene/useCore"
+import { useSettings } from "Scene/UserInterface2D/Settings/useSettings"
 
 // Objects Data
 import grassData from './data/grass.json'
@@ -14,6 +14,7 @@ import christmasTreeData from './data/christmass_tree.json'
 import treeData from './data/tree.json'
 import flowerData from './data/flower.json'
 import houseData from './data/house.json'
+import stoneData from './data/stone.json'
 
 
 const DecorTest = React.memo(function Decor() {
@@ -31,6 +32,7 @@ const DecorTest = React.memo(function Decor() {
     // @ts-expect-error
     const meshes = React.useMemo(() => ({ Grass: grass.gltf.nodes.grass015,  Tree: tree.gltf.nodes.tree_1 }), [grass, tree])
     // console.log('meshes', meshes)
+    const hideSmallObjects = useSettings(state => state.hideSmallObjects)
 
     return (
         // <Merged meshes={meshes}>
@@ -51,15 +53,19 @@ const DecorTest = React.memo(function Decor() {
             <meshBasicMaterial color={'red'} />
             <sphereGeometry args={[1, 16, 16]}/>
         </mesh>) } */}
-        <Instances geometry={meshes.Grass.geometry} material={meshes.Grass.material}>
-            <group position={[0, 0, 0]}>
-                { (grassData as Array<any>).map((_, i) => <InstancedObject  objectData={_} key={i}  />) }
-            </group>
-        </Instances>
+        {/* Setting HideSmallObjects */}
+        { !hideSmallObjects ? <>
+            <Instances geometry={meshes.Grass.geometry} material={meshes.Grass.material}>
+                <group position={[0, 0, 0]}>
+                    { (grassData as Array<any>).map((_, i) => <InstancedObject  objectData={_} key={i}  />) }
+                </group>
+            </Instances>
+            { (flowerData as Array<any>).map((_, i) => <BaseObject objectData={_} name="flower" key={i}  />) }
+            { (stoneData as Array<any>).map((_, i) => <BaseObject objectData={_} name="stone" key={i}  />) }
+        </> : null }
         {/* { (grassData as Array<any>).map((_, i) => <BaseObject objectData={_} name="grass" key={i}  />) } */}
         { (christmasTreeData as Array<any>).map((_, i) => <BaseObject objectData={_} name="christmas_tree"  key={i}  />) }
         { (treeData as Array<any>).map((_, i) => <BaseObject objectData={_} name="tree" key={i}  />) }
-        { (flowerData as Array<any>).map((_, i) => <BaseObject objectData={_} name="flower" key={i}  />) }
         { (houseData as Array<any>).map((_, i) => <BaseObject objectData={_} name="house" key={i}  />) }
         </>
         // <></>
@@ -75,6 +81,7 @@ interface Props {
         scale: { x: number, y: number, z: number }
         size: { width: number, height: number, length: number }
         occupiedCoords?: [{x: number, z: number}]
+        collapsed?: boolean
     },
     models?: any
     name?: string
@@ -126,8 +133,8 @@ function BaseObject({ objectData, name }: Props) {
     const worldCoordinate = React.useMemo(() => matrixCoordToWorld(objectData.location), [objectData])
 
     // Check Collision
-    useFrame(({ clock }) => {
-        if (!objectData.type.includes('tree')) { return }
+    useFrame(() => {
+        if (!objectData.collapsed) { return }
         if (!ref.current) { return }
         const coordinate = useFighter.getState().fighter?.coordinates
         if (!coordinate) { return }

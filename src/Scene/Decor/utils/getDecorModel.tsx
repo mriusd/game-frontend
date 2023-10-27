@@ -21,5 +21,8 @@ export const getDecorModel = (name: string): GLTF => {
     // House
     if (is('house')) return models['decor_house']
 
+    // Stone
+    if (is('stone')) return models['decor_stone']
+
     return null
 }

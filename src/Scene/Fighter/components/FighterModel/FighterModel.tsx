@@ -116,8 +116,7 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
                     // } else {
                     //     fighterArmature.current.remove(object)
                     // }
-                    // @ts-expect-error
-                    if (_.isMesh) {
+                    if (_.userData.injectionType === 'binders') {
                         removePose(model.itemHash)
                     } else {
                         fighterBone.current.remove(object)
@@ -155,7 +154,7 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
                 // console.log(animation, 'animation')
                 if (animation) {
                     // console.log(animation)
-                    mixer.clipAction(animation, injectModel).setDuration(.5).play()
+                    mixer.clipAction(animation, injectModel).setEffectiveTimeScale(1.5).play()
                     clips.current.push({ itemHash: item.itemHash, animation, object: model })
                 }
     
@@ -163,13 +162,14 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
                 injectModel.userData.itemHash = item.itemHash
                 injectModel.userData.name = item.itemAttributes.name
                 injectModel.name += item.itemAttributes.name
+                injectModel.userData.injectionType = injectType
     
     
                 hideBodyPart(item)
-                addToScene(injectModel as THREE.Mesh | THREE.SkinnedMesh, injectType)
+                addToScene(injectModel as THREE.Mesh | THREE.SkinnedMesh)
             })
-            function addToScene(injectModel: THREE.Mesh | THREE.SkinnedMesh, injectType: string) {
-                if (injectType === 'binders') {
+            function addToScene(injectModel: THREE.Mesh | THREE.SkinnedMesh) {
+                if (injectModel.userData.injectionType === 'binders') {
                     addViaBinders()
                 } else {
                     addViaWeights()

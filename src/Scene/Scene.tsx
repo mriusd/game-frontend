@@ -3,17 +3,16 @@ import styles from './Scene.module.scss'
 import React from "react"
 
 import * as THREE from "three"
-import { Object3D } from "three"
 
 import { Canvas } from "@react-three/fiber"
-import { Loader, Stats, OrbitControls, Hud, Box } from "@react-three/drei"
+import { Loader, Stats, OrbitControls } from "@react-three/drei"
 
 import Light from "./Light"
 import Chunks from "./Chunks/Chunks"
 import Fighter from "./Fighter/Fighter"
 import Controls from "./Controls/Controls"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"
-import Decor from "./Decor/Decor"
+// import Decor from "./Decor/Decor"
 import DecorTest from './Decor/DecorTest'
 import UserInterface3D from './UserInterface3D/UserInterface3D'
 import GLTFLoader from './GLTFLoader/GLTFLoader'
@@ -33,13 +32,12 @@ import { useCommandLine } from './UserInterface2D/CommandLine/useCommandLine'
 
 import { useCore } from 'Scene/useCore'
 
-import { AdaptiveDpr } from '@react-three/drei'
 import { useControls } from 'leva'
 import { useFighter } from './Fighter/useFighter'
-import { useSettings } from './UserInterface2D/Settings/useSettings'
 
 // import FPSLimiter from './UserInterface2D/Settings/FPSLimiter'
 import FPSLimiter from './UserInterface2D/Settings/FPSLimiter2'
+import { DPRLimiter } from './UserInterface2D/Settings/DPRLimiter'
 
 
 const Scene = React.memo(function Scene() {
@@ -79,6 +77,8 @@ const Scene = React.memo(function Scene() {
         <div id="scene" tabIndex={0} ref={eventsNode} className={styles.scene}>
             <Canvas
                 frameloop='demand' // Required 'demand' for fps clipping
+                performance={{ min: 0.1 }}
+                dpr={2}
                 shadows={{
                     enabled: true, // Always Enabled, but in Lights.tsx control render mode
                     type: THREE.PCFSoftShadowMap
@@ -93,37 +93,33 @@ const Scene = React.memo(function Scene() {
                     outputEncoding: data.encoding,
                 }}
             >
-                {/* TODO: Think abput this */}
-                {/* <Hud> */}
-                    <color attach="background" args={[0x000000]} />
-                    { !devMode ? <fog attach="fog" args={['black', 10, 25]}></fog> : <></> }
-                    <FPSLimiter>
-                        { devMode ? <OrbitControls target={fighterNode.current?.position || new THREE.Vector3(0, 0, 0)} /> : <></> }
-                        <Camera/>
-                        <Stats className='stats' />
-                        <Postprocessing/>
-                        <React.Suspense fallback={null}>
-                            <GLTFLoader>
-                                <NpcList/>
-                                <DroppedItemList/>
-                                <OtherFighterList/>
-                                {/* {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)} */}
-                                <DecorTest/>
-                                <Fighter />
-                                <Chunks />
-                                <Controls />
-                                <FloatingDamage />
-                                <UserInterface3D />
-                                <Light />
-                                <DevHelpers/>
-                            </GLTFLoader>
-                        </React.Suspense>
-                        {/* <AdaptiveDpr/> */}
-                    </FPSLimiter>
-                {/* </Hud> */}
+                <color attach="background" args={[0x000000]} />
+                {!devMode ? <fog attach="fog" args={['black', 10, 25]}></fog> : <></>}
+                <FPSLimiter>
+                    {devMode ? <OrbitControls target={fighterNode.current?.position || new THREE.Vector3(0, 0, 0)} /> : <></>}
+                    <Camera />
+                    <Stats className='stats' />
+                    <Postprocessing />
+                    <React.Suspense fallback={null}>
+                        <GLTFLoader>
+                            <DPRLimiter/>
+                            <NpcList />
+                            <DroppedItemList />
+                            <OtherFighterList />
+                            <DecorTest />
+                            <Fighter />
+                            <Chunks />
+                            <Controls />
+                            <FloatingDamage />
+                            <UserInterface3D />
+                            <Light />
+                            <DevHelpers />
+                        </GLTFLoader>
+                    </React.Suspense>
+                </FPSLimiter>
             </Canvas>
-            <UserInterface2D/>
-            <Loader/>
+            <UserInterface2D />
+            <Loader />
         </div>
     )
 })

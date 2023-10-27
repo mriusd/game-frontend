@@ -12,8 +12,17 @@ import { useSpring } from "react-spring"
 
 const Camera = () => {
     const devMode = useCore(state => state.devMode)
+    const cameraRef = React.useRef<THREE.PerspectiveCamera>()
+    const size = useThree(({ size }) => size)
+    // Render Camera Aspect
+    React.useLayoutEffect(() => {
+        // cameraRef.current.aspect = size.width / size.height
+        // cameraRef.current.aspect = 1920 / 1080
+        // cameraRef.current.fov = size.height / size.width * 100
+    }, [size])
+    // React.useLayoutEffect(() => void cameraRef.current.updateProjectionMatrix())
     return (<>
-        <PerspectiveCamera makeDefault near={0.1} far={devMode ? 1000 : 60} fov={45} />
+        <PerspectiveCamera ref={cameraRef} makeDefault near={0.1} far={devMode ? 1000 : 60} fov={45} />
         <RenderCamera/>
     </>)
 }

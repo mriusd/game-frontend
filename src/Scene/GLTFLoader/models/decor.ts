@@ -23,5 +23,10 @@ export const decor = [
     {
         name: 'decor_house',
         url: 'models/decor/house/house.gltf'
+    },
+    // Stone
+    {
+        name: 'decor_stone',
+        url: 'models/decor/stones/stones.gltf'
     }
 ]
