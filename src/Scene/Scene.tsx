@@ -78,7 +78,6 @@ const Scene = React.memo(function Scene() {
             <Canvas
                 frameloop='demand' // Required 'demand' for fps clipping
                 performance={{ min: 0.1 }}
-                dpr={2}
                 shadows={{
                     enabled: true, // Always Enabled, but in Lights.tsx control render mode
                     type: THREE.PCFSoftShadowMap
@@ -102,7 +101,7 @@ const Scene = React.memo(function Scene() {
                     <Postprocessing />
                     <React.Suspense fallback={null}>
                         <GLTFLoader>
-                            <DPRLimiter/>
+                            {/* <DPRLimiter/> */}
                             <NpcList />
                             <DroppedItemList />
                             <OtherFighterList />

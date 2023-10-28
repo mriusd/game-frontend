@@ -223,7 +223,15 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
     // TODO: Think about this
     // If we have so strong connection between equipment change & actions
     // Should we refactor this in some more correct logic?
-    React.useEffect(() => void updatePoses(isMove), [isMove])
+    const timeout = React.useRef<any>()
+    React.useEffect(() => {
+        clearTimeout(timeout.current)
+        if (!isMove) {
+            timeout.current = setTimeout(() => updatePoses(isMove), 50)
+            return
+        }
+        updatePoses(isMove)
+    }, [isMove])
 
     return (
         <group 

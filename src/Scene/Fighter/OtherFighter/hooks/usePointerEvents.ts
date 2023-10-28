@@ -34,7 +34,7 @@ export const usePointerEvents = (npc: Fighter) => {
     const handleLeftClick = React.useCallback((e) => {
         if (npc.isDead) { return }
         e.stopPropagation()
-        setTarget(npc, fighter.skills[0])
+        // setTarget(npc, fighter.skills[0])
     }, [npc])
     // const handleRightClick = (event: ThreeEvent<PointerEvent>) => {
         // if (npc.isDead) { return }
