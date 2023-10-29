@@ -23,6 +23,7 @@ export const useCommandLine = create<CommandLineInterface>((set, get) => ({
     subscribeCommandLine: (target) => {
         if (!target) { console.error('[useCommandLine]: target event node not found') }
         set({ eventNode: target })
+        target.focus() // Focus for use
         target.addEventListener('keypress', get()._handleKeypress)
     },
     unsubscribeCommandLine() {

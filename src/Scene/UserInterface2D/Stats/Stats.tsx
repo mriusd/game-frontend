@@ -1,9 +1,9 @@
 import styles from './Stats.module.scss'
-import { useEventCloud } from "store/EventCloudContext"
 import FighterDash from './FighterDash'
+import { useFighter } from 'Scene/Fighter/useFighter'
 
 const Stats = () => {
-    const { fighter } = useEventCloud()
+    const fighter = useFighter(state => state.fighter)
     return (
         <div className={styles.Stats}>
             <h4>{fighter?.name} [{fighter?.level}]</h4>

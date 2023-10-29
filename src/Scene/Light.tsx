@@ -1,41 +1,68 @@
 import * as THREE from "three"
-import { useEffect, useMemo, useRef, memo } from "react"
-import { useSceneContext } from "store/SceneContext"
-// import { useHelper } from "@react-three/drei"
+import React from "react"
 
-// TODO: Optimise TargetObject
-const Light = memo(function Light() {
-    const { currentWorldCoordinate } = useSceneContext()
-    const shadowlightRef = useRef<THREE.DirectionalLight | null>(null)
-    const shadowlightPosition = useMemo(() => new THREE.Vector3(0, 10, 5), [])
-    
-    // Set shadow light target
-    const targetObject = useRef()
-    useEffect(() => {
-        if (!targetObject.current || !shadowlightRef.current) { return }
-        shadowlightRef.current.target = targetObject.current
-    }, [targetObject.current, shadowlightRef.current])
+import { useFighter } from "./Fighter/useFighter"
+import { useFrame, useThree } from "@react-three/fiber"
 
+import { useControls } from "leva"
+import { useSettings } from "./UserInterface2D/Settings/useSettings"
+
+const Light = React.memo(function Light() {
+    const fighterNode = useFighter(state => state.fighterNode)
+    const shadowlightRef = React.useRef<THREE.DirectionalLight | null>(null)
+    const lightPosition = React.useMemo(() => new THREE.Vector3(0, 10, 5), [])
+
+    const get = useThree(state => state.get)
+    // Set Shadows Mode
+    React.useEffect(() => {
+        const enableDynamicShadows = useSettings.getState().enableShadows
+        const gl = get().gl
+        if (!enableDynamicShadows) {
+            gl.shadowMap.autoUpdate = false
+        }
+    }, [])
+
+    // const lightPosition = useMemo(() => new THREE.Vector3(0, 0.5, 0.866), []) // ~60º
+
+    React.useEffect(() => {
+        if (!fighterNode.current || !shadowlightRef.current) { return }
+        shadowlightRef.current.target = fighterNode.current 
+    }, [fighterNode.current, shadowlightRef.current])
     // Move shadow light shadow
-    useEffect(() => {
-        if (!currentWorldCoordinate) { return }
-        if (!shadowlightRef.current) { return }
-        shadowlightRef.current.position.set(currentWorldCoordinate.x, 0, currentWorldCoordinate.z).add(shadowlightPosition)
-    }, [currentWorldCoordinate])
-
+    useFrame(() => {
+        if (!fighterNode.current || !shadowlightRef.current) { return }
+        shadowlightRef.current.position.set(fighterNode.current.position.x, fighterNode.current.position.y, fighterNode.current.position.z).add(lightPositionTest)
+    })
     // Helper
     // useHelper(shadowlightRef, THREE.DirectionalLightHelper, 0x000000)
 
+    const data = useControls('Lights', {
+        colorHemi: { value: '#8588ad' },
+        intenHemi: { value: 2, min: 0, max: 5 },
+
+        colorDirectional: { value: '#FFFFFF' },
+        intenDirectional: { value: 2.4, min: 0, max: 5 },
+        posDirectional: { value: { x: 1, y: 0, z: 0.866 } },
+
+        colorFill: { value: '#FFFFFF' },
+        intenFill: { value: 1, min: 0, max: 5 },
+        posFill: { value: { x: -50, y: 0, z: -5 } },
+
+        colorShadow: { value: '#FFFFFF' },
+        intenShadow: { value: 0.2, min: 0, max: 5 },
+        posShadow: { value: { x: 0, y: 10, z: 2 } },
+    })
+    const lightPositionTest = React.useMemo(() => new THREE.Vector3(data.posShadow.x, data.posShadow.y, data.posShadow.z), [data])
+
     return (
         <group name="light">
-            <hemisphereLight args={[0xEEF3FF, 0x300B14]} intensity={.3} />
-            {/* <ambientLight color={0xFFFFFF} intensity={.1} /> */}
-            <mesh ref={targetObject} position={[currentWorldCoordinate?.x, 0, currentWorldCoordinate?.z]}></mesh>
+            <ambientLight color={data.colorHemi} intensity={data.intenHemi} />
+            <directionalLight color={data.colorDirectional} intensity={data.intenDirectional} position={[data.posDirectional.x,data.posDirectional.y,data.posDirectional.z]}/>
+            <directionalLight color={data.colorFill} intensity={data.intenFill} position={[data.posFill.x,data.posFill.y,data.posFill.z]}/>
             <directionalLight 
-                intensity={.5}
-                color={0xFFFADE} 
+                intensity={data.intenShadow}
+                color={data.colorShadow} 
                 ref={shadowlightRef}
-                position={shadowlightPosition} 
                 castShadow
                 shadow-mapSize-width={2048}
                 shadow-mapSize-height={2048}

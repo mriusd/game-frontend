@@ -96,8 +96,6 @@ export const shader_level = () => {
             return color;
         }
         
-        
-
         vec3 getGlossColor() {
             return normalize(uColorPrimary) * uLaminateIntensity;
         }
@@ -149,7 +147,7 @@ export const shader_level = () => {
                 baseColor = (gl_FragColor.rgb - darkest/1.5) * gl_FragColor.a;
                 colorAccentWave = colorAccent * pow(uLevel + 20., 1.25) * flashAlpha * flashing;
             } else {
-                baseColor = (gl_FragColor.rgb - darkest) * gl_FragColor.a;
+                baseColor = (gl_FragColor.rgb - darkest/1.5) * gl_FragColor.a;
                 colorAccentWave = normalize(uColorPrimary) * pow(uLevel + 15., 1.25) * flashAlpha * flashing;
             }
 
@@ -190,6 +188,7 @@ export const shader_level = () => {
             gl_FragColor = vec4(baseColor + waveBaseAccentColor, gl_FragColor.a);
             gl_FragColor.rgb += verticalFlickerAlpha;
             gl_FragColor.rgb += verticalFlickerReversed;
+            gl_FragColor.rgb *= 2.;
             return;
         }
     `

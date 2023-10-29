@@ -1,9 +1,9 @@
 import styles from './Auth.module.scss'
 import { useAuth } from "./useAuth"
-import { useEventCloud } from 'store/EventCloudContext'
+import { useFighter } from 'Scene/Fighter/useFighter'
 
 const CloseButton = () => {
-    const { fighter } = useEventCloud()
+    const fighter = useFighter(state => state.fighter)
     const hide = useAuth(state => state.hide)
 
     if (!fighter) {

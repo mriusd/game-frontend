@@ -1,19 +1,23 @@
-import { useState, useEffect } from 'react';
-import { useEventCloud } from '../store/EventCloudContext';
-import Web3 from 'web3';
 import styles from './Auth.module.scss'
+
+import React from 'react';
+import Web3 from 'web3';
+
 import { useAuth } from './useAuth';
+import { useCloud } from 'EventCloud/useCloud';
 
 function MetamaskDialog() {
-	const [fighterName, setFighterName] = useState<string>('');
-	const { account, setAccount, userFighters, fetchUserFighters, createFighter, sendAuth } = useEventCloud();
+	const [fighterName, setFighterName] = React.useState<string>('');
+	const [readyState, account, setAccount, sendAuth, fetchUserFighters, createFighter, userFighters] = useCloud(state => [state.readyState ,state.account, state.setAccount, state.sendAuth, state.fetchUserFighters, state.createFighter, state.userFighters])
 	const hide = useAuth(state => state.hide)
 
-	useEffect(() => {
-		connectToMetamask();
-	}, []);
+	React.useEffect(() => {
+		if (readyState) {
+			connectToMetamask()
+		}
+	}, [readyState])
 
-	const connectToMetamask = async () => {
+	const connectToMetamask = React.useCallback(async () => {
 		// Check if Metamask is installed
 		if (window.ethereum) {
 			const web3 = new Web3(window.ethereum);
@@ -31,15 +35,15 @@ function MetamaskDialog() {
 		} else {
 			console.log("Please install Metamask!");
 		}
-	};
+	}, [setAccount, fetchUserFighters])
 
-	const createWarrior = () => {
+	const createWarrior = React.useCallback(() => {
 		createFighter(account, "Warrior", fighterName)
-	};
+	}, [account, createFighter, fighterName])
 
-	const createWizard = () => {
+	const createWizard = React.useCallback(() => {
 		createFighter(account, "Wizard", fighterName)
-	};
+	}, [account, createFighter, fighterName])
 
 	if (!account) {
 		return (

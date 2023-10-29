@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { Plane } from "@react-three/drei"
 import { useMemo, useRef } from "react"
-import { useBackpackStore } from "store/backpackStore";
+import { useBackpack } from "Scene/UserInterface3D/Backpack/useBackpack";
 import { shallow } from 'zustand/shallow'
 import { ThreeEvent } from '@react-three/fiber';
 import SlotModel from 'Scene/UserInterface3D/Backpack/SlotModel'
@@ -23,7 +23,7 @@ const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter
     const itemPlaneRef = useRef<THREE.Mesh | null>(null)
     const itemRef = useRef<THREE.Mesh | null>(null)
 
-    const [ cellSize, slots ] = useBackpackStore(
+    const [ cellSize, slots ] = useBackpack(
         state => [state.cellSize, state.equipmentSlots], 
         shallow
     )

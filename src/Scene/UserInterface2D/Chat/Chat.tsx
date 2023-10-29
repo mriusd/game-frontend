@@ -1,10 +1,10 @@
 import styles from './Chat.module.scss'
-import { useEventCloud } from 'store/EventCloudContext'
 import ChatMessage from './ChatMessage'
+import { useCloud } from 'EventCloud/useCloud'
 
 
 const Chat = () => {
-    const { chatLog } = useEventCloud()
+    const chatLog = useCloud(state => state.chatLog)
     return (
         <div className={styles.chat}>
             { chatLog.map((message, i) => <ChatMessage key={i} message={message} />) }

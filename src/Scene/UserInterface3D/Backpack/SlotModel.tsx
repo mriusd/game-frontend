@@ -1,17 +1,10 @@
 import * as THREE from 'three'
-// @ts-expect-error 
-import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js'
 import { useMemo, memo, useRef } from "react"
 import { forwardRef } from 'react'
 import type { InventorySlot } from 'interfaces/inventory.interface'
-import { getBackpackModel } from './utils/getBackpackModel'
 import { useTexture } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { useControls } from 'leva'
-import { isExcellent } from 'Scene/utils/isExcellent'
 
-import { shader_level } from 'Scene/shaders/shader_level'
-import { generateItemName } from 'helpers/generateItemName'
 import { getShaderedBackpackModel } from './utils/getShaderedBackpackModel'
 
 interface Props { position?: number[], rotation?: number[], scale?: number[], onPointerEnter?: (e?: any) => void, onPointerLeave?: (e?: any) => void, item: InventorySlot }

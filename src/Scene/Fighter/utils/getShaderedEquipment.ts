@@ -5,6 +5,7 @@ import { isExcellent } from "Scene/utils/isExcellent"
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader"
 import { SkeletonUtils } from "three-stdlib"
 import * as THREE from 'three'
+import { useSettings } from "Scene/UserInterface2D/Settings/useSettings"
 
 
 // TODO: Think about this
@@ -17,12 +18,14 @@ export const getShaderedEquipment = (item: InventorySlot, uniforms: any) => {
     const levelShader = shader_level()
     // console.log(model, item.itemAttributes.name)
 
+    const enableDynamicShadows = useSettings.getState().enableShadows
+
     model.traverse((object: any) => {
         if (object.isMesh) {
             const material = object.material.clone()
 
-            object.castShadow = true
-            object.revieveShadow = true
+            object.castShadow = enableDynamicShadows
+            object.revieveShadow = enableDynamicShadows
 
             material.onBeforeCompile = (_shader: THREE.Shader) => {
                 // Uniforms

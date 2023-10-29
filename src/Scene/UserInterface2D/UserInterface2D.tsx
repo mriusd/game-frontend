@@ -1,20 +1,25 @@
 import styles from './UserInterface2D.module.scss'
 
 import { Leva } from 'leva'
-import { useBackpackStore } from 'store/backpackStore'
-import { useSceneContext } from 'store/SceneContext'
+import { useBackpack } from 'Scene/UserInterface3D/Backpack/useBackpack'
 
-import Chat from './Chat/Chat'
 import CommandLine from './CommandLine/CommandLine'
 import Stats from './Stats/Stats'
 import Skills from './Skills/Skills'
+import Settings from './Settings/Settings'
 
 import OpenButton from 'Auth/OpenButton'
 
+import { useOtherFighter } from 'Scene/Fighter/OtherFighter/useOtherFighter'
+import { useFighter } from 'Scene/Fighter/useFighter'
+import { useCore } from 'Scene/useCore'
+
 
 const UserInterface2D = () => {
-    const store = useSceneContext()
-    const isBackpackOpened = useBackpackStore(state => state.isOpened)
+    const [otherFighterList] = useOtherFighter(state => [state.otherFighterList])
+    const fighter = useFighter(state => state.fighter)
+    const isBackpackOpened = useBackpack(state => state.isOpened)
+    const [worldSize, matrixCoordToWorld] = useCore(state => [state.worldSize, state.matrixCoordToWorld])
 
     // const handleClick = (e) => {
     //     e.preventDefault()
@@ -24,10 +29,10 @@ const UserInterface2D = () => {
 
     return (
         <div className={styles.UserInterface2D} >
-            <Chat/>
             <Stats/>
             <Skills/>
             <CommandLine/>
+            <Settings/>
 
             {/* Auth Modal */}
             <OpenButton/>
@@ -35,20 +40,21 @@ const UserInterface2D = () => {
 
             {/* For test */}
             {
-                store.PlayerList.current.length && (
+                otherFighterList.length && (
                     <div className={styles.players}>
-                        <p>Close Players({store.PlayerList.current.length}):</p>
-                        { store.PlayerList.current.map(_ => (<p key={_.id}>{ `${store.fighter.name} [${_.coordinates.x}, ${_.coordinates.z}]` }<span></span></p>)) }
+                        <p>Close Players({otherFighterList.length}):</p>
+                        { otherFighterList.map(_ => (<p key={_.id}>{ `${_.name} [${_.coordinates.x}, ${_.coordinates.z}]` }<span></span></p>)) }
                     </div>
                 )
             }
             <div className={styles.coordinates}>
-                <div>World size [{store.worldSize.current}x{store.worldSize.current}]</div>
+                <div>World size [{worldSize}x{worldSize}]</div>
                 {/* <div>Server coordinate [ X: {store.currentMatrixCoordinate?.x} Z: {store.currentMatrixCoordinate?.z} ]</div> */}
-                <div>Coordinate [ X: {store.currentWorldCoordinate?.x.toFixed(0)} Z: {store.currentWorldCoordinate?.z.toFixed(0)} ]</div>
+                {fighter?.coordinates && <div>Coordinate [ X: {matrixCoordToWorld(fighter.coordinates)?.x+60-.5} Z: {matrixCoordToWorld(fighter.coordinates)?.z+60-.5} ]</div>}
             </div>
             <Leva
-                hidden={!isBackpackOpened}
+                // hidden={!isBackpackOpened}
+                collapsed
                 flat
             />
         </div>

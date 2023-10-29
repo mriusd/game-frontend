@@ -4,16 +4,16 @@ import { Flex, Box } from '@react-three/flex'
 import { Center, Plane } from '@react-three/drei'
 import { memo } from 'react'
 import BackpackItem from './BackpackItem'
-import { useBackpackStore } from 'store/backpackStore'
+import { useBackpack } from 'Scene/UserInterface3D/Backpack/useBackpack'
 import { shallow } from 'zustand/shallow'
-import { useEventStore } from 'store/EventStore'
+import { useCloud } from 'EventCloud/useCloud'
 import { ThreeEvent, useFrame, useThree } from '@react-three/fiber'
-import { useUiStore } from 'store/uiStore'
+import { useUi } from '../useUI'
 import { getCoordInUISpace } from 'Scene/utils/getCoordInUiSpace'
-import { useFighterStore } from 'store/fighterStore'
 import { Text } from '@react-three/drei'
 import EquipmentItem from './EquipmentItem'
 import { getMeshDimensions } from 'Scene/utils/getMeshDimensions'
+import { useFighter } from 'Scene/Fighter/useFighter'
 
 type CellType = 'equipment' | 'backpack'
 
@@ -41,13 +41,13 @@ const Backpack = memo(function Backpack() {
     // 
 
     // console.log('[CPU CHECK]: Rerender <Backpack>')
-    const [backpack, equipmentSlots, equipment] = useEventStore(state => [state.backpack, state.equipmentSlots, state.equipment], shallow)
-    const [backpackWidth, backpackHeight, isOpened, slotsRef, equipmentSlotsRef, cellSize] = useBackpackStore(state => 
+    const [backpack, equipmentSlots, equipment] = useCloud(state => [state.backpack, state.equipmentSlots, state.equipment], shallow)
+    const [backpackWidth, backpackHeight, isOpened, slotsRef, equipmentSlotsRef, cellSize] = useBackpack(state => 
         [state.width, state.height, state.isOpened, state.slots, state.equipmentSlots, state.cellSize], 
         shallow
     )
     // TODO: change location for handler
-    const [updateBackpackItemPosition, dropBackpackItem, unequipBackpackItem, equipBackpackItem] = useEventStore(state => 
+    const [updateBackpackItemPosition, dropBackpackItem, unequipBackpackItem, equipBackpackItem] = useCloud(state => 
         [state.updateItemBackpackPosition, state.dropBackpackItem, state.unequipBackpackItem, state.equipBackpackItem], 
         shallow
     )
@@ -66,9 +66,6 @@ const Backpack = memo(function Backpack() {
         const backpackWidth = getMeshDimensions(InventorySlotsContainerRef.current).width
         backpackRef.current.position.x = canvasWidth / 2 - backpackWidth - marginRight
     })
-
-    // TODO: Causes lots of backpack rerenders
-    const fighterCurrentMatrixCoordinate = useFighterStore(state => state.currentMatrixCoordinate)
     
     // Transform items to Array for rendering
     const items = useMemo(() => {
@@ -81,7 +78,7 @@ const Backpack = memo(function Backpack() {
         return Object.keys(equipment).map(slot => ({ ...equipment[slot], slot }))
     }, [equipment])
 
-    const setCursor = useUiStore(state => state.setCursor)
+    const setCursor = useUi(state => state.setCursor)
 
     const isItemPinned = useRef<boolean>(false)
     const pinnedItemEvent = useRef<ThreeEvent<PointerEvent> | null>(null)
@@ -163,18 +160,19 @@ const Backpack = memo(function Backpack() {
         
         onPointerMove(e)
         setTimeout(() => {
+            if (!hoveredItemEvent.current) { return } // Try fix issue, test required
             isItemPinned.current = !isItemPinned.current
             if (isItemPinned.current) {
                 pinnedItemEvent.current = e
                 // @ts-expect-error
-                hoveredItemEvent.current.object.parent.material.opacity = 0 // TODO: sometimes get error over here
+                hoveredItemEvent.current?.object?.parent?.material?.opacity && (hoveredItemEvent.current.object.parent.material.opacity = 0) // TODO: sometimes get error over here
                 // Display previous cell
                 setPlaceholderCells(pinnedItemEvent.current, true)
                 // setObjectRenderLayer(pinnedItemEvent.current, 'highest')
             } else {
                 setPlaceholderCells(pinnedItemEvent.current, false)
                 // @ts-expect-error
-                hoveredItemEvent.current.object.parent.material.opacity = .2
+                hoveredItemEvent.current?.object?.parent?.material?.opacity && (hoveredItemEvent.current.object.parent.material.opacity = .2)
                 placeItemToCell(pinnedItemEvent.current)
                 // setObjectRenderLayer(pinnedItemEvent.current, 'default')
                 pinnedItemEvent.current = null
@@ -198,7 +196,7 @@ const Backpack = memo(function Backpack() {
             // Drop if nothing hovered
             if (!pointerCell.current) {
                 item.visible = false
-                dropBackpackItem(itemHash, fighterCurrentMatrixCoordinate)
+                dropBackpackItem(itemHash, useFighter.getState().fighter.coordinates)
                 return
             }
 

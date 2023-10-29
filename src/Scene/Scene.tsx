@@ -1,86 +1,124 @@
 import styles from './Scene.module.scss'
 
+import React from "react"
+
 import * as THREE from "three"
-import { Object3D } from "three"
 
 import { Canvas } from "@react-three/fiber"
-import { useRef, memo, Suspense, useEffect } from "react"
-import { useSceneContext } from "store/SceneContext"
-import { Loader, Stats } from "@react-three/drei"
-
-import { CAMERA_POSITION } from "./config"
+import { Loader, Stats, OrbitControls } from "@react-three/drei"
 
 import Light from "./Light"
-import Chunks from "./Chunks"
+import Chunks from "./Chunks/Chunks"
 import Fighter from "./Fighter/Fighter"
-import Npc from "./Npc"
-import Controller from "./Controller"
-import DroppedItem from "./DroppedItem"
+import Controls from "./Controls/Controls"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"
-import Decor from "./Decor"
+// import Decor from "./Decor/Decor"
+import DecorTest from './Decor/DecorTest'
 import UserInterface3D from './UserInterface3D/UserInterface3D'
 import GLTFLoader from './GLTFLoader/GLTFLoader'
-import OtherFighter from './Fighter/OtherFighter'
+import OtherFighterList from './Fighter/OtherFighter/OtherFighterList'
+import NpcList from './Npc/NpcList'
+import Camera from './Camera'
+import DroppedItemList from './DroppedItem/DroppedItemList'
+import { DevHelpers } from './devHelpers/DevHelpers'
 
-import { useUiStore } from 'store/uiStore'
+import { useUi } from './UserInterface3D/useUI'
 
-import Postprocessing from './Postprocessing'
-import { Environment } from '@react-three/drei'
+import Postprocessing from './Postprocessing/Postprocessing'
 
 import { shallow } from 'zustand/shallow'
 import UserInterface2D from './UserInterface2D/UserInterface2D'
 import { useCommandLine } from './UserInterface2D/CommandLine/useCommandLine'
 
-const Scene = memo(function Scene() {
-    const store = useSceneContext()
-    const worldRef = useRef<Object3D | null>(null)
-    const eventsNode = useUiStore(state => state.eventsNode)
+import { useCore } from 'Scene/useCore'
 
+import { useControls } from 'leva'
+import { useFighter } from './Fighter/useFighter'
+
+// import FPSLimiter from './UserInterface2D/Settings/FPSLimiter'
+import FPSLimiter from './UserInterface2D/Settings/FPSLimiter2'
+import { DPRLimiter } from './UserInterface2D/Settings/DPRLimiter'
+
+
+const Scene = React.memo(function Scene() {
+    const eventsNode = useUi(state => state.eventsNode)
+    const [devMode, setDevMode] = useCore(state => [state.devMode, state.setDevMode], shallow)
+    const fighterNode = useFighter(state => state.fighterNode)
     const [subscribe, unsubscribe] = useCommandLine(state => [state.subscribeCommandLine, state.unsubscribeCommandLine], shallow)
-    useEffect(() => {
+    React.useEffect(() => {
         if (eventsNode.current) { subscribe(eventsNode.current) }
         return () => unsubscribe()
     }, [eventsNode.current])
 
+    const data = useControls('GL', {
+        exposure: { value: 0.8, min: -5, max: 5 },
+        toneMapping: {
+            options: {
+                'filmic': THREE.ACESFilmicToneMapping,
+                'linear': THREE.LinearToneMapping,
+                'notone': THREE.NoToneMapping,
+                'reinhard': THREE.ReinhardToneMapping,
+                'cineon': THREE.CineonToneMapping
+            },
+        },
+        legacyLights: { value: false },
+        encoding: {
+            options: {
+                'rgb': THREE.sRGBEncoding,
+                'linear': THREE.LinearEncoding,
+            }
+        },
+    })
+
+    const dev = useControls('Camera', { freeCamera: false })
+    React.useEffect(() => void setDevMode(dev.freeCamera), [dev])
+
     return (
         <div id="scene" tabIndex={0} ref={eventsNode} className={styles.scene}>
             <Canvas
-                shadows
-                camera={{
-                    position: new THREE.Vector3(...CAMERA_POSITION),
-                    near: 0.1,
-                    far: 60,
-                    fov: 45,
+                frameloop='demand' // Required 'demand' for fps clipping
+                performance={{ min: 0.1 }}
+                shadows={{
+                    enabled: true, // Always Enabled, but in Lights.tsx control render mode
+                    type: THREE.PCFSoftShadowMap
                 }}
                 gl={{
                     powerPreference: "high-performance",
                     alpha: false,
-                    antialias: false,
+                    antialias: true,
+                    toneMappingExposure: Math.pow(2, data.exposure),
+                    toneMapping: data.toneMapping,
+                    useLegacyLights: data.legacyLights,
+                    outputEncoding: data.encoding,
                 }}
             >
                 <color attach="background" args={[0x000000]} />
-                <fog attach="fog" args={['black', 5, 25]}></fog>
-                <Stats className='stats' />
-                {/* <Environment preset='forest' /> */}
-
-                <Suspense fallback={null}>
-                    <GLTFLoader>
-                        {store.NpcList.current.map(npc => <Npc key={npc?.id} npc={npc} />)}
-                        {store.DroppedItems.current.map(item => <DroppedItem key={item?.itemHash} item={item} />)}
-                        {store.VisibleDecor.current.map((data, i) => <Decor key={i} objectData={data} />)}
-                        {store.PlayerList.current.map(fighter => <OtherFighter key={fighter?.id} fighter={fighter} />)}
-                        <Fighter />
-                        <Chunks ref={worldRef} />
-                        <Controller world={worldRef} />
-                        <FloatingDamage />
-                        <UserInterface3D />
-                        <Light />
-                    </GLTFLoader>
-                </Suspense>
-                {/* <Postprocessing/> */}
+                {!devMode ? <fog attach="fog" args={['black', 10, 25]}></fog> : <></>}
+                <FPSLimiter>
+                    {devMode ? <OrbitControls target={fighterNode.current?.position || new THREE.Vector3(0, 0, 0)} /> : <></>}
+                    <Camera />
+                    <Stats className='stats' />
+                    <Postprocessing />
+                    <React.Suspense fallback={null}>
+                        <GLTFLoader>
+                            {/* <DPRLimiter/> */}
+                            <NpcList />
+                            <DroppedItemList />
+                            <OtherFighterList />
+                            <DecorTest />
+                            <Fighter />
+                            <Chunks />
+                            <Controls />
+                            <FloatingDamage />
+                            <UserInterface3D />
+                            <Light />
+                            <DevHelpers />
+                        </GLTFLoader>
+                    </React.Suspense>
+                </FPSLimiter>
             </Canvas>
-            <UserInterface2D/>
-            <Loader/>
+            <UserInterface2D />
+            <Loader />
         </div>
     )
 })

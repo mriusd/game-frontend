@@ -3,7 +3,6 @@ import * as THREE from 'three'
 const npcMaxCountToRender = 100
 
 const minimap_material = () => {
-    console.log('arrat', new Array(npcMaxCountToRender).fill({ x: 0, y: -1, z: 0 }))
     const material = new THREE.ShaderMaterial({
         uniforms: {
             uNpcCoordinates: { value: new Array(npcMaxCountToRender).fill(new THREE.Vector3(0, -1, 0)) },

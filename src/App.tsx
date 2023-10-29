@@ -1,12 +1,13 @@
-import { useEventCloud } from './store/EventCloudContext';
-
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { EventCloudProvider } from 'EventCloud/EventCloud';
 
 import Scene from './Scene/Scene';
-import SceneContextProvider from './store/SceneContext';
 
 import Auth from 'Auth/Auth';
+import Chat from 'Scene/UserInterface2D/Chat/Chat';
+
+import { useFighter } from 'Scene/Fighter/useFighter';
 
 
 // Placeholder with commands for game is located:
@@ -30,17 +31,16 @@ import Auth from 'Auth/Auth';
 //
 
 function App() {
-	const { fighter } = useEventCloud();
+	const fighter = useFighter(state => state.fighter)
 
 	return (
-		<DndProvider backend={HTML5Backend}>
-			<Auth />
-			{fighter && (
-				<SceneContextProvider>
-					<Scene />
-				</SceneContextProvider>
-			)}
-		</DndProvider>
+		<EventCloudProvider>
+			<DndProvider backend={HTML5Backend}>
+				<Auth />
+				<Chat />
+				{fighter && <Scene />}
+			</DndProvider>
+		</EventCloudProvider>
 	);
 
 }
