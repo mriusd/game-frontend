@@ -23,10 +23,9 @@ export const useEquimentPoses = (fighter: Fighter, model: THREE.Group | THREE.Me
         const pose = store.current[name]
         if (!pose) { return }
         // For Test
-        const binder = pose.binders[pose.poseIndex]
-        const fighterModelNode = model.getObjectByName(binder.parentNodeName.replace(':', ''))
-        if (!fighterModelNode) { return console.warn('[useEquipmentPoses]: fighterModelNode not found, check binders') }
-        fighterModelNode.remove( pose.mesh )
+        // const binder = pose.binders[pose.poseIndex]
+        // 
+        removeBinder(model, pose.mesh)
         delete store.current[name]
     }, [])
 
@@ -35,21 +34,8 @@ export const useEquimentPoses = (fighter: Fighter, model: THREE.Group | THREE.Me
         if (!pose) { return }
         // For Test
         const binder = pose.binders[pose.poseIndex]
-
-        const fighterModelNode = model.getObjectByName(binder.parentNodeName.replace(':', ''))
-        if (!fighterModelNode) { return console.warn('[useEquipmentPoses]: fighterModelNode not found, check binders') }
-        // console.log('fighterModelNode', fighterModelNode)
-        // const mesh = SkeletonUtils.clone(pose.mesh)
-        const mesh = pose.mesh
-
-        mesh.position.set(binder.position.x, binder.position.y, binder.position.z)
-        mesh.rotation.set(degToRad(binder.rotation.x), degToRad(binder.rotation.y), degToRad(binder.rotation.z))
-        mesh.scale.set(binder.scale.x, binder.scale.y, binder.scale.z)
-
-        // console.log('one', fighterModelNode, mesh)
-
-        // // fighterModelNode.add( modelArmature )
-        fighterModelNode.add( mesh )
+        // 
+        applyBinder(model, pose.mesh, binder)
     }, [])
 
     // TODO: Fix this, for now made just for sword
@@ -71,4 +57,20 @@ export const useEquimentPoses = (fighter: Fighter, model: THREE.Group | THREE.Me
     }, [])
 
     return { addPose, updatePose, updatePoses, removePose }
+}
+
+export function applyBinder(fighterNode: THREE.Group | THREE.Mesh, targetNode: THREE.Group | THREE.Mesh, binder: any) {
+    const fighterModelNode = fighterNode.getObjectByName(binder.parentNodeName.replace(':', ''))
+    if (!fighterModelNode) { return console.warn('[applyBinder]: fighterModelNode not found, check binders') }
+    targetNode.userData.binderParsed = binder
+    targetNode.position.set(binder.position.x, binder.position.y, binder.position.z)
+    targetNode.rotation.set(degToRad(binder.rotation.x), degToRad(binder.rotation.y), degToRad(binder.rotation.z))
+    targetNode.scale.set(binder.scale.x, binder.scale.y, binder.scale.z)
+    fighterModelNode.add( targetNode )
+}
+
+export function removeBinder(fighterNode: THREE.Group | THREE.Mesh, targetNode: THREE.Group | THREE.Mesh) {
+    const fighterModelNode = fighterNode.getObjectByName(targetNode.userData.binderParsed.parentNodeName.replace(':', ''))
+    if (!fighterModelNode) { return console.warn('[useEquipmentPoses]: fighterModelNode not found, check binders') }
+    fighterModelNode.remove( targetNode )
 }

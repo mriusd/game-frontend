@@ -2,15 +2,15 @@ import * as THREE from 'three'
 import React from "react"
 import { InventorySlot } from "interfaces/inventory.interface"
 import { getShaderedEquipment } from "../../utils/getShaderedEquipment"
+import { getShaderedFragments } from 'Scene/Fighter/utils/getShaderedFragment'
 import { useFrame } from "@react-three/fiber"
 import { Fighter } from "interfaces/fighter.interface"
 import { getEquipmentBodyType } from "../../utils/getEquipmentBodyType"
 import { useCore } from 'Scene/useCore'
-import { degToRad } from 'three/src/math/MathUtils'
-import { useEquimentPoses } from './EquipmentPoses/useEquipmentPoses'
+import { useEquimentPoses, applyBinder, removeBinder } from './useEquipmentPoses'
 
 interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, children?: any, onPointerMove?: (e: any) => void, onPointerLeave?: (e: any) => void, onPointerDown?: (e: any) => void, isMove: boolean }
-const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, fighter, children, onPointerMove, onPointerLeave, onPointerDown, isMove }: Props, ref) {
+const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: fighterModel, fighter, children, onPointerMove, onPointerLeave, onPointerDown, isMove }: Props, ref) {
 
     // Equipment we take on Fighter
     const equipment = React.useMemo(() => fighter.equipment, [fighter])
@@ -29,7 +29,8 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
     // Save main Bone & then insert equipment bones there
     const fighterBone = React.useRef<THREE.Bone | null>(null)
     // Save all currently equipmented items to remove then
-    const equipedMeshes = React.useRef<Array<{ itemHash: string, objects: (THREE.Mesh | THREE.Group)[] }>>([])
+    const equipedMeshes = React.useRef<{ [itemHash: string]:(THREE.Mesh | THREE.Group)[] }>({})
+    const equipedFragments = React.useRef<{ [itemHash: string]:(THREE.Mesh | THREE.Group)[] }>({})
 
     // Store last equipment state
     const lastEquipment = React.useRef<InventorySlot[]>([])
@@ -40,24 +41,26 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
     const uniforms = React.useRef({ uTime: { value: 0 } })
 
     // Mixer for Equipment Animation
-    const mixer = React.useMemo(() => new THREE.AnimationMixer(model), [])
-    const clips = React.useRef<Array<{ itemHash: string; object: THREE.Object3D | THREE.Mesh | THREE.Group; animation: THREE.AnimationClip }>>([])
+    const mixer = React.useMemo(() => new THREE.AnimationMixer(fighterModel), [])
+    // TODO: Add advanced animation logic, remove animations after remove equipment]
+    // const clips = React.useRef<Array<{ itemHash: string; object: THREE.Object3D | THREE.Mesh | THREE.Group; animation: THREE.AnimationClip }>>([])
 
     // Store Poses for models which we equip without weights
     // Example: Sword has two states holding in hand while fight and located along the back while in peace mode
-    const { addPose, updatePose, removePose, updatePoses } = useEquimentPoses(fighter, model)
+    const { addPose, updatePose, removePose, updatePoses } = useEquimentPoses(fighter, fighterModel)
+    
 
     // Find Armature & Skeleton
     React.useEffect(() => {
         // @ts-expect-error
-        fighterArmature.current = model.getObjectByName("Armature") // Used for show/hide boyd parts
-        fighterSkeleton.current = (model.getObjectByName("standard_helmet") as THREE.SkinnedMesh)?.skeleton // Used for binding fighter skeleton to equipment skinnedMeshes
-        fighterBone.current = model.getObjectByName("mixamorigHips") as THREE.Bone // Main bone in Fighter, Insert inside it equipment Armature
+        fighterArmature.current = fighterModel.getObjectByName("Armature") // Used for show/hide boyd parts
+        fighterSkeleton.current = (fighterModel.getObjectByName("standard_helmet") as THREE.SkinnedMesh)?.skeleton // Used for binding fighter skeleton to equipment skinnedMeshes
+        fighterBone.current = fighterModel.getObjectByName("mixamorigHips") as THREE.Bone // Main bone in Fighter, Insert inside it equipment Armature
         // console.log('FighterModel ', model, fighterArmature.current, fighterSkeleton.current, fighterBone.current)
         if (!fighterArmature.current) { console.warn('[FighterModel]: "Armature" not found') }
         if (!fighterSkeleton.current) { console.warn('[FighterModel]: "standard_helmet" not found') }
         if (!fighterBone.current) { console.warn('[FighterModel]: "mixamorigHips" not found') }
-    }, [model])
+    }, [fighterModel])
 
     // Main Logic
     React.useEffect(() => {
@@ -90,38 +93,30 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
 
         function takeOfLastEquipment() {
             equipmentToTakeOF.current.forEach(item => {
-                const meshIndex = equipedMeshes.current.findIndex(eqMesh => eqMesh.itemHash === item.itemHash)
-                // console.log('meshIndex', meshIndex, equipedMeshes.current, equipedMeshes.current[meshIndex])
-                if (meshIndex === -1) { return }
-                // Remove from mixers
-                const clipIndex = clips.current.findIndex(_ => _.itemHash === item.itemHash)
-                if (clipIndex !== -1) {
-                    mixer.clipAction(clips.current[clipIndex].animation, clips.current[clipIndex].object).stop()
-                    clips.current.splice(clipIndex, 1)
-                }
-                removeFromScene(equipedMeshes.current[meshIndex])
+                const meshs = equipedMeshes.current[item.itemHash]
+                const fragments = equipedFragments.current[item.itemHash]
+                if (!meshs) { return }
+                // TODO: Remove from mixers
+
+                removeFromScene(meshs)
+                removeFragments(fragments)
                 showBodyPart(item)
                 // Remove from stored array
-                equipedMeshes.current.splice(meshIndex, 1)
+                delete equipedMeshes.current[item.itemHash]
+                delete equipedFragments.current[item.itemHash]
             })
-            function removeFromScene(model: { itemHash: string, objects: (THREE.Mesh | THREE.Group)[] }) {
+            function removeFromScene(meshs: (THREE.Mesh | THREE.Group)[]) {
                 // console.log('removeFromScene', model)
-                model.objects.forEach(_ => {
+                meshs.forEach(_ => {
                     const object = fighterBone.current.getObjectByName(_.name)
-                    console.log(_.name)
                     // console.log('Object to remove', object)
-                    // // @ts-expect-error
-                    // if (object.isBone) {
-                    //     fighterBone.current.remove(object)
-                    // } else {
-                    //     fighterArmature.current.remove(object)
-                    // }
+
                     if (_.userData.injectionType === 'binders') {
-                        removePose(model.itemHash)
+                        removePose(_.userData.itemHash)
                     } else {
                         fighterBone.current.remove(object)
                     }
-    
+
                 })
             }
             function showBodyPart(item: InventorySlot) {
@@ -132,13 +127,18 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
                 if (!bodyPart) { return console.warn('[FighterModel<takeOf>]: Not body Part found, mb Fighter body parts name has been changed') }
                 bodyPart.visible = true
             }
+            function removeFragments(fragments: (THREE.Mesh | THREE.Group)[]) {
+                if (!fragments) { return }
+                fragments.forEach(_ => removeBinder(fighterModel, _))
+            }
         }
         function takeOnNewEquipment() {
             equipmentToTakeON.current.forEach(item => {
                 const { model, animations } = getShaderedEquipment(item, uniforms)
+
                 if (!model) { return console.warn('[FighterModel<takeOn>]: Equipment Model not Found') }
-                const { injectModel, injectType } = getInjectModel()
-                function getInjectModel() {
+                const { injectModel, injectType } = getInjectModel(model)
+                function getInjectModel(model) {
                     const armature = model.getObjectByName('Armature') // 1. Adding by weights
                     if (armature) { return {injectModel: armature, injectType: 'weights'} }
                     const animatedArmature = model.getObjectByName('animatedArmature') 
@@ -155,14 +155,19 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
                 if (animation) {
                     // console.log(animation)
                     mixer.clipAction(animation, injectModel).setEffectiveTimeScale(1.5).play()
-                    clips.current.push({ itemHash: item.itemHash, animation, object: model })
+                    // clips.current.push({ itemHash: item.itemHash, animation, object: model })
                 }
     
                 // Set itemHash to remove via it then
+                injectModel.userData.item = item
                 injectModel.userData.itemHash = item.itemHash
                 injectModel.userData.name = item.itemAttributes.name
                 injectModel.name += item.itemAttributes.name
                 injectModel.userData.injectionType = injectType
+                // Set this in blender, to add animated armour parts
+                // if (item.itemAttributes.name.toLowerCase().includes('pants')) {
+                //     injectModel.userData.fragments = "legendary_pants_skirt_front,legendary_pants_skirt_back"
+                // }
     
     
                 hideBodyPart(item)
@@ -174,6 +179,9 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
                 } else {
                     addViaWeights()
                 }
+                // Fragments -- animated peaces of Equipment
+                const fragments = addFragments()
+
                 function addViaBinders() {
                     const binders = injectModel.userData.binders
                     const bindersData = JSON.parse(binders)
@@ -189,9 +197,29 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
                     })
                     fighterBone.current.add( injectModel )
                 }
+                function addFragments() {
+                    // console.log('injectModel', injectModel)
+                    const names = injectModel.userData?.fragments?.split(',')
+                    if (!names) { return }
+                    const fragments = getShaderedFragments(injectModel.userData.item, names, uniforms)
+                    // console.log('fragments', fragments)
+                    const models = []
+                    fragments.forEach(fr => {
+                        const model = fr.model.children[0]
+                        // // Binders Logic
+                        const binders = model.userData.binders
+                        // console.log('binders',binders)
+                        const bindersData = JSON.parse(binders)
+                        applyBinder(fighterModel, model as any, bindersData[0])
+                        fr.animations.forEach(_ => _.name.toLowerCase().includes('simulation') && mixer.clipAction(_, model).play())
+                        models.push(model)
+                    })
+                    return models
+                }
     
                 // Store
-                equipedMeshes.current.push({ itemHash: injectModel.userData.itemHash, objects: [injectModel] })
+                equipedMeshes.current[injectModel.userData.itemHash] = [injectModel]
+                equipedFragments.current[injectModel.userData.itemHash] = fragments
             }
             function hideBodyPart(item: InventorySlot) {
                 // Remove part of body
@@ -242,7 +270,7 @@ const FighterModel = React.memo(React.forwardRef(function FighterModel({ model, 
         >
             <primitive 
                 ref={modelRef}
-                object={model}
+                object={fighterModel}
                 scale={.32}
             >
                 { children }
