@@ -14,6 +14,7 @@ import { Text } from '@react-three/drei'
 import EquipmentItem from './EquipmentItem'
 import { getMeshDimensions } from 'Scene/utils/getMeshDimensions'
 import { useFighter } from 'Scene/Fighter/useFighter'
+import { useCore } from 'Scene/useCore'
 
 type CellType = 'equipment' | 'backpack'
 
@@ -419,12 +420,23 @@ const Backpack = memo(function Backpack() {
         })
     }
 
+    const handlePointerEnter = () => {
+        if (useBackpack.getState().isOpened) {
+            // @ts-expect-error
+            useCore.getState().setHoveredItems({ id: 'backpack' }, 'add')
+        }
+    }
+    const handlePointerLeave = () => {
+        // @ts-expect-error
+        useCore.getState().setHoveredItems({ id: 'backpack' }, 'remove')
+    }
+
     if (!items) {
         return <></>
     }
 
     return (
-        <group visible={isOpened}>
+        <group visible={isOpened} onPointerEnter={handlePointerEnter} onPointerLeave={handlePointerLeave}>
 
             <group ref={backpackRef} /*position={Position is changing based on viewport size}*/>
 

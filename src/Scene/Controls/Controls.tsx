@@ -32,7 +32,7 @@ const Controls = React.memo(function Controls() {
 
     useFrame(({ raycaster, camera, pointer }) => {
         if (useCore.getState().hoveredItems.length) { return }
-        if (useBackpack.getState().isOpened) { return }
+        // if (useBackpack.getState().isOpened) { return }
 
         raycaster.setFromCamera(pointer, camera)
         const intersected = raycaster.ray.intersectPlane(intersectionPlane.current, intersection.current)
@@ -59,7 +59,7 @@ const Controls = React.memo(function Controls() {
     const mouseDown = React.useCallback((e: MouseEvent) => {
         if (e.target !== canvas) { return }
         if (useCore.getState().hoveredItems.length) { return }
-        if (useBackpack.getState().isOpened) { return }
+        // if (useBackpack.getState().isOpened) { return }
 
         isHolding.current = true
         move(useControls.getState().pointerCoordinate)
