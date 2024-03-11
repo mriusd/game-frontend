@@ -29,8 +29,8 @@ export interface CloudStoreInterface {
     account: string
     setAccount: (account: string) => void
     sendAuth: (target: any) => void
-    userFighters: FighterAttributes[]
-    setUserFighters: (userFighters: FighterAttributes[]) => void
+    userFighters: Fighter[]
+    setUserFighters: (userFighters: Fighter[]) => void
     fetchUserFighters: (ownerAddress: string) => void
     createFighter: (ownerAddress: string, fighterClass: string, name: string) => void
 

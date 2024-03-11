@@ -60,7 +60,7 @@ function MetamaskDialog() {
 				<p>Your Characters:</p>
 				<div>
 					{userFighters?.map((userFighter, index) => (
-						<button key={index} onClick={() => {sendAuth(userFighter.TokenID); hide()}}>{userFighter.Name}</button>  // Added onClick here
+						<button key={index} onClick={() => {sendAuth(userFighter.tokenId); hide()}}>{userFighter.name}</button>  // Added onClick here
 					))}
 				</div>
 			</div>
