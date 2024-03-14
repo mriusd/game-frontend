@@ -507,6 +507,19 @@ const Backpack = memo(function Backpack() {
                             </Box>
                         )) }
                     </Flex>
+
+                    <Flex name='gold' position={[32, -500, 0]} flexDir="column" >
+                        <Text
+                            position={[0, 0, 0]} // Adjust this position based on your layout
+                            color="gold" // Set the color of the text
+                            fontSize={18} // Adjust the size as needed
+                            maxWidth={200} // Optional: Adjust max width to keep text contained if necessary
+                            anchorX="center" // Center the text horizontally
+                            anchorY="middle" // Center the text vertically
+                        >
+                            Gold {backpack.gold}  {/* Replace goldCount with your state variable tracking the amount of gold */}
+                        </Text>
+                    </Flex>
                 </group>
 
 
@@ -542,8 +555,10 @@ const Backpack = memo(function Backpack() {
                     : <></>
                     }
                 </group>
-            
+                
             </group>
+
+            
 
         </group>
     )
