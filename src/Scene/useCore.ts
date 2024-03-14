@@ -50,9 +50,14 @@ export interface CoreInterface {
 export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
     location: 'Lorencia',
     
-    worldSize: 80,
-    chunkSize: 40,
-    chunksPerAxis: 80 / 40,
+    // worldSize: 80,
+    // chunkSize: 40,
+    // chunksPerAxis: 80 / 40,
+
+    worldSize: 360,
+    chunkSize: 120,
+    chunksPerAxis: 360 / 120,
+
     groundObject: React.createRef(),
 
     occupiedCoords: [],

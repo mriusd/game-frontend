@@ -7,11 +7,16 @@ import { shared } from "./shared"
 import { decor } from "./decor"
 import { fragments } from "./fragments"
 
+import { lorencia } from "./maps/lorencia"
+
 export const models: ModelLoadItem[] = [
     ...fighter,
     ...inventory,
     ...npc,
     ...shared,
     ...decor,
-    ...fragments
+    ...fragments,
+
+
+    ...lorencia
 ]

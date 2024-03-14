@@ -8,7 +8,7 @@ import { Canvas } from "@react-three/fiber"
 import { Loader, Stats, OrbitControls } from "@react-three/drei"
 
 import Light from "./Light"
-import Chunks from "./Chunks/Chunks"
+import Chunks from "./Chunks3d/Chunks"
 import Fighter from "./Fighter/Fighter"
 import Controls from "./Controls/Controls"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"

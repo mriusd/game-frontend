@@ -116,7 +116,7 @@ function InstancedObject({ objectData }: Props) {
         <group name='instanced-object'>
             <Instance
                 ref={ref}
-                position={[worldCoordinate.x - 40/2, 0, worldCoordinate.z - 40/2]}
+                position={[worldCoordinate.x /*- 40/2*/, 0, worldCoordinate.z /*- 40/2*/]}
                 rotation={[objectData.rotation.x, objectData.rotation.y, objectData.rotation.z]}
                 scale={[objectData.scale.x, objectData.scale.y, objectData.scale.z]}
             />
@@ -163,7 +163,7 @@ function BaseObject({ objectData, name }: Props) {
     React.useEffect(() => {
         const coords = objectData.occupiedCoords
         if (!coords) { return }
-        coords.forEach(_ => {updateOccupiedCoord({ id: objectData.type+_.x+_.z, coordinates: {x:_.x-chunkSize/2, z:_.z-chunkSize/2}}, 'add')})
+        coords.forEach(_ => {updateOccupiedCoord({ id: objectData.type+_.x+_.z, coordinates: {x:_.x, z:_.z}}, 'add')})
         return () => coords.forEach(_ => {updateOccupiedCoord({ id: objectData.type+_.x+_.z, coordinates: {x:0,z:0} }, 'remove')})
     }, [])
 
@@ -172,7 +172,7 @@ function BaseObject({ objectData, name }: Props) {
             <primitive
                 ref={ref}
                 object={model}
-                position={[worldCoordinate.x - chunkSize/2, 0, worldCoordinate.z - chunkSize/2]}
+                position={[worldCoordinate.x, 0, worldCoordinate.z]}
                 rotation={[objectData.rotation.x, objectData.rotation.y, objectData.rotation.z]}
                 scale={[objectData.scale.x, objectData.scale.y, objectData.scale.z]}
             ></primitive>
