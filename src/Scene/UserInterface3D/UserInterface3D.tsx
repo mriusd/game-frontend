@@ -7,6 +7,7 @@ import { useUi } from "./useUI"
 import { useSettings } from "Scene/UserInterface2D/Settings/useSettings"
 
 import Backpack from "./Backpack/Backpack"
+import CharStats from "./CharStats/CharStats"
 import BottomMenu from "./BottomMenu"
 
 import { shallow } from "zustand/shallow"
@@ -25,6 +26,7 @@ const UserInterface3D = memo(function UserInterface() {
 
             <group position={[0, 0, -1000]} ref={userInterface} name="user-interface">
                 <Backpack/>
+                <CharStats/>
                 <BottomMenu/>
                 <Plane ref={intersectionPlane} name='intersection-plane' visible={false} args={[4000, 4000, 1]}></Plane>
             </group>

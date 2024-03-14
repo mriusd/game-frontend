@@ -6,7 +6,7 @@ import { Box } from "@react-three/drei"
 
 import { angleToVector } from "../utils/angleToVector"
 
-import { useBackpack } from "Scene/UserInterface3D/Backpack/useBackpack"
+
 import { useCore } from "Scene/useCore"
 import { useUi } from "Scene/UserInterface3D/useUI"
 import { useFighter } from "Scene/Fighter/useFighter"

@@ -1,7 +1,6 @@
 import styles from './UserInterface2D.module.scss'
 
 import { Leva } from 'leva'
-import { useBackpack } from 'Scene/UserInterface3D/Backpack/useBackpack'
 
 import CommandLine from './CommandLine/CommandLine'
 import Stats from './Stats/Stats'
@@ -18,7 +17,6 @@ import { useCore } from 'Scene/useCore'
 const UserInterface2D = () => {
     const [otherFighterList] = useOtherFighter(state => [state.otherFighterList])
     const fighter = useFighter(state => state.fighter)
-    const isBackpackOpened = useBackpack(state => state.isOpened)
     const [worldSize, matrixCoordToWorld] = useCore(state => [state.worldSize, state.matrixCoordToWorld])
 
     // const handleClick = (e) => {
@@ -53,7 +51,6 @@ const UserInterface2D = () => {
                 {fighter?.coordinates && <div>Coordinate [ X: {matrixCoordToWorld(fighter.coordinates)?.x+60-.5} Z: {matrixCoordToWorld(fighter.coordinates)?.z+60-.5} ]</div>}
             </div>
             <Leva
-                // hidden={!isBackpackOpened}
                 collapsed
                 flat
             />

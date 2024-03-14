@@ -18,7 +18,6 @@ import type { MapObject } from 'interfaces/mapObject.interface';
 import { useFighter } from 'Scene/Fighter/useFighter';
 import { useBackpack } from "../Scene/UserInterface3D/Backpack/useBackpack";
 
-
 export interface CloudStoreInterface {
     readyState: boolean
     sendJsonMessage: (jsonMessage: JsonValue) => void | null

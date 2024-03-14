@@ -434,6 +434,7 @@ const Backpack = memo(function Backpack() {
     if (!items) {
         return <></>
     }
+    
 
     return (
         <group visible={isOpened} onPointerEnter={handlePointerEnter} onPointerLeave={handlePointerLeave}>
