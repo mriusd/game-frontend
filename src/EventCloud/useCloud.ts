@@ -29,8 +29,8 @@ export interface CloudStoreInterface {
     account: string
     setAccount: (account: string) => void
     sendAuth: (target: any) => void
-    userFighters: FighterAttributes[]
-    setUserFighters: (userFighters: FighterAttributes[]) => void
+    userFighters: Fighter[]
+    setUserFighters: (userFighters: Fighter[]) => void
     fetchUserFighters: (ownerAddress: string) => void
     createFighter: (ownerAddress: string, fighterClass: string, name: string) => void
 
@@ -145,6 +145,7 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
         set(() => ({ equipment: equipment }))
     },
     updateBackpack: (backpack) => {
+        console.log('[updateBackpack] ', backpack);
         set(() => ({ backpack: backpack }))
         // Sets the size of backpack based on Server Side
         useBackpack.setState(() => ({ width: backpack.grid[0].length, height: backpack.grid.length }))
