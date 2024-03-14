@@ -16,10 +16,20 @@ const Fighter = () => {
 	}, [fighter])
 	const width = React.useMemo(() => fighter.currentHealth / fighter.maxHealth * 100 || 0, [])
 	const progressStyle = React.useMemo(() => ({ backgroundColor: color, width: width+'%' }), [color, width])
+	const levelProgressStyle = React.useMemo(() => ({ backgroundColor: "pink", width: fighter.level_progress+'%' }), [color, fighter.level_progress])
+		
+	console.log("fighter.level_progress", fighter.level_progress);
 	return (
-		<div className={styles.FighterDash}>
-			<div><div style={progressStyle} ></div></div>
-			<p>{fighter.currentHealth} / {fighter.maxHealth}</p>
+		<div>
+			<div className={styles.FighterDash}>
+				<div><div style={progressStyle} ></div></div>
+				<p>{fighter.currentHealth} / {fighter.maxHealth}</p>				
+			</div>	
+
+			<div className={styles.FighterDash}>
+				<div><div style={levelProgressStyle} ></div></div>
+				<p>{fighter.level_progress}% / LVL</p>				
+			</div>	
 		</div>
 	)
 }
