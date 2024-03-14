@@ -32,7 +32,7 @@ const Npc = memo(function Npc({ npc }: Props) {
         handlePointerEnter,
         handlePointerLeave,
         handleLeftClick
-    } = usePointerEvents(npc)
+    } = usePointerEvents(npc, model)
 
     // Fill changed npc properties
     useEffect(() => {

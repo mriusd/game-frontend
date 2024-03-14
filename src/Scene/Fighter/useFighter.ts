@@ -63,6 +63,7 @@ export const useFighter = createWithEqualityFn<UseFighterInterface>((set, get) =
 
         const serverTo = $core.worldCoordToMatrix(to)
         const nextServerPosition = $core.getNearestEmptySquareToTarget($this.fighter.coordinates, serverTo)
+        console.log('nextServerPosition', nextServerPosition)
         if (!nextServerPosition) { return }
         const next = $core.matrixCoordToWorld(nextServerPosition)
 
