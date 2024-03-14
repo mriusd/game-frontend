@@ -9,4 +9,5 @@ export interface InventorySlot {
 export interface Inventory {
   grid: boolean[][];
   items: Map<string, InventorySlot>;
+  gold: number;
 }

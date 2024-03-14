@@ -39,6 +39,7 @@ export interface Fighter {
     defence: number;
 
     level: number;
+    level_progress: number;
     experience: number;
 
     direction: Direction;
