@@ -145,6 +145,7 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
         set(() => ({ equipment: equipment }))
     },
     updateBackpack: (backpack) => {
+        console.log('[updateBackpack] ', backpack);
         set(() => ({ backpack: backpack }))
         // Sets the size of backpack based on Server Side
         useBackpack.setState(() => ({ width: backpack.grid[0].length, height: backpack.grid.length }))
