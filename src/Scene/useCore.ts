@@ -48,15 +48,15 @@ export interface CoreInterface {
 }
 
 export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
-    location: 'Lorencia',
+    location: 'Small',
     
     // worldSize: 80,
     // chunkSize: 40,
     // chunksPerAxis: 80 / 40,
 
-    worldSize: 360,
-    chunkSize: 120,
-    chunksPerAxis: 360 / 120,
+    worldSize: 20,
+    chunkSize: 20,
+    chunksPerAxis: 20 / 20,
 
     groundObject: React.createRef(),
 
@@ -155,6 +155,7 @@ export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
 
         const currentDistance = euclideanDistance(currentCoordinate, targetCoordinate)
         const availableNearestSquares = $this._getAvailableNearestSquares(currentCoordinate)
+
         if (!availableNearestSquares.length) { return null }
         const sortedSquares = availableNearestSquares.map(square => ({
           square,

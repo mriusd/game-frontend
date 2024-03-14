@@ -1,6 +1,6 @@
 import styles from './Scene.module.scss'
 
-import React from "react"
+import React, { useEffect } from "react"
 
 import * as THREE from "three"
 
@@ -8,7 +8,7 @@ import { Canvas } from "@react-three/fiber"
 import { Loader, Stats, OrbitControls } from "@react-three/drei"
 
 import Light from "./Light"
-import Chunks from "./Chunks3d/Chunks"
+import Chunks from "./ChunkSimple/Chunks"
 import Fighter from "./Fighter/Fighter"
 import Controls from "./Controls/Controls"
 import FloatingDamage from "./FloatingDamage/FloatingDamage"
@@ -72,6 +72,9 @@ const Scene = React.memo(function Scene() {
 
     const dev = useControls('Camera', { freeCamera: false })
     React.useEffect(() => void setDevMode(dev.freeCamera), [dev])
+
+    // const occupied = useCore(state => state.occupiedCoords)
+    // useEffect(() => {console.log('/occupied', occupied)}, [occupied])
 
     return (
         <div id="scene" tabIndex={0} ref={eventsNode} className={styles.scene}>
