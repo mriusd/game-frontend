@@ -38,16 +38,27 @@ import { useFighter } from './Fighter/useFighter'
 // import FPSLimiter from './UserInterface2D/Settings/FPSLimiter'
 import FPSLimiter from './UserInterface2D/Settings/FPSLimiter2'
 import { DPRLimiter } from './UserInterface2D/Settings/DPRLimiter'
+import { useBackpack } from './UserInterface3D/Backpack/useBackpack'
 
 
 const Scene = React.memo(function Scene() {
     const eventsNode = useUi(state => state.eventsNode)
     const [devMode, setDevMode] = useCore(state => [state.devMode, state.setDevMode], shallow)
     const fighterNode = useFighter(state => state.fighterNode)
-    const [subscribe, unsubscribe] = useCommandLine(state => [state.subscribeCommandLine, state.unsubscribeCommandLine], shallow)
+
     React.useEffect(() => {
-        if (eventsNode.current) { subscribe(eventsNode.current) }
-        return () => unsubscribe()
+        if (eventsNode.current) { 
+            // TODO: use global node instead providing one
+            useCommandLine.getState().subscribeCommandLine(eventsNode.current)
+            // 
+            useBackpack.getState().subscribeBackpack()
+            useUi.getState().subscribePressedKeys()
+        }
+        return () => {
+            useCommandLine.getState().unsubscribeCommandLine()
+            useBackpack.getState().unsubscribeBackpack()
+            useUi.getState().unsubscribePressedKeys()
+        }
     }, [eventsNode.current])
 
     const data = useControls('GL', {

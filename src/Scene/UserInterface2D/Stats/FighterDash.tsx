@@ -18,7 +18,7 @@ const Fighter = () => {
 	const progressStyle = React.useMemo(() => ({ backgroundColor: color, width: width+'%' }), [color, width])
 	const levelProgressStyle = React.useMemo(() => ({ backgroundColor: "pink", width: fighter.level_progress+'%' }), [color, fighter.level_progress])
 		
-	console.log("fighter.level_progress", fighter.level_progress);
+	// console.log("fighter.level_progress", fighter.level_progress);
 	return (
 		<div>
 			<div className={styles.FighterDash}>

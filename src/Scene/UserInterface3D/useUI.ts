@@ -13,6 +13,13 @@ export interface UiStoreInterface {
     userInterface: RefObject<THREE.Group | null>
     // Plane which we raycasts, based on which all mouse events in ui
     intersectionPlane: RefObject<THREE.Mesh | null>
+
+    pressedKeys: Array<String>
+    _keyDownHandler: (enent: KeyboardEvent) => void
+    _keyUpHandler: (enent: KeyboardEvent) => void
+    _updatePressedKeys: (key: string, action: 'add' | 'remove') => void
+    subscribePressedKeys: () => void
+    unsubscribePressedKeys: () => void
 }
 
 export const useUi = create<UiStoreInterface>((set, get) => ({
@@ -27,5 +34,41 @@ export const useUi = create<UiStoreInterface>((set, get) => ({
         eventsNode.style.cursor = property
     },
     userInterface: createRef(),
-    intersectionPlane: createRef()
+    intersectionPlane: createRef(),
+
+    pressedKeys: [],
+    _keyDownHandler: event => {
+        const key = event.code.toLowerCase()
+        get()._updatePressedKeys(key, 'add')
+    },
+    _keyUpHandler: event => {
+        const key = event.code.toLowerCase()
+        get()._updatePressedKeys(key, 'remove')
+    },
+        _updatePressedKeys: (key, action) => {
+        const pressedKeys = get().pressedKeys
+        if (action === 'add') {
+            if (!pressedKeys.includes(key)) {
+                pressedKeys.push(key)
+            }
+        } else if (action === 'remove') {
+            const index = pressedKeys.indexOf(key)
+            if (index !== -1) {
+                pressedKeys.splice(index, 1)
+            }
+        }
+    },
+    subscribePressedKeys: () => {
+        const $this = get()
+        if (!$this.eventsNode.current) { return }
+        $this.eventsNode.current.addEventListener('keydown', $this._keyDownHandler)
+        $this.eventsNode.current.addEventListener('keyup', $this._keyUpHandler)
+    },
+    unsubscribePressedKeys: () => {
+        const $this = get()
+        if (!$this.eventsNode.current) { return }
+        $this.eventsNode.current.removeEventListener('keydown', $this._keyDownHandler)
+        $this.eventsNode.current.removeEventListener('keyup', $this._keyUpHandler)
+    },
+
 }))

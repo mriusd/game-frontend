@@ -61,8 +61,15 @@ const Npc = memo(function Npc({ npc }: Props) {
         // Used over here instead isMoving useEffect cuz it rms a little delay which looks weird
         setAction('run')
         // 
-        isMoving.current = true
         const current = { x: ref.position.x, z: ref.position.z }
+        // Check if the distance more than 2 squares, what means we no need animation, just immidiate move
+        if (Math.abs(current.x - to.x) > 2 || Math.abs(current.z - to.z) > 2) {
+            setNpcPosition(to, ref)
+            return
+        }
+
+        isMoving.current = true
+
         Tween.to(current, to,
             {
                 duration: getMoveDuration(npc.movementSpeed, current, to),

@@ -71,7 +71,8 @@ const Fighter = React.memo(function Fighter() {
 
         if (target?.skill) {
             // Check the distance, if too long - move fighter
-            if (euclideanDistance(objectCoordinate, fighter.coordinates) <= target.skill.activeDistance) {
+            // target.skill.activeDistance + 0.5 for diagonal
+            if (euclideanDistance(objectCoordinate, fighter.coordinates) <= target.skill.activeDistance + 0.5) {
                 const direction = calcDirection(worldCoordToMatrix(fighterNode.current.position), objectCoordinate)
                 setDirection(Math.atan2(direction.dx, direction.dz)) // Additionally set direction on attack, to be sure that fighter look at opponent
                 setAction('attack')
