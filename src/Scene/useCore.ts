@@ -172,31 +172,60 @@ export const useCore = createWithEqualityFn<CoreInterface>((set, get) => ({
       
         return data.square
     },
-    getTargetSquareWithAttackDistance: (currentCoordinate, targetCoordinate, minDistance) => {
-        const $this = get()
+    // getTargetSquareWithAttackDistance: (currentCoordinate, targetCoordinate, minDistance) => {
+    //     const $this = get()
 
-        const currentDistance = euclideanDistance(currentCoordinate, targetCoordinate)
+    //     const currentDistance = euclideanDistance(currentCoordinate, targetCoordinate)
   
-        if (currentDistance <= minDistance) { return null }
+    //     if (currentDistance <= minDistance) { return null }
         
-        const availableNearestSquares = $this._getAvailableNearestSquares(currentCoordinate)
-        const sortedSquares = availableNearestSquares.map(square => ({
-          square,
-          distance: euclideanDistance(square, targetCoordinate)
-        })).sort((a, b) => a.distance - b.distance)
+    //     const availableNearestSquares = $this._getAvailableNearestSquares(currentCoordinate)
+    //     const sortedSquares = availableNearestSquares.map(square => ({
+    //       square,
+    //       distance: euclideanDistance(square, targetCoordinate)
+    //     })).sort((a, b) => a.distance - b.distance)
       
-        if (currentDistance <= sortedSquares[0].distance) { return null }
+    //     if (currentDistance <= sortedSquares[0].distance) { return null }
       
-        if (sortedSquares[0].distance > minDistance) { 
-          return $this.getTargetSquareWithAttackDistance(sortedSquares[0].square, targetCoordinate, minDistance)
+    //     if (sortedSquares[0].distance > minDistance) { 
+    //       return $this.getTargetSquareWithAttackDistance(sortedSquares[0].square, targetCoordinate, minDistance)
+    //     }
+      
+    //     const data = {
+    //       distance: sortedSquares[0].distance,
+    //       square: sortedSquares[0].square
+    //     }
+      
+    //     return data.square
+    // },
+    getTargetSquareWithAttackDistance: (currentCoordinate, targetCoordinate, minDistance) => {
+        // Initialize variables to hold the nearest coordinate and its distance
+        let nearestCoordinate = null;
+        let nearestDistance = Infinity; // Initialize to Infinity to find the minimum distance
+        let nearestCurrentDistance = Infinity;
+
+        // Calculate the maximum delta in each direction to cover the entire attack range
+        const deltaX = Math.min(minDistance, Math.abs(currentCoordinate.x - targetCoordinate.x));
+        const deltaZ = Math.min(minDistance, Math.abs(currentCoordinate.z - targetCoordinate.z));
+
+        // Iterate over adjacent coordinates within the attack distance
+        for (let dx = -deltaX; dx <= deltaX; dx++) {
+            for (let dz = -deltaZ; dz <= deltaZ; dz++) {
+                const adjacentCoord = { x: currentCoordinate.x + dx, z: currentCoordinate.z + dz };
+                const distanceToTarget = euclideanDistance(adjacentCoord, targetCoordinate);
+                const distanceToCurrent = euclideanDistance(adjacentCoord, currentCoordinate);
+
+                // If the distance is within the attack range and closer than the current nearest distance
+                if (distanceToTarget <= minDistance && distanceToTarget < nearestDistance && distanceToCurrent < nearestCurrentDistance) {
+                    nearestCoordinate = adjacentCoord;
+                    nearestDistance = distanceToTarget;
+                    nearestCurrentDistance = distanceToCurrent;
+                }
+            }
         }
-      
-        const data = {
-          distance: sortedSquares[0].distance,
-          square: sortedSquares[0].square
-        }
-      
-        return data.square
+
+        // Return the nearest coordinate found
+        return nearestCoordinate;
     },
 
     sceneObjects: {},

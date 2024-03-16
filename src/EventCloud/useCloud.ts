@@ -60,7 +60,7 @@ export interface CloudStoreInterface {
     setTarget: (target: Fighter, skill: Skill) => void
     selectedSkill: number
     setSelectedSkill: (skill: number) => void
-    submitAttack: (direction: Direction) => void
+    submitAttack: (direction: Direction, target: { target: Fighter | null, skill: Skill | null }) => void
 
 
     // Fighter
@@ -287,15 +287,16 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
     setTarget: (target, skill) => set({ target: { target, skill } }),
     selectedSkill: 4,
     setSelectedSkill: (skill: number) => set({ selectedSkill: skill }),
-    submitAttack: async (direction) => {
+    submitAttack: async (direction, target) => {
         const $this = get()
-        if (!$this?.target?.target?.id) { return }
+        if (!target?.target?.id) { return }
+        
         $this.sendJsonMessage({
             type: "submit_attack",
             data: {
-                opponentID: $this.target.target.id.toString(),
+                opponentID: target.target.id.toString(),
                 playerID: useFighter.getState().fighter.tokenId.toString(),
-                skill: $this.selectedSkill,
+                skill: target.skill.skillId,
                 direction: direction
             }
         });

@@ -31,7 +31,8 @@ const Npc = memo(function Npc({ npc }: Props) {
         nameColor,
         handlePointerEnter,
         handlePointerLeave,
-        handleLeftClick
+        handleLeftClick,
+        handleRightClick
     } = usePointerEvents(npc, model)
 
     // Fill changed npc properties
@@ -124,6 +125,7 @@ const Npc = memo(function Npc({ npc }: Props) {
                 onPointerMove={handlePointerEnter}
                 onPointerLeave={handlePointerLeave}
                 onPointerDown={handleLeftClick}
+                onContextMenu={handleRightClick}
             />
         </group>
     )

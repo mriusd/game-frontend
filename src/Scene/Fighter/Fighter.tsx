@@ -76,11 +76,20 @@ const Fighter = React.memo(function Fighter() {
                 const direction = calcDirection(worldCoordToMatrix(fighterNode.current.position), objectCoordinate)
                 setDirection(Math.atan2(direction.dx, direction.dz)) // Additionally set direction on attack, to be sure that fighter look at opponent
                 setAction('attack')
-                submitAttack(direction)
+                submitAttack(direction, target)
                 setTarget(null, null)
                 return
             }
-            move(matrixCoordToWorld(objectCoordinate))
+            console.log('current ->', fighter.coordinates)
+            console.log('target ->', objectCoordinate)
+            console.log('active ->', useCore.getState().getTargetSquareWithAttackDistance(fighter.coordinates, objectCoordinate, target.skill.activeDistance))
+
+            move(
+                matrixCoordToWorld(
+                    // useCore.getState().getTargetSquareWithAttackDistance(fighter.coordinates, objectCoordinate, target.skill.activeDistance)
+                    objectCoordinate
+                )
+            )
         }
 
     }, [target])

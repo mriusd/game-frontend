@@ -40,6 +40,8 @@ import FPSLimiter from './UserInterface2D/Settings/FPSLimiter2'
 import { DPRLimiter } from './UserInterface2D/Settings/DPRLimiter'
 import { useBackpack } from './UserInterface3D/Backpack/useBackpack'
 
+import { subscribeDisableContextMenu, unsubscribeDisableContextMenu } from './utils/contextMenu'
+
 
 const Scene = React.memo(function Scene() {
     const eventsNode = useUi(state => state.eventsNode)
@@ -53,11 +55,13 @@ const Scene = React.memo(function Scene() {
             // 
             useBackpack.getState().subscribeBackpack()
             useUi.getState().subscribePressedKeys()
+            subscribeDisableContextMenu()
         }
         return () => {
             useCommandLine.getState().unsubscribeCommandLine()
             useBackpack.getState().unsubscribeBackpack()
             useUi.getState().unsubscribePressedKeys()
+            unsubscribeDisableContextMenu()
         }
     }, [eventsNode.current])
 

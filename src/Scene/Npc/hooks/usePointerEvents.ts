@@ -6,14 +6,12 @@ import { useCore } from "Scene/useCore"
 import { getHeatbox } from "Scene/utils/getHeatbox"
 
 import type { Fighter } from "interfaces/fighter.interface"
+import { ThreeEvent } from "@react-three/fiber"
 
 
 export const usePointerEvents = (npc: Fighter, model?: any) => {
     const nameColor = React.useRef<0xFFFFFF | 0xFF3300>(0xFFFFFF)
-    const setTarget = useCloud(state => state.setTarget)
     const fighter = useFighter(state => state.fighter)
-    const [setHoveredItems, isItemHovered] = useCore(state => [state.setHoveredItems, state.isItemHovered])
-
 
     // Set target & hover
     const handlePointerEnter = useCallback((e) => {
@@ -26,17 +24,18 @@ export const usePointerEvents = (npc: Fighter, model?: any) => {
         e.stopPropagation()
         nameColor.current = 0xFF3300
         $ui.setCursor('pointer')
-        setHoveredItems(npc, 'add')
+        useCore.getState().setHoveredItems(npc, 'add')
         const heatbox = getHeatbox(model)
         heatbox && (heatbox.visible = true)
     }, [npc, model])
 
     const handlePointerLeave = useCallback(() => {
         const $ui = useUi.getState()
-        if (!isItemHovered(npc)) { return } // To prevent extra leave events, what leads to mouse flickering
+        const $core = useCore.getState()
+        if (!$core.isItemHovered(npc)) { return } // To prevent extra leave events, what leads to mouse flickering
         nameColor.current = 0xFFFFFF
         $ui.setCursor('default')
-        setHoveredItems(npc, 'remove')
+        $core.setHoveredItems(npc, 'remove')
         const heatbox = getHeatbox(model)
         heatbox && (heatbox.visible = false)
     }, [npc, model])
@@ -49,20 +48,20 @@ export const usePointerEvents = (npc: Fighter, model?: any) => {
         }
         if (npc.isDead) { return }
         e.stopPropagation()
-        setTarget(npc, fighter.skills[useCloud.getState().selectedSkill])
+        useCloud.getState().setTarget(npc, fighter.skills[0])
     }, [npc, model])
-    // const handleRightClick = (event: ThreeEvent<PointerEvent>) => {
-        // if (npc.isDead) { return }
-    //     // onContextMenu
-    //     console.log('Right CLick', event)
-    //     setTarget(npc, fighter.skills[1])
-    // }
+    const handleRightClick = useCallback((event: ThreeEvent<PointerEvent>) => {
+        if (npc.isDead) { return }
+        event.stopPropagation()
+        useCloud.getState().setTarget(npc, fighter.skills[useCloud.getState().selectedSkill])
+    }, [])
 
 
     return {
         nameColor,
         handlePointerEnter,
         handlePointerLeave,
+        handleRightClick,
         handleLeftClick
     }
 }
