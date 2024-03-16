@@ -1,7 +1,7 @@
-import React from "react"
+import React, { useRef } from "react"
 
 import * as THREE from "three"
-import { useFrame } from "@react-three/fiber"
+import { useFrame, useThree } from "@react-three/fiber"
 import { Plane, Text } from "@react-three/drei"
 
 import { useSpring, easings } from "react-spring"
@@ -24,6 +24,8 @@ import { useUi } from "Scene/UserInterface3D/useUI"
 interface Props { item: ItemDroppedEvent }
 const DroppedItem = React.memo(function DroppedItem({ item }: Props) {
     const itemRef = React.useRef<THREE.Mesh | null>(null)    
+    const pickedUp = useRef(false)
+    const hovered = useRef(false)
 
     const [pickupDroppedItem] = useCloud(state => [state.pickupDroppedItem])
     const [setHoveredItems, matrixCoordToWorld] = useCore(state => [state.setHoveredItems, state.matrixCoordToWorld])
@@ -33,6 +35,7 @@ const DroppedItem = React.memo(function DroppedItem({ item }: Props) {
     const { model, uniforms } = useShaderedItem(item)
 
     const scale = useModelScale(item)
+    const get = useThree(state => state.get)
 
     // Positioning
     const rotationZ = React.useMemo(() => Math.random() * Math.PI * 2, [])
@@ -47,10 +50,22 @@ const DroppedItem = React.memo(function DroppedItem({ item }: Props) {
     }, [model, item, scale])
 
     // Billboard Material
-    const textBillboardMaterial = React.useMemo(() => createBillboardMaterial(new THREE.MeshBasicMaterial()), [])
-    const backgroundBillboardMaterial = React.useMemo(() => createBillboardMaterial(new THREE.MeshBasicMaterial({ color: 0x000000, opacity: .7, transparent: true })), [])
+    const textBillboardMaterial = React.useMemo(() => { 
+        const m = createBillboardMaterial(new THREE.MeshBasicMaterial())
+        m.depthTest = false
+        m.depthWrite = false
+        return m
+    }, [])
+    const backgroundBillboardMaterial = React.useMemo(() => {
+        const m = createBillboardMaterial(new THREE.MeshBasicMaterial({ color: 0x000000, opacity: .7, transparent: true }))
+        m.depthTest = false
+        m.depthWrite = false
+        return m
+    }, [])
 
     const textRef = React.useRef<THREE.Mesh | null>(null)
+    const textContainerRef = React.useRef<THREE.Group | null>(null)
+
     
     // Text
     const generatedName = React.useMemo(() => generateItemName(item.item, item.qty), [item])
@@ -75,6 +90,7 @@ const DroppedItem = React.memo(function DroppedItem({ item }: Props) {
         setHoveredItems(item, 'add')
         if (!itemRef.current) { return }
         setOpacity(itemRef.current, .4)
+        hovered.current = true
     }
     const handlePointerLeave = () => {
         setCursor('default')
@@ -82,6 +98,7 @@ const DroppedItem = React.memo(function DroppedItem({ item }: Props) {
         setHoveredItems(item, 'remove')
         if (!itemRef.current) { return }
         setOpacity(itemRef.current, 1)
+        hovered.current = false
     }
     function setOpacity(item: THREE.Group | THREE.Mesh, opacity: number) {
         item.traverse(object => {
@@ -95,14 +112,38 @@ const DroppedItem = React.memo(function DroppedItem({ item }: Props) {
         })
     }
     const handlePointerClick = () => {
+        if (pickedUp.current) { return }
         pickupDroppedItem(item)
+        hovered.current = false
         // TODO: Check what it was
         // setItemTarget(item)
+        pickedUp.current = true
     }
 
     useFrame(({ clock }) => {
         if (model) {
             uniforms.current.uTime.value = clock.getElapsedTime()
+
+            // Show Text on Hover / Hide while holding ALT
+            if (textContainerRef.current) {
+                const $ui = useUi.getState()
+                if (hovered.current) {
+                    textContainerRef.current.visible = true
+                    if ($ui.pressedKeys.includes('metaleft') || $ui.pressedKeys.includes('altleft')) { 
+                        textContainerRef.current.position.y = 0.2
+                        return
+                    }
+                    return
+                }
+                // TODO: add correct types to HoveredItems
+                // @ts-expect-error
+                if (useCore.getState().hoveredItems.find(_ => !!_.item) && ($ui.pressedKeys.includes('metaleft') || $ui.pressedKeys.includes('altleft'))) {
+                    textContainerRef.current.visible = false
+                    return
+                }
+                textContainerRef.current.visible = true
+                textContainerRef.current.position.y = 1
+            }
         }
     })
 
@@ -129,7 +170,8 @@ const DroppedItem = React.memo(function DroppedItem({ item }: Props) {
                     position-y={props.posY}
                     position-z={props.posZ}
                 >
-                    <group 
+                    <group
+                        ref={textContainerRef}
                         // visible={!!isActive.current}
                         position={[0, 1, 0]}
                     >
