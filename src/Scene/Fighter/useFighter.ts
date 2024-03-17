@@ -18,6 +18,7 @@ import { getActionName } from './utils/getActionName';
 import { getActionTimeScale } from './utils/getActionTimeScale';
 
 import type { WorldCoordinate } from 'interfaces/coordinate.interface';
+import type { TargetType } from 'EventCloud/useCloud';
 
 export type AllActionsType =  'stand' | 'run' | 'attack' | 'die' | 'sword_attack' | 'sword_run' | 'sword_stand' | 'none'
 export type ActionsType =  'stand' | 'run' | 'attack' | 'die' | 'none'
@@ -29,8 +30,9 @@ export interface UseFighterInterface {
     isMoving: boolean
     setIsMoving: (isMoving: boolean) => void
     targetCoordinate: WorldCoordinate | null
-    move: (to: WorldCoordinate, saveTarget?: boolean) => void
+    move: (to: WorldCoordinate, _attack?: TargetType, saveAttack?: boolean, saveTarget?: boolean) => void
     setPosition: (to: WorldCoordinate) => void
+    attackTarget: TargetType
 
     // Actions
     actions: { [key: string]: THREE.AnimationAction}
@@ -48,8 +50,10 @@ export const useFighter = createWithEqualityFn<UseFighterInterface>((set, get) =
     isMoving: false,
     setIsMoving: (isMoving) => set({ isMoving }),
     targetCoordinate: null,
-    move: (outerTo, saveTarget = true) => {
+    attackTarget: { target: null, skill: null },
+    move: (outerTo, _attackTarget = { target: null, skill: null }, saveAttack = true, saveTarget = true) => {
         if (saveTarget) { set({ targetCoordinate: {...outerTo} }) }
+        if (saveAttack) { set({ attackTarget: _attackTarget }) }
 
         const $core = useCore.getState()
         const $controls = useControls.getState()
@@ -57,6 +61,7 @@ export const useFighter = createWithEqualityFn<UseFighterInterface>((set, get) =
         const $this = get()
         const ref = $this.fighterNode.current
         const to = $this.targetCoordinate
+        const attackTarget = $this.attackTarget
 
         if ($this.isMoving) { return }
         if (isEqualCoord(ref.position, to)) { return }
@@ -85,8 +90,12 @@ export const useFighter = createWithEqualityFn<UseFighterInterface>((set, get) =
                 onChange: (state: { value: Coordinate }) => void $this.setPosition(state.value),
                 onComplete: () => { 
                     $this.setIsMoving(false)
-                    moveTimeout.value = setTimeout(() => get().action.includes('run') && $this.setAction('stand'), 50)
-                    $this.move($this.targetCoordinate, false)
+                    moveTimeout.value = setTimeout(() => { 
+                        get().action.includes('run') && $this.setAction('stand')
+                        useCloud.getState().setTarget(attackTarget.target, attackTarget.skill)
+                        set({ attackTarget: { target: null, skill: null } })
+                    }, 50)
+                    $this.move($this.targetCoordinate, {} as any, false, false)
                 },
             }
         )

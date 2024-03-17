@@ -19,6 +19,10 @@ import { useFighter } from 'Scene/Fighter/useFighter';
 import { useBackpack } from "../Scene/UserInterface3D/Backpack/useBackpack";
 
 
+export type TargetType = {
+    target: Fighter | null 
+    skill: Skill | null
+}
 export interface CloudStoreInterface {
     readyState: boolean
     sendJsonMessage: (jsonMessage: JsonValue) => void | null
@@ -56,11 +60,11 @@ export interface CloudStoreInterface {
 
 
     // Attack
-    target: { target: Fighter | null, skill: Skill | null }
+    target: TargetType
     setTarget: (target: Fighter, skill: Skill) => void
     selectedSkill: number
     setSelectedSkill: (skill: number) => void
-    submitAttack: (direction: Direction, target: { target: Fighter | null, skill: Skill | null }) => void
+    submitAttack: (direction: Direction, target: TargetType) => void
 
 
     // Fighter

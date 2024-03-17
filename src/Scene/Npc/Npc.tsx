@@ -13,6 +13,10 @@ import { isEqualCoord } from 'Scene/utils/isEqualCoord'
 import { useActions } from './hooks/useActions'
 import { useEvent } from 'Scene/hooks/useEvent'
 import { usePointerEvents } from './hooks/usePointerEvents'
+import { useFrame } from '@react-three/fiber'
+
+import { getHeatbox } from "Scene/utils/getHeatbox"
+import { useUi } from 'Scene/UserInterface3D/useUI'
 
 
 interface Props { npc: Fighter }
@@ -32,7 +36,8 @@ const Npc = memo(function Npc({ npc }: Props) {
         handlePointerEnter,
         handlePointerLeave,
         handleLeftClick,
-        handleRightClick
+        handleRightClick,
+        hovered
     } = usePointerEvents(npc, model)
 
     // Fill changed npc properties
@@ -107,6 +112,20 @@ const Npc = memo(function Npc({ npc }: Props) {
             setSceneObject(npc.id, npcRef.current, 'remove')
         }
     }, [npcRef.current, npc])
+
+
+    const heatbox = useRef(getHeatbox(model))
+    useFrame(() => {
+        if (hovered.current) {
+            heatbox.current && (heatbox.current.visible = true)
+            if (useUi.getState().pressedKeys.includes('metaleft') || useUi.getState().pressedKeys.includes('altleft')) { 
+                handlePointerLeave()
+                return 
+            }
+            return
+        }
+        heatbox.current && (heatbox.current.visible = false)
+    })
 
     return (
         <group 

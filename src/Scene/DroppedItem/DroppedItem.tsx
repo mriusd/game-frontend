@@ -128,20 +128,14 @@ const DroppedItem = React.memo(function DroppedItem({ item }: Props) {
             if (textContainerRef.current) {
                 const $ui = useUi.getState()
                 if (hovered.current) {
-                    textContainerRef.current.visible = true
                     if ($ui.pressedKeys.includes('metaleft') || $ui.pressedKeys.includes('altleft')) { 
                         textContainerRef.current.position.y = 0.2
                         return
                     }
+                    textContainerRef.current.position.y = 1
                     return
                 }
                 // TODO: add correct types to HoveredItems
-                // @ts-expect-error
-                if (useCore.getState().hoveredItems.find(_ => !!_.item) && ($ui.pressedKeys.includes('metaleft') || $ui.pressedKeys.includes('altleft'))) {
-                    textContainerRef.current.visible = false
-                    return
-                }
-                textContainerRef.current.visible = true
                 textContainerRef.current.position.y = 1
             }
         }
@@ -170,6 +164,13 @@ const DroppedItem = React.memo(function DroppedItem({ item }: Props) {
                     position-y={props.posY}
                     position-z={props.posZ}
                 >
+                    <Plane 
+                        name="plane-heatbox"
+                        material={backgroundBillboardMaterial}
+                        args={[width, .25]}
+                        position={[0, 1, 0]}
+                        visible={false}
+                    />
                     <group
                         ref={textContainerRef}
                         // visible={!!isActive.current}

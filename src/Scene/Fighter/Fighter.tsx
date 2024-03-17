@@ -1,6 +1,6 @@
-import React from "react"
+import React, { useRef } from "react"
 import { useFrame } from "@react-three/fiber"
-import { useAnimations } from "@react-three/drei"
+import { Plane, useAnimations } from "@react-three/drei"
 import { euclideanDistance } from "../utils/euclideanDistance"
 import { calcDirection } from "../utils/calcDirection"
 // TODO: Temporary, create Skills Manager and swap shader materials instead
@@ -17,6 +17,8 @@ import { useEquipmentChange } from "./hooks/useEquipmentChange"
 
 import { useEvent } from "Scene/hooks/useEvent"
 import { useSkillEffects } from "./hooks/useSkillEffects/useSkillEffects"
+
+import * as THREE from 'three'
 
 const Fighter = React.memo(function Fighter() {
     const spawned = React.useRef(false)
@@ -64,6 +66,7 @@ const Fighter = React.memo(function Fighter() {
         fighterNode.current.rotation.y = useControls.getState().direction
     })
 
+    const devClickedCoordinate = useRef<THREE.Mesh>()
     // React on Target and Do Action
     React.useEffect(() => {
         if (!target?.target) { return }
@@ -77,19 +80,22 @@ const Fighter = React.memo(function Fighter() {
                 setDirection(Math.atan2(direction.dx, direction.dz)) // Additionally set direction on attack, to be sure that fighter look at opponent
                 setAction('attack')
                 submitAttack(direction, target)
-                setTarget(null, null)
                 return
             }
-            console.log('current ->', fighter.coordinates)
-            console.log('target ->', objectCoordinate)
-            console.log('active ->', useCore.getState().getTargetSquareWithAttackDistance(fighter.coordinates, objectCoordinate, target.skill.activeDistance))
 
+            // FOR TEST
+            const objectWorldCoordinate = matrixCoordToWorld(objectCoordinate)
+            if (devClickedCoordinate.current) {
+                devClickedCoordinate.current.position.x = objectWorldCoordinate.x
+                devClickedCoordinate.current.position.z = objectWorldCoordinate.z
+            }
+            // 
+            const to = matrixCoordToWorld(useCore.getState().getTargetSquareWithAttackDistance(fighter.coordinates, objectCoordinate, target.skill.activeDistance))
             move(
-                matrixCoordToWorld(
-                    // useCore.getState().getTargetSquareWithAttackDistance(fighter.coordinates, objectCoordinate, target.skill.activeDistance)
-                    objectCoordinate
-                )
+                to,
+                target
             )
+            setTarget(null, null)
         }
 
     }, [target])
@@ -120,6 +126,7 @@ const Fighter = React.memo(function Fighter() {
             >
                 {effects.map((_, i) => <primitive object={_} key={i} />)}
             </FighterModel>
+            <Plane ref={devClickedCoordinate} rotation={[Math.PI / -2, 0, 0]} position={[100, 0.0001, 100]} material={new THREE.MeshBasicMaterial({ color: 0x0000FF })} />
         </group>
     )
 })
