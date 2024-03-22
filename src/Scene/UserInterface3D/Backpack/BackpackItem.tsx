@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { Plane } from "@react-three/drei"
-import { useMemo, useRef } from "react"
+import { RefObject, useMemo, useRef } from "react"
 import { useBackpack } from "Scene/UserInterface3D/Backpack/useBackpack";
 import { shallow } from 'zustand/shallow'
 import { ThreeEvent } from '@react-three/fiber';
@@ -14,23 +14,29 @@ interface Props {
     onPointerEnter?: (e: ThreeEvent<PointerEvent>) => void
     onPointerMove?: (e: ThreeEvent<PointerEvent>) => void
     onPointerLeave?: (e: ThreeEvent<PointerEvent>) => void
-    mounted: boolean
+    mounted: boolean,
+    cellSize: number,
+    slots: RefObject<{[key: number]: THREE.Mesh}>
 }
 
-const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter, onPointerMove, onPointerLeave, mounted }: Props) {
+const BackpackItem = memo(function BackpackItem({ 
+    item, 
+    onClick, 
+    onPointerEnter, 
+    onPointerMove, 
+    onPointerLeave, 
+    mounted,
+    cellSize,
+    slots
+}: Props) {
     // console.log('[CPU CHECK]: Rerender <Backpack Item>')
 
     const itemPlaneRef = useRef<THREE.Mesh | null>(null)
     const itemRef = useRef<THREE.Mesh | null>(null)
 
-    const [ cellSize, slots ] = useBackpack(
-        state => [state.cellSize, state.slots], 
-        shallow
-    )
-
     // Positioning
-    const itemPlaneWidth = useMemo(() => cellSize * item.itemAttributes.itemParameters.itemWidth, [item, mounted])
-    const itemPlaneHeight = useMemo(() => cellSize * item.itemAttributes.itemParameters.itemHeight, [item, mounted])
+    const itemPlaneWidth = useMemo(() => cellSize * item.itemAttributes.itemParameters.itemWidth, [item, mounted, cellSize])
+    const itemPlaneHeight = useMemo(() => cellSize * item.itemAttributes.itemParameters.itemHeight, [item, mounted, cellSize])
 
     const itemScale = useMemo(() => {
         return cellSize * .8 * Math.max(item.itemAttributes.itemParameters.itemWidth, item.itemAttributes.itemParameters.itemHeight)
@@ -55,7 +61,7 @@ const BackpackItem = memo(function BackpackItem({ item, onClick, onPointerEnter,
         y -= (item.itemAttributes.itemParameters.itemHeight - 1) * cellSize / 2
 
         return new THREE.Vector3(x, y, z)
-    }, [ item, slots.current, mounted ])
+    }, [ item, slots.current, mounted, slots ])
 
     if (!mounted) {
         return <></>

@@ -9,30 +9,30 @@ import { useCore } from "Scene/useCore"
 import { useSettings } from "Scene/UserInterface2D/Settings/useSettings"
 
 // Objects Data
-import grassData from './data/grass.json'
-import christmasTreeData from './data/christmass_tree.json'
-import treeData from './data/tree.json'
-import flowerData from './data/flower.json'
-import houseData from './data/house.json'
-import stoneData from './data/stone.json'
+// import grassData from './data/grass.json'
+import christmasTreeData from './data/christmas_tree.json'
+import tentData from './data/tent.json'
+import marqueeData from './data/marquee.json'
+import bushData from './data/bush.json'
+import logData from './data/log.json'
+import fernData from './data/fern.json'
+import barrelData from './data/barrel.json'
+
+// import treeData from './data/tree.json'
+// import flowerData from './data/flower.json'
+// import houseData from './data/house.json'
+// import stoneData from './data/stone.json'
 
 
 const DecorTest = React.memo(function Decor() {
-    // console.log('rerender')
 
-    // const matrixCoordToWorld = useCore(state => state.matrixCoordToWorld)
-    const grass = React.useMemo(() => getShaderedDecor('grass'), [])
-    const tree = React.useMemo(() => getShaderedDecor('tree'), [])
+    // const grass = React.useMemo(() => getShaderedDecor('grass'), [])
+    // const tree = React.useMemo(() => getShaderedDecor('tree'), [])
     // // @ts-expect-error
-    // console.log('nodes', grass.gltf.nodes)
+    // const meshes = React.useMemo(() => ({ Grass: grass.gltf.nodes.grass015,  Tree: tree.gltf.nodes.tree_1 }), [grass, tree])
+    // // console.log('meshes', meshes)
+    // const hideSmallObjects = useSettings(state => state.hideSmallObjects)
 
-    // console.log(grass)
-    // const worldCoordinate = useMemo(() => matrixCoordToWorld(objectData.location), [grassData])
-
-    // @ts-expect-error
-    const meshes = React.useMemo(() => ({ Grass: grass.gltf.nodes.grass015,  Tree: tree.gltf.nodes.tree_1 }), [grass, tree])
-    // console.log('meshes', meshes)
-    const hideSmallObjects = useSettings(state => state.hideSmallObjects)
 
     return (
         // <Merged meshes={meshes}>
@@ -49,12 +49,8 @@ const DecorTest = React.memo(function Decor() {
         // </Merged>
 
         <>
-        {/* { (grassData as Array<any>).map((_, i) => <mesh key={i}>
-            <meshBasicMaterial color={'red'} />
-            <sphereGeometry args={[1, 16, 16]}/>
-        </mesh>) } */}
         {/* Setting HideSmallObjects */}
-        { !hideSmallObjects ? <>
+        {/* { !hideSmallObjects ? <>
             <Instances geometry={meshes.Grass.geometry} material={meshes.Grass.material}>
                 <group position={[0, 0, 0]}>
                     { (grassData as Array<any>).map((_, i) => <InstancedObject  objectData={_} key={i}  />) }
@@ -62,11 +58,14 @@ const DecorTest = React.memo(function Decor() {
             </Instances>
             { (flowerData as Array<any>).map((_, i) => <BaseObject objectData={_} name="flower" key={i}  />) }
             { (stoneData as Array<any>).map((_, i) => <BaseObject objectData={_} name="stone" key={i}  />) }
-        </> : null }
-        {/* { (grassData as Array<any>).map((_, i) => <BaseObject objectData={_} name="grass" key={i}  />) } */}
+        </> : null } */}
         { (christmasTreeData as Array<any>).map((_, i) => <BaseObject objectData={_} name="christmas_tree"  key={i}  />) }
-        { (treeData as Array<any>).map((_, i) => <BaseObject objectData={_} name="tree" key={i}  />) }
-        { (houseData as Array<any>).map((_, i) => <BaseObject objectData={_} name="house" key={i}  />) }
+        { (tentData as Array<any>).map((_, i) => <BaseObject objectData={_} name="tent"  key={i}  />) }
+        { (marqueeData as Array<any>).map((_, i) => <BaseObject objectData={_} name="marquee"  key={i}  />) }
+        { (bushData as Array<any>).map((_, i) => <BaseObject objectData={_} name="bush"  key={i}  />) }
+        { (logData as Array<any>).map((_, i) => <BaseObject objectData={_} name="log"  key={i}  />) }
+        { (fernData as Array<any>).map((_, i) => <BaseObject objectData={_} name="fern"  key={i}  />) }
+        { (barrelData as Array<any>).map((_, i) => <BaseObject objectData={_} name="barrel"  key={i}  />) }
         </>
         // <></>
     )
@@ -89,7 +88,7 @@ interface Props {
 function Object({ objectData, models }: Props) {
     const ref = React.useRef<THREE.Mesh | null>(null)
     const matrixCoordToWorld = useCore(state => state.matrixCoordToWorld)
-    const worldCoordinate = React.useMemo(() => matrixCoordToWorld(objectData.location), [grassData])
+    const worldCoordinate = React.useMemo(() => matrixCoordToWorld(objectData.location), [])
     return (
         <models.Grass
             ref={ref}
@@ -111,7 +110,7 @@ function Object({ objectData, models }: Props) {
 function InstancedObject({ objectData }: Props) {
     const ref = React.useRef<THREE.Mesh | null>(null)
     const matrixCoordToWorld = useCore(state => state.matrixCoordToWorld)
-    const worldCoordinate = React.useMemo(() => matrixCoordToWorld(objectData.location), [grassData])
+    const worldCoordinate = React.useMemo(() => matrixCoordToWorld(objectData.location), [])
     return (
         <group name='instanced-object'>
             <Instance

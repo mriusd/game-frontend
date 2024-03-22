@@ -1,32 +1,37 @@
 export const decor = [
-    // Tree
-    {
-        name: 'decor_tree',
-        url: 'models/decor/tree/tree.gltf'
-    },
     // Christmass Tree
     {
         name: 'decor_christmas_tree',
-        url: 'models/decor/christmas_tree/christmas_tree.gltf'
+        url: 'models/decor/christmas_tree/christmas_tree.glb'
     },
-    // Grass
+    // Tent
     {
-        name: 'decor_grass',
-        url: 'models/decor/grass/grass.gltf'
+        name: 'decor_tent',
+        url: 'models/decor/tent/tent.glb'
     },
-    // Flower
+    // Marquee
     {
-        name: 'decor_flower',
-        url: 'models/decor/flower/house.gltf'
+        name: 'decor_marquee',
+        url: 'models/decor/marquee/marquee.glb'
     },
-    // House
+    // Bush
     {
-        name: 'decor_house',
-        url: 'models/decor/house/house.gltf'
+        name: 'decor_bush',
+        url: 'models/decor/bush/bush.glb'
     },
-    // Stone
+    // Log
     {
-        name: 'decor_stone',
-        url: 'models/decor/stones/stones.gltf'
-    }
+        name: 'decor_log',
+        url: 'models/decor/log/log.glb'
+    },
+    // Fern
+    {
+        name: 'decor_fern',
+        url: 'models/decor/fern/fern.glb'
+    },
+    // Barrel
+    {
+        name: 'decor_barrel',
+        url: 'models/decor/barrel/barrel.glb'
+    },
 ]

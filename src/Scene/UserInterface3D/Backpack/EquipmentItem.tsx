@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { Plane } from "@react-three/drei"
-import { useMemo, useRef } from "react"
+import { RefObject, useMemo, useRef } from "react"
 import { useBackpack } from "Scene/UserInterface3D/Backpack/useBackpack";
 import { shallow } from 'zustand/shallow'
 import { ThreeEvent } from '@react-three/fiber';
@@ -15,18 +15,23 @@ interface Props {
     onPointerMove?: (e: ThreeEvent<PointerEvent>) => void
     onPointerLeave?: (e: ThreeEvent<PointerEvent>) => void
     mounted: boolean
+    cellSize: number,
+    slots: RefObject<{[key: number]: THREE.Mesh}>
 }
 
-const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter, onPointerMove, onPointerLeave, mounted }: Props) {
+const EquipmentItem = memo(function EquipmentItem({ 
+    item, 
+    onClick, 
+    onPointerEnter, 
+    onPointerMove, 
+    onPointerLeave, 
+    mounted,
+    cellSize,
+    slots
+}: Props) {
     // console.log('[CPU CHECK]: Rerender <Backpack Item>')
-
     const itemPlaneRef = useRef<THREE.Mesh | null>(null)
     const itemRef = useRef<THREE.Mesh | null>(null)
-
-    const [ cellSize, slots ] = useBackpack(
-        state => [state.cellSize, state.equipmentSlots], 
-        shallow
-    )
 
     const slotUserData = useMemo(() => {
         if (!slots.current) { return }
@@ -35,8 +40,8 @@ const EquipmentItem = memo(function BackpackItem({ item, onClick, onPointerEnter
     }, [item, slots.current])
 
     // Positioning
-    const itemPlaneWidth = useMemo(() => cellSize * (slotUserData?.itemWidth || 0), [slotUserData])
-    const itemPlaneHeight = useMemo(() => cellSize * (slotUserData?.itemHeight || 0), [slotUserData])
+    const itemPlaneWidth = useMemo(() => cellSize * (slotUserData?.itemWidth || 0), [slotUserData, cellSize])
+    const itemPlaneHeight = useMemo(() => cellSize * (slotUserData?.itemHeight || 0), [slotUserData, cellSize])
 
     const itemScale = useMemo(() => {
         return cellSize * .9 * (slotUserData?.itemHeight || 0)
