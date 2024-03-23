@@ -34,4 +34,30 @@ export const decor = [
         name: 'decor_barrel',
         url: 'models/decor/barrel/barrel.glb'
     },
+
+    // Stump
+    {
+        name: 'decor_stump',
+        url: 'models/decor/stump/stump.glb'
+    },
+    // Table
+    {
+        name: 'decor_table',
+        url: 'models/decor/table/table.glb'
+    },
+    // Little Grass
+    {
+        name: 'decor_little_grass',
+        url: 'models/decor/little_grass/little_grass.glb'
+    },
+    // Big Grass
+    {
+        name: 'decor_big_grass',
+        url: 'models/decor/big_grass/big_grass.glb'
+    },
+    // Fire
+    {
+        name: 'decor_fire',
+        url: 'models/decor/fire/fire.glb'
+    },
 ]

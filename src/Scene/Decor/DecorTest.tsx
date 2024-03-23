@@ -18,10 +18,11 @@ import logData from './data/log.json'
 import fernData from './data/fern.json'
 import barrelData from './data/barrel.json'
 
-// import treeData from './data/tree.json'
-// import flowerData from './data/flower.json'
-// import houseData from './data/house.json'
-// import stoneData from './data/stone.json'
+import bigGrassData from './data/big_grass.json'
+import fireData from './data/fire.json'
+import littleGrassData from './data/little_grass.json'
+import stumpData from './data/stump.json'
+import tableData from './data/table.json'
 
 
 const DecorTest = React.memo(function Decor() {
@@ -65,6 +66,12 @@ const DecorTest = React.memo(function Decor() {
         { (logData as Array<any>).map((_, i) => <BaseObject objectData={_} name="log"  key={i}  />) }
         { (fernData as Array<any>).map((_, i) => <BaseObject objectData={_} name="fern"  key={i}  />) }
         { (barrelData as Array<any>).map((_, i) => <BaseObject objectData={_} name="barrel"  key={i}  />) }
+
+        { (bigGrassData as Array<any>).map((_, i) => <BaseObject objectData={_} name="big_grass"  key={i}  />) }
+        { (fireData as Array<any>).map((_, i) => <BaseObject objectData={_} name="fire"  key={i}  />) }
+        { (littleGrassData as Array<any>).map((_, i) => <BaseObject objectData={_} name="little_grass"  key={i}  />) }
+        { (stumpData as Array<any>).map((_, i) => <BaseObject objectData={_} name="stump"  key={i}  />) }
+        { (tableData as Array<any>).map((_, i) => <BaseObject objectData={_} name="table"  key={i}  />) }
         </>
         // <></>
     )
