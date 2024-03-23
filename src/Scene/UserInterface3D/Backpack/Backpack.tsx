@@ -3,25 +3,8 @@ import { memo } from 'react'
 import { useBackpack } from 'Scene/UserInterface3D/Backpack/useBackpack'
 import { shallow } from 'zustand/shallow'
 import { useCloud } from 'EventCloud/useCloud'
-import { UltimateSlots } from './UtlimateSlots'
+import { Slots } from './Slots/Slots'
 import { useCore } from 'Scene/useCore'
-
-
-type CellType = 'equipment' | 'backpack'
-
-const colors = {
-    COMMON_DARK: '#131313',
-    COMMON_LIGHT: '#202020',
-
-    INSERT_ALLOWED_DARK: '#183419',
-    INSERT_ALLOWED_LIGHT: '#1F3D20',
-
-    INSERT_DISALLOWED_DARK: '#351B1B',
-    INSERT_DISALLOWED_LIGHT: '#442323',
-
-    LAST_PLACEHOLDER_DARK: '#342F00', 
-    LAST_PLACEHOLDER_LIGHT: '#393400', 
-}
 
 
 const Backpack = memo(function Backpack() {
@@ -55,7 +38,8 @@ const Backpack = memo(function Backpack() {
                 onPointerEnter={handlePointerEnter}
                 onPointerLeave={handlePointerLeave}
             >
-                <UltimateSlots
+                <Slots
+                    id='backpack'
                     type='backpack'
                     isOpened={isOpened}
                     cellSize={cellSize}
@@ -69,7 +53,8 @@ const Backpack = memo(function Backpack() {
                     unequipItem={unequipBackpackItem}
                     dropItem={dropBackpackItem}
                 />
-                <UltimateSlots
+                <Slots
+                    id='equipment'
                     type='equipment'
                     isOpened={isOpened}
                     cellSize={cellSize}

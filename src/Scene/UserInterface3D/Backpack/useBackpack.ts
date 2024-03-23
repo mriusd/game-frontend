@@ -1,9 +1,10 @@
 import * as THREE from 'three'
 import { create } from "zustand";
 import { getMeshDimensions } from 'Scene/utils/getMeshDimensions';
-import { RefObject, createRef } from 'react';
+import { MutableRefObject, RefObject, createRef } from 'react';
 import { useCloud } from '../../../EventCloud/useCloud';
 import { useUi } from '../useUI';
+import { ThreeEvent } from '@react-three/fiber';
 
 export interface BackpackStoreInterface {
     // Backpack slots
@@ -20,7 +21,6 @@ export interface BackpackStoreInterface {
     // Slots plane, stores Backpack data in <userData>, used by backpack drag system
     slots: RefObject<{[key: number]: THREE.Mesh}>
     equipmentSlots: RefObject<{[key: number]: THREE.Mesh}>
-
 
     // Buttons
     subscribeBackpack: () => void

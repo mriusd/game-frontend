@@ -25,7 +25,6 @@ import barrelData from './data/barrel.json'
 
 
 const DecorTest = React.memo(function Decor() {
-
     // const grass = React.useMemo(() => getShaderedDecor('grass'), [])
     // const tree = React.useMemo(() => getShaderedDecor('tree'), [])
     // // @ts-expect-error

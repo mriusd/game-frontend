@@ -5,7 +5,7 @@ import type { InventorySlot } from 'interfaces/inventory.interface'
 import { useTexture } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 
-import { getShaderedBackpackModel } from './utils/getShaderedBackpackModel'
+import { getShaderedBackpackModel } from '../../utils/getShaderedBackpackModel'
 
 interface Props { position?: number[], rotation?: number[], scale?: number[], onPointerEnter?: (e?: any) => void, onPointerLeave?: (e?: any) => void, item: InventorySlot }
 const SlotModel = memo(forwardRef(function SlotModel({ item, ...props }: Props, ref: any) {
