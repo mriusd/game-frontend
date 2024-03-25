@@ -98,7 +98,7 @@ const Scene = React.memo(function Scene() {
                 performance={{ min: 0.1 }}
                 shadows={{
                     enabled: true, // Always Enabled, but in Lights.tsx control render mode
-                    type: THREE.PCFSoftShadowMap
+                    // type: THREE.PCFSoftShadowMap
                 }}
                 gl={{
                     powerPreference: "high-performance",
