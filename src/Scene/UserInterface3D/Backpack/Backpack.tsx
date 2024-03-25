@@ -50,7 +50,7 @@ const Backpack = memo(function Backpack() {
                             height={vault.grid[0].length}
                             position={[-450, 333, 0]}
                             events={[
-                                { id: 'ID_UPDATE', type: 'update', handler: updateItemVaultPosition },
+                                { id: 'ID_VAULT', type: 'update', handler: updateItemVaultPosition },
                                 { id: 'ID_BACKPACK', type: 'transferTo', handler: moveItemFromVaultToBackpack },
                             ]}
                         />
