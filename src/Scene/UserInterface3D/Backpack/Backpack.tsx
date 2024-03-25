@@ -9,16 +9,14 @@ import { useCore } from 'Scene/useCore'
 
 const Backpack = memo(function Backpack() {
     // console.log('[CPU CHECK]: Rerender <Backpack>')
-    const [backpack, equipmentSlots, equipment] = useCloud(state => [state.backpack, state.equipmentSlots, state.equipment], shallow)
-    const [backpackWidth, backpackHeight, isOpened, cellSize] = useBackpack(state => 
-        [state.width, state.height, state.isOpened, state.cellSize], 
-        shallow
-    )
+    const [backpack, vault, equipmentSlots, equipment] = useCloud(state => [state.backpack, state.vault, state.equipmentSlots, state.equipment], shallow)
+    const [isOpened, isOpenedVault, cellSize] = useBackpack(state => [state.isOpened, state.isOpenedVault, state.cellSize])
     // TODO: change location for handler
     const [updateBackpackItemPosition, dropBackpackItem, unequipBackpackItem, equipBackpackItem] = useCloud(state => 
-        [state.updateItemBackpackPosition, state.dropBackpackItem, state.unequipBackpackItem, state.equipBackpackItem], 
-        shallow
+        [state.updateItemBackpackPosition, state.dropBackpackItem, state.unequipBackpackItem, state.equipBackpackItem]
     )
+    // Vault Events
+    const [updateItemVaultPosition, moveItemFromBackpackToVault, moveItemFromVaultToBackpack] = useCloud(state => [state.updateItemVaultPosition, state.moveItemFromBackpackToVault, state.moveItemFromVaultToBackpack])
 
     const handlePointerEnter = () => {
         if (useBackpack.getState().isOpened) {
@@ -38,23 +36,45 @@ const Backpack = memo(function Backpack() {
                 onPointerEnter={handlePointerEnter}
                 onPointerLeave={handlePointerLeave}
             >
+                {
+                    vault ? 
+                    (
+                        <Slots
+                            id='ID_VAULT'
+                            type='backpack'
+                            isOpened={isOpened && isOpenedVault}
+                            cellSize={cellSize}
+                            grid={vault.grid}
+                            items={vault.items}
+                            width={vault.grid.length}
+                            height={vault.grid[0].length}
+                            position={[-450, 333, 0]}
+                            events={[
+                                { id: 'ID_UPDATE', type: 'update', handler: updateItemVaultPosition },
+                                { id: 'ID_BACKPACK', type: 'transferTo', handler: moveItemFromVaultToBackpack },
+                            ]}
+                        />
+                    ) : null
+                }
                 <Slots
-                    id='backpack'
+                    id='ID_BACKPACK'
                     type='backpack'
                     isOpened={isOpened}
                     cellSize={cellSize}
                     grid={backpack.grid}
                     items={backpack.items}
-                    width={backpackWidth}
-                    height={backpackHeight}
-                    position={[32, -50, 0]}
-                    updateItemPosition={updateBackpackItemPosition}
-                    equipItem={equipBackpackItem}
-                    unequipItem={unequipBackpackItem}
-                    dropItem={dropBackpackItem}
+                    width={backpack.grid[0].length}
+                    height={backpack.grid.length}
+                    position={[-15, -50, 0]}
+                    events={[
+                        { id: 'ID_BACKPACK', type: 'update', handler: updateBackpackItemPosition },
+                        { id: 'ID_EQUIPMENT', type: 'transferTo', handler: equipBackpackItem },
+                        { id: 'ID_VAULT', type: 'transferTo', handler: moveItemFromBackpackToVault },
+                        { id: '', type: 'drop', handler: dropBackpackItem },
+                    ]}
                 />
                 <Slots
-                    id='equipment'
+                    id='ID_EQUIPMENT'
                     type='equipment'
                     isOpened={isOpened}
                     cellSize={cellSize}
@@ -62,8 +82,9 @@ const Backpack = memo(function Backpack() {
                     equipmentSlots={equipmentSlots}
                     position={[0, 400, 0]}
                     maxWidth={450}
-                    unequipItem={unequipBackpackItem}
-                    dropItem={dropBackpackItem}
+                    events={[
+                        { id: 'ID_BACKPACK', type: 'transferTo', handler: unequipBackpackItem },
+                    ]}
                 />
             </group>
             

@@ -37,7 +37,7 @@ const EquipmentItem = memo(function EquipmentItem({
         if (!slots.current) { return }
         if (!slots.current[item.slot]) { return null }
         return slots.current[item.slot].userData
-    }, [item, slots.current])
+    }, [item, slots.current, mounted])
 
     // Positioning
     const itemPlaneWidth = useMemo(() => cellSize * (slotUserData?.itemWidth || 0), [slotUserData, cellSize])
@@ -64,6 +64,7 @@ const EquipmentItem = memo(function EquipmentItem({
         return new THREE.Vector3(x, y, z)
     }, [ item, slots.current, mounted ])
 
+    console.log(slotUserData, mounted)
     if (!slotUserData || !mounted) {
         return <></>
     }

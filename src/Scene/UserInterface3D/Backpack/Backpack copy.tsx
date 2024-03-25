@@ -44,7 +44,7 @@ const Backpack = memo(function Backpack() {
     // console.log('[CPU CHECK]: Rerender <Backpack>')
     const [backpack, equipmentSlots, equipment] = useCloud(state => [state.backpack, state.equipmentSlots, state.equipment], shallow)
     const [backpackWidth, backpackHeight, isOpened, slotsRef, equipmentSlotsRef, cellSize] = useBackpack(state => 
-        [state.width, state.height, state.isOpened, state.slots, state.equipmentSlots, state.cellSize], 
+        [8, 8, state.isOpened, state.slots, state.equipmentSlots, state.cellSize], 
         shallow
     )
     // TODO: change location for handler

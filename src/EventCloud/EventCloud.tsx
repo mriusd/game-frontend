@@ -18,6 +18,7 @@ export const EventCloudProvider = React.memo(function EventCloudProvider({ child
 	const [addEvent, setUserFighters] = useCloud(state => [state.addEvent, state.setUserFighters])
 	const [setDroppedItems] = useDroppedItem(state => [state.setDroppedItems]);
 	const [updateBackpack, updateEquipment] = useCloud(state => [state.updateBackpack, state.updateEquipment]);
+	const [updateVault] = useCloud(state => [state.updateVault])
 	const [refreshFighterItems] = useCloud(state => [state.refreshFighterItems])
 	const [setChatLog] = useCloud(state => [state.setChatLog])
 	const [setPlayerList] = useCloud(state => [state.setPlayerList])
@@ -59,6 +60,10 @@ export const EventCloudProvider = React.memo(function EventCloudProvider({ child
 
 			case "backpack_update":
 				handleUpdateBackpack(msg.backpack, msg.equipment);
+				break;
+
+			case "vault_update":
+				handleUpdateVault(msg.vault);
 				break;
 
 			case "user_fighters":
@@ -118,6 +123,10 @@ export const EventCloudProvider = React.memo(function EventCloudProvider({ child
 
 		function handleChatMessage(author, msg, msgType) {
 			setChatLog({ author, msg, msgType })
+		}
+
+		function handleUpdateVault(vault) {
+			updateVault(vault)
 		}
 	}, [])
 

@@ -2,11 +2,30 @@ import { Flex, Box } from "@react-three/flex"
 import Button from "./Button"
 import { useBackpack } from "Scene/UserInterface3D/Backpack/useBackpack" 
 import { Plane, useTexture } from "@react-three/drei"
-import { useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { ThreeEvent } from "@react-three/fiber"
+import { useCloud } from "EventCloud/useCloud"
 
 const BottomMenu = () => {
-    const toggleBackpack = useBackpack(state => state.toggle)
+    const requestVault = useCloud(state => state.requestVault)
+    const [toggleBackpack, openBackpack] = useBackpack(state => [state.toggle, state.open])
+    const [toggleVault, openVault] = useBackpack(state => [state.toggleVault, state.openVault])
+    // Request Vault on btn Mount to already have data
+    useEffect(() => {requestVault()}, [])
+    const handleVault = useCallback(() => {
+        const $state = useBackpack.getState()
+        if (!$state.isOpenedVault) {
+            requestVault()
+        }
+        if ($state.isOpened && !$state.isOpenedVault) {
+            openVault()
+            return
+        }
+
+        toggleVault()
+        toggleBackpack()
+    }, [requestVault, toggleVault])
+
     const [map, mapHover] = useTexture(['/assets/backpack-icon.png', '/assets/backpack-icon-hover.png'])
     const onPointerEnter = (e: ThreeEvent<PointerEvent>) => {
         // @ts-expect-error
@@ -23,6 +42,13 @@ const BottomMenu = () => {
             </Box> */}
             <Box>
                 <Button name="backpack-button" onClick={toggleBackpack} position={[0, -350, 0]}>
+                    <Plane onPointerEnter={onPointerEnter} onPointerLeave={onPointerLeave} args={[80, 80]}>
+                        <meshBasicMaterial map={map} transparent={true} />
+                    </Plane>
+                </Button>
+            </Box>
+            <Box>
+                <Button name="backpack-button" onClick={handleVault} position={[0, -350, 0]}>
                     <Plane onPointerEnter={onPointerEnter} onPointerLeave={onPointerLeave} args={[80, 80]}>
                         <meshBasicMaterial map={map} transparent={true} />
                     </Plane>

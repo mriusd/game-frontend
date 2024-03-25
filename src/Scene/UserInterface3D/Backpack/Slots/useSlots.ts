@@ -12,11 +12,11 @@ export interface UseSlots {
     hoveredItemEvent: MutableRefObject<ThreeEvent<PointerEvent> | null>
     hoveredItemModel: MutableRefObject<THREE.Object3D | null>
 
-    pointerCell: MutableRefObject<THREE.Mesh | null>
-    placeholderCells: MutableRefObject<THREE.Mesh[]>
-    currentPointerCells: MutableRefObject<THREE.Mesh[]>
-    lastPointerCells: MutableRefObject<THREE.Mesh[]>
-    cellToInsert: MutableRefObject<{ type: CellType, ref: THREE.Mesh } | null>
+    pointerCell: MutableRefObject<{ [id:string]: THREE.Mesh | null }>
+    placeholderCells: MutableRefObject<{ [id:string]: THREE.Mesh[] }>
+    currentPointerCells: MutableRefObject<{ [id:string]: THREE.Mesh[] }>
+    lastPointerCells: MutableRefObject<{ [id:string]: THREE.Mesh[] }>
+    cellToInsert: MutableRefObject<{ [id:string]: { type: CellType, ref: THREE.Mesh } } | null>
 }
 
 export const useSlots = create<UseSlots>((set, get) => ({

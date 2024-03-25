@@ -51,12 +51,19 @@ export interface CloudStoreInterface {
     updateEquipment: (equipment: Record<number, InventorySlot>) => void
     updateBackpack: (backpack: Inventory) => void
 
+    vault: Inventory | null
+    updateVault: (vault: Inventory) => void
+    requestVault: () => void
+
 
     // User Events
     updateItemBackpackPosition: (itemHash: string, position: { x: number; z: number }) => void
     dropBackpackItem: (itemHash: string, position: { x: number; z: number }) => void
     unequipBackpackItem: (itemHash: string, position: { x: number; z: number }) => void
     equipBackpackItem: (itemHash: string, slot: number) => void
+    moveItemFromBackpackToVault: (itemHash: string, position: { x: number; z: number }) => void
+    moveItemFromVaultToBackpack: (itemHash: string, position: { x: number; z: number }) => void
+    updateItemVaultPosition: (itemHash: string, position: { x: number; z: number }) => void
 
 
     // Attack
@@ -145,14 +152,86 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
     equipment: null,
     equipmentSlots: equipmentSlots,
 
+    vault: null,
+    updateVault(vault) {
+        console.log('[updateVault] ', vault);
+        set(() => ({ vault }))
+    },
+    requestVault() {
+        get().sendJsonMessage({
+            type: "get_vault",
+            data: {}
+        });
+    },
+
     updateEquipment: (equipment) => {
         set(() => ({ equipment: equipment }))
     },
     updateBackpack: (backpack) => {
         console.log('[updateBackpack] ', backpack);
         set(() => ({ backpack: backpack }))
-        // Sets the size of backpack based on Server Side
-        useBackpack.setState(() => ({ width: backpack.grid[0].length, height: backpack.grid.length }))
+    },
+
+    moveItemFromBackpackToVault(itemHash, position) {
+        get().sendJsonMessage({
+            type: "move_item_from_backpack_to_vault",
+            data: { itemHash, position }
+        });
+    },
+    moveItemFromVaultToBackpack(itemHash, position) {
+        get().sendJsonMessage({
+            type: "move_item_from_vault_to_backpack",
+            data: { itemHash, position }
+        });
+    },
+    updateItemVaultPosition(itemHash, position) {
+        const needServerRerender = { value: true }
+
+        // // Update State Localy
+        // set(() => {
+        //     const backpack = { ...get().backpack }
+        //     const newKey = `${position.x},${position.z}`
+        //     for (const key in backpack.items) {
+        //         if (backpack.items[key].itemHash === itemHash) {
+        //             if (key === newKey) {
+        //                 needServerRerender.value = false
+        //                 break
+        //             }
+
+        //             // Update Grid available cells settings
+        //             // rm old
+        //             for (let i = 0; i < backpack.items[key].itemAttributes.itemHeight; i++) {
+        //                 for (let j = 0; j < backpack.items[key].itemAttributes.itemWidth; j++) {
+        //                     const prevX = +key.split(',')[0] + j
+        //                     const prevY = +key.split(',')[1] + i
+        //                     backpack.grid[prevY][prevX] = false
+        //                 }
+        //             }
+        //             // set new
+        //             for (let i = 0; i < backpack.items[key].itemAttributes.itemHeight; i++) {
+        //                 for (let j = 0; j < backpack.items[key].itemAttributes.itemWidth; j++) {
+        //                     const x = position.x + j
+        //                     const y = position.z + i
+        //                     backpack.grid[y][x] = true
+        //                 }
+        //             }
+
+        //             // Set new Key with Item to Backpack
+        //             backpack.items[`${position.x},${position.z}`] = backpack.items[key]
+        //             // Remove old Key from Backpack
+        //             delete backpack.items[key]
+        //             break
+        //         }
+        //     }
+        //     return ({ backpack })
+        // })
+        // Send to Server
+        if (needServerRerender.value) {
+            get().sendJsonMessage({
+                type: "update_vault_item_position",
+                data: { itemHash, position }
+            });
+        }
     },
 
     updateItemBackpackPosition(itemHash, position) {

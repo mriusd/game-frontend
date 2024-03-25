@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useRef } from "react"
+import React, { MutableRefObject, useCallback, useLayoutEffect, useMemo, useRef } from "react"
 import type { InventorySlot } from "interfaces/inventory.interface"
 import { ThreeEvent, useFrame, useThree } from "@react-three/fiber"
 import { useUi } from "../../useUI"
@@ -17,7 +17,20 @@ import type { Equipment } from "interfaces/equipment.interface"
 import { useSlots } from "./useSlots"
 
 export type CellType = 'equipment' | 'backpack'
+export type eventType = 'update' | 'transferTo' | 'drop'
+interface EventsType {
+    id: string, type: eventType, handler: any
+}
 interface SlotCoordinate { x: number, z: number }
+
+function init(state: MutableRefObject<any>, key?: string, value?: any) {
+    if (!state.current) {
+        state.current = {}
+    }
+    if (key) {
+        state.current[key] = value
+    }
+}
 
 const colors = {
     COMMON_DARK: '#131313',
@@ -48,10 +61,17 @@ interface Props {
     items: Map<string, InventorySlot> | Record<number, InventorySlot>
     equipmentSlots?: Record<number, Equipment>
 
-    updateItemPosition?: (itemHash: string, slot: SlotCoordinate) => void
-    dropItem?: (itemHash: string, coordinate: WorldCoordinate) => void
-    equipItem?: (itemHash: string, slot: number) => void
-    unequipItem?: (itemHash: string, slot: SlotCoordinate) => void
+    // events?: {
+    //     updateItemPosition?: { id: string, type: eventType, handler: (itemHash: string, slot: SlotCoordinate) => void }
+    //     dropItem?: { id: string, handler: (itemHash: string, coordinate: WorldCoordinate) => void }
+    //     equipItem?: { id: string, handler: (itemHash: string, slot: number) => void }
+    //     unequipItem?: { id: string, handler: (itemHash: string, slot: SlotCoordinate) => void }
+    // }
+    events: EventsType[]
+    // updateItemPosition?: (itemHash: string, slot: SlotCoordinate) => void
+    // dropItem?: (itemHash: string, coordinate: WorldCoordinate) => void
+    // equipItem?: (itemHash: string, slot: number) => void
+    // unequipItem?: (itemHash: string, slot: SlotCoordinate) => void
 
     onPointerEnter?: (e: ThreeEvent<PointerEvent>) => void
     onPointerMove?: (e: ThreeEvent<PointerEvent>) => void
@@ -73,10 +93,11 @@ export const Slots = ({
     position = [0, 0, 0],
     maxWidth = 1920,
 
-    updateItemPosition,
-    dropItem,
-    equipItem,
-    unequipItem,
+    // updateItemPosition,
+    // dropItem,
+    // equipItem,
+    // unequipItem,
+    events: _events,
 
     onPointerEnter,
     onPointerLeave,
@@ -85,6 +106,7 @@ export const Slots = ({
     // Getting Non-reactive Scene data
     const get = useThree(state => state.get)
 
+    console.log('items', id, _items)
 
     // const isItemPinned = React.useRef<boolean>(false)
     // const pinnedItemEvent = React.useRef<ThreeEvent<PointerEvent> | null>(null)
@@ -113,10 +135,12 @@ export const Slots = ({
     const lastPointerCells = useSlots(state => state.lastPointerCells)
     const cellToInsert = useSlots(state => state.cellToInsert)
     useLayoutEffect(() => {
-        placeholderCells.current = []
-        currentPointerCells.current = []
-        lastPointerCells.current = []
-    }, [])
+        init(pointerCell)
+        init(placeholderCells, id, [])
+        init(currentPointerCells, id, [])
+        init(lastPointerCells, id, [])
+        init(cellToInsert)
+    }, [id])
     
 
     // TODO: Should be fixed in future?
@@ -126,7 +150,24 @@ export const Slots = ({
     React.useEffect(() => { setTimeout(() => mount(true), 1000) }, [])
     // 
 
-
+    const events = useMemo(() => {
+        const transferTo: EventsType[] = []
+        const transferFrom: EventsType[] = []
+        const update: EventsType[] = []
+        const drop: EventsType[] = []
+        _events.map(_ => {
+            if (_.type === 'transferTo') {
+                transferTo.push(_)
+            }
+            if (_.type === 'update') {
+                update.push(_)
+            }
+            if (_.type === 'drop') {
+                drop.push(_)
+            }
+        })
+        return { transferTo, transferFrom, update, drop }
+    }, [_events])
 
     // Used for boundingBox
     const backpackRef = React.useRef<THREE.Group | null>(null)
@@ -198,7 +239,7 @@ export const Slots = ({
     const onClick = (e: ThreeEvent<PointerEvent>) => {
         if (!isOpened) { return }
         if (!e.object) { return } // in case if removed
-        console.log(pinnedItemEvent.current?.object, e.object)
+        // console.log(pinnedItemEvent.current?.object, e.object)
         // If we Pinning already, we have to prevent click on another Item, otherwise -- error
         if (isItemPinned.current && e.object !== pinnedItemEvent.current.object) { return }
         // 
@@ -215,12 +256,14 @@ export const Slots = ({
                 // setObjectRenderLayer(pinnedItemEvent.current, 'highest')
                 pinnedSlotsId.current = id
             } else {
+                // TODO: fix setPlaceholderCells
                 setPlaceholderCells(pinnedItemEvent.current, false)
                 // @ts-expect-error
                 hoveredItemEvent.current?.object?.parent?.material?.opacity && (hoveredItemEvent.current.object.parent.material.opacity = .2)
                 placeItemToCell(pinnedItemEvent.current)
                 // setObjectRenderLayer(pinnedItemEvent.current, 'default')
                 pinnedItemEvent.current = null
+                // TODO: fix clearing
                 clearPointerCells()
                 onItemPointerLeave(e)
                 if (pinnedSlotsId.current === id) {
@@ -233,15 +276,15 @@ export const Slots = ({
 
     // Events Methods
     const highlightPointerCell = React.useCallback((projectedPointer: {x:number;y:number}) => {        
-        lastPointerCells.current = currentPointerCells.current
-        currentPointerCells.current = getPointerCells(projectedPointer)
-        const isHoveredEquipmentSlot = currentPointerCells.current.length 
-            ? currentPointerCells.current[0].userData.type === 'equipment'
+        lastPointerCells.current[id] = currentPointerCells.current[id]
+        currentPointerCells.current[id] = getPointerCells(projectedPointer)
+        const isHoveredEquipmentSlot = currentPointerCells.current[id].length 
+            ? currentPointerCells.current[id][0].userData.type === 'equipment'
             : false
 
-        lastPointerCells.current.forEach(cell => {
+        lastPointerCells.current[id].forEach(cell => {
             // If placeholder cell we dont touch it
-            if (placeholderCells.current.find(_ => _ === cell)) { return }
+            if (placeholderCells.current[id].find(_ => _ === cell)) { return }
             // @ts-expect-error
             cell.material.color.set(cell.userData.colors.common)
         })
@@ -250,8 +293,8 @@ export const Slots = ({
         const itemHeight = pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemParameters.itemHeight
         // Check if we can insert
         let availableCells = 0
-        currentPointerCells.current.forEach(cell => {
-            if (currentPointerCells.current.length < itemWidth * itemHeight && !isHoveredEquipmentSlot) {
+        currentPointerCells.current[id].forEach(cell => {
+            if (currentPointerCells.current[id].length < itemWidth * itemHeight && !isHoveredEquipmentSlot) {
                 return
             }
             availableCells += isOccupied(cell, isHoveredEquipmentSlot) ? 0 : 1
@@ -260,20 +303,20 @@ export const Slots = ({
         // Logic for Equipment Slot
         if (isHoveredEquipmentSlot) {
             // TODO: detect if slote enabled
-            const isAvailableCell = !items.find(_ => Number(_.slot) === Number(currentPointerCells.current[0].userData.slot))
-            const isEnabledByType = +currentPointerCells.current[0].userData.slot === +pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemParameters.acceptableSlot1 || +currentPointerCells.current[0].userData.slot === +pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemParameters.acceptableSlot2
+            const isAvailableCell = !items.find(_ => Number(_.slot) === Number(currentPointerCells.current[id][0].userData.slot))
+            const isEnabledByType = +currentPointerCells.current[id][0].userData.slot === +pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemParameters.acceptableSlot1 || +currentPointerCells.current[id][0].userData.slot === +pinnedItemEvent.current.object.parent.userData.item.itemAttributes.itemParameters.acceptableSlot2
             if (isAvailableCell && isEnabledByType) {
-                cellToInsert.current = { ref: currentPointerCells.current[0], type: 'equipment' }
+                cellToInsert.current[id] = { ref: currentPointerCells.current[id][0], type: 'equipment' }
                 // If placeholder cell we dont touch it
-                if (placeholderCells.current.find(_ => _ === currentPointerCells.current[0])) { return }
+                if (placeholderCells.current[id].find(_ => _ === currentPointerCells.current[id][0])) { return }
                 // @ts-expect-error
-                currentPointerCells.current[0].material.color.set(currentPointerCells.current[0].userData.colors.insert_allowed)
+                currentPointerCells.current[id][0].material.color.set(currentPointerCells.current[id][0].userData.colors.insert_allowed)
             } else {
-                cellToInsert.current = null
+                cellToInsert.current[id] = null
                 // If placeholder cell we dont touch it
-                if (placeholderCells.current.find(_ => _ === currentPointerCells.current[0])) { return }
+                if (placeholderCells.current[id].find(_ => _ === currentPointerCells.current[id][0])) { return }
                 // @ts-expect-error
-                currentPointerCells.current[0].material.color.set(currentPointerCells.current[0].userData.colors.insert_disallowed)
+                currentPointerCells.current[id][0].material.color.set(currentPointerCells.current[id][0].userData.colors.insert_disallowed)
             }
             return
         }
@@ -281,18 +324,18 @@ export const Slots = ({
         // Logic for Backpack Slot
         // Then set insert availability based on <availableCells>
         if (availableCells === itemWidth * itemHeight) {
-            cellToInsert.current = { ref: pointerCell.current, type: 'backpack' }
-            currentPointerCells.current.forEach(cell => {
+            cellToInsert.current[id] = { ref: pointerCell.current[id], type: 'backpack' }
+            currentPointerCells.current[id].forEach(cell => {
                 // If placeholder cell we dont touch it
-                if (placeholderCells.current.find(_ => _ === cell)) { return }
+                if (placeholderCells.current[id].find(_ => _ === cell)) { return }
                 // @ts-expect-error
                 cell.material.color.set(cell.userData.colors.insert_allowed)
             })
         } else {
-            cellToInsert.current = null
-            currentPointerCells.current.forEach(cell => {
+            cellToInsert.current[id] = null
+            currentPointerCells.current[id].forEach(cell => {
                 // If placeholder cell we dont touch it
-                if (placeholderCells.current.find(_ => _ === cell)) { return }
+                if (placeholderCells.current[id].find(_ => _ === cell)) { return }
                 // @ts-expect-error
                 cell.material.color.set(cell.userData.colors.insert_disallowed)
             })
@@ -322,8 +365,8 @@ export const Slots = ({
     
             // Could be only one typ at the same time
             // console.log(isHoveredEquipmentSlot, _equipmentPointerCell, _backpackPointerCell)
-            pointerCell.current = _backpackPointerCell || pointerCell.current
-            if (!pointerCell.current) return []
+            pointerCell.current[id] = _backpackPointerCell || null
+            if (!pointerCell.current[id]) return []
         
     
             // Calc all cells belongs to the Pointer, depending on Item size (like 1x1, 2x2) and Hovered cell type
@@ -331,9 +374,9 @@ export const Slots = ({
     
             // Depending on hovered cell type
             if ( type === 'equipment') {
-                cells.push(pointerCell.current)
+                cells.push(pointerCell.current[id])
             } else {
-                const { x, y } = pointerCell.current.userData.slot
+                const { x, y } = pointerCell.current[id].userData.slot
                 for (let i = 0; i < itemWidth; i++) {
                     for (let j = 0; j < itemHeight; j++) {
                         const cell = slotsRef.current[`${x+i},${y+j}`]
@@ -357,20 +400,27 @@ export const Slots = ({
             }
             const { x, y } = cell.userData.slot
             // Allow paste to the same cell, or a little touching the same cell 
-            if (placeholderCells.current.find(_ => _.userData.slot.x === x && _.userData.slot.y === y)) return false
+            if (placeholderCells.current[id].find(_ => _.userData.slot.x === x && _.userData.slot.y === y)) return false
             return grid[y][x]
         }
-    }, [type])
+    }, [type, id, grid])
 
     const placeItemToCell = React.useCallback((pinnedItemEvent: ThreeEvent<PointerEvent>) => {
         const itemHash = pinnedItemEvent.object.parent.userData.item.itemHash
         const item = pinnedItemEvent.object.parent
+        console.log('place', itemHash, item, cellToInsert.current)
 
-        if (!cellToInsert.current) {
+
+        // We look for the first appear, cuz situation with 2 together cannot be
+        const backpackInsert = Object.values(cellToInsert.current).find(item => item?.type === 'backpack')
+        const equipmentInsert = Object.values(cellToInsert.current).find(item => item?.type === 'equipment')
+
+        if (!backpackInsert && !equipmentInsert) {
             // Drop if nothing hovered
-            if (!pointerCell.current) {
-                item.visible = false
-                dropItem(itemHash, useFighter.getState().fighter.coordinates)
+            const isNotHovered = Object.values(pointerCell.current).every(_ => !_)
+            if (isNotHovered && events.drop.length) {
+                events.drop.forEach(event => event.handler(itemHash, useFighter.getState().fighter.coordinates))
+                // dropItem(itemHash, useFighter.getState().fighter.coordinates)
                 return
             }
 
@@ -379,22 +429,26 @@ export const Slots = ({
             return
         }
 
+        
+
         // If click on Backpack cell
-        if (cellToInsert.current.type === 'backpack') {
-            const slot = cellToInsert.current.ref.userData.slot
-            const isBackpackItem = pinnedItemEvent.object.parent.userData.type === 'backpack'
-            if (isBackpackItem) {
-                updateItemPosition(itemHash, { x: slot.x, z: slot.y })
-            } else {
-                unequipItem(itemHash, { x: slot.x, z: slot.y })
-            }
+        if (backpackInsert) {
+            const slot = backpackInsert.ref.userData.slot
+            const id = backpackInsert.ref.userData.id
+
+            // [EVENTS]: Update position
+            events.update.filter(e => e.id === id).forEach(e => e.handler(itemHash, { x: slot.x, z: slot.y }))
+            // [EVENTS]: Transfer To
+            events.transferTo.filter(e => e.id === id).forEach(e => e.handler(itemHash, { x: slot.x, z: slot.y }))
         } 
         // If click on Equipment cell
-        else if (cellToInsert.current.type === 'equipment') {
-            const slot = cellToInsert.current.ref.userData.slot
-            equipItem(itemHash, slot)
+        else if (equipmentInsert) {
+            const slot = equipmentInsert.ref.userData.slot
+            const id = equipmentInsert.ref.userData.id
+            // [EVENTS]: Transfer To (BUT FOR EQUIPMENT TYPE SLOTS/provide inner data to handler)
+            events.transferTo.filter(e => e.id === id).forEach(e => e.handler(itemHash, slot))
         }
-    }, [dropItem, updateItemPosition, unequipItem, equipItem])
+    }, [events, id])
 
     const setPlaceholderCells = React.useCallback((pinnedItemEvent: ThreeEvent<PointerEvent>, show: boolean) => {
         const cellCoordinate = pinnedItemEvent.object.parent.userData.item.slot.split(',').map((_:string)=>Number(_))
@@ -428,13 +482,16 @@ export const Slots = ({
             }
         })
 
-        placeholderCells.current = show ? cells : []
-    }, [])
+        placeholderCells.current[id] = show ? cells : []
+    }, [id])
 
     const clearPointerCells = React.useCallback(() => {
-        currentPointerCells.current.forEach(cell => {
-            // @ts-expect-error
-            cell.material.color.set(cell.userData.colors.common)
+        const cellArrays = Object.values(currentPointerCells.current)
+        cellArrays.forEach(cells => {
+            cells.forEach(cell => {
+                // @ts-expect-error
+                cell.material.color.set(cell.userData.colors.common)
+            })
         })
     }, [])
     // 
@@ -442,7 +499,8 @@ export const Slots = ({
     // Render All Highlights & Current Items
     useFrame(({ raycaster }) => {
         if (!isOpened) { return }
-        console.log('g', pointerCell.current)
+
+        // console.log('g', pointerCell.current)
         // Pin item
         if (pinnedItemEvent.current && isItemPinned.current) {
             const projectedPointer = getCoordInUISpace(raycaster)
@@ -491,6 +549,7 @@ export const Slots = ({
                                                     ref={(r) => setRef(r, j, i)} 
                                                     args={[cellSize, cellSize, 1]}
                                                     userData={{
+                                                        id,
                                                         type: 'backpack',
                                                         slot: { x: j, y: i }, 
                                                         colors: {
@@ -511,12 +570,13 @@ export const Slots = ({
                         ) :
                         (
                             <Flex name='equipment' position={position as any} maxWidth={maxWidth} flexDir="row" flexWrap="wrap">
-                                { equipmentSlots && [...Object.values(equipmentSlots)].sort((a,b) => b.height - a.height).map((_, i) => (
+                                { [...Object.values(equipmentSlots)].sort((a,b) => b.height - a.height).map((_, i) => (
                                     <Box name='row' key={i} margin={8} centerAnchor>
                                         <Plane 
                                             name='slot-equipment'
                                             ref={(r) => setRef(r, _.slot)}
                                             userData={{
+                                                id,
                                                 type: 'equipment',
                                                 slot: _.slot,
                                                 colors: {
