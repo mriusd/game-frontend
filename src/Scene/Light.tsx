@@ -50,7 +50,7 @@ const Light = React.memo(function Light() {
         posFill: { value: { x: -50, y: 0, z: -5 } },
 
         colorShadow: { value: '#FFFFFF' },
-        intenShadow: { value: 1.5, min: 0, max: 5 },
+        intenShadow: { value: 10, min: 0, max: 50 },
         posShadow: { value: { x: 0, y: 10, z: 2 } },
     })
     const lightPositionTest = React.useMemo(() => new THREE.Vector3(data.posShadow.x, data.posShadow.y, data.posShadow.z), [data])
@@ -73,6 +73,7 @@ const Light = React.memo(function Light() {
                 shadow-camera-right={20}
                 shadow-camera-top={20}
                 shadow-camera-bottom={-20}
+                shadow-darkness={0}
             />
             <Environment files='worlds/small/environment/orlando_stadium_1k.hdr' />
         </group>

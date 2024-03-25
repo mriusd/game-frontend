@@ -13,7 +13,7 @@ const Chunks = memo(function Chunks({}) {
 
     return (
         <>
-            <Plane receiveShadow args={[chunkSize, chunkSize]} rotation={[Math.PI / -2, 0, 0]} position={[0,-0.1,0]}>
+            <Plane receiveShadow args={[chunkSize, chunkSize]} rotation={[Math.PI / -2, 0, Math.PI]} position={[0,0,0]}>
                 <meshStandardMaterial color={'white'} {...mapTextures} depthWrite={false} />
             </Plane>
         </>
