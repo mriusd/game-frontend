@@ -38,20 +38,20 @@ const Light = React.memo(function Light() {
     // useHelper(shadowlightRef, THREE.DirectionalLightHelper, 0x000000)
 
     const data = useControls('Lights', {
-        colorHemi: { value: '#8588ad' },
-        intenHemi: { value: 0, min: 0, max: 5 },
+        colorHemi: { value: '#FFFFFF' },
+        intenHemi: { value: 0.25, min: 0, max: 5 },
 
         colorDirectional: { value: '#FFFFFF' },
-        intenDirectional: { value: 3, min: 0, max: 5 },
-        posDirectional: { value: { x: 1, y: 0, z: 0.866 } },
+        intenDirectional: { value: 5, min: 0, max: 5 },
+        posDirectional: { value: { x: 1, y: 0, z: 0.9 } },
 
         colorFill: { value: '#FFFFFF' },
-        intenFill: { value: 0, min: 0, max: 5 },
-        posFill: { value: { x: -50, y: 0, z: -5 } },
+        intenFill: { value: 1.65, min: 0, max: 5 },
+        posFill: { value: { x: -26, y: 0, z: -5 } },
 
         colorShadow: { value: '#FFFFFF' },
-        intenShadow: { value: 10, min: 0, max: 50 },
-        posShadow: { value: { x: 0, y: 10, z: 2 } },
+        intenShadow: { value: 8, min: 0, max: 50 },
+        posShadow: { value: { x: 0, y: 30, z: 17 } },
     })
     const lightPositionTest = React.useMemo(() => new THREE.Vector3(data.posShadow.x, data.posShadow.y, data.posShadow.z), [data])
 
@@ -65,17 +65,18 @@ const Light = React.memo(function Light() {
                 color={data.colorShadow} 
                 ref={shadowlightRef}
                 castShadow
-                shadow-mapSize-width={2048}
-                shadow-mapSize-height={2048}
+                shadow-mapSize-width={4096}
+                shadow-mapSize-height={4096}
                 shadow-camera-near={0.1}
-                shadow-camera-far={500}
+                // shadow-camera-far={500}
                 shadow-camera-left={-20}
                 shadow-camera-right={20}
                 shadow-camera-top={20}
                 shadow-camera-bottom={-20}
-                shadow-darkness={0}
+                shadow-bias={0.1}
+                // shadow-darkness={0}
             />
-            <Environment files='worlds/small/environment/orlando_stadium_1k.hdr' />
+            {/* <Environment files='worlds/small/environment/orlando_stadium_1k.hdr' /> */}
         </group>
     )
 })
