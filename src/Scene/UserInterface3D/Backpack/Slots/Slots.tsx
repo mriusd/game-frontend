@@ -106,7 +106,7 @@ export const Slots = ({
     // Getting Non-reactive Scene data
     const get = useThree(state => state.get)
 
-    console.log('items', id, _items)
+    // console.log('items', id, _items)
 
     // const isItemPinned = React.useRef<boolean>(false)
     // const pinnedItemEvent = React.useRef<ThreeEvent<PointerEvent> | null>(null)
@@ -419,7 +419,7 @@ export const Slots = ({
     const placeItemToCell = React.useCallback((pinnedItemEvent: ThreeEvent<PointerEvent>) => {
         const itemHash = pinnedItemEvent.object.parent.userData.item.itemHash
         const item = pinnedItemEvent.object.parent
-        console.log('place', itemHash, item, cellToInsert.current)
+        // console.log('place', itemHash, item, cellToInsert.current)
 
 
         // We look for the first appear, cuz situation with 2 together cannot be

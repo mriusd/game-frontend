@@ -58,18 +58,19 @@ export interface CloudStoreInterface {
     shop: Inventory | null
     updateShop: (vault: Inventory) => void
     requestShop: () => void
-    buyItemShop: (itemHash: string) => void
-
 
     // User Events
     updateItemBackpackPosition: (itemHash: string, position: { x: number; z: number }) => void
     dropBackpackItem: (itemHash: string, position: { x: number; z: number }) => void
     unequipBackpackItem: (itemHash: string, position: { x: number; z: number }) => void
     equipBackpackItem: (itemHash: string, slot: number) => void
+    buyItemShop: (itemHash: string) => void
+    dropVaultItem: (itemHash: string, position: { x: number; z: number }) => void
     moveItemFromBackpackToVault: (itemHash: string, position: { x: number; z: number }) => void
     moveItemFromVaultToBackpack: (itemHash: string, position: { x: number; z: number }) => void
     updateItemVaultPosition: (itemHash: string, position: { x: number; z: number }) => void
-
+    unequipVaultItem: (itemHash: string, position: { x: number; z: number }) => void
+    equipVaultItem: (itemHash: string, slot: number) => void
 
     // Attack
     target: TargetType
@@ -256,48 +257,54 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
             });
         }
     },
+    dropVaultItem(itemHash, position) {
+        get().sendJsonMessage({
+            type: "drop_vault_item",
+            data: { itemHash, position }
+        });
+    },
 
     updateItemBackpackPosition(itemHash, position) {
         const needServerRerender = { value: true }
 
-        // Update State Localy
-        set(() => {
-            const backpack = { ...get().backpack }
-            const newKey = `${position.x},${position.z}`
-            for (const key in backpack.items) {
-                if (backpack.items[key].itemHash === itemHash) {
-                    if (key === newKey) {
-                        needServerRerender.value = false
-                        break
-                    }
+        // // Update State Localy
+        // set(() => {
+        //     const backpack = { ...get().backpack }
+        //     const newKey = `${position.x},${position.z}`
+        //     for (const key in backpack.items) {
+        //         if (backpack.items[key].itemHash === itemHash) {
+        //             if (key === newKey) {
+        //                 needServerRerender.value = false
+        //                 break
+        //             }
 
-                    // Update Grid available cells settings
-                    // rm old
-                    for (let i = 0; i < backpack.items[key].itemAttributes.itemHeight; i++) {
-                        for (let j = 0; j < backpack.items[key].itemAttributes.itemWidth; j++) {
-                            const prevX = +key.split(',')[0] + j
-                            const prevY = +key.split(',')[1] + i
-                            backpack.grid[prevY][prevX] = false
-                        }
-                    }
-                    // set new
-                    for (let i = 0; i < backpack.items[key].itemAttributes.itemHeight; i++) {
-                        for (let j = 0; j < backpack.items[key].itemAttributes.itemWidth; j++) {
-                            const x = position.x + j
-                            const y = position.z + i
-                            backpack.grid[y][x] = true
-                        }
-                    }
+        //             // Update Grid available cells settings
+        //             // rm old
+        //             for (let i = 0; i < backpack.items[key].itemAttributes.itemHeight; i++) {
+        //                 for (let j = 0; j < backpack.items[key].itemAttributes.itemWidth; j++) {
+        //                     const prevX = +key.split(',')[0] + j
+        //                     const prevY = +key.split(',')[1] + i
+        //                     backpack.grid[prevY][prevX] = false
+        //                 }
+        //             }
+        //             // set new
+        //             for (let i = 0; i < backpack.items[key].itemAttributes.itemHeight; i++) {
+        //                 for (let j = 0; j < backpack.items[key].itemAttributes.itemWidth; j++) {
+        //                     const x = position.x + j
+        //                     const y = position.z + i
+        //                     backpack.grid[y][x] = true
+        //                 }
+        //             }
 
-                    // Set new Key with Item to Backpack
-                    backpack.items[`${position.x},${position.z}`] = backpack.items[key]
-                    // Remove old Key from Backpack
-                    delete backpack.items[key]
-                    break
-                }
-            }
-            return ({ backpack })
-        })
+        //             // Set new Key with Item to Backpack
+        //             backpack.items[`${position.x},${position.z}`] = backpack.items[key]
+        //             // Remove old Key from Backpack
+        //             delete backpack.items[key]
+        //             break
+        //         }
+        //     }
+        //     return ({ backpack })
+        // })
         // Send to Server
         if (needServerRerender.value) {
             get().sendJsonMessage({
@@ -313,34 +320,34 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
         });
     },
     equipBackpackItem(itemHash, slot) {
-        // Update State Localy
-        set(() => {
-            const backpack = { ...get().backpack }
-            const equipment = { ...get().equipment }
+        // // Update State Localy
+        // set(() => {
+        //     const backpack = { ...get().backpack }
+        //     const equipment = { ...get().equipment }
 
-            for (const key in backpack.items) {
-                if (backpack.items[key].itemHash === itemHash) {
-                    const item = backpack.items[key]
+        //     for (const key in backpack.items) {
+        //         if (backpack.items[key].itemHash === itemHash) {
+        //             const item = backpack.items[key]
 
-                    // Update Grid available cells settings
-                    for (let i = 0; i < item.itemAttributes.itemHeight; i++) {
-                        for (let j = 0; j < item.itemAttributes.itemWidth; j++) {
-                            const x = +key.split(',')[0] + j
-                            const y = +key.split(',')[1] + i
-                            backpack.grid[y][x] = false
-                        }
-                    }
+        //             // Update Grid available cells settings
+        //             for (let i = 0; i < item.itemAttributes.itemHeight; i++) {
+        //                 for (let j = 0; j < item.itemAttributes.itemWidth; j++) {
+        //                     const x = +key.split(',')[0] + j
+        //                     const y = +key.split(',')[1] + i
+        //                     backpack.grid[y][x] = false
+        //                 }
+        //             }
 
-                    // Add Item to Equipment
-                    equipment[slot] = item
-                    // Remove Item from Backpack
-                    delete backpack.items[key]
-                    break
-                }
-            }
+        //             // Add Item to Equipment
+        //             equipment[slot] = item
+        //             // Remove Item from Backpack
+        //             delete backpack.items[key]
+        //             break
+        //         }
+        //     }
 
-            return ({ backpack, equipment })
-        })
+        //     return ({ backpack, equipment })
+        // })
 
         // Send to Server
         get().sendJsonMessage({
@@ -349,40 +356,53 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
         });
     },
     unequipBackpackItem(itemHash, position) {
-        // Update State Localy
-        set(() => {
-            const backpack = { ...get().backpack }
-            const equipment = { ...get().equipment }
+        // // Update State Localy
+        // set(() => {
+        //     const backpack = { ...get().backpack }
+        //     const equipment = { ...get().equipment }
 
-            for (const key in equipment) {
-                if (equipment[key].itemHash === itemHash) {
-                    const item = equipment[key]
+        //     for (const key in equipment) {
+        //         if (equipment[key].itemHash === itemHash) {
+        //             const item = equipment[key]
 
-                    // Update Grid available cells settings
-                    // @ts-expect-error
-                    for (let i = 0; i < item.itemAttributes.itemHeight; i++) {
-                        // @ts-expect-error
-                        for (let j = 0; j < item.itemAttributes.itemWidth; j++) {
-                            const x = position.x + j
-                            const y = position.z + i
-                            backpack.grid[y][x] = true
-                        }
-                    }
+        //             // Update Grid available cells settings
+        //             // @ts-expect-error
+        //             for (let i = 0; i < item.itemAttributes.itemHeight; i++) {
+        //                 // @ts-expect-error
+        //                 for (let j = 0; j < item.itemAttributes.itemWidth; j++) {
+        //                     const x = position.x + j
+        //                     const y = position.z + i
+        //                     backpack.grid[y][x] = true
+        //                 }
+        //             }
 
-                    // Add Item to Backpack
-                    backpack.items[`${position.x},${position.z}`] = item
-                    // Remove Item from Equipments
-                    delete equipment[key]
-                    break
-                }
-            }
+        //             // Add Item to Backpack
+        //             backpack.items[`${position.x},${position.z}`] = item
+        //             // Remove Item from Equipments
+        //             delete equipment[key]
+        //             break
+        //         }
+        //     }
 
-            return ({ backpack, equipment })
-        })
+        //     return ({ backpack, equipment })
+        // })
 
         // Send to Server
         get().sendJsonMessage({
             type: "unequip_backpack_item",
+            data: { itemHash, position }
+        });
+    },
+    equipVaultItem(itemHash, slot) {
+        // Send to Server
+        get().sendJsonMessage({
+            type: "equip_vault_item",
+            data: { itemHash, slot }
+        });
+    },
+    unequipVaultItem(itemHash, position) {
+        get().sendJsonMessage({
+            type: "unequip_vault_item",
             data: { itemHash, position }
         });
     },

@@ -19,9 +19,13 @@ const Backpack = memo(function Backpack() {
         [state.updateItemBackpackPosition, state.dropBackpackItem, state.unequipBackpackItem, state.equipBackpackItem]
     )
     // Vault Events
-    const [updateItemVaultPosition, moveItemFromBackpackToVault, moveItemFromVaultToBackpack] = useCloud(state => [state.updateItemVaultPosition, state.moveItemFromBackpackToVault, state.moveItemFromVaultToBackpack])
+    const [updateItemVaultPosition, moveItemFromBackpackToVault, moveItemFromVaultToBackpack, dropVaultItem] = useCloud(state => [state.updateItemVaultPosition, state.moveItemFromBackpackToVault, state.moveItemFromVaultToBackpack, state.dropVaultItem])
+    const [equipVaultItem, unequipVaultItem] = useCloud(state => [state.equipVaultItem, state.unequipVaultItem])
+
     // Shop
     const [buyItemShop] = useCloud(state => [state.buyItemShop])
+
+    console.log(shop?.items, vault?.items, equipment, backpack?.items)
 
     const handlePointerEnter = () => {
         if (useBackpack.getState().isOpened) {
@@ -57,6 +61,8 @@ const Backpack = memo(function Backpack() {
                             events={[
                                 { id: 'ID_VAULT', type: 'update', handler: updateItemVaultPosition },
                                 { id: 'ID_BACKPACK', type: 'transferTo', handler: moveItemFromVaultToBackpack },
+                                { id: 'ID_EQUIPMENT', type: 'transferTo', handler: equipVaultItem },
+                                { id: '', type: 'drop', handler: dropVaultItem },
                             ]}
                         />
                     ) : null
@@ -108,6 +114,7 @@ const Backpack = memo(function Backpack() {
                     maxWidth={450}
                     events={[
                         { id: 'ID_BACKPACK', type: 'transferTo', handler: unequipBackpackItem },
+                        { id: 'ID_VAULT', type: 'transferTo', handler: unequipVaultItem },
                     ]}
                 />
             </group>
