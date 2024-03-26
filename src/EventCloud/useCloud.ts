@@ -260,7 +260,7 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
     dropVaultItem(itemHash, position) {
         get().sendJsonMessage({
             type: "drop_vault_item",
-            data: { itemHash, position }
+            data: { itemHash, coordinates: position }
         });
     },
 
