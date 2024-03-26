@@ -42,7 +42,11 @@ export const useBackpack = createWithEqualityFn<BackpackStoreInterface>((set, ge
     isOpened: false,
     open: () => set({ isOpened: true }),
     close: () => set({ isOpened: false, isOpenedVault: false }),
-    toggle: () => set(state => ({ isOpened: !state.isOpened, isOpenedVault: state.isOpened ? false : state.isOpenedVault })),
+    toggle: () => set(state => ({ 
+        isOpened: !state.isOpened, 
+        isOpenedVault: state.isOpened ? false : state.isOpenedVault,
+        isOpenedShop: state.isOpened ? false : state.isOpenedShop 
+    })),
 
     isOpenedVault: false,
     openVault: () => set({ isOpenedVault: true }),

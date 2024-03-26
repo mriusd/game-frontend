@@ -73,7 +73,7 @@ const Backpack = memo(function Backpack() {
                             items={shop.items}
                             width={shop.grid.length}
                             height={shop.grid[0].length}
-                            position={[-880, 333, 0]}
+                            position={[-450, 333, 0]}
                             events={[
                                 { id: '', type: 'doubleClick', handler: buyItemShop },
                             ]}

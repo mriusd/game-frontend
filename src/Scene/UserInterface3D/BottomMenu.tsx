@@ -10,8 +10,8 @@ const BottomMenu = () => {
     const requestVault = useCloud(state => state.requestVault)
     const requestShop = useCloud(state => state.requestShop)
     const [toggleBackpack, openBackpack] = useBackpack(state => [state.toggle, state.open])
-    const [toggleVault, openVault] = useBackpack(state => [state.toggleVault, state.openVault])
-    const [toggleShop] = useBackpack(state => [state.toggleShop])
+    const [toggleVault, openVault, closeVault] = useBackpack(state => [state.toggleVault, state.openVault, state.closeVault])
+    const [toggleShop, openShop, closeShop] = useBackpack(state => [state.toggleShop, state.openShop, state.closeShop])
 
     // Request Vault on btn Mount to already have data
     useEffect(() => {requestVault(); requestShop()}, [])
@@ -22,18 +22,27 @@ const BottomMenu = () => {
         }
         if ($state.isOpened && !$state.isOpenedVault) {
             openVault()
+            closeShop()
             return
         }
 
         toggleVault()
         toggleBackpack()
+        closeShop()
     }, [requestVault, toggleVault])
     const handleShop = useCallback(() => {
         const $state = useBackpack.getState()
         if (!$state.isOpenedShop) {
             requestShop()
         }
+        if ($state.isOpened && !$state.isOpenedShop) {
+            openShop()
+            closeVault()
+            return
+        }
         toggleShop()
+        toggleBackpack()
+        closeVault()
     }, [requestShop])
 
     const [map, mapHover] = useTexture(['/assets/backpack-icon.png', '/assets/backpack-icon-hover.png'])
