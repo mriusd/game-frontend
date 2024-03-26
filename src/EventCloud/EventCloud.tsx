@@ -9,6 +9,7 @@ import { useDroppedItem } from 'Scene/DroppedItem/useDroppedItem';
 import { useOtherFighter } from 'Scene/Fighter/OtherFighter/useOtherFighter';
 
 import { useWorkerWebSocket } from './hooks/useWorkerWebSocket';
+import { Inventory } from 'interfaces/inventory.interface';
 
 const EventCloudContext = React.createContext({});
 const socketUrl = process.env.REACT_APP_WS_URL; // ws://149.100.159.50:8080/ws
@@ -19,6 +20,7 @@ export const EventCloudProvider = React.memo(function EventCloudProvider({ child
 	const [setDroppedItems] = useDroppedItem(state => [state.setDroppedItems]);
 	const [updateBackpack, updateEquipment] = useCloud(state => [state.updateBackpack, state.updateEquipment]);
 	const [updateVault] = useCloud(state => [state.updateVault])
+	const [updateShop] = useCloud(state => [state.updateShop])
 	const [refreshFighterItems] = useCloud(state => [state.refreshFighterItems])
 	const [setChatLog] = useCloud(state => [state.setChatLog])
 	const [setPlayerList] = useCloud(state => [state.setPlayerList])
@@ -64,6 +66,10 @@ export const EventCloudProvider = React.memo(function EventCloudProvider({ child
 
 			case "vault_update":
 				handleUpdateVault(msg.vault);
+				break;
+
+			case "shop":
+				handleUpdateShop(msg.shop);
 				break;
 
 			case "user_fighters":
@@ -125,8 +131,12 @@ export const EventCloudProvider = React.memo(function EventCloudProvider({ child
 			setChatLog({ author, msg, msgType })
 		}
 
-		function handleUpdateVault(vault) {
+		function handleUpdateVault(vault: Inventory) {
 			updateVault(vault)
+		}
+
+		function handleUpdateShop(shop: Inventory) {
+			updateShop(shop)
 		}
 	}, [])
 

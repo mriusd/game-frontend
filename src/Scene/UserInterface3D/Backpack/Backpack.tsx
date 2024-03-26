@@ -10,13 +10,18 @@ import { useCore } from 'Scene/useCore'
 const Backpack = memo(function Backpack() {
     // console.log('[CPU CHECK]: Rerender <Backpack>')
     const [backpack, vault, equipmentSlots, equipment] = useCloud(state => [state.backpack, state.vault, state.equipmentSlots, state.equipment], shallow)
-    const [isOpened, isOpenedVault, cellSize] = useBackpack(state => [state.isOpened, state.isOpenedVault, state.cellSize])
+    const [shop] = useCloud(state => [state.shop], shallow)
+
+    const [cellSize] = useBackpack(state => [state.cellSize])
+    const [isOpened, isOpenedVault, isOpenedShop] = useBackpack(state => [state.isOpened, state.isOpenedVault, state.isOpenedShop])
     // TODO: change location for handler
     const [updateBackpackItemPosition, dropBackpackItem, unequipBackpackItem, equipBackpackItem] = useCloud(state => 
         [state.updateItemBackpackPosition, state.dropBackpackItem, state.unequipBackpackItem, state.equipBackpackItem]
     )
     // Vault Events
     const [updateItemVaultPosition, moveItemFromBackpackToVault, moveItemFromVaultToBackpack] = useCloud(state => [state.updateItemVaultPosition, state.moveItemFromBackpackToVault, state.moveItemFromVaultToBackpack])
+    // Shop
+    const [buyItemShop] = useCloud(state => [state.buyItemShop])
 
     const handlePointerEnter = () => {
         if (useBackpack.getState().isOpened) {
@@ -52,6 +57,25 @@ const Backpack = memo(function Backpack() {
                             events={[
                                 { id: 'ID_VAULT', type: 'update', handler: updateItemVaultPosition },
                                 { id: 'ID_BACKPACK', type: 'transferTo', handler: moveItemFromVaultToBackpack },
+                            ]}
+                        />
+                    ) : null
+                }
+                {
+                    shop ? 
+                    (
+                        <Slots
+                            id='ID_SHOP'
+                            type='backpack'
+                            isOpened={isOpenedShop}
+                            cellSize={cellSize}
+                            grid={shop.grid}
+                            items={shop.items}
+                            width={shop.grid.length}
+                            height={shop.grid[0].length}
+                            position={[-880, 333, 0]}
+                            events={[
+                                { id: '', type: 'doubleClick', handler: buyItemShop },
                             ]}
                         />
                     ) : null

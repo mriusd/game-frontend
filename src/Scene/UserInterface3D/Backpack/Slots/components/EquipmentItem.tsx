@@ -1,8 +1,6 @@
 import * as THREE from 'three'
 import { Plane } from "@react-three/drei"
 import { RefObject, useMemo, useRef } from "react"
-import { useBackpack } from "Scene/UserInterface3D/Backpack/useBackpack";
-import { shallow } from 'zustand/shallow'
 import { ThreeEvent } from '@react-three/fiber';
 import SlotModel from 'Scene/UserInterface3D/Backpack/Slots/components/SlotModel'
 import { memo } from 'react';
@@ -14,6 +12,7 @@ interface Props {
     onPointerEnter?: (e: ThreeEvent<PointerEvent>) => void
     onPointerMove?: (e: ThreeEvent<PointerEvent>) => void
     onPointerLeave?: (e: ThreeEvent<PointerEvent>) => void
+    onDoubleClick?: (e: ThreeEvent<PointerEvent>) => void
     mounted: boolean
     cellSize: number,
     slots: RefObject<{[key: number]: THREE.Mesh}>
@@ -25,6 +24,7 @@ const EquipmentItem = memo(function EquipmentItem({
     onPointerEnter, 
     onPointerMove, 
     onPointerLeave, 
+    onDoubleClick,
     mounted,
     cellSize,
     slots
@@ -90,6 +90,7 @@ const EquipmentItem = memo(function EquipmentItem({
                 onPointerMove={onPointerMove}
                 onPointerEnter={onPointerEnter}
                 onPointerLeave={onPointerLeave}
+                onDoubleClick={onDoubleClick}
             />
             {/* <ItemDescription item={item} type="equipment" /> */}
             <SlotModel position={[0, 0, 100]} ref={itemRef} scale={[itemScale, itemScale, itemScale]} item={item} />

@@ -17,7 +17,7 @@ import type { Equipment } from "interfaces/equipment.interface"
 import { useSlots } from "./useSlots"
 
 export type CellType = 'equipment' | 'backpack'
-export type eventType = 'update' | 'transferTo' | 'drop'
+export type eventType = 'update' | 'transferTo' | 'drop' | 'doubleClick'
 interface EventsType {
     id: string, type: eventType, handler: any
 }
@@ -152,9 +152,9 @@ export const Slots = ({
 
     const events = useMemo(() => {
         const transferTo: EventsType[] = []
-        const transferFrom: EventsType[] = []
         const update: EventsType[] = []
         const drop: EventsType[] = []
+        const doubleClick: EventsType[] = []
         _events.map(_ => {
             if (_.type === 'transferTo') {
                 transferTo.push(_)
@@ -165,8 +165,11 @@ export const Slots = ({
             if (_.type === 'drop') {
                 drop.push(_)
             }
+            if (_.type === 'doubleClick') {
+                doubleClick.push(_)
+            }
         })
-        return { transferTo, transferFrom, update, drop }
+        return { transferTo, doubleClick, update, drop }
     }, [_events])
 
     // Used for boundingBox
@@ -242,6 +245,8 @@ export const Slots = ({
         // console.log(pinnedItemEvent.current?.object, e.object)
         // If we Pinning already, we have to prevent click on another Item, otherwise -- error
         if (isItemPinned.current && e.object !== pinnedItemEvent.current.object) { return }
+        // Dont let Move if no Move events
+        if (!events.update.length && type !== 'equipment') { return }
         // 
         onItemPointerMove(e)
         setTimeout(() => {
@@ -271,6 +276,10 @@ export const Slots = ({
                 }
             }
         }, 0)
+    }
+    const onDoubleClick = (e: ThreeEvent<PointerEvent>) => {
+        const itemHash = e.object.parent.userData.item.itemHash
+        events.doubleClick.forEach(event => event.handler(itemHash))
     }
     // 
 
@@ -398,6 +407,8 @@ export const Slots = ({
                 // TODO: temporary
                 return false
             }
+            // Check if there is move event available
+            if (!events.update.length) { return true }
             const { x, y } = cell.userData.slot
             // Allow paste to the same cell, or a little touching the same cell 
             if (placeholderCells.current[id].find(_ => _.userData.slot.x === x && _.userData.slot.y === y)) return false
@@ -437,7 +448,7 @@ export const Slots = ({
             const id = backpackInsert.ref.userData.id
 
             // [EVENTS]: Update position
-            events.update.filter(e => e.id === id).forEach(e => e.handler(itemHash, { x: slot.x, z: slot.y }))
+            events.update.forEach(e => e.handler(itemHash, { x: slot.x, z: slot.y }))
             // [EVENTS]: Transfer To
             events.transferTo.filter(e => e.id === id).forEach(e => e.handler(itemHash, { x: slot.x, z: slot.y }))
         } 
@@ -615,6 +626,7 @@ export const Slots = ({
                                         onClick={onClick}
                                         onPointerMove={onItemPointerMove}
                                         onPointerLeave={onItemPointerLeave}
+                                        onDoubleClick={onDoubleClick}
                                         key={item.itemHash} 
                                         item={item} 
                                         mounted={mounted}
@@ -633,6 +645,7 @@ export const Slots = ({
                                         onClick={onClick}
                                         onPointerMove={onItemPointerMove}
                                         onPointerLeave={onItemPointerLeave}
+                                        onDoubleClick={onDoubleClick}
                                         key={item.itemHash} 
                                         item={item} 
                                         mounted={mounted}

@@ -20,6 +20,12 @@ export interface BackpackStoreInterface {
     closeVault: () => void
     toggleVault: () => void
 
+    // Shop
+    isOpenedShop: boolean
+    openShop: () => void
+    closeShop: () => void
+    toggleShop: () => void
+
     // Slots plane, stores Backpack data in <userData>, used by backpack drag system
     slots: RefObject<{[key: number]: THREE.Mesh}>
     equipmentSlots: RefObject<{[key: number]: THREE.Mesh}>
@@ -42,6 +48,11 @@ export const useBackpack = createWithEqualityFn<BackpackStoreInterface>((set, ge
     openVault: () => set({ isOpenedVault: true }),
     closeVault: () => set({ isOpenedVault: false }),
     toggleVault: () => set(state => ({ isOpenedVault: !state.isOpenedVault })),
+
+    isOpenedShop: false,
+    openShop: () => set({ isOpenedShop: true }),
+    closeShop: () => set({ isOpenedShop: false }),
+    toggleShop: () => set(state => ({ isOpenedShop: !state.isOpenedShop })),
 
     slots: createRef(),
     equipmentSlots: createRef(),

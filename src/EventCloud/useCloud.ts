@@ -55,6 +55,11 @@ export interface CloudStoreInterface {
     updateVault: (vault: Inventory) => void
     requestVault: () => void
 
+    shop: Inventory | null
+    updateShop: (vault: Inventory) => void
+    requestShop: () => void
+    buyItemShop: (itemHash: string) => void
+
 
     // User Events
     updateItemBackpackPosition: (itemHash: string, position: { x: number; z: number }) => void
@@ -161,6 +166,24 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
         get().sendJsonMessage({
             type: "get_vault",
             data: {}
+        });
+    },
+
+    shop: null,
+    updateShop(shop) {
+        console.log('[updateShop] ', shop);
+        set(() => ({ shop }))
+    },
+    requestShop() {
+        get().sendJsonMessage({
+            type: "get_shop",
+            data: { shopName: 'potion_girl' }
+        });
+    },
+    buyItemShop(itemHash) {
+        get().sendJsonMessage({
+            type: "buy_item",
+            data: { shopName: 'potion_girl', itemHash }
         });
     },
 
