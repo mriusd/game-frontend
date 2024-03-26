@@ -316,7 +316,7 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
     dropBackpackItem(itemHash, position) {
         get().sendJsonMessage({
             type: "drop_backpack_item",
-            data: { itemHash, position }
+            data: { itemHash, coordinates: position }
         });
     },
     equipBackpackItem(itemHash, slot) {
