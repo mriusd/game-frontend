@@ -4,6 +4,7 @@ import type { Damage } from "./damage.interface";
 import type { Direction } from "./direction.interface";
 import type { Skill } from "./skill.interface";
 import type { InventorySlot } from "./inventory.interface";
+import { Equipment } from "./equipment.interface";
 
 export interface Fighter {
     id: string;
@@ -45,7 +46,7 @@ export interface Fighter {
     direction: Direction;
 
     skills: Record<number, Skill>;
-    equipment: Record<number, InventorySlot | null>;
+    equipment: Equipment;
 
     lastChatMessage: string;
 }

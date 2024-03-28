@@ -9,7 +9,7 @@ import { useCore } from 'Scene/useCore'
 
 const Backpack = memo(function Backpack() {
     // console.log('[CPU CHECK]: Rerender <Backpack>')
-    const [backpack, vault, equipmentSlots, equipment] = useCloud(state => [state.backpack, state.vault, state.equipmentSlots, state.equipment], shallow)
+    const [backpack, vault, equipment] = useCloud(state => [state.backpack, state.vault, state.equipment], shallow)
     const [shop] = useCloud(state => [state.shop], shallow)
 
     const [cellSize] = useBackpack(state => [state.cellSize])
@@ -18,6 +18,10 @@ const Backpack = memo(function Backpack() {
     const [updateBackpackItemPosition, dropBackpackItem, unequipBackpackItem, equipBackpackItem] = useCloud(state => 
         [state.updateItemBackpackPosition, state.dropBackpackItem, state.unequipBackpackItem, state.equipBackpackItem]
     )
+
+    // Equipment Events
+    const [dropEquippedItem] = useCloud(state => [state.dropEquippedItem])
+
     // Vault Events
     const [updateItemVaultPosition, moveItemFromBackpackToVault, moveItemFromVaultToBackpack, dropVaultItem] = useCloud(state => [state.updateItemVaultPosition, state.moveItemFromBackpackToVault, state.moveItemFromVaultToBackpack, state.dropVaultItem])
     const [equipVaultItem, unequipVaultItem] = useCloud(state => [state.equipVaultItem, state.unequipVaultItem])
@@ -25,25 +29,10 @@ const Backpack = memo(function Backpack() {
     // Shop
     const [buyItemShop] = useCloud(state => [state.buyItemShop])
 
-    console.log(shop?.items, vault?.items, equipment, backpack?.items)
-
-    const handlePointerEnter = () => {
-        if (useBackpack.getState().isOpened) {
-            // @ts-expect-error
-            useCore.getState().setHoveredItems({ id: 'backpack' }, 'add')
-        }
-    }
-    const handlePointerLeave = () => {
-        // @ts-expect-error
-        useCore.getState().setHoveredItems({ id: 'backpack' }, 'remove')
-    }
-
     return (
         <group name='slots'>
             <group 
                 name='slots-backpack'
-                onPointerEnter={handlePointerEnter}
-                onPointerLeave={handlePointerLeave}
             >
                 {
                     vault ? 
@@ -103,20 +92,26 @@ const Backpack = memo(function Backpack() {
                         { id: '', type: 'drop', handler: dropBackpackItem },
                     ]}
                 />
-                <Slots
-                    id='ID_EQUIPMENT'
-                    type='equipment'
-                    isOpened={isOpened}
-                    cellSize={cellSize}
-                    items={equipment}
-                    equipmentSlots={equipmentSlots}
-                    position={[0, 400, 0]}
-                    maxWidth={450}
-                    events={[
-                        { id: 'ID_BACKPACK', type: 'transferTo', handler: unequipBackpackItem },
-                        { id: 'ID_VAULT', type: 'transferTo', handler: unequipVaultItem },
-                    ]}
-                />
+                {
+                    equipment ? (
+                        <Slots
+                            id='ID_EQUIPMENT'
+                            type='equipment'
+                            isOpened={isOpened}
+                            cellSize={cellSize}
+                            items={equipment.items}
+                            equipmentSlots={equipment.is_equipped}
+                            position={[0, 400, 0]}
+                            maxWidth={450}
+                            events={[
+                                { id: 'ID_BACKPACK', type: 'transferTo', handler: unequipBackpackItem },
+                                { id: 'ID_VAULT', type: 'transferTo', handler: unequipVaultItem },
+                                { id: '', type: 'drop', handler: dropEquippedItem },
+                            ]}
+                        />
+                    ) : null
+                }
+
             </group>
             
         </group>

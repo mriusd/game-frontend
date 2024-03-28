@@ -31,7 +31,7 @@ const Controls = React.memo(function Controls() {
     const boxRef = React.useRef<THREE.Mesh>()
 
     useFrame(({ raycaster, camera, pointer }) => {
-        if (useCore.getState().hoveredItems.length) { return }
+        // if (useCore.getState().hoveredItems.length) { return }
         // if (useBackpack.getState().isOpened) { return }
 
         raycaster.setFromCamera(pointer, camera)
@@ -66,7 +66,7 @@ const Controls = React.memo(function Controls() {
     }, [])
     const mouseMove = React.useCallback(() => {
         if (useFighter.getState().isMoving) { return }
-        if (useCore.getState().hoveredItems.length) { return }
+        // if (useCore.getState().hoveredItems.length) { return }
         const direction = calcDirection()
         if (!direction) { return }
         setDirection(direction)

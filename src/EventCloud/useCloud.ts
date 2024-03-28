@@ -1,10 +1,6 @@
 import { createWithEqualityFn } from 'zustand/traditional'
 import { shallow } from 'zustand/shallow';
 
-// For TEST, Then has to get from server
-import { equipment as equipmentSlots } from "interfaces/equipment.interface";
-// 
-
 import type { JsonValue } from './hooks/useWorkerWebSocket';
 import type { Equipment } from "interfaces/equipment.interface";
 import type { Fighter } from 'interfaces/fighter.interface';
@@ -46,10 +42,10 @@ export interface CloudStoreInterface {
 
     // Inventory
     backpack: Inventory | null
-    equipment: Record<number, InventorySlot> | null
-    equipmentSlots: Record<number, Equipment> | null
-    updateEquipment: (equipment: Record<number, InventorySlot>) => void
     updateBackpack: (backpack: Inventory) => void
+
+    equipment: Equipment | null
+    updateEquipment: (equipment: Equipment) => void
 
     vault: Inventory | null
     updateVault: (vault: Inventory) => void
@@ -61,16 +57,17 @@ export interface CloudStoreInterface {
 
     // User Events
     updateItemBackpackPosition: (itemHash: string, position: { x: number; z: number }) => void
-    dropBackpackItem: (itemHash: string, position: { x: number; z: number }) => void
+    dropBackpackItem: (itemHash: string, coordinate: { x: number; z: number }) => void
     unequipBackpackItem: (itemHash: string, position: { x: number; z: number }) => void
     equipBackpackItem: (itemHash: string, slot: number) => void
     buyItemShop: (itemHash: string) => void
-    dropVaultItem: (itemHash: string, position: { x: number; z: number }) => void
+    dropVaultItem: (itemHash: string, coordinate: { x: number; z: number }) => void
     moveItemFromBackpackToVault: (itemHash: string, position: { x: number; z: number }) => void
     moveItemFromVaultToBackpack: (itemHash: string, position: { x: number; z: number }) => void
     updateItemVaultPosition: (itemHash: string, position: { x: number; z: number }) => void
     unequipVaultItem: (itemHash: string, position: { x: number; z: number }) => void
     equipVaultItem: (itemHash: string, slot: number) => void
+    dropEquippedItem: (itemHash: string, coordinate: { x: number; z: number }) => void
 
     // Attack
     target: TargetType
@@ -156,7 +153,6 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
     // Inventory
     backpack: null,
     equipment: null,
-    equipmentSlots: equipmentSlots,
 
     vault: null,
     updateVault(vault) {
@@ -257,10 +253,16 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
             });
         }
     },
-    dropVaultItem(itemHash, position) {
+    dropVaultItem(itemHash, coordinates) {
         get().sendJsonMessage({
             type: "drop_vault_item",
-            data: { itemHash, coordinates: position }
+            data: { itemHash, coordinates }
+        });
+    },
+    dropEquippedItem(itemHash, coordinates) {
+        get().sendJsonMessage({
+            type: "drop_equipped_item",
+            data: { itemHash, coordinates }
         });
     },
 
@@ -313,14 +315,14 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
             });
         }
     },
-    dropBackpackItem(itemHash, position) {
+    dropBackpackItem(itemHash, coordinates) {
         get().sendJsonMessage({
             type: "drop_backpack_item",
-            data: { itemHash, coordinates: position }
+            data: { itemHash, coordinates }
         });
     },
     equipBackpackItem(itemHash, slot) {
-        // // Update State Localy
+        // Update State Localy
         // set(() => {
         //     const backpack = { ...get().backpack }
         //     const equipment = { ...get().equipment }
@@ -356,7 +358,7 @@ export const useCloud = createWithEqualityFn<CloudStoreInterface>((set, get) => 
         });
     },
     unequipBackpackItem(itemHash, position) {
-        // // Update State Localy
+        // Update State Localy
         // set(() => {
         //     const backpack = { ...get().backpack }
         //     const equipment = { ...get().equipment }
