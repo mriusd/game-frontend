@@ -64,7 +64,6 @@ const EquipmentItem = memo(function EquipmentItem({
         return new THREE.Vector3(x, y, z)
     }, [ item, slots.current, mounted ])
 
-    console.log(slotUserData, mounted)
     if (!slotUserData || !mounted) {
         return <></>
     }

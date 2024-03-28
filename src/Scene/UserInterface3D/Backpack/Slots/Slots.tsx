@@ -407,6 +407,7 @@ export const Slots = ({
             const isNotHovered = Object.values(pointerCell.current).every(_ => !_)
             if (isNotHovered && events.drop.length) {
                 const coordinates = useControls.getState().pointerCoordinate
+                handlePointerLeave()
                 events.drop.forEach(event => event.handler(itemHash, useCore.getState().worldCoordToMatrix(coordinates)))
                 return
             }
@@ -425,7 +426,6 @@ export const Slots = ({
             // [EVENTS]: Update position
             events.update.forEach(e => e.handler(itemHash, { x: slot.x, z: slot.y }))
             // [EVENTS]: Transfer To
-            console.log('transferTo', id, events.transferTo)
             events.transferTo.filter(e => e.id === id).forEach(e => e.handler(itemHash, { x: slot.x, z: slot.y }))
         } 
         // If click on Equipment cell
@@ -433,7 +433,6 @@ export const Slots = ({
             const slot = equipmentInsert.ref.userData.slot
             const id = equipmentInsert.ref.userData.id
             // [EVENTS]: Transfer To (BUT FOR EQUIPMENT TYPE SLOTS/provide inner data to handler)
-            console.log('Equip', 'transferTo', id, events.transferTo)
             events.transferTo.filter(e => e.id === id).forEach(e => e.handler(itemHash, slot))
         }
     }, [events, id])
