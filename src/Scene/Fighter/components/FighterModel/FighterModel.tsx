@@ -11,9 +11,8 @@ import { useEquimentPoses, applyBinder, removeBinder } from './useEquipmentPoses
 
 interface Props { model: THREE.Group | THREE.Mesh, fighter: Fighter, children?: any, onPointerMove?: (e: any) => void, onPointerLeave?: (e: any) => void, onPointerDown?: (e: any) => void, isMove: boolean }
 const FighterModel = React.memo(React.forwardRef(function FighterModel({ model: fighterModel, fighter, children, onPointerMove, onPointerLeave, onPointerDown, isMove }: Props, ref) {
-
     // Equipment we take on Fighter
-    const equipment = React.useMemo(() => fighter.equipment, [fighter])
+    const equipment = React.useMemo(() => fighter.equipment.items, [fighter])
 
     const modelRef = React.useRef()
     // Forward ref

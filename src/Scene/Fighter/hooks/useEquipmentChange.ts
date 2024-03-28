@@ -7,10 +7,10 @@ export const useEquipmentChange = (fighter: Fighter, callback: (changes: ReturnT
     const lastEquipment = React.useRef<Record<number, InventorySlot>>({})
     React.useEffect(() => {
         if (fighter?.equipment) {
-            const changes = getChanges(lastEquipment.current, fighter.equipment)
+            const changes = getChanges(lastEquipment.current, fighter.equipment.items)
             if (changes.addedSlots.length || changes.removedSlots.length || changes.addedEquipment.length) {
                 callback(changes)
-                lastEquipment.current = fighter.equipment
+                lastEquipment.current = fighter.equipment.items
             }
         }
     }, [fighter])

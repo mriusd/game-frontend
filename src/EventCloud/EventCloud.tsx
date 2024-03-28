@@ -116,6 +116,7 @@ export const EventCloudProvider = React.memo(function EventCloudProvider({ child
 		function handleUpdateBackpack(newBackpack, newEquipment) {
 			updateBackpack(newBackpack);
 			updateEquipment(newEquipment)
+			console.log("PING new", newBackpack, newEquipment)
 		}
 
 		function handleUserFighters(userFighters) { 

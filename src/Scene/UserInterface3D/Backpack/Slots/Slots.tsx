@@ -5,15 +5,11 @@ import { useUi } from "../../useUI"
 import { useFighter } from "Scene/Fighter/useFighter"
 import { getCoordInUISpace } from "Scene/utils/getCoordInUiSpace"
 import { getMeshDimensions } from "Scene/utils/getMeshDimensions"
-import { WorldCoordinate } from "interfaces/coordinate.interface"
 import { Flex, Box } from "@react-three/flex"
 import { Plane, Text } from "@react-three/drei"
 import BackpackItem from "./components/BackpackItem"
 import EquipmentItem from "./components/EquipmentItem"
 import { getSlotModel } from "./utils/getSlotModel"
-
-import type { Equipment } from "interfaces/equipment.interface"
-
 import { useSlots } from "./useSlots"
 
 export type CellType = 'equipment' | 'backpack'
@@ -21,8 +17,6 @@ export type eventType = 'update' | 'transferTo' | 'drop' | 'doubleClick'
 interface EventsType {
     id: string, type: eventType, handler: any
 }
-interface SlotCoordinate { x: number, z: number }
-
 function init(state: MutableRefObject<any>, key?: string, value?: any) {
     if (!state.current) {
         state.current = {}
@@ -59,7 +53,7 @@ interface Props {
 
     grid?: boolean[][]
     items: Map<string, InventorySlot> | Record<number, InventorySlot>
-    equipmentSlots?: Record<number, Equipment>
+    equipmentSlots?: Record<number, boolean>
 
     // events?: {
     //     updateItemPosition?: { id: string, type: eventType, handler: (itemHash: string, slot: SlotCoordinate) => void }
@@ -106,14 +100,6 @@ export const Slots = ({
     // Getting Non-reactive Scene data
     const get = useThree(state => state.get)
 
-    // console.log('items', id, _items)
-
-    // const isItemPinned = React.useRef<boolean>(false)
-    // const pinnedItemEvent = React.useRef<ThreeEvent<PointerEvent> | null>(null)
-    // const isItemHovered = React.useRef<boolean>(false)
-    // const hoveredItemEvent = React.useRef<ThreeEvent<PointerEvent> | null>(null)
-    // const hoveredItemModel = React.useRef<THREE.Object3D | null>(null)
-
     const pinnedItemEvent = useSlots(state => state.pinnedItemEvent)
     const isItemPinned = useSlots(state => state.isItemPinned)
     const isItemHovered = useSlots(state => state.isItemHovered)
@@ -121,14 +107,7 @@ export const Slots = ({
     const hoveredItemModel = useSlots(state => state.hoveredItemModel)
     const pinnedSlotsId = useSlots(state => state.pinnedSlotsId)
 
-    // // Cell collisions
-    // const pointerCell = React.useRef<THREE.Mesh | null>(null)
-    // const placeholderCells = React.useRef<THREE.Mesh[]>([])
-    // const currentPointerCells = React.useRef<THREE.Mesh[]>([])
-    // const lastPointerCells = React.useRef<THREE.Mesh[]>([])
-    // // For Insert, if not null, means can be insert
-    // const cellToInsert = React.useRef<{ type: CellType, ref: THREE.Mesh } | null>(null)
-
+    // Cell collisions
     const pointerCell = useSlots(state => state.pointerCell)
     const placeholderCells = useSlots(state => state.placeholderCells)
     const currentPointerCells = useSlots(state => state.currentPointerCells)
@@ -188,8 +167,13 @@ export const Slots = ({
     // Transform items to Array for rendering
     const items = React.useMemo(() => {
         if (!_items) { return }
+        // if (type === 'equipment') {
+        //     // return Object.values(_items).filter(_ => !!_).map(slot => ({ ..._items[slot], slot }))
+        //     console.log('_items --->', _items)
+        //     return []
+        // }
         return Object.keys(_items).map(slot => ({ ..._items[slot], slot }))
-    }, [_items])
+    }, [_items, type])
 
     const slotsRef =  React.useRef<{[key: number]: THREE.Mesh}>({})
     const setRef = React.useCallback((ref: any, x: number, y?: number) => {
@@ -450,6 +434,7 @@ export const Slots = ({
             // [EVENTS]: Update position
             events.update.forEach(e => e.handler(itemHash, { x: slot.x, z: slot.y }))
             // [EVENTS]: Transfer To
+            console.log('transferTo', id, events.transferTo)
             events.transferTo.filter(e => e.id === id).forEach(e => e.handler(itemHash, { x: slot.x, z: slot.y }))
         } 
         // If click on Equipment cell
@@ -457,6 +442,7 @@ export const Slots = ({
             const slot = equipmentInsert.ref.userData.slot
             const id = equipmentInsert.ref.userData.id
             // [EVENTS]: Transfer To (BUT FOR EQUIPMENT TYPE SLOTS/provide inner data to handler)
+            console.log('Equip', 'transferTo', id, events.transferTo)
             events.transferTo.filter(e => e.id === id).forEach(e => e.handler(itemHash, slot))
         }
     }, [events, id])
@@ -581,33 +567,33 @@ export const Slots = ({
                         ) :
                         (
                             <Flex name='equipment' position={position as any} maxWidth={maxWidth} flexDir="row" flexWrap="wrap">
-                                { [...Object.values(equipmentSlots)].sort((a,b) => b.height - a.height).map((_, i) => (
-                                    <Box name='row' key={i} margin={8} centerAnchor>
+                                { [...Object.keys(equipmentSlots)]/*.sort((a,b) => b.height - a.height)*/.map((key) => (
+                                    <Box name='row' key={key} margin={8} centerAnchor>
                                         <Plane 
                                             name='slot-equipment'
-                                            ref={(r) => setRef(r, _.slot)}
+                                            ref={(r) => setRef(r, +key)}
                                             userData={{
                                                 id,
                                                 type: 'equipment',
-                                                slot: _.slot,
+                                                slot: +key,
                                                 colors: {
-                                                    common: i % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT,
-                                                    insert_allowed: i % 2 === 0 ? colors.INSERT_ALLOWED_DARK : colors.INSERT_ALLOWED_LIGHT,
-                                                    insert_disallowed: i % 2 === 0 ? colors.INSERT_DISALLOWED_DARK : colors.INSERT_DISALLOWED_LIGHT,
-                                                    last_placeholder: i % 2 === 0 ? colors.LAST_PLACEHOLDER_DARK : colors.LAST_PLACEHOLDER_LIGHT,
+                                                    common: +key % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT,
+                                                    insert_allowed: +key % 2 === 0 ? colors.INSERT_ALLOWED_DARK : colors.INSERT_ALLOWED_LIGHT,
+                                                    insert_disallowed: +key % 2 === 0 ? colors.INSERT_DISALLOWED_DARK : colors.INSERT_DISALLOWED_LIGHT,
+                                                    last_placeholder: +key % 2 === 0 ? colors.LAST_PLACEHOLDER_DARK : colors.LAST_PLACEHOLDER_LIGHT,
                                                 },
-                                                allowedItemType: _.type,
-                                                itemWidth: _.width,
-                                                itemHeight: _.height
+                                                allowedItemType: +key,
+                                                itemWidth: 2,
+                                                itemHeight: 2
                                             }}
-                                            args={[cellSize * _.width, cellSize * _.height, 1]}
+                                            args={[cellSize * 2, cellSize * 2, 1]}
                                         >
-                                            <meshBasicMaterial color={i % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT} />
+                                            <meshBasicMaterial color={+key % 2 === 0 ? colors.COMMON_DARK : colors.COMMON_LIGHT} />
                                             <Text
                                                 // TODO: mb temporary 
-                                                visible={ !items.find(__ => +__.slot === +_.slot)  } 
-                                                fontSize={4 * _.height}
-                                            >{ _.type.toUpperCase() }</Text>
+                                                visible={ !items.find(__ => +__.slot === +key)  } 
+                                                fontSize={4 * 2}
+                                            >{ +key }</Text>
                                         </Plane>
                                     </Box>
                                 )) }
