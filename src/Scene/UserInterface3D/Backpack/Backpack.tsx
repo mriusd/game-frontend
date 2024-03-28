@@ -29,25 +29,10 @@ const Backpack = memo(function Backpack() {
     // Shop
     const [buyItemShop] = useCloud(state => [state.buyItemShop])
 
-    console.log(shop?.items, vault?.items, equipment, backpack?.items)
-
-    const handlePointerEnter = () => {
-        if (useBackpack.getState().isOpened) {
-            // @ts-expect-error
-            useCore.getState().setHoveredItems({ id: 'backpack' }, 'add')
-        }
-    }
-    const handlePointerLeave = () => {
-        // @ts-expect-error
-        useCore.getState().setHoveredItems({ id: 'backpack' }, 'remove')
-    }
-
     return (
         <group name='slots'>
             <group 
                 name='slots-backpack'
-                onPointerEnter={handlePointerEnter}
-                onPointerLeave={handlePointerLeave}
             >
                 {
                     vault ? 

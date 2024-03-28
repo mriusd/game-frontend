@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useCallback, useLayoutEffect, useMemo, useRef } from "react"
+import React, { MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react"
 import type { InventorySlot } from "interfaces/inventory.interface"
 import { ThreeEvent, useFrame, useThree } from "@react-three/fiber"
 import { useUi } from "../../useUI"
@@ -11,6 +11,9 @@ import BackpackItem from "./components/BackpackItem"
 import EquipmentItem from "./components/EquipmentItem"
 import { getSlotModel } from "./utils/getSlotModel"
 import { useSlots } from "./useSlots"
+import { useControls } from "Scene/Controls/useControls"
+import { worldCoordToMatrix } from "Scene/utils/worldCoordToMatrix"
+import { useCore } from "Scene/useCore"
 
 export type CellType = 'equipment' | 'backpack'
 export type eventType = 'update' | 'transferTo' | 'drop' | 'doubleClick'
@@ -55,22 +58,11 @@ interface Props {
     items: Map<string, InventorySlot> | Record<number, InventorySlot>
     equipmentSlots?: Record<number, boolean>
 
-    // events?: {
-    //     updateItemPosition?: { id: string, type: eventType, handler: (itemHash: string, slot: SlotCoordinate) => void }
-    //     dropItem?: { id: string, handler: (itemHash: string, coordinate: WorldCoordinate) => void }
-    //     equipItem?: { id: string, handler: (itemHash: string, slot: number) => void }
-    //     unequipItem?: { id: string, handler: (itemHash: string, slot: SlotCoordinate) => void }
-    // }
     events: EventsType[]
-    // updateItemPosition?: (itemHash: string, slot: SlotCoordinate) => void
-    // dropItem?: (itemHash: string, coordinate: WorldCoordinate) => void
-    // equipItem?: (itemHash: string, slot: number) => void
-    // unequipItem?: (itemHash: string, slot: SlotCoordinate) => void
 
     onPointerEnter?: (e: ThreeEvent<PointerEvent>) => void
     onPointerMove?: (e: ThreeEvent<PointerEvent>) => void
     onPointerLeave?: (e: ThreeEvent<PointerEvent>) => void
-
 }
 export const Slots = ({ 
     id,
@@ -414,8 +406,8 @@ export const Slots = ({
             // Drop if nothing hovered
             const isNotHovered = Object.values(pointerCell.current).every(_ => !_)
             if (isNotHovered && events.drop.length) {
-                events.drop.forEach(event => event.handler(itemHash, useFighter.getState().fighter.coordinates))
-                // dropItem(itemHash, useFighter.getState().fighter.coordinates)
+                const coordinates = useControls.getState().pointerCoordinate
+                events.drop.forEach(event => event.handler(itemHash, useCore.getState().worldCoordToMatrix(coordinates)))
                 return
             }
 
@@ -423,7 +415,6 @@ export const Slots = ({
             item.position.copy(item.userData.currentPosition)
             return
         }
-
         
 
         // If click on Backpack cell
@@ -518,12 +509,25 @@ export const Slots = ({
         }
     })
 
+    // Control Hover on Cells
+    const handlePointerEnter = () => {
+        if (isOpened) {
+            // @ts-expect-error
+            useCore.getState().setHoveredItems({ id: 'slot-'+id }, 'add')
+        }
+    }
+    const handlePointerLeave = () => {
+        // @ts-expect-error
+        useCore.getState().setHoveredItems({ id: 'slot-'+id }, 'remove')
+    }
+    useEffect(() => void !isOpened && handlePointerLeave(), [isOpened])
+
     return (
         <group 
             visible={isOpened} 
-            onPointerEnter={(e) => onPointerEnter && onPointerEnter(e)} 
-            onPointerMove={(e) => onPointerMove && onPointerMove(e)} 
-            onPointerLeave={(e) => onPointerLeave && onPointerLeave(e)}
+            onPointerEnter={(e) => { onPointerEnter && onPointerEnter(e); handlePointerEnter() }} 
+            onPointerMove={(e) => { onPointerMove && onPointerMove(e); handlePointerEnter() }} 
+            onPointerLeave={(e) => { onPointerLeave && onPointerLeave(e); handlePointerLeave() }}
         >
 
             <group ref={backpackRef} /*position={Position is changing based on viewport size}*/>
